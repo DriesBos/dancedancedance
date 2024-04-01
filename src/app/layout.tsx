@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.sass';
+import Header from '@/components/Header/Header';
 
 export const metadata: Metadata = {
   title: 'Dries Bos',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }
