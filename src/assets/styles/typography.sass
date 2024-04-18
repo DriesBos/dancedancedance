@@ -1,0 +1,45 @@
+// https://www.madebymike.com.au/writing/fluid-type-calc-examples/
+// https://type-scale.com/
+html
+  font-size: 16px
+
+@media screen and (min-width: 800px)
+  html
+    font-size: calc(16px + 4 * ((100vw - 800px) / 600))
+
+@media screen and (min-width: 1400px)
+  html
+    font-size: 20px
+
+h1, h2, h3, p
+  overflow-wrap: normal
+  word-wrap: normal
+  word-break: normal
+  hyphens: normal
+
+h1, h2, h3, p, a, a:link, a:visited, a:hover, a:active, span, input
+  font-family: "Sohne Buch", Helvetica, Arial, sans-serif
+  font-size: 1rem
+  line-height: 1.6
+  color: currentColor
+  font-style: normal
+  font-weight: normal
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  text-rendering: geometricPrecision
+
+a
+  text-decoration: none
+  cursor: none
+
+.uppercase, .uppercase p
+  text-transform: uppercase
+
+.ellipsis
+  overflow: hidden
+  min-width: 0
+  text-overflow: ellipsis
+  h1, span, p, a
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis

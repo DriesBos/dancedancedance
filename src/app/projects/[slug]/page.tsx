@@ -1,7 +1,7 @@
-export default function ProjectPage() {
+export default function ProjectPage({ params }: { params: any }) {
   return (
     <main>
-      <h1>PROJECT</h1>
+      <h1>Project {params.slug}</h1>
     </main>
   );
 }
