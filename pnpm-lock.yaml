@@ -11,6 +11,9 @@ importers:
       '@next/font':
         specifier: ^14.2.2
         version: 14.2.2(next@14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.75.0))
+      '@storyblok/react':
+        specifier: ^3.0.10
+        version: 3.0.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       next:
         specifier: 14.1.4
         version: 14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.75.0)
@@ -169,6 +172,15 @@ packages:
 
   '@rushstack/eslint-patch@1.10.2':
     resolution: {integrity: sha512-hw437iINopmQuxWPSUEvqE56NCPsiU8N4AYtfHmJFckclktzK9YQJieD3XkDCDH4OjL+C7zgPUh73R/nrcHrqw==}
+
+  '@storyblok/js@3.0.8':
+    resolution: {integrity: sha512-JY+abbswBId84Ubr0yRwNpq5Klf9546Ia2Qs1pn6en5Trz8o6EcBJIwxvR6evjJ0Vp2cLKT7MV1yfGLAtnzycA==}
+
+  '@storyblok/react@3.0.10':
+    resolution: {integrity: sha512-7cyUdCoT/kTXFJLojPhqhguvcTjvIizPh3wf90Q99zrD7quMALX9E6Ag/gSGkyWdMTQ7Wcbh2zEQaZxEDx0FRg==}
+    peerDependencies:
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
 
   '@swc/helpers@0.5.2':
     resolution: {integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==}
@@ -1193,6 +1205,9 @@ packages:
     resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
     engines: {node: '>=0.10.0'}
 
+  storyblok-js-client@6.7.2:
+    resolution: {integrity: sha512-5+cCZQhvIPSP5fin7jMUyyiAfV3FSbhH2q0YmDpb8NqxsY0pog6r+igHshVXNHed5yB5AZcVn0Mduao0X1MdBA==}
+
   streamsearch@1.1.0:
     resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
     engines: {node: '>=10.0.0'}
@@ -1461,6 +1476,16 @@ snapshots:
     optional: true
 
   '@rushstack/eslint-patch@1.10.2': {}
+
+  '@storyblok/js@3.0.8':
+    dependencies:
+      storyblok-js-client: 6.7.2
+
+  '@storyblok/react@3.0.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      '@storyblok/js': 3.0.8
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
 
   '@swc/helpers@0.5.2':
     dependencies:
@@ -2706,6 +2731,8 @@ snapshots:
   slash@3.0.0: {}
 
   source-map-js@1.2.0: {}
+
+  storyblok-js-client@6.7.2: {}
 
   streamsearch@1.1.0: {}
 

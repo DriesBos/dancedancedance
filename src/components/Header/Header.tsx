@@ -1,9 +1,17 @@
-import './Header.module.sass';
+import Link from 'next/link';
+import './Header.sass';
 
 export default function Header() {
   return (
-    <header className="header">
-      <h1>Header</h1>
-    </header>
+    <div className="header">
+      <ul>
+        <li>
+          <Link href="/">Home</Link>
+        </li>
+        <li>
+          <Link href="/about">About</Link>
+        </li>
+      </ul>
+    </div>
   );
 }
