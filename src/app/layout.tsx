@@ -12,7 +12,7 @@ import Header from '@/components/Header/Header';
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
 export const metadata: Metadata = {
-  title: 'Dries Bos',
+  title: 'Dance Dance Dance',
   description: 'Portfolio Dries Bos',
 };
 
