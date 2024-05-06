@@ -11,7 +11,7 @@ export default function Header() {
     <div className="header">
       <ul>
         <li>
-          <Link href="/" className={path.startsWith('/') ? 'active' : ''}>
+          <Link href="/" className={path === '/' ? 'active' : ''}>
             Home
           </Link>
         </li>

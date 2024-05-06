@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@next/font':
-        specifier: ^14.2.2
-        version: 14.2.2(next@14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.75.0))
       '@storyblok/react':
         specifier: ^3.0.10
         version: 3.0.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -94,11 +91,6 @@ packages:
 
   '@next/eslint-plugin-next@14.1.4':
     resolution: {integrity: sha512-n4zYNLSyCo0Ln5b7qxqQeQ34OZKXwgbdcx6kmkQbywr+0k6M3Vinft0T72R6CDAcDrne2IAgSud4uWCzFgc5HA==}
-
-  '@next/font@14.2.2':
-    resolution: {integrity: sha512-I4GLq5ZsMJHO+WtV3gNhcspvZsbuteUmV56wC28hEsUbtlEawTI0EW4GNVJ8xdK6eRjua7unAt7zAXDgtOvxlw==}
-    peerDependencies:
-      next: '*'
 
   '@next/swc-darwin-arm64@14.1.4':
     resolution: {integrity: sha512-ubmUkbmW65nIAOmoxT1IROZdmmJMmdYvXIe8211send9ZYJu+SqxSnJM4TrPj9wmL6g9Atvj0S/2cFmMSS99jg==}
@@ -354,8 +346,8 @@ packages:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
 
-  caniuse-lite@1.0.30001610:
-    resolution: {integrity: sha512-QFutAY4NgaelojVMjY63o6XlZyORPaLfyMnsl3HgnWdJUcX6K0oaJymHjH8PT5Gk7sTm8rvC/c5COUQKXqmOMA==}
+  caniuse-lite@1.0.30001612:
+    resolution: {integrity: sha512-lFgnZ07UhaCcsSZgWW0K5j4e69dK1u/ltrL9lTUiFOwNHs12S3UMIEYgBV0Z6C6hRDev7iRnMzzYmKabYdXF9g==}
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -1205,8 +1197,8 @@ packages:
     resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
     engines: {node: '>=0.10.0'}
 
-  storyblok-js-client@6.7.2:
-    resolution: {integrity: sha512-5+cCZQhvIPSP5fin7jMUyyiAfV3FSbhH2q0YmDpb8NqxsY0pog6r+igHshVXNHed5yB5AZcVn0Mduao0X1MdBA==}
+  storyblok-js-client@6.7.3:
+    resolution: {integrity: sha512-fBBxtyju6xtFYgAgoWBaU7WagB8M6wN+N+A3UAhZtAPW8yZmlbr3nZu26ErYIbSLaeueyFlcNrI4Kag+Kszsdw==}
 
   streamsearch@1.1.0:
     resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
@@ -1429,10 +1421,6 @@ snapshots:
     dependencies:
       glob: 10.3.10
 
-  '@next/font@14.2.2(next@14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.75.0))':
-    dependencies:
-      next: 14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.75.0)
-
   '@next/swc-darwin-arm64@14.1.4':
     optional: true
 
@@ -1479,7 +1467,7 @@ snapshots:
 
   '@storyblok/js@3.0.8':
     dependencies:
-      storyblok-js-client: 6.7.2
+      storyblok-js-client: 6.7.3
 
   '@storyblok/react@3.0.10(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
@@ -1701,7 +1689,7 @@ snapshots:
 
   callsites@3.1.0: {}
 
-  caniuse-lite@1.0.30001610: {}
+  caniuse-lite@1.0.30001612: {}
 
   chalk@4.1.2:
     dependencies:
@@ -2476,7 +2464,7 @@ snapshots:
       '@next/env': 14.1.4
       '@swc/helpers': 0.5.2
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001610
+      caniuse-lite: 1.0.30001612
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.2.0
@@ -2732,7 +2720,7 @@ snapshots:
 
   source-map-js@1.2.0: {}
 
-  storyblok-js-client@6.7.2: {}
+  storyblok-js-client@6.7.3: {}
 
   streamsearch@1.1.0: {}
 

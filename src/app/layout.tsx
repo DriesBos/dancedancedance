@@ -4,7 +4,7 @@ import '@/assets/styles/form-reset.css';
 import '@/assets/styles/typography.sass';
 import '@/assets/styles/transitions.sass';
 import '@/assets/styles/global.sass';
-import localFont from '@next/font/local';
+import localFont from 'next/font/local';
 import { storyblokInit, apiPlugin } from '@storyblok/react/rsc';
 import StoryblokProvider from '@/components/StoryblokProvider';
 import Header from '@/components/Header/Header';
@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <StoryblokProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning={true}>
         <body className={`body ${myFont.className}`}>
           <Header />
           {children}
