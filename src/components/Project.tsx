@@ -5,7 +5,7 @@ interface Props {
 }
 
 const Project = ({ blok }: Props) => (
-  <main {...storyblokEditable(blok)}>
+  <div className="container container-Project" {...storyblokEditable(blok)}>
     <h1>PROJECT</h1>
     {blok.body.map(
       (
@@ -14,7 +14,7 @@ const Project = ({ blok }: Props) => (
         <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
       )
     )}
-  </main>
+  </div>
 );
 
 export default Project;

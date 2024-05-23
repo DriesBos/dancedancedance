@@ -3,7 +3,7 @@ interface Props {
 }
 
 const BlokFilter = ({ blok }: { blok: any }) => (
-  <div>
+  <div className="blok blok-Filter">
     <p>BLOK FILTER</p>
   </div>
 );

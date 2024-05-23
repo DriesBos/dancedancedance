@@ -1,9 +1,10 @@
 interface Props {
-  blok: any;
+  blok?: any;
+  float?: boolean;
 }
 
-const BlokHead = ({ blok }: Props) => (
-  <div>
+const BlokHead = ({ blok, float }: Props) => (
+  <div className={`blok blok-Head ${float ? 'float' : ''}`}>
     <p>BLOK HEAD</p>
   </div>
 );
