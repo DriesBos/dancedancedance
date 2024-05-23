@@ -1,14 +1,14 @@
 import { storyblokEditable } from '@storyblok/react/rsc';
+import Markdown from 'marked-react';
 
 interface Props {
   blok: any;
 }
 
 const ColumnText = ({ blok }: Props) => {
-  // console.log('COLUMN TEXT', blok);
   return (
     <div {...storyblokEditable(blok)}>
-      <p>{blok.text}</p>
+      <Markdown>{blok.text}</Markdown>;
     </div>
   );
 };
