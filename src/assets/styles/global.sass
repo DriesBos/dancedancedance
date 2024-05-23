@@ -1,6 +1,32 @@
+html, body
+  position: relative
+  width: 100%
+  min-height: 100%
+  
 body
   background: var(--theme-bg)
   color: var(--theme-type)
+  display: flex
+  justify-content: center
+  align-items: flex-start
+  &.twoD
+    padding-top: calc(15rem + 10vmin)
+    padding-bottom: 6rem
+    border: 2px solid red
+  &.threeD
+    border: 2px solid blue
 
 .container
   background: var(--theme-container)
+
+.blok
+  border: 1px solid var(--theme-type)
+  padding: var(--blok-padding)
+  display: flex
+  flex-direction: row
+  row-wrap: wrap
+
+  & > .column
+    flex-grow: 1
+    min-width: 50%
+

@@ -5,9 +5,7 @@ interface Props {
 }
 
 const ColumnImage = ({ blok }: Props) => (
-  <div {...storyblokEditable(blok)}>
-    <p>COLUMN IMAGE</p>
-  </div>
+  <div className="column column-Image" {...storyblokEditable(blok)}></div>
 );
 
 export default ColumnImage;

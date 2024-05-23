@@ -7,7 +7,7 @@ interface Props {
 
 const ColumnText = ({ blok }: Props) => {
   return (
-    <div {...storyblokEditable(blok)}>
+    <div className="column column-Text" {...storyblokEditable(blok)}>
       <Markdown>{blok.text}</Markdown>;
     </div>
   );

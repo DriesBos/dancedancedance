@@ -1,0 +1,50 @@
+/* 
+// $breakpoint-mobile: 768px
+// $breakpoint-tablet: 1024px
+// $breakpoint-desktop: 1400px
+
+// Z-INDEX
+// $z-layerOne: 100 // Stars and Back-Menu
+// $z-layerTwo: 200 // Landscape
+// $z-layerThree: 300 // Clouds + Footer
+// $z-layerFour: 400 // Front-Menu
+// $z-layerFive: 500 // Modals
+// $z-mouse: 999 */
+
+/* TYPE */
+/* $type-size-p: 1rem;
+$type-lineheight-p: 1.47em; */
+/* // $type-size-h1: 1.44rem
+// $lineheight-h1: 1.111em
+// $lineheight-serif-p: 1.47em
+// $lineheight-serif-h1: 1.111em */
+
+/* COLORS */
+
+/* FONTS */
+/* $sans-serif: 'stype', Helvetica, Arial, sans-serif;
+$font-small: .75rem; */
+
+/* SPACING */
+/* $btn-padding: 0.375rem; */
+
+/* TRANSITIONS */
+/* $transition-hover: .33s ease;
+$transition-img: .33s ease-in;
+$transition-general: .33s ease-in-out;
+$transition-bg: .16s ease-in-out; */
+
+:root {
+  /* colors */
+  --color-black: #000000;
+  --color-white: white;
+  --color-neongreen: #b6fff5;
+
+  /* theme */
+  --theme-bg: var(--color-black);
+  --theme-container: var(--color-black);
+  --theme-type: var(--color-neongreen);
+
+  /* container & bloks */
+  --blok-padding: 15px 25px;
+}
