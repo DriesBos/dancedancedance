@@ -4,12 +4,14 @@ interface Props {
   blok: any;
 }
 
-const Blok = ({ blok }: Props) => (
-  <div className="blok" {...storyblokEditable(blok)}>
-    {blok.body.map((nestedBlok: any) => (
-      <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
-    ))}
-  </div>
-);
+const Blok = ({ blok }: Props) => {
+  return (
+    <div className="blok" {...storyblokEditable(blok)}>
+      {blok.body.map((nestedBlok: any) => (
+        <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
+      ))}
+    </div>
+  );
+};
 
 export default Blok;

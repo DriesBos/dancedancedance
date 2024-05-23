@@ -45,6 +45,9 @@ $transition-bg: .16s ease-in-out; */
   --theme-container: var(--color-black);
   --theme-type: var(--color-neongreen);
 
+  /* spacing */
+  --border-width: 2px;
+
   /* container & bloks */
   --blok-padding: 15px 25px;
 }
