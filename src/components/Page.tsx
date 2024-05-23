@@ -1,12 +1,16 @@
 import { storyblokEditable, StoryblokComponent } from '@storyblok/react/rsc';
 
-const Project = ({ blok }) => (
+interface Props {
+  blok: any;
+}
+
+const Page = ({ blok }: Props) => (
   <main {...storyblokEditable(blok)}>
-    <h1>PROJECT COMPONENT</h1>
-    {blok.body.map((nestedBlok) => (
+    <p>PAGE COMPONENT</p>
+    {blok.body.map((nestedBlok: any) => (
       <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
     ))}
   </main>
 );
 
-export default Project;
+export default Page;

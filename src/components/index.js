@@ -1,14 +1,16 @@
 /** Import your StoryBlok components */
 import Page from './Page';
 import Project from './Project';
-import Teaser from './Teaser';
-import Feature from './Feature';
-import Grid from './Grid';
+import Blok from './Blok';
+import ColumnEmpty from './ColumnEmpty';
+import ColumnText from './ColumnText';
+import ColumnImage from './ColumnImage';
 
 const components = {
-  feature: Feature,
-  grid: Grid,
-  teaser: Teaser,
+  blok: Blok,
+  columnempty: ColumnEmpty,
+  columntext: ColumnText,
+  columnimage: ColumnImage,
   page: Page,
   project: Project,
 };

@@ -17,8 +17,10 @@ export default async function Page({ params }) {
     { cache: 'no-store' }
   );
 
+  console.log('CONSOLE DATA', data.story.content);
+
   return (
-    <div className="mb-40">
+    <div>
       <h1>SLUG PAGE</h1>
       <StoryblokStory story={data.story} bridgeOptions={{}} />
     </div>

@@ -3,6 +3,7 @@ import StoryblokStory from '@storyblok/react/story';
 
 export default async function Home() {
   const { data } = await fetchData();
+  console.log('DATA', data.story);
 
   return (
     <div>
