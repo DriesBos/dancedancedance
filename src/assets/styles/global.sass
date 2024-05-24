@@ -10,21 +10,25 @@ body
   justify-content: center
   align-items: flex-start
   &.twoD
+    // border: 2px solid red
+  &.threeD
     padding-top: calc(15rem + 10vmin)
     padding-bottom: 6rem
-    border: 2px solid red
-  &.threeD
-    border: 2px solid blue
+    // border: 2px solid blue
 
 .container
+  display: flex
+  flex-direction: column
+  width: 100%
   background: var(--theme-container)
+  border: 1px solid red
 
 .blok
   border: 1px solid var(--theme-type)
   padding: var(--blok-padding)
   display: flex
   flex-direction: row
-  row-wrap: wrap
+  row-wrap: nowrap
 
   & > .column
     flex-grow: 1
