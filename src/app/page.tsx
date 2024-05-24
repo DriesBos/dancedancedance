@@ -6,7 +6,7 @@ export default async function Home() {
 
   return (
     <>
-      <StoryblokStory story={data.story} />
+      <StoryblokStory story={data.story.content} />
     </>
   );
 }

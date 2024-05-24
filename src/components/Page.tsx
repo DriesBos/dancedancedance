@@ -1,15 +1,17 @@
-import { storyblokEditable, StoryblokComponent } from '@storyblok/react/rsc';
+import { StoryblokComponent } from '@storyblok/react/rsc';
 
 interface Props {
-  blok: any;
+  blok?: any;
 }
 
-const Page = ({ blok }: Props) => (
-  <>
-    {blok.body.map((nestedBlok: any) => (
-      <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
-    ))}
-  </>
-);
+const Page = ({ blok }: Props) => {
+  return (
+    <>
+      {blok.body.map((nestedBlok: any) => (
+        <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
+      ))}
+    </>
+  );
+};
 
 export default Page;
