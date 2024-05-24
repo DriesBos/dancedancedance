@@ -9,19 +9,16 @@ body
   display: flex
   justify-content: center
   align-items: flex-start
-  &.twoD
-    // border: 2px solid red
+  // &.twoD
   &.threeD
     padding-top: calc(15rem + 10vmin)
     padding-bottom: 6rem
-    // border: 2px solid blue
 
 .container
   display: flex
   flex-direction: column
   width: 100%
   background: var(--theme-container)
-  border: 1px solid red
 
 .blok
   border: 1px solid var(--theme-type)
@@ -71,4 +68,6 @@ body
     width: 50px
   &-High
     height: 50px
+  &-Rotate
+    transform: rotate(180deg)
 

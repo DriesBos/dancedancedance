@@ -1,9 +1,7 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconImage from '@/components/Icons/IconImage';
 import IconText from '@/components/Icons/IconText';
@@ -18,23 +16,35 @@ interface Props {
 }
 
 const BlokHead = ({ blok, float, params }: Props) => {
-  const router = usePathname();
+  const path = usePathname();
 
-  const [showProject, setShowProject] = useState(false);
+  const [pathName, setPathName] = useState(path.split('/')[1]);
 
-  useEffect(() => {
-    if (router.split('/')[1] === 'projects') {
-      setShowProject(true);
-    } else {
-      setShowProject(false);
+  let handlePathName = () => {
+    switch (pathName) {
+      case 'about':
+        console.log('This is the about page');
+        setPathName('about');
+        break;
+      case 'projects':
+        console.log('This is the projects page');
+        setPathName('projects');
+        break;
+      default:
+        console.log('This is the home page');
+        setPathName('home');
     }
-  }, [router, showProject]);
+  };
 
-  let projectName = '';
+  if (pathName.length <= 0) {
+    handlePathName();
+    console.log(path);
+  }
+  let [projectName, setProjectName] = useState('Project Name');
 
   function stateProjectName() {
-    if (showProject) {
-      projectName = router.split('/')[2];
+    if (pathName === 'projects') {
+      projectName = path.split('/')[2];
       projectName = projectName
         .replace(/-/g, ' ')
         .split(' ')
@@ -43,59 +53,80 @@ const BlokHead = ({ blok, float, params }: Props) => {
         )
         .join(' ');
     } else {
-      projectName = 'NONE';
+      setProjectName('');
     }
   }
 
-  stateProjectName();
+  if (projectName === 'Project Name') {
+    stateProjectName();
+  }
 
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
       <div className="column">
         <Link href="/">Dries Bos&nbsp;</Link>
         <Link href="/projects/anatha-wallet">
-          {!showProject && <span>— Design, Code & Interaction</span>}
+          {pathName === 'home' && <span>— Design, Code & Interaction</span>}
+          {pathName === 'about' && <span>— Design, Code & Interaction</span>}
         </Link>
         <Link href="/projects/anatha-wallet">
-          {showProject && <span>& {projectName}</span>}
+          {pathName === 'projects' && <span>& {projectName}</span>}
         </Link>
       </div>
+
       <div className="column column-Icons">
-        <div className="icon">
-          <Link href="/about">
-            <IconAbout />
-          </Link>
-        </div>
-        <div className="icon icon-Wide">
-          <Link href="/about">
-            <IconArrowLong />
-          </Link>
-        </div>
-        <div className="icon icon-Wide">
-          <Link href="/about">
-            <IconArrowLong />
-          </Link>
-        </div>
-        <div className="icon">
-          <Link href="/about">
-            <IconClose />
-          </Link>
-        </div>
-        <div className="icon">
-          <Link href="/about">
-            <IconMail />
-          </Link>
-        </div>
-        <div className="icon">
-          <Link href="/about">
-            <IconText />
-          </Link>
-        </div>
-        <div className="icon">
-          <Link href="/about">
-            <IconImage />
-          </Link>
-        </div>
+        {pathName === 'home' && (
+          <>
+            <div className="icon">
+              <Link href="/about">
+                <IconText />
+              </Link>
+            </div>
+            <div className="icon">
+              <Link href="/about">
+                <IconImage />
+              </Link>
+            </div>
+            <div className="icon">
+              <Link href="/about">
+                <IconAbout />
+              </Link>
+            </div>
+          </>
+        )}
+        {pathName === 'about' && (
+          <>
+            <div className="icon">
+              <Link href="/about">
+                <IconMail />
+              </Link>
+            </div>
+            <div className="icon">
+              <Link href="/">
+                <IconClose />
+              </Link>
+            </div>
+          </>
+        )}
+        {pathName === 'projects' && (
+          <>
+            <div className="icon icon-Wide icon-Rotate">
+              <Link href="/">
+                <IconArrowLong />
+              </Link>
+            </div>
+            <div className="icon icon-Wide">
+              <Link href="/">
+                <IconArrowLong />
+              </Link>
+            </div>
+            <div className="icon">
+              <Link href="/">
+                <IconClose />
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
