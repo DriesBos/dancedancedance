@@ -17,49 +17,32 @@ interface Props {
 
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
+  const [pathName, setPathName] = useState('');
+  const [projectName, setProjectName] = useState('');
 
-  const [pathName, setPathName] = useState(path.split('/')[1]);
-
-  let handlePathName = () => {
-    switch (pathName) {
+  useEffect(() => {
+    let tempPathName = path.split('/')[1];
+    switch (tempPathName) {
+      case '':
+        setPathName('home');
+        break;
       case 'about':
-        console.log('This is the about page');
         setPathName('about');
         break;
       case 'projects':
-        console.log('This is the projects page');
         setPathName('projects');
+        let tempProjectName = path.split('/')[2];
+        tempProjectName = tempProjectName
+          .replace(/-/g, ' ')
+          .split(' ')
+          .map(
+            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          )
+          .join(' ');
+        setProjectName(tempProjectName);
         break;
-      default:
-        console.log('This is the home page');
-        setPathName('home');
     }
-  };
-
-  if (pathName.length <= 0) {
-    handlePathName();
-    console.log(path);
-  }
-  let [projectName, setProjectName] = useState('Project Name');
-
-  function stateProjectName() {
-    if (pathName === 'projects') {
-      projectName = path.split('/')[2];
-      projectName = projectName
-        .replace(/-/g, ' ')
-        .split(' ')
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        )
-        .join(' ');
-    } else {
-      setProjectName('');
-    }
-  }
-
-  if (projectName === 'Project Name') {
-    stateProjectName();
-  }
+  }, [path]);
 
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
