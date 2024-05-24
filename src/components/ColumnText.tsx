@@ -30,7 +30,7 @@ const ColumnText = ({ blok }: Props) => {
       ref={container}
       {...storyblokEditable(blok)}
     >
-      <Markdown>{blok.text}</Markdown>;
+      <Markdown>{blok.text}</Markdown>
     </div>
   );
 };
