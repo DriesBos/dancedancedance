@@ -4,6 +4,12 @@ import link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import IconAbout from '@/components/Icons/IconAbout';
+import IconImage from '@/components/Icons/IconImage';
+import IconText from '@/components/Icons/IconText';
+import IconMail from '@/components/Icons/IconMail';
+import IconClose from '@/components/Icons/IconClose';
+import IconArrowLong from '@/components/Icons/IconArrowLong';
 
 interface Props {
   blok?: any;
@@ -55,7 +61,41 @@ const BlokHead = ({ blok, float, params }: Props) => {
         </Link>
       </div>
       <div className="column column-Icons">
-        <Link href="/about">about</Link>
+        <div className="icon">
+          <Link href="/about">
+            <IconAbout />
+          </Link>
+        </div>
+        <div className="icon icon-Wide">
+          <Link href="/about">
+            <IconArrowLong />
+          </Link>
+        </div>
+        <div className="icon icon-Wide">
+          <Link href="/about">
+            <IconArrowLong />
+          </Link>
+        </div>
+        <div className="icon">
+          <Link href="/about">
+            <IconClose />
+          </Link>
+        </div>
+        <div className="icon">
+          <Link href="/about">
+            <IconMail />
+          </Link>
+        </div>
+        <div className="icon">
+          <Link href="/about">
+            <IconText />
+          </Link>
+        </div>
+        <div className="icon">
+          <Link href="/about">
+            <IconImage />
+          </Link>
+        </div>
       </div>
     </div>
   );

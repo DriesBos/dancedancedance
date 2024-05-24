@@ -1,7 +1,7 @@
 const IconSearch = () => {
   return (
     <svg viewBox="0 0 25 25">
-      <g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-width="2">
+      <g fill="none" fillRule="evenodd" stroke="currentColor" stroke-width="2">
         <circle cx="9" cy="9" r="8" />
         <path stroke-linecap="square" d="M15 15L23 23" />
       </g>

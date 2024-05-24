@@ -33,7 +33,6 @@ body
   & > .column
     flex-grow: 1
     min-width: 50%
-
     &-Text
       --var: 100%
       a
@@ -54,4 +53,22 @@ body
             @media ( hover: hover )
               animation: hyperHyperLink .66s ease
               animation-iteration-count: 1
+    &-Icons
+      display: flex
+      justify-content: flex-end
+      & > div 
+        margin: 0 12.5px
+        &:first-child
+          margin-left: 0
+        &:last-child
+          margin-right: 0
+
+
+.icon
+  width: 25px
+  height: 25px
+  &-Wide
+    width: 50px
+  &-High
+    height: 50px
 
