@@ -9,7 +9,7 @@ export default async function ProjectList() {
       slug: story.slug,
       year: story.content.year,
       title: story.content.title,
-      client: story.content.client,
+      client: story.content.agency,
       category: story.content.category,
     };
   });

@@ -22,13 +22,14 @@ body
 
 .blok
   border: 1px solid var(--theme-type)
-  padding: var(--blok-padding)
   display: flex
   flex-direction: row
   row-wrap: nowrap
 
   & > .column
     flex-grow: 1
+    text-align: left
+    padding: var(--blok-padding)
     &-Text
       --var: 100%
       a
@@ -49,6 +50,8 @@ body
             @media ( hover: hover )
               animation: hyperHyperLink .66s ease
               animation-iteration-count: 1
+    &-Year
+      flex-grow: 0
     &-Icons
       display: flex
       justify-content: flex-end
@@ -58,6 +61,8 @@ body
           margin-left: 0
         &:last-child
           margin-right: 0
+
+  
 
 
 .icon
