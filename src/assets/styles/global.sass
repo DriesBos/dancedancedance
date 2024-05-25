@@ -55,6 +55,7 @@ body
     &-Icons
       display: flex
       justify-content: flex-end
+      align-items: center
       & > div 
         margin: 0 12.5px
         &:first-child
@@ -66,12 +67,20 @@ body
 
 
 .icon
+  position: relative
   width: 25px
   height: 25px
+  svg
+    position: absolute
+    top: 0
+    left: 0
+    height: 100%
+    width: 100%
   &-Wide
     width: 50px
   &-High
     height: 50px
   &-Rotate
     transform: rotate(180deg)
+      
 

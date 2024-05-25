@@ -9,6 +9,7 @@ import localFont from 'next/font/local';
 import { storyblokInit, apiPlugin } from '@storyblok/react/rsc';
 import StoryblokProvider from '@/components/StoryblokProvider';
 import BlokHead from '@/components/BlokHead';
+import BlokFooter from '@/components/BlokFooter';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
@@ -37,6 +38,7 @@ export default function RootLayout({
           <main className="container">
             <BlokHead />
             {children}
+            <BlokFooter />
           </main>
         </body>
       </html>
