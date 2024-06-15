@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export type Theme = 'DEFAULT' | 'NIGHTMODE';
 
-export type Space = '2D' | '3D';
+export type Space = '2D' | '3D' | 'PHONE';
 
 export type Props = {
   theme: Theme;
@@ -15,6 +15,7 @@ export type Actions = {
   setTheme: (theme: Theme) => void;
   setTwoD: (space: Space) => void;
   setThreeD: (space: Space) => void;
+  setPhone: (space: Space) => void;
 };
 
 export const useStore = create<Props & Actions>()((set) => ({
@@ -25,4 +26,5 @@ export const useStore = create<Props & Actions>()((set) => ({
   setTheme: (theme: Theme) => set({ theme }),
   setTwoD: () => set({ space: '2D' }),
   setThreeD: () => set({ space: '3D' }),
+  setPhone: () => set({ space: 'PHONE' }),
 }));

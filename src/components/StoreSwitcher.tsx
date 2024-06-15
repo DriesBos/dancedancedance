@@ -7,6 +7,7 @@ const StoreSwitcher = () => {
   const setDefault = useStore((state: any) => state.setDefault);
   const setTwoD = useStore((state: any) => state.setTwoD);
   const setThreeD = useStore((state: any) => state.setThreeD);
+  const setPhone = useStore((state: any) => state.setPhone);
 
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
@@ -14,16 +15,18 @@ const StoreSwitcher = () => {
   function handlePickTheme() {
     if (theme === 'DEFAULT') {
       setNightmode();
-    } else {
+    } else if (theme === 'NIGHTMODE') {
       setDefault();
     }
   }
 
   function handlePickSpace() {
-    if (space === '3D') {
-      setTwoD();
-    } else {
+    if (space === '2D') {
       setThreeD();
+    } else if (space === '3D') {
+      setPhone();
+    } else {
+      setTwoD();
     }
   }
 
