@@ -10,6 +10,8 @@ import { storyblokInit, apiPlugin } from '@storyblok/react/rsc';
 import StoryblokProvider from '@/components/StoryblokProvider';
 import BlokHead from '@/components/BlokHead';
 import BlokFooter from '@/components/BlokFooter';
+import AppInitializer from '@/components/AppInitStore';
+import StoreSwitcher from '@/components/StoreSwitcher';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
@@ -26,7 +28,7 @@ storyblokInit({
   },
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -34,13 +36,14 @@ export default function RootLayout({
   return (
     <StoryblokProvider>
       <html lang="en" suppressHydrationWarning={true}>
-        <body className={`body ${myFont.className} twoD`}>
+        <AppInitializer className={`body ${myFont.className}`}>
+          <StoreSwitcher />
           <main className="container">
             <BlokHead />
             {children}
             <BlokFooter />
           </main>
-        </body>
+        </AppInitializer>
       </html>
     </StoryblokProvider>
   );

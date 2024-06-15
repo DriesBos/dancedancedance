@@ -38,17 +38,30 @@ $transition-bg: .16s ease-in-out; */
   /* colors */
   --color-black: #000000;
   --color-white: white;
-  --color-neongreen: #b6fff5;
+  --color-tron: #b6fff5;
+  --color-red: #ff0000;
   --opacity-inactive: 0.33;
 
   /* theme */
   --theme-bg: var(--color-black);
   --theme-container: var(--color-black);
-  --theme-type: var(--color-neongreen);
+  --theme-type: var(--color-tron);
 
   /* spacing */
   --border-width: 2px;
 
   /* container & bloks */
   --blok-padding: 15px 25px;
+}
+
+body[data-theme='DEFAULT'] {
+  --theme-bg: var(--color-black);
+  --theme-container: var(--color-black);
+  --theme-type: var(--color-tron);
+}
+
+body[data-theme='NIGHTMODE'] {
+  --theme-bg: var(--color-black);
+  --theme-container: var(--color-black);
+  --theme-type: var(--color-red);
 }
