@@ -12,6 +12,7 @@ import BlokHead from '@/components/BlokHead';
 import BlokFooter from '@/components/BlokFooter';
 import AppInitializer from '@/components/AppInitStore';
 import StoreSwitcher from '@/components/StoreSwitcher';
+import BlokFilter from '@/components/BlokFilter';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
@@ -40,6 +41,7 @@ export default async function RootLayout({
           <StoreSwitcher />
           <main className="container">
             <BlokHead />
+            <BlokFilter />
             {children}
             <BlokFooter />
           </main>

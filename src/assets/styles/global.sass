@@ -52,14 +52,19 @@ body
   flex-direction: row
   row-wrap: nowrap
 
-  &.inActive
-    .column 
-      opacity: var(--opacity-inactive)
+  &-Filter
+    padding-top: 160px
+
+  // &.inActive
+  //   .column 
+  //     opacity: var(--opacity-inactive)
 
   & > .column
     flex-grow: 1
     text-align: left
     padding: var(--blok-padding)
+    &[data-inactive='true']
+      color: var(--theme-type-inactive)
     &-Text
       --var: 100%
       a
