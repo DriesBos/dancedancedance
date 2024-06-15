@@ -60,7 +60,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       <div className="column column-Icons">
         {pathName === 'home' && (
           <>
-            <div className="icon">
+            {/* <div className="icon">
               <Link href="/about">
                 <IconText />
               </Link>
@@ -69,7 +69,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
               <Link href="/about">
                 <IconImage />
               </Link>
-            </div>
+            </div> */}
             <div className="icon">
               <Link href="/about">
                 <IconAbout />

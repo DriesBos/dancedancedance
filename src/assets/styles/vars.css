@@ -39,6 +39,7 @@ $transition-bg: .16s ease-in-out; */
   --color-black: #000000;
   --color-white: white;
   --color-neongreen: #b6fff5;
+  --opacity-inactive: 0.33;
 
   /* theme */
   --theme-bg: var(--color-black);
