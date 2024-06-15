@@ -4,8 +4,6 @@ import BlokProject from './BlokProject';
 export default async function ProjectList() {
   const projects = await fetchProjects();
 
-  console.log(projects.data.stories);
-
   const data = projects.data.stories.map((story: any) => {
     return {
       slug: story.slug,
