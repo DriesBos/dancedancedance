@@ -1,6 +1,8 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
@@ -17,6 +19,8 @@ interface Props {
 
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
+  const router = useRouter();
+
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
 
@@ -43,6 +47,20 @@ const BlokHead = ({ blok, float, params }: Props) => {
         break;
     }
   }, [path]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const handleKeyDown = (e: any) => {
+    if (e.key === 'Escape') {
+      router.push('/');
+    }
+  };
 
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>

@@ -16,8 +16,6 @@ export default async function ProjectList() {
     };
   });
 
-  console.log(typeof data);
-
   return (
     <>
       {data.map((item: any, index: number) => (
