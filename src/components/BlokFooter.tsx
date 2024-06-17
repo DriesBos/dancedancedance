@@ -2,6 +2,8 @@
 
 import IconArrowLongUp from '@/components/Icons/IconArrowLongUp';
 import Row from './Row';
+import Blok from './Blok';
+import BlokTopPanel from './Icons/BlokTopPanel';
 
 const BlokFooter = () => {
   const ScrollToTop = () => {
@@ -12,6 +14,7 @@ const BlokFooter = () => {
   };
   return (
     <div className="blok blok-Footer">
+      <BlokTopPanel />
       <Row>
         <div className="column column-Icons">
           <div onClick={ScrollToTop} className="icon icon-High icon-Footer">

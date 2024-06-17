@@ -3,11 +3,13 @@
 import IconAbout from '@/components/Icons/IconAbout';
 import { usePathname } from 'next/navigation';
 import Row from './Row';
+import BlokTopPanel from '@/components/Icons/BlokTopPanel';
 
 export default function BlokFilter() {
   const path = usePathname();
   return (
     <div className={`blok blok-Filter ${path === '/' ? 'active' : 'inactive'}`}>
+      <BlokTopPanel />
       <Row>
         <div className="column" data-inactive={true}>
           Date

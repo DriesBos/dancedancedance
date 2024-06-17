@@ -33,6 +33,9 @@ body
     main
       width: 88vw
       max-width: 1150px
+      & > .blok:first-child, & > .blok:nth-child(2) 
+        .blokTopPanel
+          display: inline-block
 
   &[data-space="PHONE"]
     padding-top: calc(15rem + 10vmin)
@@ -49,6 +52,14 @@ body
   background: var(--theme-container)
   &.inactive
     display: none
+  .blokTopPanel
+    display: none
+    position: absolute
+    transform: translateY(-100%)
+    top: 0
+    left: 0
+    right: 0
+    pointer-events: none
 
   .row
     display: flex
@@ -103,6 +114,8 @@ body
   &-Filter
     padding-top: 160px
   &-Project
+    .row
+      overflow: hidden
     .imageContainer
       animation: projectImages 100s linear infinite
       height: 10rem

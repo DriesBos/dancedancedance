@@ -9,6 +9,7 @@ import IconAbout from '@/components/Icons/IconAbout';
 import IconMail from '@/components/Icons/IconMail';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
+import BlokTopPanel from '@/components/Icons/BlokTopPanel';
 import Row from './Row';
 
 interface Props {
@@ -64,6 +65,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
+      <BlokTopPanel />
       <Row>
         <div className="column">
           <Link href="/">Dries Bos&nbsp;</Link>
