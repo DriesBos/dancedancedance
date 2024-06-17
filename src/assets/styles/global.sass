@@ -11,7 +11,7 @@ body
   justify-content: center
   align-items: flex-start
   padding: 0
-  transition: padding .5s ease, color .25s ease, background .25s ease
+  transition: padding-top .5s ease, padding-bottom .5s ease, color .5s ease, background .5s ease
 
   // Containers
   main
@@ -28,19 +28,25 @@ body
       max-width: 100%
 
   &[data-space="3D"]
-    padding: 100px
+    padding-top: calc(15rem + 10vmin)
+    padding-bottom: 6rem
     main
+      width: 88vw
       max-width: 1150px
 
   &[data-space="PHONE"]
-    padding: 100px
+    padding-top: calc(15rem + 10vmin)
+    padding-bottom: 6rem
     main
       max-width: 400px
 
 .blok
-  border: 1px solid var(--theme-type)
+  position: sticky
+  top: 0
   display: flex
   flex-direction: column
+  border: 1px solid var(--theme-type)
+  background: var(--theme-container)
   &.inactive
     display: none
 
