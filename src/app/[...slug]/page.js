@@ -1,6 +1,7 @@
 import { storyblokInit, apiPlugin } from '@storyblok/react/rsc';
 import { getStoryblokApi } from '@storyblok/react/rsc';
 import StoryblokStory from '@storyblok/react/story';
+import RunGSAP from '../../helpers/runGSAP';
 
 storyblokInit({
   accessToken: process.env.DB_STORYBLOK_PREVIEW,
@@ -19,6 +20,7 @@ export default async function Page({ params }) {
 
   return (
     <>
+      <RunGSAP />
       <StoryblokStory story={data.story} bridgeOptions={{}} />
     </>
   );

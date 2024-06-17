@@ -20,7 +20,7 @@ export type Actions = {
 
 export const useStore = create<Props & Actions>()((set) => ({
   theme: 'DEFAULT',
-  space: '2D',
+  space: '3D',
   setNightmode: () => set({ theme: 'NIGHTMODE' }),
   setDefault: () => set({ theme: 'DEFAULT' }),
   setTheme: (theme: Theme) => set({ theme }),
