@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
+import { useStore } from '@/store/store';
 
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
@@ -11,6 +12,8 @@ import IconClose from '@/components/Icons/IconClose';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import BlokTopPanel from '@/components/Icons/BlokTopPanel';
 import Row from './Row';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 interface Props {
   blok?: any;
@@ -21,9 +24,31 @@ interface Props {
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
   const router = useRouter();
+  const topPanel = useStore((state: any) => state.topPanel);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
+
+  useEffect(() => {
+    toggleBlokTopPannel();
+  }, [topPanel]);
+
+  function toggleBlokTopPannel() {
+    if (topPanel) {
+      gsap.to('.blok-Head', {
+        yPercent: -100,
+        ease: 'power1.inOut',
+        duration: 0.33,
+        delay: 0.5,
+      });
+    } else {
+      gsap.to('.blok-Head', {
+        yPercent: 0,
+        ease: 'power1.inOut',
+        duration: 0.33,
+      });
+    }
+  }
 
   useEffect(() => {
     let tempPathName = path.split('/')[1];
@@ -51,12 +76,10 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
   const handleKeyDown = (e: any) => {
     if (e.key === 'Escape') {
       router.push('/');

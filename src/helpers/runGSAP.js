@@ -18,30 +18,30 @@ function RunGsap() {
     });
   });
 
-  useGSAP(() => {
-    gsap.to('.animateModule', {
-      opacity: 1,
-      y: 0,
-      ease: 'power1.inOut',
+  // useGSAP(() => {
+  //   gsap.to('.animateModule', {
+  //     opacity: 1,
+  //     y: 0,
+  //     ease: 'power1.inOut',
 
-      duration: 0.66,
-      stagger: {
-        amount: 0.33,
-      },
-    });
-  });
+  //     duration: 0.66,
+  //     stagger: {
+  //       amount: 0.33,
+  //     },
+  //   });
+  // });
 
-  useGSAP(() => {
-    gsap.to('.animateToken', {
-      opacity: 1,
-      y: 0,
-      ease: 'power1.inOut',
-      duration: 1,
-      stagger: {
-        amount: 0.165,
-      },
-    });
-  });
+  // useGSAP(() => {
+  //   gsap.to('.animateToken', {
+  //     opacity: 1,
+  //     y: 0,
+  //     ease: 'power1.inOut',
+  //     duration: 1,
+  //     stagger: {
+  //       amount: 0.165,
+  //     },
+  //   });
+  // });
 
   return null;
 }
