@@ -19,6 +19,7 @@ export default async function Page({ params }) {
 
   return (
     <>
+      <p>SLUG</p>
       <StoryblokStory story={data.story} bridgeOptions={{}} />
     </>
   );

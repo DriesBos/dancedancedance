@@ -1,13 +1,13 @@
 'use client';
+
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
-import IconImage from '@/components/Icons/IconImage';
-import IconText from '@/components/Icons/IconText';
 import IconMail from '@/components/Icons/IconMail';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
+import Row from './Row';
 
 interface Props {
   blok?: any;
@@ -46,21 +46,22 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
-      <div className="column">
-        <Link href="/">Dries Bos&nbsp;</Link>
-        <Link href="/projects/anatha-wallet">
-          {pathName === 'home' && <span>— Design, Code & Interaction</span>}
-          {pathName === 'about' && <span>— Design, Code & Interaction</span>}
-        </Link>
-        <Link href="/projects/anatha-wallet">
-          {pathName === 'projects' && <span>& {projectName}</span>}
-        </Link>
-      </div>
+      <Row>
+        <div className="column">
+          <Link href="/">Dries Bos&nbsp;</Link>
+          <Link href="/projects/anatha-wallet">
+            {pathName === 'home' && <span>— Design, Code & Interaction</span>}
+            {pathName === 'about' && <span>— Design, Code & Interaction</span>}
+          </Link>
+          <Link href="/projects/anatha-wallet">
+            {pathName === 'projects' && <span>& {projectName}</span>}
+          </Link>
+        </div>
 
-      <div className="column column-Icons">
-        {pathName === 'home' && (
-          <>
-            {/* <div className="icon">
+        <div className="column column-Icons">
+          {pathName === 'home' && (
+            <>
+              {/* <div className="icon">
               <Link href="/about">
                 <IconText />
               </Link>
@@ -70,47 +71,48 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 <IconImage />
               </Link>
             </div> */}
-            <div className="icon">
-              <Link href="/about">
-                <IconAbout />
-              </Link>
-            </div>
-          </>
-        )}
-        {pathName === 'about' && (
-          <>
-            <div className="icon">
-              <Link href="/about">
-                <IconMail />
-              </Link>
-            </div>
-            <div className="icon">
-              <Link href="/">
-                <IconClose />
-              </Link>
-            </div>
-          </>
-        )}
-        {pathName === 'projects' && (
-          <>
-            <div className="icon icon-Wide icon-Rotate">
-              <Link href="/">
-                <IconArrowLong />
-              </Link>
-            </div>
-            <div className="icon icon-Wide">
-              <Link href="/">
-                <IconArrowLong />
-              </Link>
-            </div>
-            <div className="icon">
-              <Link href="/">
-                <IconClose />
-              </Link>
-            </div>
-          </>
-        )}
-      </div>
+              <div className="icon">
+                <Link href="/about">
+                  <IconAbout />
+                </Link>
+              </div>
+            </>
+          )}
+          {pathName === 'about' && (
+            <>
+              <div className="icon">
+                <Link href="/about">
+                  <IconMail />
+                </Link>
+              </div>
+              <div className="icon">
+                <Link href="/">
+                  <IconClose />
+                </Link>
+              </div>
+            </>
+          )}
+          {pathName === 'projects' && (
+            <>
+              <div className="icon icon-Wide icon-Rotate">
+                <Link href="/">
+                  <IconArrowLong />
+                </Link>
+              </div>
+              <div className="icon icon-Wide">
+                <Link href="/">
+                  <IconArrowLong />
+                </Link>
+              </div>
+              <div className="icon">
+                <Link href="/">
+                  <IconClose />
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </Row>
     </div>
   );
 };

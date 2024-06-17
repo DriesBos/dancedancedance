@@ -12,8 +12,11 @@ export default async function ProjectList() {
       active: story.content.active,
       client: story.content.agency,
       category: story.content.category,
+      images: story.content.images,
     };
   });
+
+  console.log(typeof data);
 
   return (
     <>
@@ -26,21 +29,16 @@ export default async function ProjectList() {
           active={item.active}
           client={item.client}
           category={item.category}
+          images={item.images}
         />
       ))}
-      <BlokProject
-        year={'year'}
-        title={'title'}
-        client={'client'}
-        category={'category'}
-      />
     </>
   );
 }
 
 export async function fetchProjects() {
   let sbParams: ISbStoriesParams = {
-    version: 'draft',
+    version: 'published',
     starts_with: 'projects',
     is_startpage: false,
   };

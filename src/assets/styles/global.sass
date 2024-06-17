@@ -1,3 +1,4 @@
+// Global
 html, body
   position: relative
   width: 100%
@@ -10,12 +11,15 @@ body
   justify-content: center
   align-items: flex-start
   padding: 0
-  // Transition
-  transition: padding .5s ease
+  transition: padding .5s ease, color .25s ease, background .25s ease
 
+  // Containers
   main
-    width: auto
+    display: flex
+    flex-direction: column
     max-width: auto
+    width: 100%
+    background: var(--theme-container)
     transition: max-width .5s ease
 
   &[data-space="2D"]
@@ -33,6 +37,97 @@ body
     main
       max-width: 400px
 
+.blok
+  border: 1px solid var(--theme-type)
+  display: flex
+  flex-direction: column
+  &.inactive
+    display: none
+
+  .row
+    display: flex
+    flex-direction: row
+    row-wrap: nowrap
+
+    .column
+      flex: 1
+      text-align: left
+      padding: var(--blok-padding)
+      &[data-inactive='true']
+        color: var(--theme-type-inactive)
+      &-Text
+        --var: 100%
+        a
+          position: relative
+          white-space: nowrap
+          &::before
+            content: ''
+            position: absolute
+            left: 0
+            display: inline-block
+            bottom: calc(0px - (#{var(--border-width)} / 2))
+            top: 0
+            width: var(--var)
+            z-index: 0
+            border-bottom: var(--border-width) solid var(--theme-type)
+          &:hover
+            &::before
+              @media ( hover: hover )
+                animation: hyperHyperLink .66s ease
+                animation-iteration-count: 1
+      &-Image
+        padding: 0
+        img, video
+          width: 100%
+          height: auto
+      &-Year
+        flex-grow: 0
+      &-Icons
+        display: flex
+        justify-content: flex-end
+        align-items: center
+        & > div 
+          margin: 0 12.5px
+          &:first-child
+            margin-left: 0
+          &:last-child
+            margin-right: 0
+
+  // Specific Bloks
+  &-Filter
+    padding-top: 160px
+  &-Project
+    .imageContainer
+      animation: projectImages 100s linear infinite
+      height: 10rem
+      display: flex
+      flex-direction: row
+      flex-frap: nowrap
+      justify-content: flex-start
+      gap: 1px
+      img
+        height: 100%
+        width: auto
+    
+// Global Elements
+.icon
+  position: relative
+  width: 25px
+  height: 25px
+  svg
+    position: absolute
+    top: 0
+    left: 0
+    height: 100%
+    width: 100%
+  &-Wide
+    width: 50px
+  &-High
+    height: 50px
+  &-Rotate
+    transform: rotate(180deg)
+
+// Specific Elements
 .storeSwitcher
   position: fixed
   bottom: 0
@@ -54,82 +149,11 @@ body
       color: var(--theme-bg)
       background: var(--theme-type)
 
-.container
-  display: flex
-  flex-direction: column
-  width: 100%
-  background: var(--theme-container)
-
-.blok
-  border: 1px solid var(--theme-type)
-  display: flex
-  flex-direction: row
-  row-wrap: nowrap
-
-  &-Filter
-    padding-top: 160px
-
-  // &.inActive
-  //   .column 
-  //     opacity: var(--opacity-inactive)
-
-  & > .column
-    flex-grow: 1
-    text-align: left
-    padding: var(--blok-padding)
-    &[data-inactive='true']
-      color: var(--theme-type-inactive)
-    &-Text
-      --var: 100%
-      a
-        position: relative
-        white-space: nowrap
-        &::before
-          content: ''
-          position: absolute
-          left: 0
-          display: inline-block
-          bottom: calc(0px - (#{var(--border-width)} / 2))
-          top: 0
-          width: var(--var)
-          z-index: 0
-          border-bottom: var(--border-width) solid var(--theme-type)
-        &:hover
-          &::before
-            @media ( hover: hover )
-              animation: hyperHyperLink .66s ease
-              animation-iteration-count: 1
-    &-Year
-      flex-grow: 0
-    &-Icons
-      display: flex
-      justify-content: flex-end
-      align-items: center
-      & > div 
-        margin: 0 12.5px
-        &:first-child
-          margin-left: 0
-        &:last-child
-          margin-right: 0
-
-  
-
-
-.icon
-  position: relative
-  width: 25px
-  height: 25px
-  svg
-    position: absolute
-    top: 0
-    left: 0
-    height: 100%
-    width: 100%
-  &-Wide
-    width: 50px
-  &-High
-    height: 50px
-  &-Rotate
-    transform: rotate(180deg)
+// Animations
+@keyframes projectImages
+  0%
+    transform: translateX(0)
+  100%
+    transform: translateX(-100%)
       
 

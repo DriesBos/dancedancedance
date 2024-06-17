@@ -39,7 +39,7 @@ export default async function RootLayout({
       <html lang="en" suppressHydrationWarning={true}>
         <AppInitializer className={`body ${myFont.className}`}>
           <StoreSwitcher />
-          <main className="container">
+          <main className="main">
             <BlokHead />
             <BlokFilter />
             {children}
