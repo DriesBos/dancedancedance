@@ -49,6 +49,33 @@ const BlokProject = ({
           {array.map((item: any, index: number) => (
             <img key={index} src={item.filename} alt={item.alt} />
           ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
+          {array.map((item: any, index: number) => (
+            <img key={index} src={item.filename} alt={item.alt} />
+          ))}
         </div>
       </Row>
     </Link>
