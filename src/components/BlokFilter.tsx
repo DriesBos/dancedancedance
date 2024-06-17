@@ -8,33 +8,37 @@ import BlokTopPanel from '@/components/Icons/BlokTopPanel';
 export default function BlokFilter() {
   const path = usePathname();
   return (
-    <div className={`blok blok-Filter ${path === '/' ? 'active' : 'inactive'}`}>
-      <BlokTopPanel />
-      <Row>
-        <div className="column" data-inactive={true}>
-          Date
+    <>
+      {path === '/' && (
+        <div className="blok blok-Filter">
+          <BlokTopPanel />
+          <Row>
+            <div className="column" data-inactive={true}>
+              Date
+            </div>
+            <div className="column" data-inactive={true}>
+              Project
+            </div>
+            <div className="column" data-inactive={true}>
+              Role
+            </div>
+            <div className="column" data-inactive={true}>
+              Client type
+            </div>
+            <div className="column" data-inactive={true}>
+              Project Type
+            </div>
+            <div className="column" data-inactive={true}>
+              Tech
+            </div>
+            <div className="column column-Icons" data-inactive={true}>
+              <div className="icon">
+                <IconAbout />
+              </div>
+            </div>
+          </Row>
         </div>
-        <div className="column" data-inactive={true}>
-          Project
-        </div>
-        <div className="column" data-inactive={true}>
-          Role
-        </div>
-        <div className="column" data-inactive={true}>
-          Client type
-        </div>
-        <div className="column" data-inactive={true}>
-          Project Type
-        </div>
-        <div className="column" data-inactive={true}>
-          Tech
-        </div>
-        <div className="column column-Icons" data-inactive={true}>
-          <div className="icon">
-            <IconAbout />
-          </div>
-        </div>
-      </Row>
-    </div>
+      )}
+    </>
   );
 }

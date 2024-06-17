@@ -7,7 +7,6 @@ interface Props {
 const Page = ({ blok }: Props) => {
   return (
     <>
-      <p>PAGE COMPONENT</p>
       {blok.body.map((nestedBlok: any) => (
         <StoryblokComponent blok={nestedBlok} key={nestedBlok._uid} />
       ))}

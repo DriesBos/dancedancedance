@@ -5,13 +5,7 @@ import ProjectList from '../components/ProjectList';
 export default async function Home() {
   const { data } = await fetchData();
 
-  return (
-    <>
-      {' '}
-      <p>PAGE</p>
-      {<ProjectList />}
-    </>
-  );
+  return <>{<ProjectList />}</>;
 }
 
 export async function fetchData() {

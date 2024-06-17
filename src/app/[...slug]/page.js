@@ -17,11 +17,8 @@ export default async function Page({ params }) {
     { cache: 'no-store' }
   );
 
-
-
   return (
     <>
-      <p>SLUG</p>
       <StoryblokStory story={data.story} bridgeOptions={{}} />
     </>
   );
