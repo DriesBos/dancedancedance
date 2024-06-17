@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <>
       {' '}
-      <p>SLUG</p>
+      <p>PAGE</p>
       {<ProjectList />}
     </>
   );
