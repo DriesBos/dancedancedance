@@ -8,8 +8,8 @@ const StoreSwitcher = () => {
   const setTwoD = useStore((state: any) => state.setTwoD);
   const setThreeD = useStore((state: any) => state.setThreeD);
   const setPhone = useStore((state: any) => state.setPhone);
-  var topPanel = useStore((state) => state.topPanel);
-  const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
+  // var topPanel = useStore((state) => state.topPanel);
+  // const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
 
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
@@ -25,13 +25,13 @@ const StoreSwitcher = () => {
   function handlePickSpace() {
     if (space === '2D') {
       setThreeD();
-      setTopPanelTrue((topPanel = true));
+      // setTopPanelTrue((topPanel = false));
     } else if (space === '3D') {
       setPhone();
-      setTopPanelTrue((topPanel = false));
+      // setTopPanelTrue((topPanel = false));
     } else {
       setTwoD();
-      setTopPanelTrue((topPanel = false));
+      // setTopPanelTrue((topPanel = false));
     }
   }
 

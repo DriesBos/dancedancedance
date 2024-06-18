@@ -24,6 +24,7 @@ interface Props {
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
   const router = useRouter();
+  const space = useStore((state: any) => state.space);
   var topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
 
@@ -34,30 +35,34 @@ const BlokHead = ({ blok, float, params }: Props) => {
     const main = document.querySelector('main');
     const selection = main !== null;
     if (selection) {
-      main.addEventListener('mouseleave', toggleBlokTopPannel);
-      main.addEventListener('mouseenter', toggleBlokTopPannel);
+      main.addEventListener('mouseleave', handleTopPanel);
+      main.addEventListener('mouseenter', handleTopPanel);
       return () => {
-        main.removeEventListener('mouseleave', toggleBlokTopPannel);
-        main.removeEventListener('mouseenter', toggleBlokTopPannel);
+        main.removeEventListener('mouseleave', handleTopPanel);
+        main.removeEventListener('mouseenter', handleTopPanel);
       };
     }
   }, []);
 
-  function toggleBlokTopPannel() {
-    setTopPanelTrue((topPanel = !topPanel));
-    if (topPanel) {
+  function handleTopPanel() {
+    // setTopPanelTrue((topPanel = !topPanel));
+    if (!topPanel && space === '3D') {
+      console.log(space, topPanel, 'handleTopPanel IF');
       gsap.to('.blok-Head', {
         yPercent: -100,
         ease: 'power1.inOut',
         duration: 0.33,
         // delay: 0.5,
       });
-    } else {
+      setTopPanelTrue((topPanel = true));
+    } else if (topPanel && space === '3D') {
+      console.log(space, topPanel, 'handleTopPanel ELSE IF');
       gsap.to('.blok-Head', {
         yPercent: 0,
         ease: 'power1.inOut',
         duration: 0.33,
       });
+      setTopPanelTrue((topPanel = false));
     }
   }
 
