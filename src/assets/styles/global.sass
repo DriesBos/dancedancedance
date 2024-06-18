@@ -76,7 +76,8 @@ body
       &[data-inactive='true']
         color: var(--theme-type-inactive)
       &-Text
-        --var: 100%
+        --var: 0%
+        min-width: 0 // Ellipsis hack
         a
           position: relative
           white-space: nowrap
@@ -181,5 +182,29 @@ body
     transform: translateX(0)
   100%
     transform: translateX(-100%)
+
+@keyframes hyperLink
+  0%
+    width: 0%
+  100%
+    width: 100%
+
+@keyframes hyperHyperLink
+  0%
+    width: 100%
+    left: auto
+    right: 0
+  50%
+    width: 0%
+    left: auto
+    right: 0
+  51%
+    width: 0%
+    left: 0
+    right: auto
+  100%
+    left: 0
+    right: auto
+    width: 100%
       
 
