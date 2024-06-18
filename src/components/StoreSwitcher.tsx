@@ -8,7 +8,8 @@ const StoreSwitcher = () => {
   const setTwoD = useStore((state: any) => state.setTwoD);
   const setThreeD = useStore((state: any) => state.setThreeD);
   const setPhone = useStore((state: any) => state.setPhone);
-  const topPanelToggle = useStore((state: any) => state.topPanelToggle);
+  var topPanel = useStore((state) => state.topPanel);
+  const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
 
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
@@ -24,13 +25,13 @@ const StoreSwitcher = () => {
   function handlePickSpace() {
     if (space === '2D') {
       setThreeD();
-      topPanelToggle(true);
+      setTopPanelTrue((topPanel = true));
     } else if (space === '3D') {
       setPhone();
-      topPanelToggle(false);
+      setTopPanelTrue((topPanel = false));
     } else {
       setTwoD();
-      topPanelToggle(false);
+      setTopPanelTrue((topPanel = false));
     }
   }
 

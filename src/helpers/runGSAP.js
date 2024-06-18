@@ -2,6 +2,7 @@
 
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { useEffect } from 'react';
 
 gsap.registerPlugin(useGSAP);
 

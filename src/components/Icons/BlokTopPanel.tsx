@@ -11,7 +11,7 @@ const BlokTopPanel = ({ className }: Props) => {
           fill="none"
           fillRule="evenodd"
           stroke="currentColor"
-          stroke-width="3"
+          strokeWidth="3"
         />
       </svg>
     </div>

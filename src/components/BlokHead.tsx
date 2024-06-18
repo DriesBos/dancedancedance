@@ -24,22 +24,33 @@ interface Props {
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
   const router = useRouter();
-  const topPanel = useStore((state: any) => state.topPanel);
+  var topPanel = useStore((state) => state.topPanel);
+  const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
 
   useEffect(() => {
-    toggleBlokTopPannel();
-  }, [topPanel]);
+    const main = document.querySelector('main');
+    const selection = main !== null;
+    if (selection) {
+      main.addEventListener('mouseleave', toggleBlokTopPannel);
+      main.addEventListener('mouseenter', toggleBlokTopPannel);
+      return () => {
+        main.removeEventListener('mouseleave', toggleBlokTopPannel);
+        main.removeEventListener('mouseenter', toggleBlokTopPannel);
+      };
+    }
+  }, []);
 
   function toggleBlokTopPannel() {
+    setTopPanelTrue((topPanel = !topPanel));
     if (topPanel) {
       gsap.to('.blok-Head', {
         yPercent: -100,
         ease: 'power1.inOut',
         duration: 0.33,
-        delay: 0.5,
+        // delay: 0.5,
       });
     } else {
       gsap.to('.blok-Head', {

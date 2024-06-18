@@ -17,7 +17,7 @@ export type Actions = {
   setTwoD: (space: Space) => void;
   setThreeD: (space: Space) => void;
   setPhone: (space: Space) => void;
-  topPanelToggle: (topPanel: boolean) => void;
+  setTopPanelTrue: (topPanel: boolean) => void;
 };
 
 export const useStore = create<Props & Actions>()((set) => ({
@@ -30,5 +30,5 @@ export const useStore = create<Props & Actions>()((set) => ({
   setTwoD: () => set({ space: '2D' }),
   setThreeD: () => set({ space: '3D' }),
   setPhone: () => set({ space: 'PHONE' }),
-  topPanelToggle: (topPanel: boolean) => set({ topPanel }),
+  setTopPanelTrue: () => set({ topPanel: true }),
 }));
