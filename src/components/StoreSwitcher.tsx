@@ -8,6 +8,7 @@ const StoreSwitcher = () => {
   const setTwoD = useStore((state: any) => state.setTwoD);
   const setThreeD = useStore((state: any) => state.setThreeD);
   const setPhone = useStore((state: any) => state.setPhone);
+  const setTheme = useStore((state: any) => state.setTheme);
   // var topPanel = useStore((state) => state.topPanel);
   // const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
 
@@ -15,9 +16,13 @@ const StoreSwitcher = () => {
   const space = useStore((state: any) => state.space);
 
   function handlePickTheme() {
-    if (theme === 'DEFAULT') {
+    if (theme === 'BASIC') {
       setNightmode();
     } else if (theme === 'NIGHTMODE') {
+      setTheme('IMAGE');
+    } else if (theme === 'IMAGE') {
+      setTheme('TRON');
+    } else if (theme === 'TRON') {
       setDefault();
     }
   }

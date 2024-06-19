@@ -13,6 +13,7 @@ import BlokFooter from '@/components/BlokFooter';
 import AppInitializer from '@/components/AppInitStore';
 import StoreSwitcher from '@/components/StoreSwitcher';
 import BlokFilter from '@/components/BlokFilter';
+import ThemeBackground from '@/components/ThemeBackground';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
@@ -38,6 +39,7 @@ export default async function RootLayout({
     <StoryblokProvider>
       <html lang="en" suppressHydrationWarning={true}>
         <AppInitializer className={`body ${myFont.className}`}>
+          <ThemeBackground />
           <StoreSwitcher />
           <main className="main">
             <BlokHead />

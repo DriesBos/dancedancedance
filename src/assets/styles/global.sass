@@ -19,14 +19,13 @@ body
     flex-direction: column
     max-width: auto
     width: 100%
-    background: var(--theme-container)
     transition: max-width .5s ease
-
+    & > .blok
+      margin-top: -2px
   &[data-space="2D"]
     padding: 0
     main
       max-width: 100%
-
   &[data-space="3D"]
     padding-top: calc(15rem + 10vmin)
     padding-bottom: 6rem
@@ -36,21 +35,50 @@ body
       & > .blok:first-child, & > .blok:nth-child(2) 
         .blokTopPanel
           display: inline-block
-
+      & > .blok:first-child 
+        z-index: +1
   &[data-space="PHONE"]
     padding-top: calc(15rem + 10vmin)
     padding-bottom: 6rem
     main
       max-width: 400px
 
-.blok
-  position: sticky
+  &[data-theme="BASIC"]
+    .themeBackground
+      opacity: 0
+  &[data-theme="NIGHTMODE"]
+    .themeBackground
+      opacity: 0
+  &[data-theme="IMAGE"]
+    .themeBackground
+      opacity: 1
+  &[data-theme="TRON"]
+    .themeBackground
+      opacity: 0
+
+.themeBackground
+  position: fixed
+  width: 100%
+  height: 100vh
   top: 0
+  left: 0
+  transition: opacity .5s ease
+  img
+    width: 100%
+    height: 100%
+    object-fit: cover
+    object-position: center
+
+.blok
+  // position: sticky
+  // top: 0
+  position: relative
   display: flex
   flex-direction: column
-  border: 1px solid var(--theme-type)
+  border: var(--border-width) solid var(--theme-type)
   background: var(--theme-container)
   // GSAP Animations
+  // transform-style: preserve-3d
   opacity: 0
   transform: translateY(50px)
   &.inactive
@@ -59,10 +87,15 @@ body
     display: none
     position: absolute
     transform: translateY(-100%)
-    top: 0
-    left: 0
+    top: 2px
+    left: -2px
     right: 0
     pointer-events: none
+    z-index: -100
+    svg
+      width: calc(100% + 2px)
+      path
+        fill: var(--theme-container)
 
   .row
     display: flex
@@ -162,7 +195,7 @@ body
   z-index: 1000
   padding: 10px
   background: var(--theme-container)
-  border: 1px solid var(--theme-type)
+  border: var(--border-width) solid var(--theme-type)
   border-radius: 5px
   margin: 10px
   display: flex
