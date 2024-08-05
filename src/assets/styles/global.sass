@@ -154,11 +154,18 @@ body
   &-Filter
     padding-top: 160px
   &-Project
+    transform: translateY(0)
+    transition: transform .5s ease
+    &:hover
+      transform: translateY(-10rem)
+      .imageContainer
+        height: 10rem
     .row
       overflow: hidden
     .imageContainer
+      transition: height .5s ease
       animation: projectImages 2000s linear infinite
-      height: 10rem
+      height: 0rem
       display: flex
       flex-direction: row
       flex-frap: nowrap
@@ -167,8 +174,9 @@ body
       img
         height: 100%
         width: auto
-      // &:hover
-      //   animation-play-state: paused
+        height: 10rem
+      &:hover
+        animation-play-state: paused
     
 // Global Elements
 .icon
