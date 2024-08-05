@@ -42,8 +42,8 @@ const StoreSwitcher = () => {
 
   return (
     <div className="storeSwitcher">
-      <button onClick={handlePickTheme}>{theme}</button>
-      <button onClick={handlePickSpace}>{space}</button>
+      <div onClick={handlePickTheme}>{theme}</div>
+      <div onClick={handlePickSpace}>{space}</div>
     </div>
   );
 };

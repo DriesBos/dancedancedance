@@ -152,6 +152,9 @@ body
             margin-right: 0
 
   // Specific Bloks
+  &-Head
+    .column-Icons
+      user-select: none
   &-Filter
     padding-top: 160px
   &-Project
@@ -201,22 +204,15 @@ body
 
 // Specific Elements
 .storeSwitcher
-  position: fixed
-  top: 0
-  right: 0
-  z-index: 1000
-  padding: 10px
-  background: var(--theme-container)
-  border: var(--border-width) solid var(--theme-type)
-  border-radius: 5px
-  margin: 10px
   display: flex
-  flex-direction: column
   align-items: center
-  justify-content: center
   & > div
     margin: 5px
     cursor: pointer
+    border: 1px solid var(--theme-type)
+    border-radius: 1000px
+    padding: 1px 8px
+    font-size: 12px
     &:hover
       color: var(--theme-bg)
       background: var(--theme-type)
