@@ -31,8 +31,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const [projectName, setProjectName] = useState('');
 
   const handleTopPanel = useCallback(() => {
-    // setTopPanelTrue((topPanel = !topPanel));
-    if (!topPanel && space === '3D') {
+    if (topPanel && space === '3D') {
       console.log(space, 'TOPPANEL');
       console.log(space, topPanel, 'handleTopPanel IF');
       gsap.to('.blok-Head', {
@@ -42,7 +41,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         // delay: 0.5,
       });
       setTopPanelTrue((topPanel = true));
-    } else if (topPanel && space === '3D') {
+    } else if (!topPanel && space === '3D') {
       console.log(space, topPanel, 'handleTopPanel ELSE IF');
       gsap.to('.blok-Head', {
         yPercent: 0,
@@ -65,6 +64,19 @@ const BlokHead = ({ blok, float, params }: Props) => {
       };
     }
   }, [handleTopPanel, space]);
+
+  // TopPanel to FALSE on 2D and PHONE
+  useEffect(() => {
+    if (space === '2D' || space === 'PHONE') {
+      console.log(space, topPanel, 'SPACE CHANGE');
+      gsap.to('.blok-Head', {
+        yPercent: 0,
+        ease: 'power1.inOut',
+        duration: 0.165,
+      });
+      setTopPanelTrue((topPanel = true));
+    }
+  }, [space]);
 
   // Set Header Blok Title
   useEffect(() => {
