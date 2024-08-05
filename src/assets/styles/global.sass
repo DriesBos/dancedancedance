@@ -15,11 +15,13 @@ body
 
   // Containers
   main
+    position: relative
     display: flex
     flex-direction: column
     max-width: auto
     width: 100%
     transition: max-width .5s ease
+    // overflow: hidden
     & > .blok
       margin-top: -2px
   &[data-space="2D"]
@@ -42,6 +44,8 @@ body
     padding-bottom: 6rem
     main
       max-width: 400px
+      border: 12px solid var(--theme-type)
+      border-radius: 36px
 
   &[data-theme="BASIC"]
     .themeBackground
@@ -70,9 +74,8 @@ body
     object-position: center
 
 .blok
-  // position: sticky
-  // top: 0
-  position: relative
+  position: sticky
+  top: 0
   display: flex
   flex-direction: column
   border: var(--border-width) solid var(--theme-type)
