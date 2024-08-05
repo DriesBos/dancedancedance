@@ -206,16 +206,19 @@ body
 .storeSwitcher
   display: flex
   align-items: center
+  gap: 1rem
   & > div
-    margin: 5px
     cursor: pointer
+    padding: 3px 10px
+    font-size: 12px
+    color: var(--theme-bg)
+    background: var(--theme-type)
     border: 1px solid var(--theme-type)
     border-radius: 1000px
-    padding: 1px 8px
-    font-size: 12px
+    transition: all .33s ease
     &:hover
-      color: var(--theme-bg)
-      background: var(--theme-type)
+      color: var(--theme-type)
+      background: var(--theme-bg)
 
 // Animations
 @keyframes projectImages
