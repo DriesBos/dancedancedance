@@ -3,9 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/store/store';
-
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconMail from '@/components/Icons/IconMail';
 import IconClose from '@/components/Icons/IconClose';
@@ -31,22 +30,10 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
 
-  useEffect(() => {
-    const main = document.querySelector('main');
-    const selection = main !== null;
-    if (selection) {
-      main.addEventListener('mouseleave', handleTopPanel);
-      main.addEventListener('mouseenter', handleTopPanel);
-      return () => {
-        main.removeEventListener('mouseleave', handleTopPanel);
-        main.removeEventListener('mouseenter', handleTopPanel);
-      };
-    }
-  }, []);
-
-  function handleTopPanel() {
+  const handleTopPanel = useCallback(() => {
     // setTopPanelTrue((topPanel = !topPanel));
     if (!topPanel && space === '3D') {
+      console.log(space, 'TOPPANEL');
       console.log(space, topPanel, 'handleTopPanel IF');
       gsap.to('.blok-Head', {
         yPercent: -100,
@@ -64,8 +51,22 @@ const BlokHead = ({ blok, float, params }: Props) => {
       });
       setTopPanelTrue((topPanel = false));
     }
-  }
+  }, []);
 
+  useEffect(() => {
+    const main = document.querySelector('main');
+    const selection = main !== null;
+    if (selection && space === '3D') {
+      main.addEventListener('mouseleave', handleTopPanel);
+      main.addEventListener('mouseenter', handleTopPanel);
+      return () => {
+        main.removeEventListener('mouseleave', handleTopPanel);
+        main.removeEventListener('mouseenter', handleTopPanel);
+      };
+    }
+  }, [handleTopPanel, space]);
+
+  // Set Header Blok Title
   useEffect(() => {
     let tempPathName = path.split('/')[1];
     switch (tempPathName) {
@@ -90,6 +91,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     }
   }, [path]);
 
+  // Set Escape Key
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
