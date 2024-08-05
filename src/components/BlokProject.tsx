@@ -21,7 +21,11 @@ const BlokProject = ({
   category,
   images,
 }: Props) => {
-  const array = Array.from(images);
+  const arr = Array.from(images);
+  const repeatedArr = Array(10)
+    .fill(arr)
+    .flatMap((x) => x);
+
   return (
     <Link
       className={`blok blok-Project ${active ? '' : 'inActive'}`}
@@ -40,40 +44,7 @@ const BlokProject = ({
       </Row>
       <Row>
         <div className="imageContainer">
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-          {array.map((item: any, index: number) => (
+          {repeatedArr.map((item: any, index: number) => (
             <img key={index} src={item.filename} alt={item.alt} />
           ))}
         </div>
