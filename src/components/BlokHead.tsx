@@ -121,7 +121,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
       <BlokTopPanel />
       <Row>
-        <div className="column">
+        <div className="column column-Title">
           <Link href="/">Dries Bos&nbsp;</Link>
           <Link href="/projects/anatha-wallet">
             {pathName === 'home' && <span>— Design, Code & Interaction</span>}

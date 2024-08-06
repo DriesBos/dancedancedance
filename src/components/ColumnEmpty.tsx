@@ -1,3 +1,3 @@
-const ColumnEmpty = () => <div className="column"></div>;
+const ColumnEmpty = () => <div className="column column-Empty"></div>;
 
 export default ColumnEmpty;
