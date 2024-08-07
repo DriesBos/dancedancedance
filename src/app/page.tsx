@@ -1,14 +1,12 @@
 import { ISbStoriesParams, getStoryblokApi } from '@storyblok/react/rsc';
 import ProjectList from '../components/ProjectList';
 // import StoryblokStory from '@storyblok/react/story';
-import RunGSAP from '../helpers/runGSAP';
 
 export default async function Home() {
   const { data } = await fetchData();
 
   return (
     <>
-      <RunGSAP />
       <ProjectList />
     </>
   );

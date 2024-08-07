@@ -11,7 +11,6 @@ import StoryblokProvider from '@/components/StoryblokProvider';
 import BlokHead from '@/components/BlokHead';
 import BlokFooter from '@/components/BlokFooter';
 import AppInitializer from '@/components/AppInitStore';
-import StoreSwitcher from '@/components/StoreSwitcher';
 import BlokFilter from '@/components/BlokFilter';
 import ThemeBackground from '@/components/ThemeBackground';
 
