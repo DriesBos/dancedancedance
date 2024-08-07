@@ -139,7 +139,7 @@ body
         display: none
   &-Project
     transform: translateY(0)
-    transition: transform 1s ease
+    transition: transform var(--transition-project)
     &:hover
       transform: translateY(-10rem)
       .imageContainer
@@ -150,7 +150,7 @@ body
       &-Icons
         flex-grow: 1
     .imageContainer
-      transition: height 1s ease
+      transition: height var(--transition-project)
       will-change: height, transform
       animation: projectImages 2000s linear infinite
       height: 0rem

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
-import '@/assets/styles/vars.css';
+import '@/assets/styles/vars.sass';
 import '@/assets/styles/typography.sass';
 import '@/assets/styles/transitions.sass';
 import '@/assets/styles/global.sass';
