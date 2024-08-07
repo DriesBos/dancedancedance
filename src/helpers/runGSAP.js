@@ -13,9 +13,8 @@ function RunGsap() {
       y: 0,
       ease: 'power1.inOut',
       duration: 0.33,
-      // delay: 10,
       stagger: {
-        amount: 1,
+        amount: 0.66,
       },
     });
   });
