@@ -242,12 +242,17 @@ body
         z-index: +1
   // PHONE
   &[data-space="PHONE"]
-    padding-top: calc(10vmin)
-    padding-bottom: 6rem
+    height: 100vh
+    overflow: hidden
+    align-items: center
     main
       max-width: 400px
       border: 10px solid var(--theme-type)
       border-radius: 36px
+      flex-grow: 1
+      overflow-y: auto 
+      aspect-ratio: 9 / 19.5
+      max-height: 90vh
     .blok
       border-left: 0
       border-right: 0
