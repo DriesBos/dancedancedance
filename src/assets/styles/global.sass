@@ -24,6 +24,7 @@ body
     border: 0 solid var(--theme-type)
     border-radius: 0
     transition: border 1s ease, border-radius 1s ease, max-width 1s ease
+    will-change: border, border-radius, max-width
     & > .blok
       margin-top: -2px
 
@@ -49,7 +50,9 @@ body
   background: var(--theme-container)
   // GSAP Animations
   // transform-style: preserve-3d
+  will-change: transform, opacity
   opacity: 0
+  transform: translateY(50px)
   &.inactive
     display: none
   .blokTopPanel
@@ -138,7 +141,6 @@ body
       .column:nth-child(n+3):not(.column-Icons)
         display: none
   &-Project
-    transform: translateY(0)
     transition: transform var(--transition-project)
     &:hover
       transform: translateY(-10rem)
