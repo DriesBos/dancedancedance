@@ -9,9 +9,6 @@ const StoreSwitcher = () => {
   const setThreeD = useStore((state: any) => state.setThreeD);
   const setPhone = useStore((state: any) => state.setPhone);
   const setTheme = useStore((state: any) => state.setTheme);
-  // var topPanel = useStore((state) => state.topPanel);
-  // const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
-
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
 

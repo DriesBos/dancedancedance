@@ -27,6 +27,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const space = useStore((state: any) => state.space);
   var topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
+  const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -38,12 +39,14 @@ const BlokHead = ({ blok, float, params }: Props) => {
         ease: 'power1.inOut',
         duration: 0.33,
       });
+      setTopPanelTrue(true);
     } else {
       gsap.to('.blok-Head', {
         yPercent: 0,
         ease: 'power1.inOut',
         duration: 0.33,
       });
+      setTopPanelFalse(false);
     }
   }, []);
 
@@ -69,7 +72,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
         duration: 0.165,
       });
     }
-  }, [space]);
+    setTopPanelFalse(false);
+  }, [space, setTopPanelFalse]);
 
   // Set Header Blok Title
   useEffect(() => {
