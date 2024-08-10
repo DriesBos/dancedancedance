@@ -21,9 +21,9 @@ body
     max-width: auto
     width: 100%
     overflow: hidden
-    border: 0 solid var(--theme-type)
+    border: 0 solid var(--theme-type) 
     border-radius: 0
-    transition: border 1s ease, border-radius 1s ease, max-width 1s ease
+    transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease
     will-change: border, border-radius, max-width
     & > .blok
       margin-top: -2px
@@ -47,10 +47,9 @@ body
   display: flex
   flex-direction: column
   border: var(--border-width) solid var(--theme-type)
-  background: var(--theme-container)
-  // GSAP Animations
-  // transform-style: preserve-3d
-  will-change: transform, opacity
+  background-color: var(--theme-container)
+  transition: border 1s ease, background-color 1s ease, color 1s ease
+  will-change: border, background-color, transform, opacity, color
   opacity: 0
   transform: translateY(50px)
   &.inactive
@@ -68,6 +67,8 @@ body
       width: calc(100% + 2px)
       path
         fill: var(--theme-container)
+        transition: fill 1s ease
+        will-change: fill
 
   .row
     display: flex
@@ -80,6 +81,8 @@ body
       padding: var(--blok-padding)
       &[data-inactive='true']
         color: var(--theme-type-inactive)
+        transition: color 1s ease
+        will-change: color
       &-Empty
         @media (max-width: 800px)
           display: none
@@ -99,6 +102,7 @@ body
             width: var(--var)
             z-index: 0
             border-bottom: var(--border-width) solid var(--theme-type)
+            will-change: width, border-bottom
           &:hover
             &::before
               @media ( hover: hover )
@@ -167,8 +171,6 @@ body
         height: 100%
         width: auto
         height: 10rem
-      // &:hover
-      //   animation-play-state: paused
     @media (max-width: 800px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
@@ -199,16 +201,12 @@ body
   gap: .5rem
   & > div
     cursor: pointer
-    padding: 3px 10px
-    font-size: 12px
-    color: var(--theme-type)
-    background: var(--theme-background)
+    padding: 4px 11px
+    font-size: 11px
     border: var(--border-width) solid var(--theme-type)
+    transition: border 1s ease, color 1s ease
+    will-change: border, color
     border-radius: 1000px
-    transition: all .33s ease
-    &:hover
-      color: var(--theme-type)
-      background: var(--theme-bg)
 
 //// SPACES
 body
