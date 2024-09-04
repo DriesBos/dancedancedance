@@ -8,11 +8,13 @@ import '@/assets/styles/global.sass';
 import localFont from 'next/font/local';
 import { storyblokInit, apiPlugin } from '@storyblok/react/rsc';
 import StoryblokProvider from '@/components/StoryblokProvider';
-import BlokHead from '@/components/BlokHead';
-import BlokFooter from '@/components/BlokFooter';
 import AppInitializer from '@/components/AppInitStore';
-import BlokFilter from '@/components/BlokFilter';
 import ThemeBackground from '@/components/ThemeBackground';
+import BlokHead from '@/components/BlokHead';
+import BlokFilter from '@/components/BlokFilter';
+import BlokFooter from '@/components/BlokFooter';
+import { Canvas, useLoader } from '@react-three/fiber';
+import CanvasComponent from '@/components/CanvasComponent';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
@@ -37,8 +39,10 @@ export default async function RootLayout({
   return (
     <StoryblokProvider>
       <html lang="en" suppressHydrationWarning={true}>
+        <head />
         <AppInitializer className={`body ${myFont.className}`}>
           <ThemeBackground />
+          {/* <CanvasComponent>{children}</CanvasComponent> */}
           <main className="main">
             <BlokHead />
             <BlokFilter />

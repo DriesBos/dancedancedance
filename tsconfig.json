@@ -32,7 +32,10 @@
     ".next/types/**/*.ts",
     "src/app/page.tsx",
     "src/app/projects/[...slug].js",
-    "src/app/about/page.js"
+    "src/app/about/page.js",
+    "src/components/CanvasInner.js",
+    "src/components/CanvasComponent.js",
+    "src/components/BlokTest.js"
   ],
   "exclude": ["node_modules"]
 }
