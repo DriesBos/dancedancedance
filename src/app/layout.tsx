@@ -42,8 +42,11 @@ export default async function RootLayout({
         <head />
         <AppInitializer className={`body ${myFont.className}`}>
           <ThemeBackground />
-          {/* <CanvasComponent>{children}</CanvasComponent> */}
-          <main className="main">
+          <CanvasComponent>
+            {children}
+            <p>THIS IS MAIN</p>
+          </CanvasComponent>
+          {/* <main className="main">
             <div className="containerBackground side side_Back" />
             <div className="containerBackground side side_Front" />
             <div className="containerBackground side side_Left" />
@@ -54,7 +57,7 @@ export default async function RootLayout({
             <BlokFilter />
             {children}
             <BlokFooter />
-          </main>
+          </main> */}
         </AppInitializer>
       </html>
     </StoryblokProvider>

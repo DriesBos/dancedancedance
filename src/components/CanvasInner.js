@@ -28,7 +28,9 @@ const CanvasComponent = ({ children, rangeValue }) => {
         ref={htmlObject}
         position={[0, 0, rangeValue * 2]}
         transform
+        className="html"
       >
+        <p>HTML</p>
         {children}
       </Html>
 

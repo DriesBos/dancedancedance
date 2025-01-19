@@ -44,6 +44,7 @@ const CanvasComponent = ({ children }) => {
 
         <CanvasInner rangeValue={rangeValue}>
           {/* <BlokTest onRangeChange={handleRangeChange} /> */}
+          <p>CANVASINNER</p>
           {children}
         </CanvasInner>
       </Canvas>
