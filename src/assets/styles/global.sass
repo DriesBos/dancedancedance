@@ -145,7 +145,6 @@ body
   &-Filter
     transition: padding-top 1s ease
     padding-top: var(--top-padding-filter)
-    z-index: -1
     .column
       &-Icons
         flex-grow: 1
@@ -172,7 +171,6 @@ body
       flex-direction: row
       flex-frap: nowrap
       justify-content: flex-start
-      gap: 1px
       @media (max-width: 800px)
         animation: projectImages 500s linear infinite
       img
@@ -222,6 +220,8 @@ body
     & > .blok:first-child, & > .blok:nth-child(2) 
       .side
         display: inline-block
+    & > .blok:nth-child(2) 
+      z-index: -1
   // 2D
   &[data-space="2D"]
     padding: 0
@@ -292,6 +292,12 @@ body
   &[data-theme="NIGHTMODE"]
     .themeBackground
       opacity: 0
+    .blok-Project
+      .imageContainer
+        background: var(--theme-type)
+        img
+          filter: grayscale(100%)
+          opacity: 0.75
   &[data-theme="IMAGE"]
     .themeBackground
       opacity: 1
