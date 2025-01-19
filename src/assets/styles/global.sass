@@ -145,6 +145,7 @@ body
   &-Filter
     transition: padding-top 1s ease
     padding-top: var(--top-padding-filter)
+    z-index: -1
     .column
       &-Icons
         flex-grow: 1
@@ -249,10 +250,7 @@ body
       transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform .33s ease
       & > .blok
         transform-style: preserve-3d
-        position: relative // TODO: remove and add sticky again (check stuttering)
         perspective-origin: 50% -1000px
-      & > .blok:first-child 
-        z-index: +1
   // PHONE
   &[data-space="PHONE"]
     height: 100vh
