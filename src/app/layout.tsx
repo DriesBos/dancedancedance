@@ -13,8 +13,6 @@ import ThemeBackground from '@/components/ThemeBackground';
 import BlokHead from '@/components/BlokHead';
 import BlokFilter from '@/components/BlokFilter';
 import BlokFooter from '@/components/BlokFooter';
-import { Canvas, useLoader } from '@react-three/fiber';
-import CanvasComponent from '@/components/CanvasComponent';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
@@ -42,7 +40,6 @@ export default async function RootLayout({
         <head />
         <AppInitializer className={`body ${myFont.className}`}>
           <ThemeBackground />
-          {/* <CanvasComponent>{children}</CanvasComponent> */}
           <main className="main">
             <div className="containerBackground side side_Back" />
             <div className="containerBackground side side_Front" />
