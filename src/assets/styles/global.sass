@@ -281,6 +281,13 @@ body
       overflow: visible
       transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform .33s ease
       transform: perspective($perspective) rotateX(0deg) rotateY(15deg) scale(0.6)
+      & > .blok
+        position: relative
+        &-Project
+          &:hover
+            transform: translateY(0rem)
+            .imageContainer
+              height: 0
       & > .blok:first-child, & > .blok:nth-child(2) 
         .blokTopPanel
           display: inline-block
