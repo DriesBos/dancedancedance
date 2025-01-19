@@ -1,5 +1,5 @@
-// Global
-$perspective: 2000px
+// VARS
+$perspective: 3000px
 $scale: 0.8
 
 html, body
@@ -23,15 +23,13 @@ body
     flex-direction: column
     max-width: auto
     width: 100%
-    overflow: hidden
+    // overflow: hidden
     border: 0 solid var(--theme-type) 
     border-radius: 0
     transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform 1s ease
     will-change: border, border-radius, max-width, transform, color
     transform-style: preserve-3d
-    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(0.8)
-    transform: perspective($perspective) rotateX(-20deg) rotateY(20deg) scale($scale)
-    animation: testSpin 20s linear infinite
+    transform: perspective($perspective) rotateX(0deg) rotateY(0deg) scale(1)
     & > .blok
       margin-top: -2px
 
@@ -60,18 +58,18 @@ body
   &_Front
     transform: rotateX(0deg) rotateY(0deg) translateZ(100px) 
   &_Back
-    border: 1px solid var(--theme-type)
+    border: var(--border-width) solid var(--theme-type)
     transform: rotateX(0deg) rotateY(0deg) translateZ(-100px) 
   &_Left
     width: 200px
-    border: 1px solid var(--theme-type)
+    border: var(--border-width) solid var(--theme-type)
     transform-origin: left center
     transform: rotateX(0deg) rotateY(-90deg) translateX(-100px)  
   &_Right
     width: 200px
     right: 0
     left: auto
-    border: 1px solid var(--theme-type)
+    border: var(--border-width) solid var(--theme-type)
     transform-origin: right center
     transform: rotateX(0deg) rotateY(90deg) translateX(100px) 
   &_Top
@@ -79,18 +77,12 @@ body
     transform: rotateX(90deg) rotateY(0deg) translateY(-100px) 
     transform-origin: 0 0
   &_Bottom
-    border: 1px solid var(--theme-type)
+    border: var(--border-width) solid var(--theme-type)
     top: auto
     bottom: 0
     height: 200px
     transform: rotateX(90deg) rotateY(0deg) translateY(100px) 
     transform-origin: center bottom
-
-// .containerBackground
-//   background: red
-
-  
-  // background-color: var(--theme-container)
 
 .blok
   position: sticky
@@ -227,18 +219,6 @@ body
     @media (max-width: 800px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
-// Global Elements
-// .canvas
-//   position: fixed
-//   top: 0
-//   left: 0
-//   width: 100%
-//   height: 100vh
-//   z-index: 1000
-// canvas
-//   width: 100%
-//   height: 100%
-//   display: block
 .icon
   position: relative
   width: 25px
@@ -293,17 +273,21 @@ body
         border-top: 0
   // 3D
   &[data-space="3D"]
-    padding-top: calc(15rem + 10vmin)
+    padding-top: calc(10vmin)
     padding-bottom: 6rem
     main
       width: 88vw
       max-width: 1150px
       overflow: visible
+      transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform .33s ease
+      transform: perspective($perspective) rotateX(0deg) rotateY(15deg) scale(0.6)
       & > .blok:first-child, & > .blok:nth-child(2) 
         .blokTopPanel
           display: inline-block
       & > .blok:first-child 
         z-index: +1
+      &:hover
+        transform: perspective($perspective) rotateX(0deg) rotateY(0deg) scale(0.8)
   // PHONE
   &[data-space="PHONE"]
     height: 100vh
