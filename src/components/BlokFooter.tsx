@@ -2,7 +2,6 @@
 
 import IconArrowLongUp from '@/components/Icons/IconArrowLongUp';
 import Row from './Row';
-import Blok from './Blok';
 import BlokTopPanel from './Icons/BlokTopPanel';
 
 const BlokFooter = () => {
