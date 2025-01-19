@@ -43,6 +43,7 @@ body
 
 .side 
   position: absolute
+  display: none
   left: 0
   top: 0
   width: 100%
@@ -73,8 +74,6 @@ body
   perspective: 3000px
   perspective-origin: 0 0
   &.inactive
-    display: none
-  & > .blokSidePanels
     display: none
 
   .row
@@ -217,6 +216,11 @@ body
 
 //// SPACES
 body
+  // OMNI
+  main
+    & > .blok:first-child, & > .blok:nth-child(2) 
+      .side
+        display: inline-block
   // 2D
   &[data-space="2D"]
     padding: 0
@@ -247,14 +251,6 @@ body
         transform-style: preserve-3d
         position: relative // TODO: remove and add sticky again (check stuttering)
         perspective-origin: 50% -1000px
-        &-Project
-          &:hover
-            transform: translateY(0rem)
-            .imageContainer
-              height: 0
-      & > .blok:first-child, & > .blok:nth-child(2) 
-        .blokSidePanels
-          display: inline-block
       & > .blok:first-child 
         z-index: +1
   // PHONE
