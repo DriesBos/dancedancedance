@@ -1,4 +1,7 @@
 // Global
+$perspective: 2000px
+$scale: 0.8
+
 html, body
   position: relative
   width: 100%
@@ -23,8 +26,12 @@ body
     overflow: hidden
     border: 0 solid var(--theme-type) 
     border-radius: 0
-    transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease
-    will-change: border, border-radius, max-width
+    transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform 1s ease
+    will-change: border, border-radius, max-width, transform, color
+    transform-style: preserve-3d
+    transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(0.8)
+    transform: perspective($perspective) rotateX(-20deg) rotateY(20deg) scale($scale)
+    animation: testSpin 20s linear infinite
     & > .blok
       margin-top: -2px
 
@@ -41,17 +48,63 @@ body
     object-fit: cover
     object-position: center
 
+.side 
+  position: absolute
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  background: hsl(0, 0%, 0%, 0.33)
+  transition: all 1s ease
+  will-change: transform
+  &_Front
+    transform: rotateX(0deg) rotateY(0deg) translateZ(100px) 
+  &_Back
+    border: 1px solid var(--theme-type)
+    transform: rotateX(0deg) rotateY(0deg) translateZ(-100px) 
+  &_Left
+    width: 200px
+    border: 1px solid var(--theme-type)
+    transform-origin: left center
+    transform: rotateX(0deg) rotateY(-90deg) translateX(-100px)  
+  &_Right
+    width: 200px
+    right: 0
+    left: auto
+    border: 1px solid var(--theme-type)
+    transform-origin: right center
+    transform: rotateX(0deg) rotateY(90deg) translateX(100px) 
+  &_Top
+    height: 200px
+    transform: rotateX(90deg) rotateY(0deg) translateY(-100px) 
+    transform-origin: 0 0
+  &_Bottom
+    border: 1px solid var(--theme-type)
+    top: auto
+    bottom: 0
+    height: 200px
+    transform: rotateX(90deg) rotateY(0deg) translateY(100px) 
+    transform-origin: center bottom
+
+// .containerBackground
+//   background: red
+
+  
+  // background-color: var(--theme-container)
+
 .blok
   position: sticky
   top: 0
   display: flex
   flex-direction: column
   border: var(--border-width) solid var(--theme-type)
-  background-color: var(--theme-container)
+  // background-color: var(--theme-container)
   transition: border 1s ease, background-color 1s ease, color 1s ease
   will-change: border, background-color, transform, opacity, color
   opacity: 0
-  transform: translateY(50px)
+  // transform: translateY(50px)
+  transform-style: preserve-3d
+  transform: translateZ(100px) !important
   &.inactive
     display: none
   .blokTopPanel
@@ -300,6 +353,18 @@ body
       opacity: 0
 
 //// Animations
+@keyframes testSpin
+  0%
+    transform: perspective($perspective) rotateX(20deg) rotateY(20deg) scale($scale)
+  25%
+    transform: perspective($perspective) rotateX(-20deg) rotateY(20deg) scale($scale)
+  50%
+    transform: perspective($perspective) rotateX(-20deg) rotateY(-20deg) scale($scale)
+  75%
+    transform: perspective($perspective) rotateX(20deg) rotateY(-20deg) scale($scale)
+  100%
+    transform: perspective($perspective) rotateX(20deg) rotateY(20deg) scale($scale)
+
 @keyframes projectImages
   0%
     transform: translateX(0)
