@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
+import BlokSidePanels from './BlokSides';
 
 interface Props {
   slug?: String;

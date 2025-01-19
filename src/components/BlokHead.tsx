@@ -9,11 +9,10 @@ import IconAbout from '@/components/Icons/IconAbout';
 import IconMail from '@/components/Icons/IconMail';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
-import BlokTopPanel from '@/components/Icons/BlokTopPanel';
 import Row from './Row';
 import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
 import StoreSwitcher from '@/components/StoreSwitcher';
+import BlokSidePanels from './BlokSides';
 
 interface Props {
   blok?: any;
@@ -116,7 +115,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
-      <BlokTopPanel />
+      <BlokSidePanels />
       <Row>
         <div className="column column-Title">
           <Link href="/">Dries Bos&nbsp;</Link>

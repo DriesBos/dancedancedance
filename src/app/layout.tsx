@@ -41,12 +41,6 @@ export default async function RootLayout({
         <AppInitializer className={`body ${myFont.className}`}>
           <ThemeBackground />
           <main className="main">
-            <div className="containerBackground side side_Back" />
-            <div className="containerBackground side side_Front" />
-            <div className="containerBackground side side_Left" />
-            <div className="containerBackground side side_Right" />
-            <div className="containerBackground side side_Top" />
-            <div className="containerBackground side side_Bottom" />
             <BlokHead />
             <BlokFilter />
             {children}

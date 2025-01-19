@@ -3,7 +3,7 @@
 import IconAbout from '@/components/Icons/IconAbout';
 import { usePathname } from 'next/navigation';
 import Row from './Row';
-import BlokTopPanel from '@/components/Icons/BlokTopPanel';
+import BlokSidePanels from './BlokSides';
 
 export default function BlokFilter() {
   const path = usePathname();
@@ -11,7 +11,7 @@ export default function BlokFilter() {
     <>
       {path === '/' && (
         <div className="blok blok-Filter">
-          <BlokTopPanel />
+          <BlokSidePanels />
           <Row>
             <div className="column column-Year" data-inactive={true}>
               Date

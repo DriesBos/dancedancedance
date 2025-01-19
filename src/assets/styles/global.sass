@@ -1,7 +1,3 @@
-// VARS
-$perspective: 3000px
-$scale: 0.8
-
 html, body
   position: relative
   width: 100%
@@ -29,7 +25,6 @@ body
     transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform 1s ease
     will-change: border, border-radius, max-width, transform, color
     transform-style: preserve-3d
-    transform: perspective($perspective) rotateX(0deg) rotateY(0deg) scale(1)
     & > .blok
       margin-top: -2px
 
@@ -52,37 +47,17 @@ body
   top: 0
   width: 100%
   height: 100%
-  background: hsl(0, 0%, 0%, 0.33)
-  transition: all 1s ease
-  will-change: transform
-  &_Front
-    transform: rotateX(0deg) rotateY(0deg) translateZ(100px) 
-  &_Back
-    border: var(--border-width) solid var(--theme-type)
-    transform: rotateX(0deg) rotateY(0deg) translateZ(-100px) 
-  &_Left
-    width: 200px
-    border: var(--border-width) solid var(--theme-type)
-    transform-origin: left center
-    transform: rotateX(0deg) rotateY(-90deg) translateX(-100px)  
-  &_Right
-    width: 200px
-    right: 0
-    left: auto
-    border: var(--border-width) solid var(--theme-type)
-    transform-origin: right center
-    transform: rotateX(0deg) rotateY(90deg) translateX(100px) 
+  background: var(--theme-container)
+  border: var(--border-width) solid var(--theme-type)
+  will-change: transform, background, color, border
+  pointer-events: none
   &_Top
-    height: 200px
-    transform: rotateX(90deg) rotateY(0deg) translateY(-100px) 
+    left: calc(0px - #{var(--border-width)})
+    top: calc(0px - #{var(--border-width)})
+    height: 700px
+    width: calc(100% + 2 * #{var(--border-width)})
+    transform: rotateX(90deg) rotateY(0deg) translateY(-700px) 
     transform-origin: 0 0
-  &_Bottom
-    border: var(--border-width) solid var(--theme-type)
-    top: auto
-    bottom: 0
-    height: 200px
-    transform: rotateX(90deg) rotateY(0deg) translateY(100px) 
-    transform-origin: center bottom
 
 .blok
   position: sticky
@@ -90,30 +65,17 @@ body
   display: flex
   flex-direction: column
   border: var(--border-width) solid var(--theme-type)
-  // background-color: var(--theme-container)
-  transition: border 1s ease, background-color 1s ease, color 1s ease
-  will-change: border, background-color, transform, opacity, color
+  background-color: var(--theme-container)
+  transition: border 1s ease, background-color 1s ease, color 1s ease, perspective 1s ease, perspective-origin 1s ease
+  will-change: border, background-color, transform, opacity, color, perspective
   opacity: 0
-  // transform: translateY(50px)
   transform-style: preserve-3d
-  transform: translateZ(100px) !important
+  perspective: 3000px
+  perspective-origin: 0 0
   &.inactive
     display: none
-  .blokTopPanel
+  & > .blokSidePanels
     display: none
-    position: absolute
-    transform: translateY(-100%)
-    top: 2px
-    left: -2px
-    right: 0
-    pointer-events: none
-    z-index: -100
-    svg
-      width: calc(100% + 2px)
-      path
-        fill: var(--theme-container)
-        transition: fill 1s ease
-        will-change: fill
 
   .row
     display: flex
@@ -273,28 +235,27 @@ body
         border-top: 0
   // 3D
   &[data-space="3D"]
-    padding-top: calc(10vmin)
+    padding-top: calc(15rem + 10vmin)
     padding-bottom: 6rem
     main
       width: 88vw
       max-width: 1150px
       overflow: visible
       transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform .33s ease
-      transform: perspective($perspective) rotateX(0deg) rotateY(15deg) scale(0.6)
       & > .blok
-        position: relative
+        transform-style: preserve-3d
+        position: relative // TODO: remove and add sticky again (check stuttering)
+        perspective-origin: 50% -1000px
         &-Project
           &:hover
             transform: translateY(0rem)
             .imageContainer
               height: 0
       & > .blok:first-child, & > .blok:nth-child(2) 
-        .blokTopPanel
+        .blokSidePanels
           display: inline-block
       & > .blok:first-child 
         z-index: +1
-      &:hover
-        transform: perspective($perspective) rotateX(0deg) rotateY(0deg) scale(0.8)
   // PHONE
   &[data-space="PHONE"]
     height: 100vh
@@ -344,18 +305,6 @@ body
       opacity: 0
 
 //// Animations
-@keyframes testSpin
-  0%
-    transform: perspective($perspective) rotateX(20deg) rotateY(20deg) scale($scale)
-  25%
-    transform: perspective($perspective) rotateX(-20deg) rotateY(20deg) scale($scale)
-  50%
-    transform: perspective($perspective) rotateX(-20deg) rotateY(-20deg) scale($scale)
-  75%
-    transform: perspective($perspective) rotateX(20deg) rotateY(-20deg) scale($scale)
-  100%
-    transform: perspective($perspective) rotateX(20deg) rotateY(20deg) scale($scale)
-
 @keyframes projectImages
   0%
     transform: translateX(0)
