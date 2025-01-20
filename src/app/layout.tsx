@@ -13,11 +13,12 @@ import ThemeBackground from '@/components/ThemeBackground';
 import BlokHead from '@/components/BlokHead';
 import BlokFilter from '@/components/BlokFilter';
 import BlokFooter from '@/components/BlokFooter';
+import StoreSwitcher from '@/components/StoreSwitcher';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
 export const metadata: Metadata = {
-  title: 'Dance Dance Dance',
+  title: 'Studio Monolith',
   description: 'Portfolio Dries Bos',
 };
 
@@ -40,6 +41,7 @@ export default async function RootLayout({
         <head />
         <AppInitializer className={`body ${myFont.className}`}>
           <ThemeBackground />
+          <StoreSwitcher />
           <main className="main">
             <BlokHead />
             <BlokFilter />

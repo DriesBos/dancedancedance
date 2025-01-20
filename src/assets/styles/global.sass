@@ -19,10 +19,10 @@ body
     flex-direction: column
     max-width: auto
     width: 100%
-    // overflow: hidden
     border: 0 solid var(--theme-type) 
+    background: var(--theme-container)
     border-radius: 0
-    transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform 1s ease
+    transition: border 1s ease, border-radius 1s ease, max-width 1s ease, color 1s ease, transform 1s ease, background 1s ease
     will-change: border, border-radius, max-width, transform, color
     transform-style: preserve-3d
     & > .blok
@@ -34,6 +34,7 @@ body
   height: 100vh
   top: 0
   left: 0
+  opacity: 0
   transition: opacity 1s ease
   img
     width: 100%
@@ -48,7 +49,8 @@ body
   top: 0
   width: 100%
   height: 100%
-  background: var(--theme-container)
+  background: var(--theme-blok)
+  transition: background 1s ease, border 1s ease, color 1s ease
   border: var(--border-width) solid var(--theme-type)
   will-change: transform, background, color, border
   pointer-events: none
@@ -66,8 +68,8 @@ body
   display: flex
   flex-direction: column
   border: var(--border-width) solid var(--theme-type)
-  background-color: var(--theme-container)
-  transition: border 1s ease, background-color 1s ease, color 1s ease, perspective 1s ease, perspective-origin 1s ease
+  background: var(--theme-blok)
+  transition: border 1s ease, background 1s ease, color 1s ease, perspective 1s ease, perspective-origin 1s ease
   will-change: border, background-color, transform, opacity, color, perspective
   opacity: 0
   transform-style: preserve-3d
@@ -201,9 +203,14 @@ body
 
 // Specific Elements
 .storeSwitcher
+  position: fixed
+  top: 1rem
+  right: 5rem
   display: flex
   align-items: center
   gap: .5rem
+  z-index: 999
+  pointer-events: auto
   & > div
     cursor: pointer
     padding: 4px 11px
@@ -304,13 +311,9 @@ body
   &[data-theme="TRON"]
     .themeBackground
       opacity: 0
-
-//// Animations
-@keyframes projectImages
-  0%
-    transform: translateX(0)
-  100%
-    transform: translateX(-100%)
+  &[data-theme="GRADIENT"]
+    .themeBackground
+      opacity: 0
 
 @keyframes hyperLink
   0%
@@ -335,50 +338,3 @@ body
     left: 0
     right: auto
     width: 100%
-
-// .blok
-//   min-height: 100px
-//   width: 100%
-//   opacity: 1 !important
-
-// .testContainer
-//   display: flex
-//   flex-direction: column
-//   &_2D
-//     width: 100vw
-//     position: absolute
-//     left: 0
-//     top: 0
-//     rightl: 0
-//     z-index: 1000
-//   &_3D
-//     width: 100vw
-
-
-// .blokTest
-//   position: relative
-//   display: flex
-//   border: var(--border-width) solid var(--theme-type)
-//   background-color: var(--theme-container)
-//   &_Row
-//     display: flex
-//     flex-direction: row
-//     row-wrap: nowrap
-//   &_Column
-//     flex: 1
-//     text-align: left
-//     padding: var(--blok-padding)
-//     &-Range
-//       flex-grow: 1
-//       width: 500px
-//       gap: 1rem
-//       display: flex
-//       align-items: center
-//       flex-wrap: nowrap
-//       span
-//         margin-left: 1rem
-//       input[type=range]
-//         flex-grow: 1
-//         cursor: pointer
-//         border-radius: 1000px
-//         background: lightgrey

@@ -39,6 +39,7 @@ $break-desktop: 1400px
   /* colors */
   --color-black: hsla(0, 0%, 0%, 1)
   --color-white: white
+  --color-white-inactive: hsla(0, 0%, 100%, 0.4)
   --opacity-inactive: 0.33
   /* Theme Tron */
   --color-tron: hsla(172, 100%, 75%, 1)
@@ -51,7 +52,7 @@ $break-desktop: 1400px
   --color-grey-inactive: #989898
   /* theme */
   --theme-bg: var(--color-black)
-  --theme-container: var(--color-black)
+  --theme-container: var(--color-black) 
   --theme-container-subpanel: transparent
   --theme-type: var(--color-tron)
   --theme-type-inactive: var(--color-tron-inactive)
@@ -80,25 +81,29 @@ body[data-space='3D']
 // THEMES
 body[data-theme='TRON']
   --theme-bg: var(--color-black)
-  --theme-container: var(--color-black)
-  --theme-type: var(--color-tron)
+  --theme-container: transparent
+  --theme-blok: transparent
+  --theme-type: var(--color-tron) 
   --theme-type-inactive: var(--color-tron-inactive)
 
 body[data-theme='NIGHTMODE']
   --theme-bg: var(--color-black)
   --theme-container: transparent
+  --theme-blok: transparent
   --theme-type: var(--color-red)
   --theme-type-inactive: var(--color-red-inactive)
 
 body[data-theme='BASIC']
-  --theme-bg: var(--color-grey)
-  --theme-container: var(--color-white)
+  --theme-bg: var(--color-white)
+  --theme-container: transparent
+  --theme-blok: transparent
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
 
 body[data-theme='IMAGE']
-  --theme-bg: var(--color-grey)
-  --theme-container: hsla(0, 0%, 0%, 0.66)
+  --theme-bg: transparent
+  --theme-container: transparent
+  --theme-blok: hsla(0, 0%, 0%, 0.66)
   --theme-container-subpanel: hsla(100, 100%, 100%, 0.33)
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-grey-inactive)
@@ -106,5 +111,17 @@ body[data-theme='IMAGE']
 body[data-theme='BLACK']
   --theme-bg: transparent
   --theme-container: transparent
+  --theme-blok: var(--color-black)
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
+
+body[data-theme='GRADIENT']
+  --theme-bg: radial-gradient(#D8DAD9, #BCBDC1)
+  --theme-container: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
+  --theme-blok: transparent
+  --theme-type: var(--color-white)
+  --theme-type-inactive: var(--color-white-inactive)
+  &[data-space='3D']
+    --theme-container: transparent
+    --theme-bg: linear-gradient(0.00turn, #A99DA7, #AA899E, #47485A)
+

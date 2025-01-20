@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Theme = 'BASIC' | 'NIGHTMODE' | 'IMAGE' | 'TRON';
+export type Theme = 'BASIC' | 'NIGHTMODE' | 'IMAGE' | 'TRON' | 'GRADIENT';
 
 export type Space = '2D' | '3D' | 'PHONE';
 
@@ -22,11 +22,11 @@ export type Actions = {
 };
 
 export const useStore = create<Props & Actions>()((set) => ({
-  theme: 'BASIC',
-  space: '3D',
+  theme: 'GRADIENT',
+  space: '2D',
   topPanel: true,
   setNightmode: () => set({ theme: 'NIGHTMODE' }),
-  setDefault: () => set({ theme: 'BASIC' }),
+  setDefault: () => set({ theme: 'GRADIENT' }),
   setTheme: (theme: Theme) => set({ theme }),
   setTwoD: () => set({ space: '2D' }),
   setThreeD: () => set({ space: '3D' }),

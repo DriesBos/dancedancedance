@@ -11,7 +11,6 @@ import IconClose from '@/components/Icons/IconClose';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import gsap from 'gsap';
-import StoreSwitcher from '@/components/StoreSwitcher';
 import BlokSidePanels from './BlokSides';
 
 interface Props {
@@ -141,7 +140,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 <IconImage />
               </Link>
             </div> */}
-              <StoreSwitcher />
               <div className="icon">
                 <Link href="/about">
                   <IconAbout />

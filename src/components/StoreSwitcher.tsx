@@ -20,20 +20,19 @@ const StoreSwitcher = () => {
     } else if (theme === 'IMAGE') {
       setTheme('TRON');
     } else if (theme === 'TRON') {
-      setDefault();
+      setTheme('GRADIENT');
+    } else if (theme === 'GRADIENT') {
+      setTheme('BASIC');
     }
   }
 
   function handlePickSpace() {
     if (space === '2D') {
       setThreeD();
-      // setTopPanelTrue((topPanel = false));
     } else if (space === '3D') {
       setPhone();
-      // setTopPanelTrue((topPanel = false));
     } else {
       setTwoD();
-      // setTopPanelTrue((topPanel = false));
     }
   }
 
