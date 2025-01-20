@@ -11,8 +11,6 @@ body
   align-items: flex-start
   padding: 0
   transition: padding-top 1s ease, padding-bottom 1s ease, color 1s ease, background 1s ease
-
-  // Containers
   main
     position: relative
     display: flex
@@ -41,6 +39,20 @@ body
     height: 100%
     object-fit: cover
     object-position: center
+  
+.introText
+  position: fixed
+  top: 0
+  left: 0
+  z-index: -1
+  margin: 5vmin
+  max-width: 80em
+  transition: color 1s ease, opacity 1s ease
+  will-change: color
+  opacity: 0
+  h1
+    font-size: 4vw
+    line-height: 1
 
 .side 
   position: absolute
@@ -220,6 +232,38 @@ body
     will-change: border, color
     border-radius: 1000px
 
+  //// THEMES
+body
+  &[data-theme="BASIC"]
+    .themeBackground
+      opacity: 0
+    main, .side
+      backdrop-filter: blur(100px)
+    .introText
+      opacity: 1
+  &[data-theme="NIGHTMODE"]
+    .themeBackground
+      opacity: 0
+    .blok-Project
+      .imageContainer
+        background: var(--theme-type)
+        img
+          filter: grayscale(100%)
+          opacity: 0.75
+  &[data-theme="IMAGE"]
+    .themeBackground
+      opacity: 1
+  &[data-theme="TRON"]
+    .themeBackground
+      opacity: 0
+  &[data-theme="GRADIENT"]
+    .themeBackground
+      opacity: 0
+    main, .side
+      backdrop-filter: blur(100px)
+    .introText
+      opacity: 1
+
 //// SPACES
 body
   // OMNI
@@ -235,6 +279,8 @@ body
     main
       max-width: 100%
       min-height: 100vh
+    .introText
+      opacity: 0
     .blok
       border-left: 0
       border-right: 0
@@ -271,6 +317,8 @@ body
       overflow-y: auto 
       aspect-ratio: 9 / 19.5
       max-height: 852px
+    .introText
+      opacity: 0
     .blok
       border-left: 0
       border-right: 0
@@ -291,29 +339,6 @@ body
       .column
         &-Empty
           display: none
-
-  //// THEMES
-  &[data-theme="BASIC"]
-    .themeBackground
-      opacity: 0
-  &[data-theme="NIGHTMODE"]
-    .themeBackground
-      opacity: 0
-    .blok-Project
-      .imageContainer
-        background: var(--theme-type)
-        img
-          filter: grayscale(100%)
-          opacity: 0.75
-  &[data-theme="IMAGE"]
-    .themeBackground
-      opacity: 1
-  &[data-theme="TRON"]
-    .themeBackground
-      opacity: 0
-  &[data-theme="GRADIENT"]
-    .themeBackground
-      opacity: 0
 
 @keyframes hyperLink
   0%
