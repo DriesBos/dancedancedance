@@ -43,13 +43,13 @@ const BlokProject = ({
           </div>
         </div>
       </Row>
-      <Row>
+      {/* <Row>
         <div className="imageContainer">
           {repeatedArr.map((item: any, index: number) => (
             <img key={index} src={item.filename} alt={item.alt} />
           ))}
         </div>
-      </Row>
+      </Row> */}
     </Link>
   );
 };

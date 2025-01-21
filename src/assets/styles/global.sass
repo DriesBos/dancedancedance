@@ -79,7 +79,9 @@ body
   top: 0
   display: flex
   flex-direction: column
-  border: var(--border-width) solid var(--theme-type)
+  border-top: var(--border-width) solid var(--theme-type)
+  border-left: var(--border-width) solid var(--theme-type)
+  border-right: var(--border-width) solid var(--theme-type)
   background: var(--theme-blok)
   transition: border 1s ease, background 1s ease, color 1s ease, perspective 1s ease, perspective-origin 1s ease
   will-change: border, background-color, transform, opacity, color, perspective
@@ -148,6 +150,7 @@ body
 
   // Specific Bloks
   &-Head
+    border: var(--border-width) solid var(--theme-type)
     .column 
       &-Title
         flex-grow: 1
@@ -166,34 +169,26 @@ body
       .column:nth-child(n+3):not(.column-Icons)
         display: none
   &-Project
-    transition: transform var(--transition-project)
-    &:hover
-      transform: translateY(-10rem)
-      .imageContainer
-        height: 10rem
+    background: var(--theme-blok-project)
+    border-top: 0
     .row
+      border-top: var(--border-width) solid var(--theme-type)
+      transition: transform 1s
       overflow: hidden
+      background: var(--theme-blok-project)
+    &:hover
+      .row
+        transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
+        transition: transform var(--transition-project-hover)
     .column
       &-Icons
         flex-grow: 1
-    .imageContainer
-      transition: height var(--transition-project)
-      will-change: height, transform
-      animation: projectImages 2000s linear infinite
-      height: 0rem
-      display: flex
-      flex-direction: row
-      flex-frap: nowrap
-      justify-content: flex-start
-      @media (max-width: 800px)
-        animation: projectImages 500s linear infinite
-      img
-        height: 100%
-        width: auto
-        height: 10rem
     @media (max-width: 800px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
+  &-Footer
+    border-bottom: var(--border-width) solid var(--theme-type)
+
 .icon
   position: relative
   width: 25px
@@ -232,7 +227,7 @@ body
     will-change: border, color
     border-radius: 1000px
 
-  //// THEMES
+  // Themes
 body
   &[data-theme="BASIC"]
     .themeBackground
@@ -264,7 +259,7 @@ body
     .introText
       opacity: 1
 
-//// SPACES
+// Spaces
 body
   // OMNI
   main
