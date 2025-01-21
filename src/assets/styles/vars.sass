@@ -53,9 +53,9 @@ $break-desktop: 1400px
   /* theme */
   --theme-bg: var(--color-black)
   --theme-container: var(--color-black) 
-  --theme-blok: transparent
-  --theme-blok-project: transparent
-  --theme-blok-subpanel: transparent
+  --theme-blok: hsla(0, 0%, 100%, 0)
+  --theme-blok-project: hsla(0, 0%, 100%, 0)
+  --theme-blok-subpanel: hsla(100, 100%, 100%, 0)
   --theme-type: var(--color-tron)
   --theme-type-inactive: var(--color-tron-inactive)
 
@@ -69,6 +69,8 @@ $break-desktop: 1400px
 
   // Transition
   --transition-project-hover: .2s ease
+  --transition-space: 1s ease
+  --transition-theme: 1s ease
 
 @media screen and (max-width: 768px)
   :root
@@ -110,6 +112,7 @@ body[data-theme='IMAGE']
   --theme-bg: transparent
   --theme-container: transparent
   --theme-blok: hsla(0, 0%, 0%, 0.66)
+  --theme-blok-project: hsla(0, 0%, 0%, 0.66)
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0.33)
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-grey-inactive)
