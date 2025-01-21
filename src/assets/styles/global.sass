@@ -16,8 +16,12 @@ body
     position: relative
     display: flex
     flex-direction: column
-    max-width: auto
     width: 100%
+    height: auto
+    height: calc-size(auto)
+    max-width: 100%
+    max-height: auto
+    max-height: calc-size(auto)
     border: 0 solid var(--theme-type) 
     background: var(--theme-container)
     backdrop-filter: none
@@ -140,6 +144,7 @@ body
         img, video
           width: 100%
           height: auto
+          height: calc-size(auto)
       &-Year
         flex-grow: 0
       &-Icons
@@ -327,12 +332,12 @@ body
     height: 100vh
     align-items: center
     main
+      flex-grow: 1
       max-width: 393px
+      max-height: 852px
       border: 6px solid var(--theme-type)
       border-radius: 36px
-      flex-grow: 1
       aspect-ratio: 9 / 19.5
-      max-height: 852px
       overflow: hidden
     .introText
       opacity: 0
