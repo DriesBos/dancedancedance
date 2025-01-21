@@ -4,7 +4,7 @@ interface Props {
 const BlokSidePanels = ({ className }: Props) => {
   return (
     <>
-      <div className="containerBackground side side_Top" />
+      <div className="side side_Top" />
     </>
   );
 };
