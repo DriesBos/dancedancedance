@@ -1,3 +1,8 @@
+*
+  &::-webkit-scrollbar 
+    display: none
+    scrollbar-width: none
+  
 html, body
   position: relative
   width: 100%
@@ -151,6 +156,8 @@ body
         display: flex
         justify-content: flex-end
         align-items: center
+        flex-shrink: 1
+        flex-grow: 0
         & > div 
           margin: 0 12.5px
           &:first-child
@@ -200,8 +207,8 @@ body
 
 .icon
   position: relative
-  width: 25px
-  height: 25px
+  width: var(--icon-size)
+  height: var(--icon-size)
   svg
     position: absolute
     top: 0
@@ -341,11 +348,16 @@ body
       border-radius: 36px
       aspect-ratio: 9 / 19.5
       overflow: hidden
+      overflow-y: auto
     .introText
       opacity: 0
     .blok
       border-left: 0
       border-right: 0
+
+      font-size: var(--font-size-mobile) 
+      a, p, h1, h2
+        font-size: var(--font-size-mobile) 
       &-Footer
         border-bottom: 0
       &-Head
