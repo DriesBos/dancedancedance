@@ -22,6 +22,8 @@ const StoreSwitcher = () => {
     } else if (theme === 'TRON') {
       setTheme('GRADIENT');
     } else if (theme === 'GRADIENT') {
+      setTheme('DONJUDD');
+    } else if (theme === 'DONJUDD') {
       setTheme('BASIC');
     }
   }
