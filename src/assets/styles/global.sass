@@ -227,6 +227,26 @@ body
     will-change: border, color
     border-radius: 1000px
 
+.laserBlok
+  position: fixed
+  left: 0
+  top: 0
+  right: 0
+  bottom: 0
+  opacity: 0
+  will-change: opacity
+  pointer-events: none
+  &-Line
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    width: 0vw
+    height: 0vh
+    opacity: 0
+    will-change: width, height, opacity
+    border: var(--border-width) solid var(--theme-type)
+
   // Themes
 body
   &[data-theme="BASIC"]
@@ -291,6 +311,8 @@ body
   &[data-space="3D"]
     padding-top: calc(15rem + 10vmin)
     padding-bottom: 6rem
+    .laserBlok
+      opacity: 1
     main
       width: 88vw
       max-width: 1150px

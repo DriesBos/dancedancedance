@@ -42,6 +42,9 @@ export default async function RootLayout({
         <head />
         <AppInitializer className={`body ${myFont.className}`}>
           <ThemeBackground />
+          <div className="laserBlok">
+            <div className="laserBlok-Line"></div>
+          </div>
           <div className="introText">
             <h1>
               Dance Dance, computational design, creative development, digital

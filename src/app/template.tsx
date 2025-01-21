@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import RunGSAP from '@/helpers/runGSAP';
+import RunLaser from '@/helpers/runLaser';
 
 export default function Template({ children }: { children: React.ReactNode }) {
   useEffect(() => {}, []);
@@ -9,6 +10,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <>
       <RunGSAP />
+      <RunLaser />
       {children}
     </>
   );
