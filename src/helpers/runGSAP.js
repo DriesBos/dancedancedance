@@ -10,7 +10,7 @@ function RunGsap() {
     () => {
       gsap.set('.blok', {
         opacity: 0,
-        y: 22,
+        y: 68,
       });
       gsap.to('.blok', {
         opacity: 1,

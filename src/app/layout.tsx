@@ -18,9 +18,9 @@ import StoreSwitcher from '@/components/StoreSwitcher';
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
 export const metadata: Metadata = {
-  title: 'Dance Dance',
+  title: 'Dries Bos',
   description:
-    'Dance Dance, computational design, creative development, digital partner',
+    'Dries Bos, computational design, creative development & digital partner',
 };
 
 storyblokInit({
@@ -47,7 +47,7 @@ export default async function RootLayout({
           </div>
           <div className="introText">
             <h1>
-              Dance Dance, computational design, creative development, digital
+              Dries Bos, computational design, creative development & digital
               partner
             </h1>
           </div>
