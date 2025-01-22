@@ -129,7 +129,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   // TopPanel to FALSE on 2D and PHONE
   useEffect(() => {
-    if (space === '2D' || space === 'PHONE') {
+    if (space === 'LAPTOP' || space === 'PHONE') {
       gsap.to('.blok-Head', {
         yPercent: 0,
         ease: 'power1.inOut',

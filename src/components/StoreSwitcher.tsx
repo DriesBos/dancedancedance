@@ -29,7 +29,7 @@ const StoreSwitcher = () => {
   }
 
   function handlePickSpace() {
-    if (space === '2D') {
+    if (space === 'LAPTOP') {
       setThreeD();
     } else if (space === '3D') {
       setPhone();

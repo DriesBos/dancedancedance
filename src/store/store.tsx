@@ -8,7 +8,7 @@ export type Theme =
   | 'GRADIENT'
   | 'DONJUDD';
 
-export type Space = '2D' | '3D' | 'PHONE';
+export type Space = 'LAPTOP' | 'PHONE' | '3D';
 
 export type Props = {
   theme: Theme;
@@ -34,7 +34,7 @@ export const useStore = create<Props & Actions>()((set) => ({
   setNightmode: () => set({ theme: 'NIGHTMODE' }),
   setDefault: () => set({ theme: 'GRADIENT' }),
   setTheme: (theme: Theme) => set({ theme }),
-  setTwoD: () => set({ space: '2D' }),
+  setTwoD: () => set({ space: 'LAPTOP' }),
   setThreeD: () => set({ space: '3D' }),
   setPhone: () => set({ space: 'PHONE' }),
   setTopPanelTrue: () => set({ topPanel: true }),

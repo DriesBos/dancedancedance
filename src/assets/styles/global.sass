@@ -58,7 +58,6 @@ body
       flex: 1
       text-align: left
       padding: var(--blok-padding)
-      overflow: hidden
       &[data-inactive='true']
         color: var(--theme-type-inactive)
         transition: color var(--transition-theme)
@@ -96,6 +95,7 @@ body
     
       &-Image
         padding: 0
+        overflow: visible
         img, video
           width: 100%
           height: auto
@@ -106,7 +106,6 @@ body
         display: flex
         justify-content: flex-end
         align-items: center
-        flex-shrink: 1
         flex-grow: 0
         & > div 
           margin: 0 12.5px
@@ -169,6 +168,7 @@ body
   height: var(--icon-size)
   cursor: pointer
   user-select: none
+  flex-shrink: 0
   svg
     position: absolute
     top: 0
@@ -312,8 +312,8 @@ body
   main
     & > .blok:nth-child(2) 
       z-index: -1
-  // 2D
-  &[data-space="2D"]
+  // LAPTOP
+  &[data-space="LAPTOP"]
     padding: 0
     main
       max-width: 100%
@@ -321,13 +321,15 @@ body
     .introText
       opacity: 0
     .blok
+      &-Head
+        border-bottom-width: 0
+      &-Project
+        overflow: hidden
+      &-Filter
+        border-top-width: 0
       &-Footer
         flex-grow: 1
         justify-content: flex-end
-      &-Head
-        border-bottom-width: 0
-      &-Filter
-        border-top-width: 0
 
   // 3D
   &[data-space="3D"]
