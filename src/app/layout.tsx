@@ -51,13 +51,13 @@ export default async function RootLayout({
               partner
             </h1>
           </div>
-          <StoreSwitcher />
           <main className="main">
             <BlokHead />
             <BlokFilter />
             {children}
             <BlokFooter />
           </main>
+          <StoreSwitcher />
         </AppInitializer>
       </html>
     </StoryblokProvider>
