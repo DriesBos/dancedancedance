@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/store/store';
 import Link from 'next/link';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconMail from '@/components/Icons/IconMail';
 import IconClose from '@/components/Icons/IconClose';
@@ -12,6 +12,21 @@ import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import gsap from 'gsap';
 import BlokSidePanels from './BlokSides';
+
+const hyperLink = [
+  'anatha-wallet',
+  'hello-comrade',
+  'fotomat',
+  'van-hooff-architects',
+  'close-my-eyes',
+  'made-of-web',
+  'ko',
+  'cris-mannen',
+  'jasper-rens-van-es',
+  'leon',
+  'ilovethatphoto',
+  'de-fotohal',
+];
 
 interface Props {
   blok?: any;
@@ -26,9 +41,60 @@ const BlokHead = ({ blok, float, params }: Props) => {
   var topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
+  const [hasPrev, setHasPrev] = useState(false);
+  const [hasNext, setHasNext] = useState(false);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
+
+  const clickNext = () => {
+    const nextPath = path;
+    const currentSlug = nextPath.split('/')[2];
+    const currentIndex = hyperLink.indexOf(currentSlug);
+    if (currentIndex !== -1 && currentIndex < hyperLink.length - 1) {
+      router.push(hyperLink[currentIndex + 1]);
+    } else {
+      return false;
+    }
+  };
+
+  const checkNext = () => {
+    const checkNextPath = path;
+    const currentSlug = checkNextPath.split('/')[2];
+    const currentIndex = hyperLink.indexOf(currentSlug);
+    if (currentIndex === -1 || currentIndex >= hyperLink.length - 1) {
+      setHasNext(false);
+    } else {
+      setHasNext(true);
+    }
+  };
+
+  const clickPrev = () => {
+    const prevPath = path;
+    const currentSlug = prevPath.split('/')[2];
+    const currentIndex = hyperLink.indexOf(currentSlug);
+    if (currentIndex > 0) {
+      router.push(hyperLink[currentIndex - 1]);
+    } else {
+      return false;
+    }
+  };
+
+  const checkPrev = () => {
+    const checkPrevPath = path;
+    const currentSlug = checkPrevPath.split('/')[2];
+    const currentIndex = hyperLink.indexOf(currentSlug);
+    if (currentIndex <= 0) {
+      setHasPrev(false);
+    } else {
+      setHasPrev(true);
+    }
+  };
+
+  useEffect(() => {
+    checkNext();
+    checkPrev();
+  }, [path]);
 
   const handleTopPanel = useCallback((e: any) => {
     if (e.type === 'mouseenter') {
@@ -165,15 +231,21 @@ const BlokHead = ({ blok, float, params }: Props) => {
           )}
           {pathName === 'projects' && (
             <>
-              <div className="icon icon-Wide icon-Rotate">
-                <Link href="/">
+              <div
+                className={`${
+                  hasPrev ? 'active' : 'disabled'
+                } icon icon-Wide icon-Rotate`}
+              >
+                <div onClick={clickPrev}>
                   <IconArrowLong />
-                </Link>
+                </div>
               </div>
-              <div className="icon icon-Wide">
-                <Link href="/">
+              <div
+                className={`${hasNext ? 'active' : 'disabled'} icon icon-Wide`}
+              >
+                <div onClick={clickNext}>
                   <IconArrowLong />
-                </Link>
+                </div>
               </div>
               <div className="icon">
                 <Link href="/">
