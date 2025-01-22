@@ -22,16 +22,16 @@ body
     display: flex
     flex-direction: column
     width: 100%
+    max-width: 100%
     height: auto
     height: calc-size(auto)
-    max-width: 100%
     max-height: auto
     max-height: calc-size(auto)
     border: 0 solid currentColor
     border-radius: 0
     background: var(--theme-container)
     backdrop-filter: none
-    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width, height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme), backdrop-filter var(--transition-theme)
+    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme), backdrop-filter var(--transition-theme)
     will-change: border, border-radius, width, max-width, height, max-height, transform, background, backdrop-filter
     transform-style: preserve-3d
     & > .blok
@@ -44,7 +44,7 @@ body
   top: 0
   left: 0
   opacity: 0
-  transition: opacity var(--transition-theme)
+  transition: opacity var(--transition-theme-quick)
   will-change: opacity
   img
     width: 100%
@@ -74,7 +74,6 @@ body
   border: var(--border-width) solid currentColor
   background: var(--theme-blok)
   backdrop-filter: none
-  opacity: 0
   transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
   will-change: background, border, backdrop-filter, opacity
   pointer-events: none
@@ -262,35 +261,14 @@ body
 
   // Themes
 body
-  &[data-theme="BASIC"]
-    .themeBackground
-      opacity: 0
-    main, .side
-      backdrop-filter: blur(100px)
-    .introText
-      opacity: 1
-  &[data-theme="NIGHTMODE"]
-    .themeBackground
-      opacity: 0
-    .blok-Project
-      .imageContainer
-        background: currentColor
-        img
-          filter: grayscale(100%)
-          opacity: 0.75
   &[data-theme="IMAGE"]
     .themeBackground
       opacity: 1
-  &[data-theme="TRON"]
-    .themeBackground
-      opacity: 0
-  &[data-theme="GRADIENT"]
-    .themeBackground
-      opacity: 0
-    main, .side
-      backdrop-filter: blur(100px)
+  &[data-theme="GRADIENT"], &[data-theme="BASIC"], &[data-theme="DONJUDD"]
     .introText
       opacity: 1
+    main, .side
+      backdrop-filter: blur(100px)
 
 // Spaces
 body
@@ -328,9 +306,6 @@ body
       max-width: 1150px
       & > .blok
         perspective-origin: 50% -1000px
-      & > .blok:first-child, & > .blok:nth-child(2) 
-        .side
-          opacity: 1
   // PHONE
   &[data-space="PHONE"]
     height: 100vh
