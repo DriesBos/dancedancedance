@@ -46,16 +46,13 @@ body
   overflow: visible
   transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme)
   will-change: border, border-left, border-right, border-top, border-bottom, background, opacity
-  opacity: 0
   transform-style: preserve-3d
   &.inactive
     display: none
-
   .row
     display: flex
     flex-direction: row
     row-wrap: nowrap
-
     .column
       flex: 1
       text-align: left
@@ -116,7 +113,9 @@ body
           &:last-child
             margin-right: 0
 
-  // Specific Bloks
+  Specific Bloks
+  &-Animate
+    opacity: 0
   &-Head
     border-top: var(--border-width) solid currentColor
     border-bottom: var(--border-width) solid currentColor

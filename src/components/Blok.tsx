@@ -8,7 +8,7 @@ interface Props {
 
 const Blok = ({ blok }: Props) => {
   return (
-    <div className="blok" {...storyblokEditable(blok)}>
+    <div className="blok blok-Animate" {...storyblokEditable(blok)}>
       <BlokSidePanels />
       <Row>
         {blok.body.map((nestedBlok: any) => (

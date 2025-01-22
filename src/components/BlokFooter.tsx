@@ -11,7 +11,7 @@ const BlokFooter = () => {
     });
   };
   return (
-    <div className="blok blok-Footer">
+    <div className="blok blok-Footer blok-Animate">
       <Row>
         <div className="column column-Icons">
           <div onClick={ScrollToTop} className="icon icon-High icon-Footer">

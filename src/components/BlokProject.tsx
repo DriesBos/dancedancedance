@@ -29,7 +29,7 @@ const BlokProject = ({
 
   return (
     <Link
-      className={`blok blok-Project ${active ? '' : 'inActive'}`}
+      className={`blok blok-Project blok-Animate ${active ? '' : 'inActive'}`}
       href={`/projects/${slug}`}
     >
       <Row>

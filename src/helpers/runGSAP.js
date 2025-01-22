@@ -8,11 +8,11 @@ gsap.registerPlugin(useGSAP);
 function RunGsap() {
   useGSAP(
     () => {
-      gsap.set('.blok', {
+      gsap.set('.blok-Animate', {
         opacity: 0,
         y: 68,
       });
-      gsap.to('.blok', {
+      gsap.to('.blok-Animate', {
         opacity: 1,
         y: 0,
         ease: 'power1.inOut',

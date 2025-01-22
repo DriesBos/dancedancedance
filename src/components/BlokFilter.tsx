@@ -10,7 +10,7 @@ export default function BlokFilter() {
   return (
     <>
       {path === '/' && (
-        <div className="blok blok-Filter">
+        <div className="blok blok-Filter blok-Animate">
           <BlokSidePanels />
           <Row>
             <div className="column column-Year" data-inactive={true}>
