@@ -76,8 +76,8 @@ $break-desktop: 1400px
 
   // Transition
   --transition-project-hover: .2s ease
-  --transition-space: 0.66s ease-in-out
-  --transition-space-quick: 0.33s ease
+  --transition-space: 5.66s ease-in-out
+  --transition-space-quick: 5.33s ease
   --transition-theme: 0.66s ease-in-out
   --transition-theme-quick: 0.33s ease
 
@@ -146,6 +146,9 @@ body[data-theme='GRADIENT']
   &[data-space='3D']
     --theme-container: transparent
     --theme-bg: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
+  &[data-space='PHONE']
+    --theme-container: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
+
 
 body[data-theme='DONJUDD']
   --theme-bg: #DAD9E0

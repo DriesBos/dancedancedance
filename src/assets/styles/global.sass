@@ -30,8 +30,9 @@ body
     max-height: calc-size(auto)
     border: 0 solid currentColor
     border-radius: 0
-    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space)
-    will-change: border, border-radius, width, max-width, height, max-height, transform
+    background: var(--theme-container)
+    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme)
+    will-change: border, border-radius, width, max-width, height, max-height, transform, background
     transform-style: preserve-3d
     & > .blok
       margin-top: -2px
@@ -113,7 +114,7 @@ body
           &:last-child
             margin-right: 0
 
-  Specific Bloks
+  // Specific Bloks
   &-Animate
     opacity: 0
   &-Head
@@ -314,7 +315,7 @@ body
     padding: 0
     main
       max-width: 100%
-      min-height: 100vh
+      min-height: 100dvh
     .introText
       opacity: 0
     .blok
