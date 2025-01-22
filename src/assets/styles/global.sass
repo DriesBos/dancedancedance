@@ -214,6 +214,8 @@ body
   position: relative
   width: var(--icon-size)
   height: var(--icon-size)
+  cursor: pointer
+  user-select: none
   svg
     position: absolute
     top: 0
@@ -226,8 +228,6 @@ body
     height: 50px
   &-Rotate
     transform: rotate(180deg)
-  &-Footer
-    cursor: pointer
 
 // Specific Elements
 .storeSwitcher
@@ -351,6 +351,10 @@ body
       .column
         &-Empty
           display: none
+
+.clickable
+  cursor: pointer
+  user-select: none
 
 @keyframes hyperLink
   0%
