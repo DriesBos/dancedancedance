@@ -28,12 +28,11 @@ body
     max-height: auto
     max-height: calc-size(auto)
     border: 0 solid currentColor
+    border-radius: 0
     background: var(--theme-container)
     backdrop-filter: none
-    border-radius: 0
-    aspect-ratio: auto
-    transition: border var(--transition-theme), border-radius var(--transition-space), width var(--transition-space), max-width, height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme), backdrop-filter var(--transition-theme), aspect-ratio var(--transition-space)
-    will-change: border, border-radius, width, max-width, height, max-height, transform, background, backdrop-filter, aspect-ratio
+    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width, height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme), backdrop-filter var(--transition-theme)
+    will-change: border, border-radius, width, max-width, height, max-height, transform, background, backdrop-filter
     transform-style: preserve-3d
     & > .blok
       margin-top: -2px
@@ -344,7 +343,6 @@ body
       max-height: 852px
       border: 6px solid currentColor
       border-radius: 36px
-      aspect-ratio: 9 / 19.5
       overflow: hidden
       overflow-y: auto
     .introText
