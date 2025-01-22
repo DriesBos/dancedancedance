@@ -15,8 +15,8 @@ body
   align-items: flex-start
   padding: 0
   min-height: 100dvh
-  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
-  will-change: padding-top, padding-bottom, color, background
+  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme)
+  will-change: padding-top, padding-bottom, color
   main
     position: relative
     display: flex
@@ -29,74 +29,11 @@ body
     max-height: calc-size(auto)
     border: 0 solid currentColor
     border-radius: 0
-    background: var(--theme-container)
-    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme)
-    will-change: border, border-radius, width, max-width, height, max-height, transform, background
+    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space)
+    will-change: border, border-radius, width, max-width, height, max-height, transform
     transform-style: preserve-3d
     & > .blok
       margin-top: -2px
-
-.themeBackground
-  position: fixed
-  width: 100%
-  height: 100vh
-  top: 0
-  left: 0
-  &-Image
-    position: absolute
-    width: 100%
-    height: 100%
-    top: 0
-    left: 0
-    opacity: 0
-    object-fit: cover
-    object-position: center
-    transition: opacity var(--transition-theme-quick)
-    will-change: opacity
-  &-Color
-    position: absolute
-    width: 100%
-    height: 100%
-    top: 0
-    left: 0
-    opacity: 1
-    background: var(--theme-bg)
-    transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
-    will-change: opacity, background
-  
-.introText
-  position: fixed
-  top: 0
-  left: 0
-  margin: 5vh
-  max-width: 66em
-  opacity: 0
-  transition: opacity var(--transition-theme-quick)
-  will-change: opacity
-  h1
-    font-size: 3.5vw
-    line-height: 1
-
-.side 
-  position: absolute
-  left: 0
-  top: 0
-  width: 100%
-  height: 100%
-  border: var(--border-width) solid currentColor
-  background: var(--theme-blok)
-  backdrop-filter: none
-  transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
-  will-change: background, border, backdrop-filter, opacity
-  pointer-events: none
-  opacity: 0
-  &_Top
-    left: calc(0px - #{var(--border-width)})
-    top: calc(0px - #{var(--border-width)})
-    height: 700px
-    width: calc(100% + 2 * #{var(--border-width)})
-    transform: rotateX(90deg) rotateY(0deg) translateY(-700px) 
-    transform-origin: 0 0
 
 .blok
   position: sticky
@@ -104,7 +41,7 @@ body
   display: flex
   flex-direction: column
   border: var(--border-width) solid currentColor
-  background: var(--theme-blok)
+  background: transparent
   overflow: visible
   transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme)
   will-change: border, border-left, border-right, border-top, border-bottom, background, opacity
@@ -199,12 +136,9 @@ body
       .column:nth-child(n+3):not(.column-Icons)
         display: none
   &-Project
-    background: var(--theme-blok-project)
     border-top-width: 0
     .row
       border-top: var(--border-width) solid currentColor
-      transition: transform 1s
-      background: var(--theme-blok-project)
     &:hover
       .row
         transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
@@ -241,6 +175,27 @@ body
   &-Rotate
     transform: rotate(180deg)
 
+.side 
+  position: absolute
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  border: var(--border-width) solid currentColor
+  // background: var(--theme-blok)
+  backdrop-filter: none
+  transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
+  will-change: background, border, backdrop-filter, opacity
+  pointer-events: none
+  opacity: 0
+  &_Top
+    left: calc(0px - #{var(--border-width)})
+    top: calc(0px - #{var(--border-width)})
+    height: 700px
+    width: calc(100% + 2 * #{var(--border-width)})
+    transform: rotateX(90deg) rotateY(0deg) translateY(-700px) 
+    transform-origin: 0 0
+
 // Specific Elements
 .storeSwitcher
   position: fixed
@@ -258,6 +213,47 @@ body
     transition: border var(--transition-theme)
     will-change: border
     border-radius: 1000px
+
+.themeBackground
+  position: fixed
+  width: 100%
+  height: 100vh
+  top: 0
+  left: 0
+  &-Image
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    opacity: 0
+    object-fit: cover
+    object-position: center
+    transition: opacity var(--transition-theme-quick)
+    will-change: opacity
+  &-Color
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    opacity: 1
+    background: var(--theme-bg)
+    transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
+    will-change: opacity, background
+  
+.introText
+  position: fixed
+  top: 0
+  left: 0
+  margin: 5vh
+  max-width: 66em
+  opacity: 0
+  transition: opacity var(--transition-theme-quick)
+  will-change: opacity
+  h1
+    font-size: 3.5vw
+    line-height: 1
 
 .laserBlok
   position: fixed
@@ -290,12 +286,14 @@ body
   &[data-theme="GRADIENT"], &[data-theme="BASIC"], &[data-theme="DONJUDD"]
     .introText
       opacity: 1
+  &[data-theme="GRADIENT"], &[data-theme="IMAGE"]
     .side
       backdrop-filter: blur(#{var(--backdrop-filter)})
-    .blok-Head .row
+    .blok-Head .row, .blok-Project .row, .blok-Filter .row, .blok-Footer
       backdrop-filter: blur(#{var(--backdrop-filter)})
-    .blok-Project .row
-      backdrop-filter: blur(#{var(--backdrop-filter)})
+  &[data-theme="BASIC"], &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
+    .blok, .blok .row, .side
+      background: var(--theme-blok)
 
 // Spaces
 body
@@ -334,6 +332,8 @@ body
         &:first-child, &:nth-child(2)
           .side
             opacity: 1
+      .blok-Footer
+        padding-bottom: 100vh
   // PHONE
   &[data-space="PHONE"]
     align-items: center
