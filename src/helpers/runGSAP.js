@@ -8,6 +8,10 @@ gsap.registerPlugin(useGSAP);
 function RunGsap() {
   useGSAP(
     () => {
+      gsap.set('.blok', {
+        opacity: 0,
+        y: 22,
+      });
       gsap.to('.blok', {
         opacity: 1,
         y: 0,
