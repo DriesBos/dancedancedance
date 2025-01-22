@@ -217,11 +217,11 @@ const BlokHead = ({ blok, float, params }: Props) => {
           )}
           {pathName === 'about' && (
             <>
-              <div className="icon">
+              {/* <div className="icon">
                 <Link href="/about">
                   <IconMail />
                 </Link>
-              </div>
+              </div> */}
               <div className="icon">
                 <Link href="/">
                   <IconClose />

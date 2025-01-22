@@ -69,7 +69,11 @@ body
           display: none
       &-Text
         --var: 0%
+        text-align: justify
         min-width: 0 // Ellipsis hack
+        white-space: pre-line // Listens to line breaks in markdown
+        p
+          display: block
         a
           position: relative
           white-space: nowrap
@@ -89,6 +93,8 @@ body
               @media ( hover: hover )
                 animation: hyperHyperLink .66s ease
                 animation-iteration-count: 1
+
+    
       &-Image
         padding: 0
         img, video
