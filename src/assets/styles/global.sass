@@ -91,8 +91,6 @@ body
               @media ( hover: hover )
                 animation: hyperHyperLink .66s ease
                 animation-iteration-count: 1
-
-    
       &-Image
         padding: 0
         overflow: visible
@@ -101,12 +99,10 @@ body
           height: auto
           height: calc-size(auto)
       &-Year
-        flex-grow: 0
       &-Icons
         display: flex
         justify-content: flex-end
         align-items: center
-        flex-grow: 0
         & > div 
           margin: 0 12.5px
           &:first-child
@@ -144,6 +140,8 @@ body
     border-top-width: 0
     .row
       border-top: var(--border-width) solid currentColor
+      transform: translateY(0)
+      transition: 1s ease
     &:hover
       .row
         transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
@@ -377,20 +375,16 @@ body
         .column-Title
           & > a:nth-child(2)
             display: none
-            max-width: 0.0001px
       &-Filter
         border-top-width: 0
         .column:nth-child(n+3):not(.column-Icons)
           display: none 
-          max-width: 0.0001px
       &-Project
         .column:nth-child(n+3):not(.column-Icons)
           display: none 
-          max-width: 0.0001px
       .column
         &-Empty
           display: none
-          max-width: 0.0001px
 
 .clickable
   cursor: pointer
