@@ -57,13 +57,13 @@ body
   position: fixed
   top: 0
   left: 0
-  margin: 5vmin
-  max-width: 80em
+  margin: 5vh
+  max-width: 66em
   opacity: 0
-  transition: opacity var(--transition-theme)
+  transition: opacity var(--transition-theme-quick)
   will-change: opacity
   h1
-    font-size: 4vw
+    font-size: 3.5vw
     line-height: 1
 
 .side 
@@ -179,6 +179,7 @@ body
   &-Filter
     transition: padding-top var(--transition-space)
     padding-top: var(--top-padding-filter)
+    justify-content: flex-end
     .column
       &-Icons
         flex-grow: 1
@@ -301,7 +302,7 @@ body
         border-top-width: 0
   // 3D
   &[data-space="3D"]
-    padding-top: calc(15rem + 10vmin)
+    padding-top: calc(191px + 68px + 15vh)
     padding-bottom: 6rem
     .laserBlok
       opacity: 1
@@ -324,9 +325,10 @@ body
       overflow-y: auto
     .introText
       opacity: 0
+      h1
+        font-size: 3.5vw
+    p, h1, h2, a, span
       font-size: var(--font-size-mobile) 
-      p, h1, h2, a, span
-        font-size: var(--font-size-mobile) 
     .blok
       border-left-width: 0
       border-right-width: 0

@@ -65,7 +65,7 @@ $break-desktop: 1400px
   /* spacing */
   --border-width: 2px
   --row-height: 68px
-  --top-padding-filter: 136px
+  --top-padding-filter: calc(68px * 3)
 
   // Sizing
   --icon-size: 1.2rem
@@ -75,9 +75,9 @@ $break-desktop: 1400px
 
   // Transition
   --transition-project-hover: .2s ease
-  --transition-space: 1s ease
+  --transition-space: 0.66s ease-in-out
   --transition-space-quick: 0.33s ease
-  --transition-theme: 1s ease
+  --transition-theme: 0.66s ease-in-out
   --transition-theme-quick: 0.33s ease
 
 @media screen and (max-width: 768px)
@@ -88,9 +88,10 @@ $break-desktop: 1400px
 body[data-space='PHONE']
   --blok-padding: 15px 16px
   --icon-size: 16px
+  --top-padding-filter: calc(68px * 2)
 // body[data-space='2D']
 body[data-space='3D']
-  --top-padding-filter: 0
+  --top-padding-filter: calc(68px * 2)
 
 // THEMES
 body[data-theme='TRON']
