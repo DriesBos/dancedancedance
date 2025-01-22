@@ -119,8 +119,10 @@ const BlokHead = ({ blok, float, params }: Props) => {
         <div className="column column-Title">
           <Link href="/">Dries Bos&nbsp;</Link>
           <Link href="/projects/anatha-wallet">
-            {pathName === 'home' && <span>— Design, Code & Interaction</span>}
-            {pathName === 'about' && <span>— Design, Code & Interaction</span>}
+            {pathName === 'home' && <span>— Design & Development Partner</span>}
+            {pathName === 'about' && (
+              <span>— Design & Development Partner</span>
+            )}
           </Link>
           <Link href="/projects/anatha-wallet">
             {pathName === 'projects' && <span>& {projectName}</span>}
