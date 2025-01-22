@@ -58,6 +58,7 @@ body
       flex: 1
       text-align: left
       padding: var(--blok-padding)
+      overflow: hidden
       &[data-inactive='true']
         color: var(--theme-type-inactive)
         transition: color var(--transition-theme)
@@ -149,6 +150,7 @@ body
         transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
         transition: transform var(--transition-project-hover)
     .column
+      max-width: 100%
       &-Icons
         flex-grow: 1
     @media (max-width: 800px)
@@ -373,16 +375,20 @@ body
         .column-Title
           & > a:nth-child(2)
             display: none
+            max-width: 0.0001px
       &-Filter
         border-top-width: 0
         .column:nth-child(n+3):not(.column-Icons)
           display: none 
+          max-width: 0.0001px
       &-Project
         .column:nth-child(n+3):not(.column-Icons)
           display: none 
+          max-width: 0.0001px
       .column
         &-Empty
           display: none
+          max-width: 0.0001px
 
 .clickable
   cursor: pointer
