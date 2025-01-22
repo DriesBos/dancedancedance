@@ -9,7 +9,6 @@ html, body
   min-height: 100%
   
 body
-  background: var(--theme-bg)
   color: var(--theme-type)
   display: flex
   justify-content: center
@@ -31,9 +30,8 @@ body
     border: 0 solid currentColor
     border-radius: 0
     background: var(--theme-container)
-    backdrop-filter: none
-    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme), backdrop-filter var(--transition-theme)
-    will-change: border, border-radius, width, max-width, height, max-height, transform, background, backdrop-filter
+    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme)
+    will-change: border, border-radius, width, max-width, height, max-height, transform, background
     transform-style: preserve-3d
     & > .blok
       margin-top: -2px
@@ -44,14 +42,27 @@ body
   height: 100vh
   top: 0
   left: 0
-  opacity: 0
-  transition: opacity var(--transition-theme-quick)
-  will-change: opacity
-  img
+  &-Image
+    position: absolute
     width: 100%
     height: 100%
+    top: 0
+    left: 0
+    opacity: 0
     object-fit: cover
     object-position: center
+    transition: opacity var(--transition-theme-quick)
+    will-change: opacity
+  &-Color
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    opacity: 1
+    background: var(--theme-bg)
+    transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
+    will-change: opacity, background
   
 .introText
   position: fixed
@@ -78,6 +89,7 @@ body
   transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
   will-change: background, border, backdrop-filter, opacity
   pointer-events: none
+  opacity: 0
   &_Top
     left: calc(0px - #{var(--border-width)})
     top: calc(0px - #{var(--border-width)})
@@ -271,12 +283,19 @@ body
 body
   &[data-theme="IMAGE"]
     .themeBackground
-      opacity: 1
+      &-Image
+        opacity: 1
+      &-Color
+        opacity: 0
   &[data-theme="GRADIENT"], &[data-theme="BASIC"], &[data-theme="DONJUDD"]
     .introText
       opacity: 1
-    main, .side
-      backdrop-filter: blur(100px)
+    .side
+      backdrop-filter: blur(#{var(--backdrop-filter)})
+    .blok-Head .row
+      backdrop-filter: blur(#{var(--backdrop-filter)})
+    .blok-Project .row
+      backdrop-filter: blur(#{var(--backdrop-filter)})
 
 // Spaces
 body
@@ -311,6 +330,10 @@ body
       max-width: 1150px
       & > .blok
         perspective-origin: 50% -1000px
+      & > .blok
+        &:first-child, &:nth-child(2)
+          .side
+            opacity: 1
   // PHONE
   &[data-space="PHONE"]
     align-items: center
