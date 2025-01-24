@@ -57,7 +57,6 @@ export default async function RootLayout({
             {children}
             <BlokFooter />
           </main>
-          <StoreSwitcher />
         </AppInitializer>
       </html>
     </StoryblokProvider>

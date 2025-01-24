@@ -108,7 +108,7 @@ body
         justify-content: flex-end
         align-items: center
         & > div 
-          margin: 0 12.5px
+          margin: 0 .75rem
           &:first-child
             margin-left: 0
           &:last-child
@@ -171,9 +171,9 @@ body
     height: 100%
     width: 100%
   &-Wide
-    width: 50px
+    width: calc(2 * #{var(--icon-size)})
   &-High
-    height: 50px
+    height: calc(2 * #{var(--icon-size)})
   &-Rotate
     transform: rotate(180deg)
   &.disabled
@@ -203,51 +203,10 @@ body
     transform-origin: 0 0
 
 // Specific Elements
-.storeSwitcher
-  position: fixed
-  top: 0  
-  right: 0
-  padding: 1vmax
-  display: flex
-  align-items: center
-  gap: .5rem
-  opacity: 0
-  &-Item
-    display: flex
-    align-items: center
-    gap: .5rem
-    cursor: pointer
-    margin: 0 12.5px
-  .IconTheme
-    border: var(--border-width) solid var(--theme-type)
-    background: var(--theme-type)
-    border-radius: 1000px
-    width: 23px
-    height: 23px
-.blok
-  .storeSwitcher
-    position: relative
-    top: auto
-    right: auto
-    padding: 0
-    opacity: 1
-body[data-space="LAPTOP"]
-  .storeSwitcher
-    opacity: 0
-    pointer-events: none
-  .blok
-    .storeSwitcher
-      opacity: 1
-      pointer-events: auto
-body[data-space="PHONE"], body[data-space="3D"]
-  .storeSwitcher
-    opacity: 1
-    pointer-events: auto
-  .blok
-    .storeSwitcher
-      opacity: 0
-      pointer-events: none
-
+.IconTheme
+  border: var(--border-width) solid var(--theme-type)
+  background: var(--theme-type)
+  border-radius: 1000px
 
 .themeBackground
   position: fixed
@@ -294,7 +253,6 @@ body[data-space="PHONE"], body[data-space="3D"]
     font-size: 3.3vmax
     line-height: 1.1
       
-
 .laserBlok
   position: fixed
   left: 0
@@ -383,6 +341,7 @@ body
   // PHONE
   &[data-space="PHONE"]
     align-items: center
+    font-size: var(--font-size-mobile)
     main
       flex-grow: 1
       width: 100%
@@ -394,10 +353,6 @@ body
       overflow-y: auto
     .introText
       opacity: 0
-      h1
-        font-size: 3.5vw
-    p, h1, h2, a, span, .row
-      font-size: var(--font-size-mobile) 
     .blok
       border-left-width: 0
       border-right-width: 0

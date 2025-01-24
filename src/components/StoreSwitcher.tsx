@@ -57,31 +57,24 @@ const StoreSwitcher = () => {
   }
 
   return (
-    <div className="storeSwitcher">
-      <div
-        className="clickable storeSwitcher-Item storeSwitcher-Item_Theme"
-        onClick={handlePickTheme}
-      >
-        <div className="IconTheme" />
-      </div>
-      <div className="clickable storeSwitcher-Item" onClick={handlePickSpace}>
-        {space === 'LAPTOP' && (
-          <div className="icon">
-            <IconDesktop />
-          </div>
-        )}
-        {space === 'PHONE' && (
-          <div className="icon">
-            <IconMobile />
-          </div>
-        )}
-        {space === '3D' && (
-          <div className="icon">
-            <IconThreeD />
-          </div>
-        )}
-      </div>
-    </div>
+    <>
+      <div className="icon IconTheme" onClick={handlePickTheme} />
+      {space === 'LAPTOP' && (
+        <div className="icon" onClick={handlePickSpace}>
+          <IconDesktop />
+        </div>
+      )}
+      {space === 'PHONE' && (
+        <div className="icon" onClick={handlePickSpace}>
+          <IconMobile />
+        </div>
+      )}
+      {space === '3D' && (
+        <div className="icon" onClick={handlePickSpace}>
+          <IconThreeD />
+        </div>
+      )}
+    </>
   );
 };
 
