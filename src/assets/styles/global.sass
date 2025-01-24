@@ -86,11 +86,12 @@ body
             z-index: 0
             border-bottom: var(--border-width) solid currentColor
             will-change: width, border-bottom
-          &:hover
-            &::before
-              @media ( hover: hover )
-                animation: hyperHyperLink .66s ease
-                animation-iteration-count: 1
+          @media (hover: hover)
+            a:hover
+              &::before
+                @media ( hover: hover )
+                  animation: hyperHyperLink .66s ease
+                  animation-iteration-count: 1
       &-Image
         padding: 0
         overflow: visible
@@ -142,10 +143,11 @@ body
       border-top: var(--border-width) solid currentColor
       transform: translateY(0)
       transition: 1s ease
-    &:hover
-      .row
-        transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
-        transition: transform var(--transition-project-hover)
+    @media (hover: hover)
+      .row:hover
+        .row
+          transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
+          transition: transform var(--transition-project-hover)
     .column
       max-width: 100%
       &-Icons
