@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import { useStore } from '@/store/store';
 
 const StoreSwitcher = () => {
@@ -11,6 +12,19 @@ const StoreSwitcher = () => {
   const setTheme = useStore((state: any) => state.setTheme);
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
+  const [orientation, setOrientation] = useState('');
+
+  // https://blog.codewithsky.in/screen-orientation-in-nextjs
+  useEffect(() => {
+    function updateOrientation() {
+      setOrientation(window.screen.orientation.type);
+    }
+    updateOrientation();
+    window.addEventListener('orientationchange', updateOrientation);
+    return () => {
+      window.removeEventListener('orientationchange', updateOrientation);
+    };
+  }, [orientation]);
 
   function handlePickTheme() {
     if (theme === 'BASIC') {
@@ -31,7 +45,7 @@ const StoreSwitcher = () => {
   function handlePickSpace() {
     if (space === 'LAPTOP') {
       setThreeD();
-    } else if (space === '3D') {
+    } else if (space === '3D' && orientation.includes('landscape')) {
       setPhone();
     } else {
       setTwoD();
