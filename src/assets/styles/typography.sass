@@ -1,14 +1,14 @@
 // https://www.madebymike.com.au/writing/fluid-type-calc-examples/
 // https://type-scale.com/
-body
+html
   font-size: 16px
 
 @media screen and (min-width: 770px)
-  body
+  html
     font-size: calc(16px + 4 * ((100vw - 770px) / 600))
 
 @media screen and (min-width: 1370px)
-  body
+  html
     font-size: 20px
 
 h1, h2, h3, p, span, a, input
@@ -19,7 +19,7 @@ h1, h2, h3, p, span, a, input
 
 h1, h2, h3, p, a, a:link, a:visited, a:hover, a:active, span, input
   font-family: "Sohne Buch", Helvetica, Arial, sans-serif
-  font-size: 1rem
+  font-size: 1em
   line-height: 1.6
   color: currentColor
   font-style: normal
