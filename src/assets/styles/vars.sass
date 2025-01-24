@@ -69,10 +69,10 @@ $break-desktop: 1370px
   --top-padding-filter: calc(68px * 3)
 
   // Sizing
-  --icon-size: 1.5rem
+  --icon-size: 1rem
 
   /* container & bloks */
-  --blok-padding: 16px 24px
+  --blok-padding: .66rem 1rem
 
   // Transition
   --transition-project-hover: .2s ease
@@ -86,9 +86,7 @@ $break-desktop: 1370px
     --blok-padding: 15px 16px
 
 // SPACES
-body[data-space='PHONE']
-  --blok-padding: 15px 16px
-  --icon-size: 16px
+body[data-space='MOBILE']
   --top-padding-filter: calc(68px * 2)
 body[data-space='3D']
   --top-padding-filter: 0
@@ -145,7 +143,7 @@ body[data-theme='GRADIENT']
   &[data-space='3D']
     --theme-container: transparent
     --theme-bg: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
-  &[data-space='PHONE']
+  &[data-space='MOBILE']
     --theme-container: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
 
 

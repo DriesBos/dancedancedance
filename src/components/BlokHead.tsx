@@ -7,6 +7,7 @@ import Link from 'next/link';
 import React, { useState, useEffect, useCallback, use } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
+import IconArrow from './Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import gsap from 'gsap';
@@ -129,7 +130,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   // TopPanel to FALSE on 2D and PHONE
   useEffect(() => {
-    if (space === '2D' || space === 'PHONE') {
+    if (space === '2D' || space === 'MOBILE') {
       gsap.to('.blok-Head', {
         yPercent: 0,
         ease: 'power1.inOut',
@@ -182,7 +183,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
       <BlokSidePanels />
       <Row>
-        <div className="column column-Title">
+        <div className="column column-Title ellipsis">
           <Link href="/">Dries Bos&nbsp;</Link>
           <Link href="/projects/anatha-wallet">
             {pathName === 'home' && <span>— Design & Development Partner</span>}
@@ -235,17 +236,33 @@ const BlokHead = ({ blok, float, params }: Props) => {
               <div
                 className={`${
                   hasPrev ? 'active' : 'disabled'
-                } icon icon-Wide icon-Rotate`}
+                } icon icon-Wide icon-Rotate desktop`}
               >
                 <div onClick={clickPrev}>
                   <IconArrowLong />
                 </div>
               </div>
               <div
-                className={`${hasNext ? 'active' : 'disabled'} icon icon-Wide`}
+                className={`${
+                  hasPrev ? 'active' : 'disabled'
+                } icon icon-Rotate mobile`}
+              >
+                <div onClick={clickPrev}>
+                  <IconArrow />
+                </div>
+              </div>
+              <div
+                className={`${
+                  hasNext ? 'active' : 'disabled'
+                } icon icon-Wide desktop`}
               >
                 <div onClick={clickNext}>
                   <IconArrowLong />
+                </div>
+              </div>
+              <div className={`${hasNext ? 'active' : 'disabled'} icon mobile`}>
+                <div onClick={clickNext}>
+                  <IconArrow />
                 </div>
               </div>
               <div className="icon">

@@ -47,7 +47,7 @@ const StoreSwitcher = () => {
   }
 
   function handlePickSpace() {
-    if (space === 'LAPTOP') {
+    if (space === 'DESKTOP') {
       setThreeD();
     } else if (space === '3D' && orientation.includes('landscape')) {
       setPhone();
@@ -59,12 +59,12 @@ const StoreSwitcher = () => {
   return (
     <>
       <div className="icon IconTheme" onClick={handlePickTheme} />
-      {space === 'LAPTOP' && (
+      {space === 'DESKTOP' && (
         <div className="icon" onClick={handlePickSpace}>
           <IconDesktop />
         </div>
       )}
-      {space === 'PHONE' && (
+      {space === 'MOBILE' && (
         <div className="icon" onClick={handlePickSpace}>
           <IconMobile />
         </div>
