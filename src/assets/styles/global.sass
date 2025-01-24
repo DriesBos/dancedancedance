@@ -55,7 +55,6 @@ body
     flex-direction: row
     row-wrap: nowrap
     .column
-      flex: 1
       text-align: left
       padding: var(--blok-padding)
       &[data-inactive='true']
@@ -65,6 +64,9 @@ body
       &-Empty
         @media (max-width: 770px)
           display: none
+      &-Title, &-Client, &-Category
+        flex: 1 1 0
+        width: 0
       &-Text
         --var: 0%
         min-width: 0 // Ellipsis hack
@@ -100,6 +102,7 @@ body
           height: auto
           height: calc-size(auto)
       &-Year
+        width: 4.375em
       &-Icons
         display: flex
         justify-content: flex-end
@@ -121,7 +124,6 @@ body
     border-right: var(--border-width) solid currentColor
     .column 
       &-Title
-        flex-grow: 1
         @media (max-width: 770px)
           & > a:nth-child(2)
             display: none
@@ -131,9 +133,6 @@ body
     transition: padding-top var(--transition-space)
     padding-top: var(--top-padding-filter)
     justify-content: flex-end
-    .column
-      &-Icons
-        flex-grow: 1
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none
@@ -148,10 +147,6 @@ body
         .row
           transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
           transition: transform var(--transition-project-hover)
-    .column
-      max-width: 100%
-      &-Icons
-        flex-grow: 1
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
