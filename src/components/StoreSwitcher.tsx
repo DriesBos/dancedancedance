@@ -2,6 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useStore } from '@/store/store';
+import IconSearch from './Icons/IconSearch';
+import IconDesktop from './Icons/IconDesktop';
+import IconMobile from './Icons/IconMobile';
+import IconThreeD from './Icons/IconThreeD';
 
 const StoreSwitcher = () => {
   const setNightmode = useStore((state: any) => state.setNightmode);
@@ -54,11 +58,28 @@ const StoreSwitcher = () => {
 
   return (
     <div className="storeSwitcher">
-      <div className="clickable" onClick={handlePickTheme}>
-        {theme}
+      <div
+        className="clickable storeSwitcher-Item storeSwitcher-Item_Theme"
+        onClick={handlePickTheme}
+      >
+        <div className="IconTheme" />
       </div>
-      <div className="clickable" onClick={handlePickSpace}>
-        {space}
+      <div className="clickable storeSwitcher-Item" onClick={handlePickSpace}>
+        {space === 'LAPTOP' && (
+          <div className="icon">
+            <IconDesktop />
+          </div>
+        )}
+        {space === 'PHONE' && (
+          <div className="icon">
+            <IconMobile />
+          </div>
+        )}
+        {space === '3D' && (
+          <div className="icon">
+            <IconThreeD />
+          </div>
+        )}
       </div>
     </div>
   );

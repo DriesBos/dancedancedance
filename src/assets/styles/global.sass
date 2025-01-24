@@ -210,20 +210,50 @@ body
 // Specific Elements
 .storeSwitcher
   position: fixed
-  top: 1rem
-  right: 5rem
+  top: 0  
+  right: 0
+  padding: 1vmax
   display: flex
   align-items: center
   gap: .5rem
-  pointer-events: auto
-  & > div
+  opacity: 0
+  pointer-events: none
+  &-Item
+    display: flex
+    align-items: center
+    gap: .5rem
     cursor: pointer
-    padding: 4px 11px
-    font-size: 11px
-    border: var(--border-width) solid currentColor
-    transition: border var(--transition-theme)
-    will-change: border
+    margin: 0 12.5px
+  .IconTheme
+    border: var(--border-width) solid var(--theme-type)
+    background: var(--theme-type)
     border-radius: 1000px
+    width: 23px
+    height: 23px
+.blok
+  .storeSwitcher
+    position: relative
+    top: auto
+    right: auto
+    padding: 0
+    opacity: 0
+    transition: opacity var(--transition-theme)
+    will-change: opacity
+body[data-space="LAPTOP"]
+  .storeSwitcher
+    opacity: 0
+  .blok
+    .storeSwitcher
+      opacity: 1
+      pointer-events: auto
+body[data-space="PHONE"], body[data-space="3D"]
+  .storeSwitcher
+    opacity: 1
+    pointer-events: auto
+  .blok
+    .storeSwitcher
+      opacity: 0
+
 
 .themeBackground
   position: fixed

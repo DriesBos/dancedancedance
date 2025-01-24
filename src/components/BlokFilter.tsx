@@ -1,6 +1,6 @@
 'use client';
 
-import IconAbout from '@/components/Icons/IconAbout';
+import IconSearch from '@/components/Icons/IconSearch';
 import { usePathname } from 'next/navigation';
 import Row from './Row';
 import BlokSidePanels from './BlokSides';
@@ -33,7 +33,7 @@ export default function BlokFilter() {
             </div> */}
             <div className="column column-Icons" data-inactive={true}>
               <div className="icon">
-                <IconAbout />
+                <IconSearch />
               </div>
             </div>
           </Row>
