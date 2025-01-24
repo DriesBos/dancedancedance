@@ -63,18 +63,18 @@ body
         transition: color var(--transition-theme)
         will-change: color
       &-Empty
-        @media (max-width: 800px)
+        @media (max-width: 770px)
           display: none
       &-Text
         --var: 0%
-        text-align: justify
         min-width: 0 // Ellipsis hack
         white-space: pre-line // Listens to line breaks in markdown
+        @media (min-width: 770px)
+          text-align: justify
         p
           display: block
         a
           position: relative
-          white-space: nowrap
           &::before
             content: ''
             position: absolute
@@ -122,7 +122,7 @@ body
     .column 
       &-Title
         flex-grow: 1
-        @media (max-width: 800px)
+        @media (max-width: 770px)
           & > a:nth-child(2)
             display: none
       &-Icons
@@ -134,7 +134,7 @@ body
     .column
       &-Icons
         flex-grow: 1
-    @media (max-width: 800px)
+    @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none
   &-Project
@@ -152,7 +152,7 @@ body
       max-width: 100%
       &-Icons
         flex-grow: 1
-    @media (max-width: 800px)
+    @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
   &-Footer
