@@ -217,7 +217,6 @@ body
   align-items: center
   gap: .5rem
   opacity: 0
-  pointer-events: none
   &-Item
     display: flex
     align-items: center
@@ -236,12 +235,11 @@ body
     top: auto
     right: auto
     padding: 0
-    opacity: 0
-    transition: opacity var(--transition-theme)
-    will-change: opacity
-body[data-space="LAPTOP"][data-page="index"]
+    opacity: 1
+body[data-space="LAPTOP"]
   .storeSwitcher
     opacity: 0
+    pointer-events: none
   .blok
     .storeSwitcher
       opacity: 1
@@ -253,7 +251,7 @@ body[data-space="PHONE"], body[data-space="3D"]
   .blok
     .storeSwitcher
       opacity: 0
-      display: none
+      pointer-events: none
 
 
 .themeBackground

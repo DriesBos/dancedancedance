@@ -12,7 +12,7 @@ const AppInitializer = ({ children, className }: Props) => {
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
   const path = usePathname();
-  const slug = path.split('/')[1] || 'index';
+  const slug = path.split('/')[1] || 'home';
 
   return (
     <body

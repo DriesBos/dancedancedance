@@ -6,12 +6,12 @@ import { useStore } from '@/store/store';
 import Link from 'next/link';
 import React, { useState, useEffect, useCallback, use } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
-import IconMail from '@/components/Icons/IconMail';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import gsap from 'gsap';
 import BlokSidePanels from './BlokSides';
+import StoreSwitcher from './StoreSwitcher';
 
 const hyperLink = [
   'anatha-wallet',
@@ -208,6 +208,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 <IconImage />
               </Link>
             </div> */}
+              <StoreSwitcher />
               <div className="icon">
                 <Link href="/about">
                   <IconAbout />
