@@ -29,7 +29,7 @@ export type Actions = {
 
 export const useStore = create<Props & Actions>()((set) => ({
   theme: 'GRADIENT',
-  space: '3D',
+  space: 'LAPTOP',
   topPanel: true,
   setNightmode: () => set({ theme: 'NIGHTMODE' }),
   setDefault: () => set({ theme: 'GRADIENT' }),

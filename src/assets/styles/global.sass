@@ -326,7 +326,10 @@ body
     .introText
       opacity: 0
     .blok
+      border-left-width: 0
+      border-right-width: 0
       &-Head
+        border-top-width: 0
         border-bottom-width: 0
       &-Project
         overflow: hidden
@@ -335,6 +338,7 @@ body
       &-Footer
         flex-grow: 1
         justify-content: flex-end
+        border-bottom-width: 0
 
   // 3D
   &[data-space="3D"]
