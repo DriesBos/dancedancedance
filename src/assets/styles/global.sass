@@ -257,14 +257,19 @@ body
   position: fixed
   top: 0
   left: 0
-  margin: 5vh
-  max-width: 66em
+  margin-top: 5vh
+  margin-left: 5vw
+  margin-right: 10vw
+  max-width: 58em
   opacity: 0
   transition: opacity var(--transition-theme-quick)
   will-change: opacity
+  @media screen and ( max-width: 770px )
+    margin-top: 10vh
   h1
-    font-size: 3.5vw
-    line-height: 1
+    font-size: 3.3vmax
+    line-height: 1.1
+      
 
 .laserBlok
   position: fixed
