@@ -6,12 +6,12 @@ import { useStore } from '@/store/store';
 import Link from 'next/link';
 import React, { useState, useEffect, useCallback, use } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
+import IconMail from '@/components/Icons/IconMail';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import gsap from 'gsap';
 import BlokSidePanels from './BlokSides';
-import StoreSwitcher from './StoreSwitcher';
 
 const hyperLink = [
   'anatha-wallet',
@@ -129,7 +129,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   // TopPanel to FALSE on 2D and PHONE
   useEffect(() => {
-    if (space === 'LAPTOP' || space === 'PHONE') {
+    if (space === '2D' || space === 'PHONE') {
       gsap.to('.blok-Head', {
         yPercent: 0,
         ease: 'power1.inOut',
@@ -196,7 +196,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
         </div>
 
         <div className="column column-Icons">
-          <StoreSwitcher />
           {pathName === 'home' && (
             <>
               {/* <div className="icon">
