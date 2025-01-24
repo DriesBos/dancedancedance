@@ -65,8 +65,8 @@ $break-desktop: 1370px
 
   /* spacing */
   --border-width: 2px
-  --row-height: 68px
-  --top-padding-filter: calc(68px * 3)
+  --blok-height: 2.9em
+  --top-padding-filter: 0
 
   // Sizing
   --icon-size: 1.25em
@@ -81,15 +81,9 @@ $break-desktop: 1370px
   --transition-theme: 0.66s ease-in-out
   --transition-theme-quick: 0.33s ease
 
-@media screen and (max-width: 768px)
-  :root
-    --blok-padding: 15px 16px
-
 // SPACES
 body[data-space='MOBILE']
   --top-padding-filter: calc(68px * 2)
-body[data-space='3D']
-  --top-padding-filter: 0
 
 // THEMES
 body[data-theme='TRON']
@@ -155,4 +149,6 @@ body[data-theme='DONJUDD']
   --theme-blok-subpanel: hsla(7, 95%, 62%, 0.4)
   --theme-type: #FA5942
   --theme-type-inactive: hsla(7, 95%, 62%, 0.4)
+  &[data-space='DESKTOP']
+    --border-width: 0
 

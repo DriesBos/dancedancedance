@@ -107,7 +107,8 @@ body
         display: flex
         justify-content: flex-end
         align-items: center
-        padding: 0
+        padding: var(--blok-padding)
+        padding-left: 0
         padding-right: .5rem
         & > div 
           margin: 0 .5rem
@@ -142,16 +143,15 @@ body
     @media (hover: hover)
       .row:hover
         .row
-          transform: translateY(calc(0px - (#{var(--row-height)} / 2))) !important
+          transform: translateY(calc(0px - (#{var(--blok-height)} / 2))) !important
           transition: transform var(--transition-project-hover)
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
   &-Footer
-    transition: flex-grow var(--transition-space)
-    will-change: flex-grow
-    flex-grow: 0.0001
     align-items: flex-end
+    justify-content: flex-end
+    height: calc(#{var(--blok-height)} * 2)
     border-bottom: var(--border-width) solid currentColor
 
 .icon
@@ -321,8 +321,9 @@ body
         overflow: hidden
       &-Filter
         border-top-width: 0
-      &-Footer
         flex-grow: 1
+      &-Footer
+        height: calc(68px * 2)
         justify-content: flex-end
         border-bottom-width: 0
 
