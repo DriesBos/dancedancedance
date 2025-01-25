@@ -7,9 +7,10 @@ interface Props {
   slug?: String;
   year?: String;
   title?: String;
-  active?: Boolean;
-  client?: String;
   category?: String;
+  role?: String;
+  location?: String;
+  active?: Boolean;
   images?: any;
 }
 
@@ -17,9 +18,10 @@ const BlokProject = ({
   slug,
   year,
   title,
-  active,
-  client,
   category,
+  role,
+  location,
+  active,
   images,
 }: Props) => {
   const arr = Array.from(images);
@@ -35,8 +37,9 @@ const BlokProject = ({
       <Row>
         <div className="column column-Year">{year}</div>
         <div className="column column-Title">{title}</div>
-        <div className="column column-Client">{client}</div>
         <div className="column column-Category">{category}</div>
+        <div className="column column-Client">{role}</div>
+        <div className="column column-Client">{location}</div>
         <div className="column column-Icons">
           <div className="icon">
             <IconArrow />

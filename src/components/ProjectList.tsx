@@ -9,12 +9,15 @@ export default async function ProjectList() {
       slug: story.slug,
       year: story.content.year,
       title: story.content.title,
-      active: story.content.active,
-      client: story.content.agency,
       category: story.content.category,
+      role: story.content.role,
+      location: story.content.location,
+      active: story.content.active,
       images: story.content.images,
     };
   });
+
+  console.log(data, 'data');
 
   return (
     <>
@@ -24,9 +27,10 @@ export default async function ProjectList() {
           slug={item.slug}
           year={item.year}
           title={item.title}
-          active={item.active}
-          client={item.client}
           category={item.category}
+          role={item.role}
+          location={item.location}
+          active={item.active}
           images={item.images}
         />
       ))}
