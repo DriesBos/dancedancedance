@@ -36,10 +36,10 @@ const BlokProject = ({
     >
       <Row>
         <div className="column column-Year">{year}</div>
-        <div className="column column-Title">{title}</div>
+        <div className="column column-Project">{title}</div>
         <div className="column column-Category">{category}</div>
-        <div className="column column-Client">{role}</div>
-        <div className="column column-Client">{location}</div>
+        <div className="column column-Role">{role}</div>
+        <div className="column column-Location">{location}</div>
         <div className="column column-Icons">
           <div className="icon">
             <IconArrow />

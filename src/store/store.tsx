@@ -6,7 +6,8 @@ export type Theme =
   | 'IMAGE'
   | 'TRON'
   | 'GRADIENT'
-  | 'DONJUDD';
+  | 'DONJUDD'
+  | 'GRUNGE';
 
 export type Space = 'DESKTOP' | 'MOBILE' | '3D';
 

@@ -42,6 +42,8 @@ const StoreSwitcher = () => {
     } else if (theme === 'GRADIENT') {
       setTheme('DONJUDD');
     } else if (theme === 'DONJUDD') {
+      setTheme('GRUNGE');
+    } else if (theme === 'GRUNGE') {
       setTheme('BASIC');
     }
   }
@@ -59,6 +61,7 @@ const StoreSwitcher = () => {
   return (
     <>
       <div className="icon IconTheme" onClick={handlePickTheme} />
+      {theme}
       {space === 'DESKTOP' && (
         <div className="icon" onClick={handlePickSpace}>
           <IconDesktop />

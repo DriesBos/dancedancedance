@@ -14,6 +14,7 @@ import BlokHead from '@/components/BlokHead';
 import BlokFilter from '@/components/BlokFilter';
 import BlokFooter from '@/components/BlokFooter';
 import StoreSwitcher from '@/components/StoreSwitcher';
+import ThemeFilter from '@/components/ThemeFilter';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
@@ -41,6 +42,7 @@ export default async function RootLayout({
       <html lang="en" suppressHydrationWarning={true}>
         <head />
         <AppInitializer className={`body ${myFont.className}`}>
+          <ThemeFilter />
           <ThemeBackground />
           <div className="laserBlok">
             <div className="laserBlok-Line"></div>

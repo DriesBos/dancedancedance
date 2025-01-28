@@ -16,16 +16,16 @@ export default function BlokFilter() {
             <div className="column column-Year" data-inactive={true}>
               Date
             </div>
-            <div className="column column-Title" data-inactive={true}>
+            <div className="column column-Project" data-inactive={true}>
               Selected Projects
             </div>
             <div className="column column-Category" data-inactive={true}>
               Type
             </div>
-            <div className="column column-Client" data-inactive={true}>
+            <div className="column column-Role" data-inactive={true}>
               Role
             </div>
-            <div className="column" data-inactive={true}>
+            <div className="column column-Location" data-inactive={true}>
               Location
             </div>
             <div className="column column-Icons" data-inactive={true}>

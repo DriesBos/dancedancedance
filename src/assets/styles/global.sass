@@ -64,7 +64,7 @@ body
       &-Empty
         @media (max-width: 770px)
           display: none
-      &-Title, &-Client, &-Category
+      &-Project, &-Title, &-Category, &-Role, &-Location
         flex: 1 1 0
         width: 0
       &-Text
@@ -232,6 +232,26 @@ body
     background: var(--theme-bg)
     transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
     will-change: opacity, background
+
+.themeFilter
+  position: fixed
+  width: 100%
+  height: 100vh
+  top: 0
+  left: 0
+  background: linear-gradient(180deg, #371921, #533535 44%, #422328 94%)
+  object-fit: cover
+  opacity: 0
+  transition: opacity var(--transition-theme-quick)
+  will-change: opacity
+  svg, img
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    opacity: 0.05
+    object-fit: cover
   
 .introText
   position: fixed
@@ -296,6 +316,14 @@ body
   &[data-theme="BASIC"], &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
     .blok, .blok .row, .side
       background: var(--theme-blok)
+  &[data-theme="GRUNGE"]
+    .themeBackground
+      opacity: 0
+    .themeFilter
+      opacity: 1
+    
+
+
 
 // Spaces
 body
