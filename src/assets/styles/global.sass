@@ -28,7 +28,7 @@ body
     height: calc-size(auto)
     max-height: auto
     max-height: calc-size(auto)
-    border: 0 solid currentColor
+    border: 0 solid var(--border-color)
     border-radius: 0
     background: var(--theme-container)
     transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme)
@@ -42,7 +42,7 @@ body
   top: 0
   display: flex
   flex-direction: column
-  border: var(--border-width) solid currentColor
+  border: var(--border-width) solid var(--border-color)
   background: transparent
   overflow: visible
   transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme)
@@ -117,10 +117,10 @@ body
   &-Animate
     opacity: 0
   &-Head
-    border-top: var(--border-width) solid currentColor
-    border-bottom: var(--border-width) solid currentColor
-    border-left: var(--border-width) solid currentColor
-    border-right: var(--border-width) solid currentColor
+    border-top: var(--border-width) solid var(--border-color)
+    border-bottom: var(--border-width) solid var(--border-color)
+    border-left: var(--border-width) solid var(--border-color)
+    border-right: var(--border-width) solid var(--border-color)
     .column 
       &-Title
         @media (max-width: 770px)
@@ -137,7 +137,7 @@ body
   &-Project
     border-top-width: 0
     .row
-      border-top: var(--border-width) solid currentColor
+      border-top: var(--border-width) solid var(--border-color)
       transform: translateY(0)
       transition: 1s ease
     @media (hover: hover)
@@ -152,7 +152,7 @@ body
     align-items: flex-end
     justify-content: flex-end
     height: calc(#{var(--blok-height)} * 2)
-    border-bottom: var(--border-width) solid currentColor
+    border-bottom: var(--border-width) solid var(--border-color)
 
 .icon
   position: relative
@@ -185,7 +185,7 @@ body
   top: 0
   width: 100%
   height: 100%
-  border: var(--border-width) solid currentColor
+  border: var(--border-width) solid var(--border-color)
   backdrop-filter: none
   transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
   will-change: background, border, backdrop-filter, opacity
@@ -384,7 +384,7 @@ body
       max-width: 393px
       height: 100%
       max-height: 852px
-      border: 4px solid currentColor
+      border: 4px solid var(--border-color)
       border-radius: 2em
       overflow-y: auto
     .introText
