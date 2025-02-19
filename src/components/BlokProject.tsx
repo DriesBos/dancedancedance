@@ -1,7 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
-import BlokSidePanels from './BlokSides';
+import { useStore } from '@/store/store';
 
 interface Props {
   slug?: String;
@@ -24,35 +26,35 @@ const BlokProject = ({
   active,
   images,
 }: Props) => {
-  const arr = Array.from(images);
-  const repeatedArr = Array(10)
-    .fill(arr)
-    .flatMap((x) => x);
+  const index = useStore((state: any) => state.index);
+
+  console.log(images, 'images');
 
   return (
     <Link
       className={`blok blok-Project blok-Animate ${active ? '' : 'inActive'}`}
       href={`/projects/${slug}`}
     >
-      <Row>
-        <div className="column column-Year">{year}</div>
-        <div className="column column-Project">{title}</div>
-        <div className="column column-Category">{category}</div>
-        <div className="column column-Role">{role}</div>
-        <div className="column column-Location">{location}</div>
-        <div className="column column-Icons">
-          <div className="icon">
-            <IconArrow />
+      {index === 'TXT' ? (
+        <Row>
+          <div className="column column-Year">{year}</div>
+          <div className="column column-Project">{title}</div>
+          <div className="column column-Category">{category}</div>
+          <div className="column column-Role">{role}</div>
+          <div className="column column-Location">{location}</div>
+          <div className="column column-Icons">
+            <div className="icon">
+              <IconArrow />
+            </div>
           </div>
-        </div>
-      </Row>
-      {/* <Row>
-        <div className="imageContainer">
-          {repeatedArr.map((item: any, index: number) => (
-            <img key={index} src={item.filename} alt={item.alt} />
-          ))}
-        </div>
-      </Row> */}
+        </Row>
+      ) : (
+        <Row>
+          <div className="column column-Thumbnail">
+            <img src={images[0].filename} alt={images[0].alt} />
+          </div>
+        </Row>
+      )}
     </Link>
   );
 };

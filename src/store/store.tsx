@@ -11,9 +11,12 @@ export type Theme =
 
 export type Space = 'DESKTOP' | 'MOBILE' | '3D';
 
+export type Index = 'TXT' | 'IMG';
+
 export type Props = {
   theme: Theme;
   space: Space;
+  index: Index;
   topPanel: boolean;
 };
 
@@ -26,11 +29,13 @@ export type Actions = {
   setPhone: (space: Space) => void;
   setTopPanelTrue: (topPanel: boolean) => void;
   setTopPanelFalse: (topPanel: boolean) => void;
+  setIndex: (index: Index) => void;
 };
 
 export const useStore = create<Props & Actions>()((set) => ({
   theme: 'DONJUDD',
   space: 'DESKTOP',
+  index: 'TXT',
   topPanel: true,
   setNightmode: () => set({ theme: 'NIGHTMODE' }),
   setDefault: () => set({ theme: 'GRADIENT' }),
@@ -40,4 +45,5 @@ export const useStore = create<Props & Actions>()((set) => ({
   setPhone: () => set({ space: 'MOBILE' }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
+  setIndex: (index: Index) => set({ index }),
 }));

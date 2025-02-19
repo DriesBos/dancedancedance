@@ -7,7 +7,9 @@ import Link from 'next/link';
 import React, { useState, useEffect, useCallback, use } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
-import IconArrow from './Icons/IconArrow';
+import IconArrow from '@/components/Icons/IconArrow';
+import IconText from '@/components/Icons/IconText';
+import IconImage from '@/components/Icons/IconImage';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import gsap from 'gsap';
@@ -39,6 +41,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
   const router = useRouter();
   const space = useStore((state: any) => state.space);
+  const index = useStore((state: any) => state.index);
+  const setIndex = useStore((state: any) => state.setIndex);
   var topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
@@ -179,6 +183,16 @@ const BlokHead = ({ blok, float, params }: Props) => {
     };
   }, [router]);
 
+  function handlePickIndex() {
+    if (index === 'TXT') {
+      setIndex('IMG');
+      console.log('IMG');
+    } else {
+      setIndex('TXT');
+      console.log('TXT');
+    }
+  }
+
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
       <BlokSidePanels />
@@ -197,16 +211,10 @@ const BlokHead = ({ blok, float, params }: Props) => {
         <div className="column column-Icons">
           {pathName === 'home' && (
             <>
-              {/* <div className="icon">
-              <Link href="/about">
-                <IconText />
-              </Link>
-            </div>
-            <div className="icon">
-              <Link href="/about">
-                <IconImage />
-              </Link>
-            </div> */}
+              <div className="icon" onClick={handlePickIndex}>
+                {index === 'TXT' ? <IconText /> : <IconImage />}
+              </div>
+
               <StoreSwitcher />
               <div className="icon">
                 <Link href="/about">
