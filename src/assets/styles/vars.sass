@@ -84,7 +84,13 @@ $break-desktop: 1370px
 
 // SPACES
 body[data-space='MOBILE']
-  --top-padding-filter: calc(68px * 2)
+  --top-padding-filter: calc(#{var(--blok-height)} * 2)
+
+body[data-space='DESKTOP']
+  --top-padding-filter: calc(#{var(--blok-height)} * 3)
+
+body[data-space='3D']
+  --top-padding-filter: calc(#{var(--blok-height)} * 2)
 
 // THEMES
 body[data-theme='TRON']
@@ -145,7 +151,6 @@ body[data-theme='GRADIENT']
     --theme-bg: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
   &[data-space='MOBILE']
     --theme-container: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
-
 
 body[data-theme='DONJUDD']
   --theme-bg: #DAD9E0
