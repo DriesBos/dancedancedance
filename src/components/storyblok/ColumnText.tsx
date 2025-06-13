@@ -1,3 +1,5 @@
+'use client';
+
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Markdown from 'marked-react';
 import { useRef } from 'react';
