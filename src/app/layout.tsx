@@ -7,13 +7,12 @@ import '@/assets/styles/transitions.sass';
 import '@/assets/styles/global.sass';
 import localFont from 'next/font/local';
 import { storyblokInit, apiPlugin } from '@storyblok/react/rsc';
-import StoryblokProvider from '@/components/StoryblokProvider';
+import StoryblokProvider from '@/providers/storyblok-provider';
 import AppInitializer from '@/components/AppInitStore';
 import ThemeBackground from '@/components/ThemeBackground';
 import BlokHead from '@/components/BlokHead';
 import BlokFilter from '@/components/BlokFilter';
 import BlokFooter from '@/components/BlokFooter';
-import StoreSwitcher from '@/components/StoreSwitcher';
 import ThemeFilter from '@/components/ThemeFilter';
 
 const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });

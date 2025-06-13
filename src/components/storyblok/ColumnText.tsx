@@ -1,4 +1,4 @@
-import { storyblokEditable } from '@storyblok/react/rsc';
+import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Markdown from 'marked-react';
 import { useRef } from 'react';
 import gsap from 'gsap';
@@ -6,11 +6,15 @@ import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(useGSAP);
 
-interface Props {
-  blok: any;
+interface SbPageData extends SbBlokData {
+  body: SbBlokData[];
 }
 
-const ColumnText = ({ blok }: Props) => {
+interface ColumnTextProps {
+  blok: SbPageData;
+}
+
+const ColumnText: React.FunctionComponent<ColumnTextProps> = ({ blok }) => {
   const container = useRef(null);
 
   useGSAP(
@@ -30,7 +34,7 @@ const ColumnText = ({ blok }: Props) => {
       ref={container}
       {...storyblokEditable(blok)}
     >
-      <Markdown>{blok.text}</Markdown>
+      {/* {blok.text} */}
     </div>
   );
 };
