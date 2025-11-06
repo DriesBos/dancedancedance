@@ -9,9 +9,10 @@ export const fetchStory = async (
   const correctSlug = `/${slug ? slug.join('/') : 'home'}`;
   console.log('FETCHSTORY', correctSlug, version);
 
-  const token = version === 'published'
-    ? process.env.NEXT_PUBLIC_STORYBLOK_TOKEN
-    : process.env.NEXT_PREVIEW_STORYBLOK_TOKEN;
+  const token =
+    version === 'published'
+      ? process.env.NEXT_PUBLIC_STORYBLOK_TOKEN
+      : process.env.NEXT_PREVIEW_STORYBLOK_TOKEN;
 
   if (!token) {
     throw new Error(`Missing Storyblok token for version: ${version}`);

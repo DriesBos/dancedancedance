@@ -11,7 +11,7 @@ export default async function Home({ params }: { params: Params }) {
   try {
     const slug = (await params).slug;
     console.log('Fetching story for slug:', slug);
-    
+
     const pageData = await fetchStory('published', slug);
     console.log('STORY DYNAMIC PAGE:', pageData);
 
