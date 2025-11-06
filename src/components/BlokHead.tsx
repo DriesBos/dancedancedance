@@ -198,11 +198,11 @@ const BlokHead = ({ blok, float, params }: Props) => {
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">
-          <Link href="/">Dries Bos&nbsp;</Link>
-          <Link href="/projects/anatha-wallet">
-            {pathName === 'home' && <span>— Design, Code & Interaction</span>}
-            {pathName === 'about' && <span>— Design, Code & Interaction</span>}
-          </Link>
+          <Link href="/">DanceDanceDance&nbsp;</Link>
+          {/* <Link href="/projects/anatha-wallet">
+            {pathName === 'home' && <span>— Design & Code Partner</span>}
+            {pathName === 'about' && <span>— Design & Code Partner</span>}
+          </Link> */}
           <Link href="/projects/anatha-wallet">
             {pathName === 'projects' && <span>& {projectName}</span>}
           </Link>
