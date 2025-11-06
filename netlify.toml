@@ -9,6 +9,14 @@
 [functions]
   node_bundler = "esbuild"
   included_files = [".next/**"]
+  external_node_modules = ["sharp"]
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Handle Next.js rewrites properly
+[[redirects]]
+  from = "/*"
+  to = "/:splat"
+  status = 200
+  force = false
