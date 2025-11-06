@@ -8,7 +8,6 @@ export const fetchStory = async (
   try {
     getStoryblokApi();
     const correctSlug = `/${slug ? slug.join('/') : 'home'}`;
-    console.log('FETCHSTORY - Slug:', correctSlug, 'Version:', version);
 
     const token =
       version === 'published'
@@ -16,12 +15,10 @@ export const fetchStory = async (
         : process.env.NEXT_PREVIEW_STORYBLOK_TOKEN;
 
     if (!token) {
-      console.error('Missing token for version:', version);
       throw new Error(`Missing Storyblok token for version: ${version}`);
     }
 
     const url = `https://api.storyblok.com/v2/cdn/stories${correctSlug}?version=${version}&token=${token}`;
-    console.log('Fetching from Storyblok:', url.replace(token, 'TOKEN_HIDDEN'));
 
     const response = await fetch(url, {
       next: { tags: ['cms'] },
@@ -29,20 +26,13 @@ export const fetchStory = async (
     });
 
     if (!response.ok) {
-      console.error(
-        'Storyblok API error:',
-        response.status,
-        response.statusText
-      );
       const errorText = await response.text();
-      console.error('Error body:', errorText);
       throw new Error(
-        `Failed to fetch story: ${response.status} ${response.statusText}`
+        `Failed to fetch story: ${response.status} ${response.statusText} - ${errorText}`
       );
     }
 
     const data = await response.json();
-    console.log('Successfully fetched story:', data.story?.name || 'unknown');
     return data as { story: ISbResponse };
   } catch (error) {
     console.error('Error in fetchStory:', error);

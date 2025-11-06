@@ -13,13 +13,9 @@ type Params = Promise<{ slug?: string[] }>;
 export default async function Home({ params }: { params: Params }) {
   try {
     const slug = (await params).slug;
-    console.log('Fetching story for slug:', slug);
-
     const pageData = await fetchStory('published', slug);
-    console.log('STORY DYNAMIC PAGE:', pageData);
 
     if (!pageData || !pageData.story) {
-      console.error('No story data returned');
       return (
         <div style={{ padding: '2rem' }}>
           <h1>Story not found</h1>
@@ -30,7 +26,7 @@ export default async function Home({ params }: { params: Params }) {
 
     return <StoryblokStory story={pageData.story} />;
   } catch (error) {
-    console.error('Error in page component:', error);
+    console.error('Error loading page:', error);
     return (
       <div style={{ padding: '2rem' }}>
         <h1>Error loading page</h1>
