@@ -29,7 +29,11 @@ export const fetchStory = async (
     });
 
     if (!response.ok) {
-      console.error('Storyblok API error:', response.status, response.statusText);
+      console.error(
+        'Storyblok API error:',
+        response.status,
+        response.statusText
+      );
       const errorText = await response.text();
       console.error('Error body:', errorText);
       throw new Error(
