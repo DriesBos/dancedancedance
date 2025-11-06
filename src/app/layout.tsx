@@ -29,8 +29,8 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <StoryblokProvider>
-        <AppInitializer className={`body ${myFont.className}`}>
+      <AppInitializer className={`body ${myFont.className}`}>
+        <StoryblokProvider>
           <ThemeFilter />
           <ThemeBackground />
           {/* <div className="laserBlok">
@@ -48,8 +48,8 @@ export default async function RootLayout({
             {children}
             <BlokFooter />
           </main>
-        </AppInitializer>
-      </StoryblokProvider>
+        </StoryblokProvider>
+      </AppInitializer>
     </html>
   );
 }

@@ -8,9 +8,21 @@ export async function generateStaticParams() {
 type Params = Promise<{ slug?: string[] }>;
 
 export default async function Home({ params }: { params: Params }) {
-  const slug = (await params).slug;
-  const pageData = await fetchStory('published', slug);
-  console.log('STORY DYNAMIC PAGE:', pageData);
+  try {
+    const slug = (await params).slug;
+    console.log('Fetching story for slug:', slug);
+    
+    const pageData = await fetchStory('published', slug);
+    console.log('STORY DYNAMIC PAGE:', pageData);
 
-  return <StoryblokStory story={pageData.story} />;
+    if (!pageData || !pageData.story) {
+      console.error('No story data returned');
+      return <div>Story not found</div>;
+    }
+
+    return <StoryblokStory story={pageData.story} />;
+  } catch (error) {
+    console.error('Error in page component:', error);
+    throw error;
+  }
 }
