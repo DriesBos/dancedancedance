@@ -1,8 +1,8 @@
 import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 
-export const dynamic = 'force-static';
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function generateStaticParams() {
   return [];
@@ -20,12 +20,23 @@ export default async function Home({ params }: { params: Params }) {
 
     if (!pageData || !pageData.story) {
       console.error('No story data returned');
-      return <div>Story not found</div>;
+      return (
+        <div style={{ padding: '2rem' }}>
+          <h1>Story not found</h1>
+          <p>Could not load content from Storyblok.</p>
+        </div>
+      );
     }
 
     return <StoryblokStory story={pageData.story} />;
   } catch (error) {
     console.error('Error in page component:', error);
-    throw error;
+    return (
+      <div style={{ padding: '2rem' }}>
+        <h1>Error loading page</h1>
+        <p>An error occurred while loading this page.</p>
+        <pre>{error instanceof Error ? error.message : 'Unknown error'}</pre>
+      </div>
+    );
   }
 }
