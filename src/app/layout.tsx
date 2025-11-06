@@ -33,15 +33,15 @@ export default async function RootLayout({
         <AppInitializer className={`body ${myFont.className}`}>
           <ThemeFilter />
           <ThemeBackground />
-          <div className="laserBlok">
+          {/* <div className="laserBlok">
             <div className="laserBlok-Line"></div>
-          </div>
-          <div className="introText">
+          </div> */}
+          {/* <div className="introText">
             <h1>
               Dries Bos, computational design, creative development & digital
               partner
             </h1>
-          </div>
+          </div> */}
           <main className="main">
             <BlokHead />
             <BlokFilter />

@@ -1,3 +1,5 @@
+import styles from './PageProject.module.sass';
+
 import {
   SbBlokData,
   storyblokEditable,
@@ -14,7 +16,7 @@ interface ProjectProps {
 
 const PageProject = ({ blok }: ProjectProps) => {
   return (
-    <div {...storyblokEditable(blok)}>
+    <div className="Page page-Project" {...storyblokEditable(blok)}>
       {blok.body.map((nestedBlok: any) => (
         <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
       ))}

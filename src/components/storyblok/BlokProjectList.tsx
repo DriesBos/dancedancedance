@@ -1,5 +1,5 @@
 import { ISbStoriesParams, getStoryblokApi } from '@storyblok/react/rsc';
-import BlokProject from '../../BlokProject';
+import BlokProject from '../BlokProject';
 
 export default async function BlokProjectList() {
   const projects = await fetchProjects();
@@ -20,7 +20,7 @@ export default async function BlokProjectList() {
   console.log(data, 'data');
 
   return (
-    <>
+    <div className="blok blok-ProjectList">
       {data.map((item: any, index: number) => (
         <BlokProject
           key={index}
@@ -34,7 +34,7 @@ export default async function BlokProjectList() {
           images={item.images}
         />
       ))}
-    </>
+    </div>
   );
 }
 

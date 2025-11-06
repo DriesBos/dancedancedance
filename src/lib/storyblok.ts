@@ -6,7 +6,7 @@ import ColumnText from '@/components/storyblok/ColumnText';
 import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
 import Page from '@/components/storyblok/Page';
 import Project from '@/components/storyblok/PageProject';
-import ProjectList from '@/components/storyblok/BlokProjectList/BlokProjectList';
+import ProjectList from '@/components/storyblok/BlokProjectList';
 
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,

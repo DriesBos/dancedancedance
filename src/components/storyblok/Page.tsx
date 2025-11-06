@@ -14,7 +14,7 @@ interface PageProps {
 
 const Page: React.FunctionComponent<PageProps> = ({ blok }) => {
   return (
-    <div {...storyblokEditable(blok)}>
+    <div className="Page" {...storyblokEditable(blok)}>
       {blok.body.map((nestedBlok: any) => (
         <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
       ))}
