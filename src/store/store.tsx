@@ -33,7 +33,8 @@ export type Actions = {
 };
 
 export const useStore = create<Props & Actions>()((set) => ({
-  theme: 'DONJUDD',
+  // initial state
+  theme: 'BASIC',
   space: 'DESKTOP',
   index: 'TXT',
   topPanel: true,
