@@ -4,15 +4,15 @@ import {
   StoryblokServerComponent,
 } from '@storyblok/react/rsc';
 
-interface SbPageData extends SbBlokData {
+interface SbPageProjectData extends SbBlokData {
   body: SbBlokData[];
 }
 
 interface ProjectProps {
-  blok: SbPageData;
+  blok: SbPageProjectData;
 }
 
-const Project = ({ blok }: ProjectProps) => {
+const PageProject = ({ blok }: ProjectProps) => {
   return (
     <div {...storyblokEditable(blok)}>
       {blok.body.map((nestedBlok: any) => (
@@ -22,4 +22,4 @@ const Project = ({ blok }: ProjectProps) => {
   );
 };
 
-export default Project;
+export default PageProject;

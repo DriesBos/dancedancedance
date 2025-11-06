@@ -1,7 +1,7 @@
 import { ISbStoriesParams, getStoryblokApi } from '@storyblok/react/rsc';
-import BlokProject from './BlokProject';
+import BlokProject from '../../BlokProject';
 
-export default async function ProjectList() {
+export default async function BlokProjectList() {
   const projects = await fetchProjects();
 
   const data = projects.data.stories.map((story: any) => {
