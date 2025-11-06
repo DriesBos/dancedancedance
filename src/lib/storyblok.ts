@@ -1,6 +1,6 @@
 import { apiPlugin, storyblokInit } from '@storyblok/react/rsc';
 
-import Blok from '@/components/storyblok/Blok';
+import BlokContainer from '@/components/storyblok/BlokContainer';
 import ColumnImage from '@/components/storyblok/ColumnImage';
 import ColumnText from '@/components/storyblok/ColumnText';
 import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
@@ -11,7 +11,7 @@ import ProjectList from '@/components/storyblok/BlokProjectList/BlokProjectList'
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
   components: {
-    blok: Blok,
+    'Blok Container': BlokContainer,
     'Column Image': ColumnImage,
     'Column Text': ColumnText,
     'Column Empty': ColumnEmpty,

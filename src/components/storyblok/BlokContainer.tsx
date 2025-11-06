@@ -14,7 +14,7 @@ interface BlokProps {
   blok: SbPageData;
 }
 
-const Blok = ({ blok }: BlokProps) => {
+const BlokContainer = ({ blok }: BlokProps) => {
   return (
     <div className="blok blok-Animate" {...storyblokEditable(blok)}>
       <BlokSidePanels />
@@ -27,4 +27,4 @@ const Blok = ({ blok }: BlokProps) => {
   );
 };
 
-export default Blok;
+export default BlokContainer;
