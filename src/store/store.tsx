@@ -7,7 +7,9 @@ export type Theme =
   | 'TRON'
   | 'GRADIENT'
   | 'DONJUDD'
-  | 'GRUNGE';
+  | 'GRUNGE'
+  | 'LIGHT'
+  | 'DARK';
 
 export type Space = 'DESKTOP' | 'MOBILE' | '3D';
 
@@ -34,7 +36,7 @@ export type Actions = {
 
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
-  theme: 'BASIC',
+  theme: 'LIGHT',
   space: 'DESKTOP',
   index: 'TXT',
   topPanel: true,

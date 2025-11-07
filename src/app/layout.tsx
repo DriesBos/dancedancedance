@@ -44,7 +44,7 @@ export default async function RootLayout({
           </div> */}
           <main className="main">
             <BlokHead />
-            <BlokFilter />
+            {/* <BlokFilter /> */}
             {children}
             <BlokFooter />
           </main>

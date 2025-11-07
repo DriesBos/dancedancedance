@@ -2,10 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useStore } from '@/store/store';
-import IconSearch from './Icons/IconSearch';
-import IconDesktop from './Icons/IconDesktop';
-import IconMobile from './Icons/IconMobile';
-import IconThreeD from './Icons/IconThreeD';
 
 const StoreSwitcher = () => {
   const setNightmode = useStore((state: any) => state.setNightmode);
@@ -31,20 +27,10 @@ const StoreSwitcher = () => {
   }, [orientation]);
 
   function handlePickTheme() {
-    if (theme === 'BASIC') {
-      setNightmode();
-    } else if (theme === 'NIGHTMODE') {
-      setTheme('IMAGE');
-    } else if (theme === 'IMAGE') {
-      setTheme('TRON');
-    } else if (theme === 'TRON') {
-      setTheme('GRADIENT');
-    } else if (theme === 'GRADIENT') {
-      setTheme('DONJUDD');
-    } else if (theme === 'DONJUDD') {
-      setTheme('GRUNGE');
-    } else if (theme === 'GRUNGE') {
-      setTheme('BASIC');
+    if (theme === 'LIGHT') {
+      setTheme('DARK');
+    } else if (theme === 'DARK') {
+      setTheme('LIGHT');
     }
   }
 

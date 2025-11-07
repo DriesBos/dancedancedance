@@ -93,6 +93,24 @@ body[data-space='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
 
 // THEMES
+body[data-theme='LIGHT']
+  --theme-bg: var(--color-white)
+  --theme-container: transparent
+  --theme-blok: var(--color-white)
+  --theme-blok-project: var(--color-white)
+  --theme-type: var(--color-black)
+  --theme-type-inactive: var(--color-grey-inactive)
+  --border-color: var(--color-black)
+
+body[data-theme='DARK']
+  --theme-bg: var(--color-black)
+  --theme-container: transparent
+  --theme-blok: var(--color-black)
+  --theme-blok-project: var(--color-black)
+  --theme-type: var(--color-white)
+  --theme-type-inactive: var(--color-grey-inactive)
+  --border-color: var(--color-white)
+
 body[data-theme='TRON']
   --theme-bg: var(--color-black)
   --theme-container: transparent

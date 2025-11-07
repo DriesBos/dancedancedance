@@ -1,8 +1,8 @@
 *
+  overscroll-behavior: none
   &::-webkit-scrollbar 
     display: none
     scrollbar-width: none
-  overscroll-behavior: none
   
 html, body
   position: relative
@@ -234,62 +234,62 @@ body
     transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
     will-change: opacity, background
 
-.themeFilter
-  position: fixed
-  width: 100%
-  height: 100vh
-  top: 0
-  left: 0
-  background: linear-gradient(180deg, #371921, #533535 44%, #422328 94%)
-  object-fit: cover
-  opacity: 0
-  transition: opacity var(--transition-theme-quick)
-  will-change: opacity
-  svg, img
-    position: absolute
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    opacity: 0.05
-    object-fit: cover
+// .themeFilter
+//   position: fixed
+//   width: 100%
+//   height: 100vh
+//   top: 0
+//   left: 0
+//   background: linear-gradient(180deg, #371921, #533535 44%, #422328 94%)
+//   object-fit: cover
+//   opacity: 0
+//   transition: opacity var(--transition-theme-quick)
+//   will-change: opacity
+//   svg, img
+//     position: absolute
+//     top: 0
+//     left: 0
+//     width: 100%
+//     height: 100%
+//     opacity: 0.05
+//     object-fit: cover
   
-.introText
-  position: fixed
-  top: 0
-  left: 0
-  margin-top: 5vh
-  margin-left: 5vw
-  margin-right: 10vw
-  max-width: 58em
-  opacity: 0
-  transition: opacity var(--transition-theme-quick)
-  will-change: opacity
-  @media screen and ( max-width: 770px )
-    margin-top: 10vh
-  h1
-    font-size: 3.3vmax
-    line-height: 1.1
+// .introText
+//   position: fixed
+//   top: 0
+//   left: 0
+//   margin-top: 5vh
+//   margin-left: 5vw
+//   margin-right: 10vw
+//   max-width: 58em
+//   opacity: 0
+//   transition: opacity var(--transition-theme-quick)
+//   will-change: opacity
+//   @media screen and ( max-width: 770px )
+//     margin-top: 10vh
+//   h1
+//     font-size: 3.3vmax
+//     line-height: 1.1
       
-.laserBlok
-  position: fixed
-  left: 0
-  top: 0
-  right: 0
-  bottom: 0
-  opacity: 0
-  will-change: opacity
-  pointer-events: none
-  &-Line
-    position: absolute
-    top: 50%
-    left: 50%
-    width: 0
-    height: 0
-    opacity: 0
-    transform: translate(-50%, -50%)
-    will-change: width, height, opacity
-    border: var(--border-width) solid currentColor
+// .laserBlok
+//   position: fixed
+//   left: 0
+//   top: 0
+//   right: 0
+//   bottom: 0
+//   opacity: 0
+//   will-change: opacity
+//   pointer-events: none
+//   &-Line
+//     position: absolute
+//     top: 50%
+//     left: 50%
+//     width: 0
+//     height: 0
+//     opacity: 0
+//     transform: translate(-50%, -50%)
+//     will-change: width, height, opacity
+//     border: var(--border-width) solid currentColor
 
 .mobile
   @media screen and ( min-width: 770px )
@@ -300,12 +300,12 @@ body
 
   // Themes
 body
-  &[data-theme="IMAGE"]
-    .themeBackground
-      &-Image
-        opacity: 1
-      &-Color
-        opacity: 0
+  // &[data-theme="IMAGE"]
+  //   .themeBackground
+  //     &-Image
+  //       opacity: 1
+  //     &-Color
+  //       opacity: 0
   &[data-theme="GRADIENT"], &[data-theme="BASIC"], &[data-theme="DONJUDD"]
     .introText
       opacity: 1
@@ -317,11 +317,14 @@ body
   &[data-theme="BASIC"], &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
     .blok, .blok .row, .side
       background: var(--theme-blok)
-  &[data-theme="GRUNGE"]
-    .themeBackground
-      opacity: 0
-    .themeFilter
-      opacity: 1
+  // &[data-theme="GRUNGE"]
+  //   .themeBackground
+  //     opacity: 0
+  //   .themeFilter
+  //     opacity: 1
+  &[data-theme="LIGHT"]
+
+  &[data-theme="DARK"]
     
 // Spaces
 body
@@ -354,63 +357,63 @@ body
         flex-grow: 1
 
   // 3D
-  &[data-space="3D"]
-    padding-top: calc(191px + 68px + 20vh)
-    padding-bottom: 6rem
-    .laserBlok
-      opacity: 1
-    main
-      width: 88vw
-      max-width: 1150px
-      & > .blok
-        perspective: 1000px
-        perspective-origin: 50% -100vh
-      & > .blok
-        &:first-child, &:nth-child(2)
-          .side
-            opacity: 1
+  // &[data-space="3D"]
+  //   padding-top: calc(191px + 68px + 20vh)
+  //   padding-bottom: 6rem
+  //   .laserBlok
+  //     opacity: 1
+  //   main
+  //     width: 88vw
+  //     max-width: 1150px
+  //     & > .blok
+  //       perspective: 1000px
+  //       perspective-origin: 50% -100vh
+  //     & > .blok
+  //       &:first-child, &:nth-child(2)
+  //         .side
+  //           opacity: 1
             
   // PHONE
-  &[data-space="MOBILE"]
-    align-items: center
-    font-size: var(--font-size-mobile)
-    h1, p, a, span
-      font-size: 1em
-    main
-      flex-grow: 1
-      width: 100%
-      max-width: 393px
-      height: 100%
-      max-height: 852px
-      border: 4px solid var(--border-color)
-      border-radius: 2em
-      overflow-y: auto
-    .introText
-      opacity: 0
-    .blok
-      border-left-width: 0
-      border-right-width: 0
-      &-Footer
-        border-bottom: 0
-        min-height: calc(68px * 2)
-        justify-content: flex-end
-      &-Head
-        border-top-width: 0
-        .column-Title
-          & > a:nth-child(2)
-            display: none
-      &-Filter
-        border-top-width: 0
-        .column:nth-child(n+3):not(.column-Icons)
-          display: none 
-      &-Project
-        .column:nth-child(n+3):not(.column-Icons)
-          display: none 
-      .column
-        &-Empty
-          display: none
-    .desktop
-      display: none
+  // &[data-space="MOBILE"]
+  //   align-items: center
+  //   font-size: var(--font-size-mobile)
+  //   h1, p, a, span
+  //     font-size: 1em
+  //   main
+  //     flex-grow: 1
+  //     width: 100%
+  //     max-width: 393px
+  //     height: 100%
+  //     max-height: 852px
+  //     border: 4px solid var(--border-color)
+  //     border-radius: 2em
+  //     overflow-y: auto
+  //   .introText
+  //     opacity: 0
+  //   .blok
+  //     border-left-width: 0
+  //     border-right-width: 0
+  //     &-Footer
+  //       border-bottom: 0
+  //       min-height: calc(68px * 2)
+  //       justify-content: flex-end
+  //     &-Head
+  //       border-top-width: 0
+  //       .column-Title
+  //         & > a:nth-child(2)
+  //           display: none
+  //     &-Filter
+  //       border-top-width: 0
+  //       .column:nth-child(n+3):not(.column-Icons)
+  //         display: none 
+  //     &-Project
+  //       .column:nth-child(n+3):not(.column-Icons)
+  //         display: none 
+  //     .column
+  //       &-Empty
+  //         display: none
+  //   .desktop
+  //     display: none
 
 .clickable
   cursor: pointer
