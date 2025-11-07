@@ -50,7 +50,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
 
-  const clickNext = () => {
+  const clickNext = useCallback(() => {
     const nextPath = path;
     const currentSlug = nextPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
@@ -59,9 +59,9 @@ const BlokHead = ({ blok, float, params }: Props) => {
     } else {
       return false;
     }
-  };
+  }, [path, router]);
 
-  const checkNext = () => {
+  const checkNext = useCallback(() => {
     const checkNextPath = path;
     const currentSlug = checkNextPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
@@ -70,9 +70,9 @@ const BlokHead = ({ blok, float, params }: Props) => {
     } else {
       setHasNext(true);
     }
-  };
+  }, [path]);
 
-  const clickPrev = () => {
+  const clickPrev = useCallback(() => {
     const prevPath = path;
     const currentSlug = prevPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
@@ -81,9 +81,9 @@ const BlokHead = ({ blok, float, params }: Props) => {
     } else {
       return false;
     }
-  };
+  }, [path, router]);
 
-  const checkPrev = () => {
+  const checkPrev = useCallback(() => {
     const checkPrevPath = path;
     const currentSlug = checkPrevPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
@@ -92,55 +92,55 @@ const BlokHead = ({ blok, float, params }: Props) => {
     } else {
       setHasPrev(true);
     }
-  };
+  }, [path]);
 
   useEffect(() => {
     checkNext();
     checkPrev();
-  }, [path]);
+  }, [path, checkNext, checkPrev]);
 
-  const handleTopPanel = useCallback((e: any) => {
-    if (e.type === 'mouseenter') {
-      gsap.to('.blok-Head', {
-        yPercent: -100,
-        ease: 'power1.inOut',
-        duration: 0.33,
-      });
-      setTopPanelTrue(true);
-    } else {
-      gsap.to('.blok-Head', {
-        yPercent: 0,
-        ease: 'power1.inOut',
-        duration: 0.33,
-      });
-      setTopPanelFalse(false);
-    }
-  }, []);
+  // const handleTopPanel = useCallback((e: any) => {
+  //   if (e.type === 'mouseenter') {
+  //     gsap.to('.blok-Head', {
+  //       yPercent: -100,
+  //       ease: 'power1.inOut',
+  //       duration: 0.33,
+  //     });
+  //     setTopPanelTrue(true);
+  //   } else {
+  //     gsap.to('.blok-Head', {
+  //       yPercent: 0,
+  //       ease: 'power1.inOut',
+  //       duration: 0.33,
+  //     });
+  //     setTopPanelFalse(false);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    const main = document.querySelector('main');
-    const selection = main !== null;
-    if (selection && space === '3D') {
-      main.addEventListener('mouseleave', handleTopPanel);
-      main.addEventListener('mouseenter', handleTopPanel);
-      return () => {
-        main.removeEventListener('mouseleave', handleTopPanel);
-        main.removeEventListener('mouseenter', handleTopPanel);
-      };
-    }
-  }, [handleTopPanel, space]);
+  // useEffect(() => {
+  //   const main = document.querySelector('main');
+  //   const selection = main !== null;
+  //   if (selection && space === '3D') {
+  //     main.addEventListener('mouseleave', handleTopPanel);
+  //     main.addEventListener('mouseenter', handleTopPanel);
+  //     return () => {
+  //       main.removeEventListener('mouseleave', handleTopPanel);
+  //       main.removeEventListener('mouseenter', handleTopPanel);
+  //     };
+  //   }
+  // }, [handleTopPanel, space]);
 
   // TopPanel to FALSE on 2D and PHONE
-  useEffect(() => {
-    if (space === '2D' || space === 'MOBILE') {
-      gsap.to('.blok-Head', {
-        yPercent: 0,
-        ease: 'power1.inOut',
-        duration: 0.165,
-      });
-    }
-    setTopPanelFalse(false);
-  }, [space, setTopPanelFalse]);
+  // useEffect(() => {
+  //   if (space === '2D' || space === 'MOBILE') {
+  //     gsap.to('.blok-Head', {
+  //       yPercent: 0,
+  //       ease: 'power1.inOut',
+  //       duration: 0.165,
+  //     });
+  //   }
+  //   setTopPanelFalse(false);
+  // }, [space, setTopPanelFalse]);
 
   // Set Header Blok Title
   useEffect(() => {
@@ -167,11 +167,19 @@ const BlokHead = ({ blok, float, params }: Props) => {
     }
   }, [path]);
 
-  // Set Escape Key
+  // Set Escape Key and Arrow Keys
   useEffect(() => {
     const handleKeyDown = (e: any) => {
       if (e.key === 'Escape') {
         router.push('/');
+      }
+
+      if (pathName === 'projects') {
+        if (e.key === 'ArrowLeft') {
+          clickPrev();
+        } else if (e.key === 'ArrowRight') {
+          clickNext();
+        }
       }
     };
 
@@ -179,15 +187,15 @@ const BlokHead = ({ blok, float, params }: Props) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [router]);
+  }, [router, pathName, clickPrev, clickNext]);
 
-  function handlePickIndex() {
-    if (index === 'TXT') {
-      setIndex('IMG');
-    } else {
-      setIndex('TXT');
-    }
-  }
+  // function handlePickIndex() {
+  //   if (index === 'TXT') {
+  //     setIndex('IMG');
+  //   } else {
+  //     setIndex('TXT');
+  //   }
+  // }
 
   return (
     <div className={`blok blok-Head ${float ? 'float' : ''}`}>
