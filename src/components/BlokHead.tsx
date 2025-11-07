@@ -8,8 +8,6 @@ import React, { useState, useEffect, useCallback, use } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
-import IconText from '@/components/Icons/IconText';
-import IconImage from '@/components/Icons/IconImage';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import gsap from 'gsap';
@@ -196,14 +194,14 @@ const BlokHead = ({ blok, float, params }: Props) => {
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">
-          <Link href="/">Dries Bos —&nbsp;</Link>
+          <Link href="/">Dries Bos&nbsp;</Link>
           <Link href="/">
             {(pathName === 'home' || pathName === 'about') && (
-              <span>Design & Code Partner</span>
+              <span>— Design & Code Partner</span>
             )}
           </Link>
           <Link href="/">
-            {pathName === 'projects' && <span>{projectName}</span>}
+            {pathName === 'projects' && <span>& {projectName}</span>}
           </Link>
         </div>
 
