@@ -35,7 +35,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
     const interval = setInterval(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
-    }, 500);
+    }, 250);
 
     return () => clearInterval(interval);
   }, [blok.body]);
@@ -54,7 +54,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
               'filename' in item.media && (
                 <Image
                   src={(item.media as any).filename}
-                  alt={(item.media as any).alt}
+                  alt={(item.name as string) || 'Project Image'}
                   width={600}
                   height={400}
                   style={{ width: '100%', height: 'auto' }}
