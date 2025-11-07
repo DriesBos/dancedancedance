@@ -149,8 +149,18 @@ body
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
+  &-ProjectImages
+    display: flex
+    flex-wrap: wrap
+    &-Item
+      display: flex 
+      flex-direction: column
+      gap: .5rem
+      width: 50%
+  &-ProjectImagesList
+    display: flex
+    flex-direction: column
   &-ProjectSlider
-    position: relative
     aspect-ratio: 16 / 9
     overflow: hidden
     &-Item
@@ -203,25 +213,25 @@ body
     transition: color var(--transition-theme)
     will-change: color
 
-.side 
-  position: absolute
-  left: 0
-  top: 0
-  width: 100%
-  height: 100%
-  border: var(--border-width) solid var(--border-color)
-  backdrop-filter: none
-  transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
-  will-change: background, border, backdrop-filter, opacity
-  pointer-events: none
-  opacity: 0
-  &_Top
-    left: calc(0px - #{var(--border-width)})
-    top: 0
-    height: 150px
-    width: calc(100% + 2 * #{var(--border-width)})
-    transform: rotateX(90deg) rotateY(0deg) translateY(-150px) 
-    transform-origin: 0 0
+// .side 
+//   position: absolute
+//   left: 0
+//   top: 0
+//   width: 100%
+//   height: 100%
+//   border: var(--border-width) solid var(--border-color)
+//   backdrop-filter: none
+//   transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
+//   will-change: background, border, backdrop-filter, opacity
+//   pointer-events: none
+//   opacity: 0
+//   &_Top
+//     left: calc(0px - #{var(--border-width)})
+//     top: 0
+//     height: 150px
+//     width: calc(100% + 2 * #{var(--border-width)})
+//     transform: rotateX(90deg) rotateY(0deg) translateY(-150px) 
+//     transform-origin: 0 0
 
 // Specific Elements
 .IconTheme
@@ -235,17 +245,17 @@ body
   height: 100vh
   top: 0
   left: 0
-  &-Image
-    position: absolute
-    width: 100%
-    height: 100%
-    top: 0
-    left: 0
-    opacity: 0
-    object-fit: cover
-    object-position: center
-    transition: opacity var(--transition-theme-quick)
-    will-change: opacity
+  // &-Image
+  //   position: absolute
+  //   width: 100%
+  //   height: 100%
+  //   top: 0
+  //   left: 0
+  //   opacity: 0
+  //   object-fit: cover
+  //   object-position: center
+  //   transition: opacity var(--transition-theme-quick)
+  //   will-change: opacity
   &-Color
     position: absolute
     width: 100%
@@ -329,25 +339,25 @@ body
   //       opacity: 1
   //     &-Color
   //       opacity: 0
-  &[data-theme="GRADIENT"], &[data-theme="BASIC"], &[data-theme="DONJUDD"]
-    .introText
-      opacity: 1
-  &[data-theme="GRADIENT"], &[data-theme="IMAGE"]
-    .side
-      backdrop-filter: blur(#{var(--backdrop-filter)})
-    .blok-Head .row, .blok-Project .row, .blok-Filter .row, .blok-Footer
-      backdrop-filter: blur(#{var(--backdrop-filter)})
-  &[data-theme="BASIC"], &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
-    .blok, .blok .row, .side
-      background: var(--theme-blok)
+  // &[data-theme="GRADIENT"], &[data-theme="BASIC"], &[data-theme="DONJUDD"]
+  //   .introText
+  //     opacity: 1
+  // &[data-theme="GRADIENT"], &[data-theme="IMAGE"]
+  //   .side
+  //     backdrop-filter: blur(#{var(--backdrop-filter)})
+  //   .blok-Head .row, .blok-Project .row, .blok-Filter .row, .blok-Footer
+  //     backdrop-filter: blur(#{var(--backdrop-filter)})
+  // &[data-theme="BASIC"], &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
+  //   .blok, .blok .row, .side
+  //     background: var(--theme-blok)
   // &[data-theme="GRUNGE"]
   //   .themeBackground
   //     opacity: 0
   //   .themeFilter
   //     opacity: 1
-  &[data-theme="LIGHT"]
-
-  &[data-theme="DARK"]
+  &[data-theme="LIGHT"], &[data-theme="DARK"]
+    .blok, .blok .row, .side
+      background: var(--theme-blok)
     
 // Spaces
 body

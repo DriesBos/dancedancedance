@@ -35,7 +35,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
     const interval = setInterval(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
-    }, 250);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [blok.body]);

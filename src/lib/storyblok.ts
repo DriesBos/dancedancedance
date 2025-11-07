@@ -8,6 +8,7 @@ import Page from '@/components/storyblok/Page';
 import Project from '@/components/storyblok/PageProject';
 import BlokProjectList from '@/components/storyblok/BlokProjectList';
 import BlokProjectSlider from '@/components/storyblok/BlokProjectSlider';
+import BlokProjectImagesList from '@/components/storyblok/BlokProjectImagesList';
 
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
@@ -19,6 +20,7 @@ export const getStoryblokApi = storyblokInit({
     Page: Page,
     'Page Project': Project,
     'Blok Project List': BlokProjectList,
+    'Blok Project Images List': BlokProjectImagesList,
     'Blok Project Slider': BlokProjectSlider,
   },
   use: [apiPlugin],
