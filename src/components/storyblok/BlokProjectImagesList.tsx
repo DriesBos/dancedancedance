@@ -33,8 +33,8 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
 
   console.log('ProjectImagesList', blok.images);
 
-  const firstSix = data.slice(0, 6);
-  const remaining = data.slice(6);
+  const firstSix = data.slice(0, 4);
+  const remaining = data.slice(4);
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
@@ -61,7 +61,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       <div className="blok-ProjectList">
         {remaining.map((item: any, index: number) => (
           <BlokProject
-            key={index + 6}
+            key={index + 4}
             slug={item.slug}
             year={item.year}
             title={item.title}
