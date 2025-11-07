@@ -198,22 +198,23 @@ const BlokHead = ({ blok, float, params }: Props) => {
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">
-          <Link href="/">DanceDanceDance&nbsp;</Link>
-          {/* <Link href="/projects/anatha-wallet">
-            {pathName === 'home' && <span>— Design & Code Partner</span>}
-            {pathName === 'about' && <span>— Design & Code Partner</span>}
-          </Link> */}
-          <Link href="/projects/anatha-wallet">
-            {pathName === 'projects' && <span>& {projectName}</span>}
+          <Link href="/">Dries Bos —&nbsp;</Link>
+          <Link href="/">
+            {(pathName === 'home' || pathName === 'about') && (
+              <span>Design & Code Partner</span>
+            )}
+          </Link>
+          <Link href="/">
+            {pathName === 'projects' && <span>{projectName}</span>}
           </Link>
         </div>
 
         <div className="column column-Icons">
           {pathName === 'home' && (
             <>
-              <div className="icon" onClick={handlePickIndex}>
+              {/* <div className="icon" onClick={handlePickIndex}>
                 {index === 'TXT' ? <IconText /> : <IconImage />}
-              </div>
+              </div> */}
 
               <StoreSwitcher />
               <div className="icon">

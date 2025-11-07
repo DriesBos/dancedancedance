@@ -58,27 +58,7 @@ const StoreSwitcher = () => {
     }
   }
 
-  return (
-    <>
-      <div className="icon IconTheme" onClick={handlePickTheme} />
-      {theme}
-      {space === 'DESKTOP' && (
-        <div className="icon" onClick={handlePickSpace}>
-          <IconDesktop />
-        </div>
-      )}
-      {space === 'MOBILE' && (
-        <div className="icon" onClick={handlePickSpace}>
-          <IconMobile />
-        </div>
-      )}
-      {space === '3D' && (
-        <div className="icon" onClick={handlePickSpace}>
-          <IconThreeD />
-        </div>
-      )}
-    </>
-  );
+  return <div className="icon IconTheme" onClick={handlePickTheme} />;
 };
 
 export default StoreSwitcher;
