@@ -17,8 +17,6 @@ export default async function BlokProjectList() {
     };
   });
 
-  console.log(data, 'data');
-
   return (
     <div className="blok blok-ProjectList">
       {data.map((item: any, index: number) => (

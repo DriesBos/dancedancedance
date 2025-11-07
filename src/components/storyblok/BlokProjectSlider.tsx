@@ -1,52 +1,71 @@
-import { ISbStoriesParams, getStoryblokApi } from '@storyblok/react/rsc';
-import BlokProject from '../BlokProject';
+'use client';
 
-export default async function BlokProjectSlider() {
-  const projects = await fetchProjects();
+import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
-  const data = projects.data.stories.map((story: any) => {
-    return {
-      slug: story.slug,
-      year: story.content.year,
-      title: story.content.title,
-      category: story.content.category,
-      role: story.content.role,
-      location: story.content.location,
-      active: story.content.active,
-      images: story.content.images,
+interface SbPageData extends SbBlokData {
+  name: string;
+  media: {
+    filename: string;
+    alt: string;
+  };
+  link: {
+    cached_url: string;
+  };
+  body: Array<{
+    _uid: string;
+    name: string;
+    media?: {
+      filename: string;
+      alt: string;
     };
-  });
+  }>;
+}
 
-  console.log(data, 'data');
+interface BlokProjectSliderProps {
+  blok: SbPageData;
+}
+
+const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!blok.body || blok.body.length === 0) return;
+
+    const interval = setInterval(() => {
+      setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [blok.body]);
 
   return (
-    <div className="blok blok-ProjectSlider">
-      {data.map((item: any, index: number) => (
-        <BlokProject
-          key={index}
-          slug={item.slug}
-          year={item.year}
-          title={item.title}
-          category={item.category}
-          role={item.role}
-          location={item.location}
-          active={item.active}
-          images={item.images}
-        />
+    <div className="blok blok-ProjectSlider" {...storyblokEditable(blok)}>
+      {blok.body.map((item, index) => (
+        <div
+          key={item._uid}
+          className="blok-ProjectSlider-Item"
+          data-active={index === activeIndex}
+        >
+          <div className="blok-ProjectSlider-Image">
+            {item.media &&
+              typeof item.media === 'object' &&
+              'filename' in item.media && (
+                <Image
+                  src={(item.media as any).filename}
+                  alt={(item.media as any).alt}
+                  width={600}
+                  height={400}
+                  style={{ width: '100%', height: 'auto' }}
+                />
+              )}
+          </div>
+          <div className="blok-ProjectSlider-Title">{String(item.name)}</div>
+        </div>
       ))}
     </div>
   );
-}
+};
 
-export async function fetchProjects() {
-  let sbParams: ISbStoriesParams = {
-    version: 'published',
-    starts_with: 'projects',
-    is_startpage: false,
-  };
-
-  const storyblokApi = getStoryblokApi();
-  return await storyblokApi.get(`cdn/stories`, sbParams, {
-    cache: 'no-store',
-  });
-}
+export default BlokProjectSlider;

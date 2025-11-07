@@ -186,10 +186,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
   function handlePickIndex() {
     if (index === 'TXT') {
       setIndex('IMG');
-      console.log('IMG');
     } else {
       setIndex('TXT');
-      console.log('TXT');
     }
   }
 

@@ -28,8 +28,6 @@ const BlokProject = ({
 }: Props) => {
   const index = useStore((state: any) => state.index);
 
-  console.log(images, 'images');
-
   return (
     <Link
       className={`blok blok-Project blok-Animate ${active ? '' : 'inActive'}`}
