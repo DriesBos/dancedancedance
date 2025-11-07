@@ -3,22 +3,18 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface SbPageData extends SbBlokData {
-  name: string;
-  media: {
-    filename: string;
-    alt: string;
-  };
-  link: {
-    cached_url: string;
-  };
   body: Array<{
     _uid: string;
     name: string;
     media?: {
       filename: string;
       alt: string;
+    };
+    link?: {
+      cached_url: string;
     };
   }>;
 }
@@ -43,10 +39,11 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   return (
     <div className="blok blok-ProjectSlider" {...storyblokEditable(blok)}>
       {blok.body.map((item, index) => (
-        <div
+        <Link
           key={item._uid}
           className="blok-ProjectSlider-Item"
           data-active={index === activeIndex}
+          href={item.link?.cached_url || '#'}
         >
           <div className="blok-ProjectSlider-Image">
             {item.media &&
@@ -62,7 +59,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
               )}
           </div>
           <div className="blok-ProjectSlider-Title">{String(item.name)}</div>
-        </div>
+        </Link>
       ))}
     </div>
   );

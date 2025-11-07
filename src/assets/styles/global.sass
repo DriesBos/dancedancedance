@@ -173,8 +173,10 @@ body
       opacity: 0
       transition: opacity 0s ease-in-out
       will-change: opacity
+      pointer-events: none
       &[data-active='true']
         opacity: 1
+        pointer-events: auto
     &-Title
       position: absolute
       top: 0
