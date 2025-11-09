@@ -31,8 +31,6 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
     };
   });
 
-  console.log('ProjectImagesList', blok.images);
-
   const firstSix = data.slice(0, 4);
   const remaining = data.slice(4);
 
