@@ -46,6 +46,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
+  const [headerActive, setHeaderActive] = useState(true);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -189,6 +190,56 @@ const BlokHead = ({ blok, float, params }: Props) => {
     };
   }, [router, pathName, clickPrev, clickNext]);
 
+  // Reveal on scroll up header pattern
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let scrollStartY = window.scrollY;
+    let isScrollingDown = false;
+
+    const updateHeaderVisibility = () => {
+      const currentScrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const scrollThreshold = windowHeight * 0.1; // 10% of window height
+
+      // Always show header at the top
+      if (currentScrollY < scrollThreshold) {
+        setHeaderActive(true);
+        scrollStartY = currentScrollY;
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      // Detect direction change
+      const scrollingDown = currentScrollY > lastScrollY;
+
+      if (scrollingDown !== isScrollingDown) {
+        // Direction changed, reset start point
+        scrollStartY = lastScrollY;
+        isScrollingDown = scrollingDown;
+      }
+
+      const scrollDistance = Math.abs(currentScrollY - scrollStartY);
+
+      // Check if we've scrolled enough in the current direction
+      if (isScrollingDown && scrollDistance > scrollThreshold) {
+        setHeaderActive(false);
+      } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
+        setHeaderActive(true);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    const handleScroll = () => {
+      window.requestAnimationFrame(updateHeaderVisibility);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   // function handlePickIndex() {
   //   if (index === 'TXT') {
   //     setIndex('IMG');
@@ -198,7 +249,10 @@ const BlokHead = ({ blok, float, params }: Props) => {
   // }
 
   return (
-    <div className={`blok blok-Head ${float ? 'float' : ''}`}>
+    <div
+      className={`blok blok-Head ${float ? 'float' : ''}`}
+      data-active={headerActive}
+    >
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">

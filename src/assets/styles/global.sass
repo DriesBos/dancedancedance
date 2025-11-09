@@ -126,16 +126,23 @@ body
     opacity: 0
     opacity: 1 // TODO: Remove this line after testing
   &-Head
+    position: sticky
+    left: 0
+    top: 0
+    width: 100%
+    z-index: +1
     border-top: var(--border-width) solid var(--border-color)
     border-bottom: var(--border-width) solid var(--border-color)
     border-left: var(--border-width) solid var(--border-color)
     border-right: var(--border-width) solid var(--border-color)
+    transition: transform 0.165s ease-in-out
+    &[data-active="false"]
+      transform: translateY(-100%)
+    &[data-active="true"]
+      transform: translateY(0)
     .column 
       &-Title
         padding-right: 0
-        @media (max-width: 770px)
-          & > a:nth-child(2)
-            display: none
   &-Filter
     transition: padding-top var(--transition-space)
     padding-top: var(--top-padding-filter)
