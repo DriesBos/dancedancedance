@@ -26,6 +26,15 @@ const StoreSwitcher = () => {
     };
   }, [orientation]);
 
+  // Update theme-color meta tag when theme changes
+  useEffect(() => {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      const color = theme === 'DARK' ? '#1A1A1A' : '#FFFFFF';
+      metaThemeColor.setAttribute('content', color);
+    }
+  }, [theme]);
+
   function handlePickTheme() {
     if (theme === 'LIGHT') {
       setTheme('DARK');

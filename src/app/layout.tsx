@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     title: 'Minka Haus',
     statusBarStyle: 'black-translucent',
   },
+  other: {
+    'theme-color': '#FFFFFF',
+  },
 };
 
 export const viewport: Viewport = {
