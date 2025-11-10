@@ -88,6 +88,13 @@ main
         white-space: pre-line // Listens to line breaks in markdown
         @media (min-width: 770px)
           text-align: justify
+        &[data-display='desktop']
+          color: var(--theme-type-inactive)
+          @media (max-width: 770px)
+            display: none
+        &[data-display='mobile']
+          @media (min-width: 770px)
+            display: none
         p
           display: block
         a
@@ -118,7 +125,6 @@ main
         &-Details
           @media (min-width: 770px)
             display: none
-
       &-Image, &-Thumbnail
         padding: 0 var(--spacing-side)
         padding-bottom: var(--spacing-base)

@@ -10,6 +10,7 @@ gsap.registerPlugin(useGSAP);
 
 interface SbPageData extends SbBlokData {
   text?: string;
+  display?: 'all' | 'desktop' | 'mobile';
 }
 
 interface ColumnTextProps {
@@ -33,6 +34,7 @@ const ColumnText: React.FunctionComponent<ColumnTextProps> = ({ blok }) => {
   return (
     <div
       className="column column-Text"
+      data-display={blok.display}
       ref={container}
       {...storyblokEditable(blok)}
     >
