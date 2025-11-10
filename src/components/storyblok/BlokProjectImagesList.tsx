@@ -39,7 +39,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       <div className="blok-ProjectImages">
         {firstSix.map((item: any, index: number) => (
           <Link
-            className="blok blok-ProjectImages-Item"
+            className="blok blok-ProjectImages-Item blok-Animate"
             key={index}
             href={`/projects/${item.slug}`}
           >

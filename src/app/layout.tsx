@@ -54,7 +54,7 @@ export default async function RootLayout({
       <AppInitializer className={`body ${myFont.className}`}>
         <StoryblokProvider>
           <ThemeFilter />
-          <ThemeBackground />
+          {/* <ThemeBackground /> */}
           {/* <div className="laserBlok">
             <div className="laserBlok-Line"></div>
           </div> */}

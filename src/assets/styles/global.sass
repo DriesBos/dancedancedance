@@ -130,7 +130,6 @@ main
   // Specific Bloks
   &-Animate
     opacity: 0
-    opacity: 1 // TODO: Remove this line after testing
   &-Head
     position: sticky
     left: 0
@@ -274,12 +273,12 @@ main
   background: var(--theme-type)
   border-radius: 1000px
 
-.themeBackground
-  position: fixed
-  width: 100%
-  height: 100vh
-  top: 0
-  left: 0
+// .themeBackground
+//   position: fixed
+//   width: 100%
+//   height: 100vh
+//   top: 0
+//   left: 0
   // &-Image
   //   position: absolute
   //   width: 100%
@@ -291,16 +290,16 @@ main
   //   object-position: center
   //   transition: opacity var(--transition-theme-quick)
   //   will-change: opacity
-  &-Color
-    position: absolute
-    width: 100%
-    height: 100%
-    top: 0
-    left: 0
-    opacity: 1
-    background: var(--theme-bg)
-    transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
-    will-change: opacity, background
+  // &-Color
+  //   position: absolute
+  //   width: 100%
+  //   height: 100%
+  //   top: 0
+  //   left: 0
+  //   opacity: 1
+  //   background: var(--theme-bg)
+  //   transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
+  //   will-change: opacity, background
 
 // .themeFilter
 //   position: fixed
@@ -406,8 +405,8 @@ body
     main
       max-width: 100%
       min-height: 100dvh
-    .introText
-      opacity: 0
+    // .introText
+    //   opacity: 0
     .blok
       border-left-width: 0
       border-right-width: 0

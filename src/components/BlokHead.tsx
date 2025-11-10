@@ -10,7 +10,6 @@ import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
-import gsap from 'gsap';
 import BlokSidePanels from './BlokSides';
 import StoreSwitcher from './StoreSwitcher';
 

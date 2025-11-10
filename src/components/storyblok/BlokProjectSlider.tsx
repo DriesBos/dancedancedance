@@ -37,7 +37,10 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   }, [blok.body]);
 
   return (
-    <div className="blok blok-ProjectSlider" {...storyblokEditable(blok)}>
+    <div
+      className="blok blok-ProjectSlider blok-Animate"
+      {...storyblokEditable(blok)}
+    >
       {blok.body.map((item, index) => (
         <Link
           key={item._uid}
