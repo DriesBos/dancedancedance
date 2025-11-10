@@ -50,6 +50,16 @@ $break-desktop: 1370px
   /* Theme basic  */
   --color-grey: #989898
   --color-grey-inactive: #989898
+  // Theme Light
+  --color-light-bg: var(--color-white)
+  --color-light-type: var(--color-black)
+  --color-light-type-secondary: #C5C5C5
+  --color-light-border: #EDEDED
+  // Theme Dark
+  --color-dark-bg: #1A1A1A
+  --color-dark-type: var(--color-white)
+  --color-dark-type-secondary: #7A7A7A
+  --color-dark-border: #2C2C2C
   /* theme */
   --theme-bg: var(--color-black)
   --theme-container: var(--color-black) 
@@ -97,22 +107,22 @@ body[data-space='3D']
 
 // THEMES
 body[data-theme='LIGHT']
-  --theme-bg: var(--color-white)
-  --theme-container: transparent
+  --theme-bg: var(--color-light-bg)
+  --theme-container: var(--color-light-bg)
   --theme-blok: var(--color-white)
   --theme-blok-project: var(--color-white)
-  --theme-type: var(--color-black)
-  --theme-type-inactive: var(--color-grey-inactive)
-  --border-color: var(--color-black)
+  --theme-type: var(--color-light-type)
+  --theme-type-inactive: var(--color-light-type-secondary)
+  --border-color: var(--color-light-border)
 
 body[data-theme='DARK']
-  --theme-bg: var(--color-black)
-  --theme-container: transparent
-  --theme-blok: var(--color-black)
-  --theme-blok-project: var(--color-black)
-  --theme-type: var(--color-white)
-  --theme-type-inactive: var(--color-grey-inactive)
-  --border-color: var(--color-white)
+  --theme-bg: var(--color-dark-bg)
+  --theme-container: var(--color-dark-bg)
+  --theme-blok: var(--color-dark-bg)
+  --theme-blok-project: var(--color-dark-bg)
+  --theme-type: var(--color-dark-type)
+  --theme-type-inactive: var(--color-dark-type-secondary)
+  --border-color: var(--color-dark-border)
 
 body[data-theme='TRON']
   --theme-bg: var(--color-black)
