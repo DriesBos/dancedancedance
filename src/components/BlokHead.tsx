@@ -252,7 +252,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   return (
     <div
-      className={`blok blok-Head ${float ? 'float' : ''}`}
+      className={`blok blok-Head blok-AnimateHead ${float ? 'float' : ''}`}
       data-active={headerActive}
     >
       <BlokSidePanels />
