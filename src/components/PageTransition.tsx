@@ -13,6 +13,11 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const hasAnimatedHeader = useRef(false);
 
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   // Animate header only on initial load
   useGSAP(() => {
     if (!hasAnimatedHeader.current) {
