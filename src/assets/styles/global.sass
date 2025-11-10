@@ -131,6 +131,7 @@ main
   &-Animate
     opacity: 0
   &-Head
+    opacity: 0
     position: sticky
     left: 0
     top: 0
@@ -140,11 +141,6 @@ main
     border-bottom: var(--border-width) solid var(--border-color)
     border-left: var(--border-width) solid var(--border-color)
     border-right: var(--border-width) solid var(--border-color)
-    transition: transform 0.165s ease-in-out
-    &[data-active="false"]
-      transform: translateY(-100%)
-    &[data-active="true"]
-      transform: translateY(0)
     .column 
       &-Title
         padding-right: 0

@@ -12,6 +12,7 @@ import IconArrowLong from '@/components/Icons/IconArrowLong';
 import Row from './Row';
 import BlokSidePanels from './BlokSides';
 import StoreSwitcher from './StoreSwitcher';
+import gsap from 'gsap';
 
 const hyperLink = [
   'anatha-wallet',
@@ -45,7 +46,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
-  const [headerActive, setHeaderActive] = useState(true);
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
 
   const [pathName, setPathName] = useState('');
@@ -205,7 +205,11 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
       // Always show header at the top
       if (currentScrollY < scrollThreshold) {
-        setHeaderActive(true);
+        gsap.to('.blok-Head', {
+          y: 0,
+          duration: 0.33,
+          ease: 'power1.inOut',
+        });
         scrollStartY = currentScrollY;
         lastScrollY = currentScrollY;
         return;
@@ -224,9 +228,19 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
       // Check if we've scrolled enough in the current direction
       if (isScrollingDown && scrollDistance > scrollThreshold) {
-        setHeaderActive(false);
+        // Hide header - move up
+        gsap.to('.blok-Head', {
+          y: -100,
+          duration: 0.33,
+          ease: 'power1.out',
+        });
       } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
-        setHeaderActive(true);
+        // Show header - move to normal position
+        gsap.to('.blok-Head', {
+          y: 0,
+          duration: 0.33,
+          ease: 'power1.out',
+        });
       }
 
       lastScrollY = currentScrollY;
@@ -251,10 +265,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   // }
 
   return (
-    <div
-      className={`blok blok-Head blok-AnimateHead ${float ? 'float' : ''}`}
-      data-active={headerActive}
-    >
+    <div className={`blok blok-Head blok-AnimateHead ${float ? 'float' : ''}`}>
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">
