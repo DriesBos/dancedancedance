@@ -18,12 +18,12 @@ export default function PageTransition({ children }: PageTransitionProps) {
     if (!hasAnimatedHeader.current) {
       gsap.set('.blok-AnimateHead', {
         opacity: 0,
-        y: 68,
+        // y: 68,
       });
 
       gsap.to('.blok-AnimateHead', {
         opacity: 1,
-        y: 0,
+        // y: 0,
         duration: 0.33,
         ease: 'power1.inOut',
       });
@@ -36,13 +36,13 @@ export default function PageTransition({ children }: PageTransitionProps) {
     // Set initial state for all animated blocks
     gsap.set('.blok-Animate', {
       opacity: 0,
-      y: 68,
+      // y: 68,
     });
 
     // Animate in with stagger
     gsap.to('.blok-Animate', {
       opacity: 1,
-      y: 0,
+      // y: 0,
       duration: 0.33,
       stagger: 0.165,
       ease: 'power1.inOut',
