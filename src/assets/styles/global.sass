@@ -164,9 +164,9 @@ main
     transform: translateY(0)
     transition: 0.165s ease-out
     &:hover
-      // transform: translateY(calc(0px - (#{var(--blok-height)} / 2))) !important
-      transform: translateY(-50%)
-      transition: transform var(--transition-project-hover)
+      @media (hover: hover)
+        transform: translateY(-50%)
+        transition: transform var(--transition-project-hover)
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
