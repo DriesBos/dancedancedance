@@ -18,24 +18,30 @@ body
   min-height: 100dvh
   transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme)
   will-change: padding-top, padding-bottom, color
-  main
-    position: relative
-    display: flex
-    flex-direction: column
-    width: 100%
-    max-width: 100%
-    height: auto
-    height: calc-size(auto)
-    max-height: auto
-    max-height: calc-size(auto)
-    border: 0 solid var(--border-color)
-    border-radius: 0
-    background: var(--theme-container)
-    transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme)
-    will-change: border, border-radius, width, max-width, height, max-height, transform, background
-    transform-style: preserve-3d
-    & > .blok
-      margin-top: -2px
+
+main
+  position: relative
+  display: flex
+  flex-direction: column
+  width: 100%
+  max-width: 100%
+  height: auto
+  height: calc-size(auto)
+  max-height: auto
+  max-height: calc-size(auto)
+  border: 0 solid var(--border-color)
+  border-radius: 0
+  background: var(--theme-container)
+  transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme)
+  will-change: border, border-radius, width, max-width, height, max-height, transform, background
+  transform-style: preserve-3d
+  // Safe envs
+  padding-top: env(safe-area-inset-top)
+  padding-right: env(safe-area-inset-right)
+  padding-bottom: env(safe-area-inset-bottom)
+  padding-left: env(safe-area-inset-left)
+  & > .blok
+    margin-top: -2px
 
 .page
   &-General
