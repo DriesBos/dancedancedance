@@ -8,7 +8,6 @@
 
 [functions]
   node_bundler = "esbuild"
-  included_files = [".next/**"]
   external_node_modules = ["sharp"]
 
 [[plugins]]
