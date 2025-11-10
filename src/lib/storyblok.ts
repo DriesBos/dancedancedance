@@ -9,6 +9,7 @@ import Project from '@/components/storyblok/PageProject';
 import BlokProjectList from '@/components/storyblok/BlokProjectList';
 import BlokProjectSlider from '@/components/storyblok/BlokProjectSlider';
 import BlokProjectImagesList from '@/components/storyblok/BlokProjectImagesList';
+import ColumnTextExpandable from '@/components/storyblok/ColumnTextExpandable';
 
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
@@ -16,6 +17,7 @@ export const getStoryblokApi = storyblokInit({
     'Blok Container': BlokContainer,
     'Column Image': ColumnImage,
     'Column Text': ColumnText,
+    'Column Text Expandable': ColumnTextExpandable,
     'Column Empty': ColumnEmpty,
     Page: Page,
     'Page Project': Project,

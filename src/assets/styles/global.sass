@@ -46,9 +46,9 @@ main
 
 .page
   &-General
-    margin-top: 25vh
+    margin-top: 20vh
   &-Project
-    margin-top: 25vh
+    margin-top: 20vh
     &-Thumbnail
       padding: 0 var(--spacing-base)
 
@@ -109,6 +109,16 @@ main
                 @media ( hover: hover )
                   animation: hyperHyperLink .66s ease
                   animation-iteration-count: 1
+      &-TextExpandable
+        display: flex
+        flex-direction: column
+        gap: var(--spacing-base)
+        &-More, &-Details
+          color: var(--theme-type-inactive)
+        &-Details
+          @media (min-width: 770px)
+            display: none
+
       &-Image, &-Thumbnail
         padding: 0 var(--spacing-side)
         padding-bottom: var(--spacing-base)
