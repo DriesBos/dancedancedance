@@ -47,6 +47,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
   const [headerActive, setHeaderActive] = useState(true);
+  const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -66,6 +67,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
     const checkNextPath = path;
     const currentSlug = checkNextPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
+    setCurrentProjectIndex(currentIndex);
+    console.log('project number', currentIndex);
     if (currentIndex === -1 || currentIndex >= hyperLink.length - 1) {
       setHasNext(false);
     } else {
@@ -315,6 +318,9 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 <div onClick={clickPrev}>
                   <IconArrow />
                 </div>
+              </div>
+              <div className="projectNumber">
+                {currentProjectIndex + 1}/{hyperLink.length}
               </div>
               <div
                 className={`${

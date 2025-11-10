@@ -143,6 +143,12 @@ body
     .column 
       &-Title
         padding-right: 0
+    .projectNumber
+      display: inline-flex
+      justify-content: flex-end 
+      width: 2.255rem
+      @media (max-width: 770px)
+        display: none
   &-Filter
     transition: padding-top var(--transition-space)
     padding-top: var(--top-padding-filter)
