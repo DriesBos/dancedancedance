@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
@@ -18,8 +18,18 @@ const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
 
 export const metadata: Metadata = {
   title: 'Dries Bos',
-  description:
-    'Dries Bos, computational design, creative development & digital partner',
+  description: 'Dries Bos — Design & Code Partner',
+  appleWebApp: {
+    title: 'Minka Haus',
+    statusBarStyle: 'black-translucent',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default async function RootLayout({
@@ -29,6 +39,15 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* prevent AI indexing - together with robots txt */}
+        <meta name="robots" content="noai, noimageai" />
+        {/* Viewport fit for notch displays */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+        />
+      </head>
       <AppInitializer className={`body ${myFont.className}`}>
         <StoryblokProvider>
           <ThemeFilter />
