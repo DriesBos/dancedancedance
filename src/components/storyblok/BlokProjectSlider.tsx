@@ -55,8 +55,9 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
                 <Image
                   src={(item.media as any).filename}
                   alt={(item.name as string) || 'Project Image'}
-                  width={600}
-                  height={400}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
                   style={{ width: '100%', height: 'auto' }}
                 />
               )}

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import { useStore } from '@/store/store';
+import Image from 'next/image';
 
 interface Props {
   slug?: String;
@@ -49,7 +50,14 @@ const BlokProject = ({
       ) : (
         <Row>
           <div className="column column-Thumbnail">
-            <img src={images[0].filename} alt={images[0].alt} />
+            <Image
+              src={images[0].filename}
+              alt={images[0].alt}
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{ width: '100%', height: 'auto' }}
+            />
           </div>
         </Row>
       )}

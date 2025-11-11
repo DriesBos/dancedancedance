@@ -1,4 +1,5 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
+import Image from 'next/image';
 
 interface SbPageData extends SbBlokData {
   image?: {
@@ -14,7 +15,14 @@ interface ColumnImageProps {
 const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
   return (
     <div className="column column-Image" {...storyblokEditable(blok)}>
-      <img src={blok.image.filename} alt={blok.image.alt} />
+      <Image
+        src={blok.image.filename}
+        alt={blok.image.alt}
+        width={0}
+        height={0}
+        sizes="100vw"
+        style={{ width: '100%', height: 'auto' }}
+      />
     </div>
   );
 };
