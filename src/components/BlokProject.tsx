@@ -14,7 +14,10 @@ interface Props {
   role?: String;
   location?: String;
   active?: Boolean;
-  images?: any;
+  images?: Array<{
+    filename: string;
+    alt: string;
+  }>;
 }
 
 const BlokProject = ({
