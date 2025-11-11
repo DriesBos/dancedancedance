@@ -13,6 +13,7 @@ import Row from './Row';
 import BlokSidePanels from './BlokSides';
 import StoreSwitcher from './StoreSwitcher';
 import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 const hyperLink = [
   'anatha-wallet',
@@ -193,7 +194,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   }, [router, pathName, clickPrev, clickNext]);
 
   // Reveal on scroll up header pattern
-  useEffect(() => {
+  useGSAP(() => {
     let lastScrollY = window.scrollY;
     let scrollStartY = window.scrollY;
     let isScrollingDown = false;
