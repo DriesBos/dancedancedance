@@ -59,8 +59,9 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
                   width={0}
                   height={0}
                   sizes="100vw"
-                  style={{ width: '100%', height: 'auto' }}
+                  quality={90}
                   priority={index === 0}
+                  style={{ width: '100%', height: 'auto' }}
                 />
               )}
           </div>

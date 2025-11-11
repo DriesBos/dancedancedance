@@ -47,8 +47,10 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
               <Image
                 src={item.images[0].filename}
                 alt={item.title || 'Project Image'}
-                width={600}
-                height={400}
+                width={0}
+                height={0}
+                sizes="100vw"
+                quality={90}
                 style={{ width: '100%', height: 'auto' }}
               />
             </div>
