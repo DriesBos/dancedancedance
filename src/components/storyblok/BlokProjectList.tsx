@@ -41,7 +41,6 @@ export async function fetchProjects() {
     version: 'published',
     starts_with: 'projects',
     is_startpage: false,
-    cv: Date.now(), // Cache version for CDN cache busting
   };
 
   const storyblokApi = getStoryblokApi();

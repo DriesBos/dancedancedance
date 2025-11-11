@@ -18,9 +18,7 @@ export const fetchStory = async (
       throw new Error(`Missing Storyblok token for version: ${version}`);
     }
 
-    // Add cv (cache version) parameter for CDN cache busting
-    const cv = Date.now();
-    const url = `https://api.storyblok.com/v2/cdn/stories${correctSlug}?version=${version}&token=${token}&cv=${cv}`;
+    const url = `https://api.storyblok.com/v2/cdn/stories${correctSlug}?version=${version}&token=${token}`;
 
     const response = await fetch(url, {
       next: {
