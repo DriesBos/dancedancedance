@@ -10,11 +10,13 @@ import BlokProjectList from '@/components/storyblok/BlokProjectList';
 import BlokProjectSlider from '@/components/storyblok/BlokProjectSlider';
 import BlokProjectImagesList from '@/components/storyblok/BlokProjectImagesList';
 import ColumnTextExpandable from '@/components/storyblok/ColumnTextExpandable';
+import BlokExperience from '@/components/storyblok/BlokExperience/BlokExperience';
 
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
   components: {
     'Blok Container': BlokContainer,
+    'Blok Experience': BlokExperience,
     'Column Image': ColumnImage,
     'Column Text': ColumnText,
     'Column Text Expandable': ColumnTextExpandable,

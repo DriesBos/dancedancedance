@@ -5,7 +5,6 @@ import {
   storyblokEditable,
   StoryblokServerComponent,
 } from '@storyblok/react/rsc';
-import Image from 'next/image';
 
 interface SbPageProjectData extends SbBlokData {
   body: SbBlokData[];

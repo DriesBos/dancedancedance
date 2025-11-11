@@ -95,8 +95,14 @@ main
         &[data-display='mobile']
           @media (min-width: 770px)
             display: none
+        &[data-color='primary']
+          color: var(--theme-type)
+        &[data-color='secondary']
+          color: var(--theme-type-inactive)
         p
           display: block
+        em
+          color: var(--theme-type-inactive)
         a
           position: relative
           &::before

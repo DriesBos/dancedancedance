@@ -24,6 +24,7 @@ const hyperLink = [
   'ko',
   'cris-mannen',
   'jasper-rens-van-es',
+  'jakob-johanna',
   'leon',
   'ilovethatphoto',
   'de-fotohal',
