@@ -17,8 +17,6 @@ interface ProjectProps {
 }
 
 const PageProject = ({ blok }: ProjectProps) => {
-  console.log('PageProject', blok.thumbnail);
-
   return (
     <div className="page page-Project" {...storyblokEditable(blok)}>
       {}

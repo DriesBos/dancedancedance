@@ -67,7 +67,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
     const currentSlug = checkNextPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
     setCurrentProjectIndex(currentIndex);
-    console.log('project number', currentIndex);
     if (currentIndex === -1 || currentIndex >= hyperLink.length - 1) {
       setHasNext(false);
     } else {
