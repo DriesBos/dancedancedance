@@ -9,6 +9,7 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["sharp"]
+  included_files = ["!.next/cache/**"]
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

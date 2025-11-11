@@ -2,6 +2,10 @@ import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import PageTransition from '@/components/PageTransition';
 
+// Enable dynamic params for catch-all route
+export const dynamicParams = true;
+export const dynamic = 'force-dynamic';
+
 export async function generateStaticParams() {
   return [];
 }
