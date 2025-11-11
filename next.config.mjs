@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Performance optimizations
-  compress: true, // Gzip compression
-  poweredByHeader: false, // Remove X-Powered-By header
-  reactStrictMode: true, // Catch bugs early
+  // compress: true, // Gzip compression
+  // poweredByHeader: false, // Remove X-Powered-By header
+  // reactStrictMode: true, // Catch bugs early
 
   // sassOptions: {
   //   additionalData: `@import "src/assets/styles/variables.sass"`,
