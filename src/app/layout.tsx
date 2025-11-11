@@ -14,7 +14,11 @@ import BlokFilter from '@/components/BlokFilter';
 import BlokFooter from '@/components/BlokFooter';
 import ThemeFilter from '@/components/ThemeFilter';
 
-const myFont = localFont({ src: '../assets/fonts/soehne-web-buch.woff2' });
+const myFont = localFont({
+  src: '../assets/fonts/soehne-web-buch.woff2',
+  display: 'swap',
+  preload: true,
+});
 
 export const metadata: Metadata = {
   title: 'Dries Bos',
