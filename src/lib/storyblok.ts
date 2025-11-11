@@ -30,5 +30,8 @@ export const getStoryblokApi = storyblokInit({
   use: [apiPlugin],
   apiOptions: {
     region: 'eu',
+    cache: {
+      type: 'memory',
+    },
   },
 });

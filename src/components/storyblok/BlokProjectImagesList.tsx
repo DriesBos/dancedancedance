@@ -80,11 +80,12 @@ export async function fetchProjects() {
     version: 'published',
     starts_with: 'projects',
     is_startpage: false,
+    cv: Date.now(), // Cache version for CDN cache busting
   };
 
   const storyblokApi = getStoryblokApi();
   return await storyblokApi.get(`cdn/stories`, sbParams, {
-    cache: 'no-store',
+    next: { revalidate: 3600 }, // Cache for 1 hour
   });
 }
 
