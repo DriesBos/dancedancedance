@@ -31,21 +31,28 @@ const ColumnTextExpandable: React.FunctionComponent<
       ease: 'ease',
     });
   });
+
   return (
     <div
       className="column column-Text column-TextExpandable"
       ref={container}
       {...storyblokEditable(blok)}
     >
-      <div className="column-TextExpandable-Main">
-        <TheMarkdown content={blok.text} />
-      </div>
-      <div className="column-TextExpandable-More">
-        {blok.more && <TheMarkdown content={blok.more} />}
-      </div>
-      <div className="column-TextExpandable-Details">
-        {blok.details && <TheMarkdown content={blok.details} />}
-      </div>
+      {blok.text && (
+        <div className="column-TextExpandable-Main">
+          <TheMarkdown content={blok.text} />
+        </div>
+      )}
+      {blok.more && (
+        <div className="column-TextExpandable-More">
+          {blok.more && <TheMarkdown content={blok.more} />}
+        </div>
+      )}
+      {blok.details && (
+        <div className="column-TextExpandable-Details">
+          {blok.details && <TheMarkdown content={blok.details} />}
+        </div>
+      )}
     </div>
   );
 };
