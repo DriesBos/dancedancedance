@@ -16,8 +16,8 @@ import ThemeFilter from '@/components/ThemeFilter';
 
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
-  display: 'swap',
-  preload: true,
+  // display: 'swap',
+  // preload: true,
 });
 
 export const metadata: Metadata = {
