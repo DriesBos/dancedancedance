@@ -2,7 +2,7 @@
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 
 interface SbPageData extends SbBlokData {
@@ -25,6 +25,7 @@ interface BlokProjectSliderProps {
 
 const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const items = useMemo(() => blok.body, [blok.body]);
 
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
