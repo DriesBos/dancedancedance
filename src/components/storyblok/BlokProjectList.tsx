@@ -45,6 +45,6 @@ export async function fetchProjects() {
 
   const storyblokApi = getStoryblokApi();
   return await storyblokApi.get(`cdn/stories`, sbParams, {
-    next: { revalidate: 3600 }, // Cache for 1 hour
+    cache: 'no-store',
   });
 }
