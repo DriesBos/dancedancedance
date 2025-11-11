@@ -2,9 +2,6 @@ import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import PageTransition from '@/components/PageTransition';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 export async function generateStaticParams() {
   return [];
 }
