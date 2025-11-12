@@ -7,36 +7,20 @@ interface Props {
   year?: String;
   title?: String;
   category?: String;
-  role?: String;
-  location?: String;
-  active?: Boolean;
-  images?: Array<{
-    filename: string;
-    alt: string;
-  }>;
+  agency?: String;
 }
 
-const BlokProject = ({
-  slug,
-  year,
-  title,
-  category,
-  role,
-  location,
-  active,
-  images,
-}: Props) => {
+const BlokProject = ({ slug, year, title, category, agency }: Props) => {
   return (
     <Link
-      className={`blok blok-Project blok-Animate ${active ? '' : 'inActive'}`}
+      className={`blok blok-Project blok-Animate}`}
       href={`/projects/${slug}`}
     >
       <Row>
         <div className="column column-Year">{year}</div>
         <div className="column column-Project">{title}</div>
         <div className="column column-Category">{category}</div>
-        <div className="column column-Role">{role}</div>
-        <div className="column column-Location">{location}</div>
+        <div className="column column-Agency">{agency}</div>
         <div className="column column-Icons">
           <div className="icon">
             <IconArrow />
