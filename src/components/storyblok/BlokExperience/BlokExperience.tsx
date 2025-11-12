@@ -62,7 +62,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Close My Eyes</span>
-            <span className={styles.rowRole}>Frontend Developer + Founder</span>
+            <span className={styles.rowRole}>Designer, Developer, Founder</span>
           </div>
         </div>
       </div>
