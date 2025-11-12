@@ -267,7 +267,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   // }
 
   return (
-    <div className={`blok blok-Head blok-AnimateHead ${float ? 'float' : ''}`}>
+    <div className={`blok blok-Head blok-AnimateHead`}>
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">

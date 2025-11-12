@@ -17,7 +17,7 @@ body
   align-items: flex-start
   padding: 0
   min-height: 100dvh
-  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme)
+  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
   will-change: padding-top, padding-bottom, color
 
 main
@@ -74,7 +74,6 @@ main
       padding: var(--blok-padding)
       &[data-inactive='true']
         color: var(--theme-type-inactive)
-        transition: color var(--transition-theme)
         will-change: color
       &-Empty
         @media (max-width: 770px)
