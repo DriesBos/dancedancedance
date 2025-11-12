@@ -1,0 +1,49 @@
+.markdown
+  --var: 0%
+  min-width: 0 // Ellipsis hack
+  white-space: pre-line // Listens to line breaks in markdown
+  a
+    position: relative
+    overflow: visible
+    &::before
+      content: ''
+      position: absolute
+      left: 0
+      bottom: 0
+      display: inline-block
+      width: var(--var)
+      height: 100%
+      border-bottom: 1px solid currentColor !important
+      box-sizing: border-box
+      z-index: 0
+      will-change: width, border-bottom
+      overflow: visible
+    &:hover
+      &::before
+        @media ( hover: hover )
+          animation: hyperHyperLink .66s ease
+          animation-iteration-count: 1
+
+@keyframes hyperLink
+  0%
+    width: 0%
+  100%
+    width: 100%
+
+@keyframes hyperHyperLink
+  0%
+    width: 100%
+    left: auto
+    right: 0
+  50%
+    width: 0%
+    left: auto
+    right: 0
+  51%
+    width: 0%
+    left: 0
+    right: auto
+  100%
+    left: 0
+    right: auto
+    width: 100%
