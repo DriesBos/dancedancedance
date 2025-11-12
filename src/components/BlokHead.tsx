@@ -16,6 +16,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
 const hyperLink = [
+  'minka-haus',
   'anatha-wallet',
   'hello-comrade',
   'fotomat',
