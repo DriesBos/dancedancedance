@@ -27,12 +27,14 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       role: story.content.role,
       location: story.content.location,
       active: story.content.active,
-      images: story.content.images,
+      thumbnail: story.content.thumbnail,
     };
   });
 
   const firstSix = data.slice(0, 4);
   const remaining = data.slice(4);
+
+  console.log('Projects data:', firstSix);
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
@@ -45,7 +47,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
           >
             <div className="blok-ProjectImages-Item-Image">
               <Image
-                src={item.images[0].filename}
+                src={item.thumbnail.filename}
                 alt={item.title || 'Project Image'}
                 width={0}
                 height={0}
