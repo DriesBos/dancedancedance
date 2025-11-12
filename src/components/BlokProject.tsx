@@ -3,17 +3,19 @@ import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 
 interface Props {
+  key?: string | number;
   slug?: String;
   year?: string;
   title?: string;
   category?: string[];
 }
 
-const BlokProject = ({ slug, year, title, category }: Props) => {
+const BlokProject = ({ slug, year, title, category, key }: Props) => {
   return (
     <Link
       className={`blok blok-Project blok-Animate}`}
       href={`/projects/${slug}`}
+      key={key}
     >
       <Row>
         {year && <div className="column column-Year">{year}</div>}
