@@ -4,23 +4,23 @@ import Row from './Row';
 
 interface Props {
   slug?: String;
-  year?: String;
-  title?: String;
-  category?: String;
-  agency?: String;
+  year?: string;
+  title?: string;
+  category?: string[];
 }
 
-const BlokProject = ({ slug, year, title, category, agency }: Props) => {
+const BlokProject = ({ slug, year, title, category }: Props) => {
   return (
     <Link
       className={`blok blok-Project blok-Animate}`}
       href={`/projects/${slug}`}
     >
       <Row>
-        <div className="column column-Year">{year}</div>
-        <div className="column column-Project">{title}</div>
-        <div className="column column-Category">{category}</div>
-        <div className="column column-Agency">{agency}</div>
+        {year && <div className="column column-Year">{year}</div>}
+        {title && <div className="column column-Project">{title}</div>}
+        {category && (
+          <div className="column column-Category">{category.join(', ')}</div>
+        )}
         <div className="column column-Icons">
           <div className="icon">
             <IconArrow />

@@ -20,13 +20,10 @@ export default function BlokFilter() {
               Selected Projects
             </div>
             <div className="column column-Category" data-inactive={true}>
-              Type
+              Category
             </div>
-            <div className="column column-Role" data-inactive={true}>
-              Role
-            </div>
-            <div className="column column-Location" data-inactive={true}>
-              Location
+            <div className="column column-Agency" data-inactive={true}>
+              Agency
             </div>
             <div className="column column-Icons" data-inactive={true}>
               <div className="icon">

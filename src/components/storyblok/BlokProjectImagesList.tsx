@@ -9,7 +9,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 interface SbPageData extends SbBlokData {
-  images: number;
+  slug?: string;
+  year?: string;
+  title?: string;
+  category?: string[];
+  thumbnail?: {
+    filename: string;
+    alt: string;
+  };
 }
 
 interface BlokProjectImagesListProps {
@@ -24,9 +31,6 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       year: story.content.year,
       title: story.content.title,
       category: story.content.category,
-      role: story.content.role,
-      location: story.content.location,
-      active: story.content.active,
       thumbnail: story.content.thumbnail,
     };
   });
@@ -34,7 +38,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
   const firstSix = data.slice(0, 4);
   const remaining = data.slice(4);
 
-  console.log('Projects data:', firstSix);
+  console.log('Projects data:', data);
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
@@ -68,10 +72,6 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
             year={item.year}
             title={item.title}
             category={item.category}
-            role={item.role}
-            location={item.location}
-            active={item.active}
-            images={item.images}
           />
         ))}
       </div>
