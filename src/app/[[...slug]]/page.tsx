@@ -15,7 +15,10 @@ type Params = Promise<{ slug?: string[] }>;
 export default async function Home({ params }: { params: Params }) {
   try {
     const slug = (await params).slug;
-    const pageData = await fetchStory('published', slug);
+    // Use 'draft' in development, 'published' in production
+    const version =
+      process.env.NODE_ENV === 'development' ? 'draft' : 'published';
+    const pageData = await fetchStory(version, slug);
 
     if (!pageData || !pageData.story) {
       return (
