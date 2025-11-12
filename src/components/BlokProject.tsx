@@ -15,7 +15,6 @@ const BlokProject = ({ slug, year, title, category, key }: Props) => {
     <Link
       className={`blok blok-Project blok-Animate}`}
       href={`/projects/${slug}`}
-      key={key}
     >
       <Row>
         {year && <div className="column column-Year">{year}</div>}
