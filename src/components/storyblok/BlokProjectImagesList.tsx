@@ -13,6 +13,7 @@ interface SbPageData extends SbBlokData {
   year?: string;
   title?: string;
   category?: string[];
+  highlight?: boolean;
   thumbnail?: {
     filename: string;
     alt: string;
@@ -31,19 +32,17 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       year: story.content.year,
       title: story.content.title,
       category: story.content.category,
+      highlight: story.content.highlight,
       thumbnail: story.content.thumbnail,
     };
   });
 
-  const firstSix = data.slice(0, 4);
-  const remaining = data.slice(4);
-
-  console.log('Projects data:', data);
+  const highlights = data.filter((item: any) => item.highlight === true);
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
       <div className="blok-ProjectImages">
-        {firstSix.map((item: any, index: number) => (
+        {highlights.map((item: any, index: number) => (
           <Link
             className="blok blok-ProjectImages-Item blok-Animate"
             key={index}
@@ -65,7 +64,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
         ))}
       </div>
       <div className="blok-ProjectList">
-        {remaining.map((item: any, index: number) => (
+        {data.map((item: any, index: number) => (
           <BlokProject
             key={index + 4}
             slug={item.slug}
