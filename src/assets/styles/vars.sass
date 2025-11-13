@@ -76,18 +76,20 @@ $break-desktop: 1370px
   // typography
   --font-size-mobile: 16px
 
-  /* spacing */
+  // Sizing
+  --icon-size: 1.25em
   --border-width: 0px
   --blok-height: 3em
   --top-padding-filter: 0
-
-  // Sizing
-  --icon-size: 1.25em
-  /* container & bloks */
   --blok-padding: 1.25rem
   --spacing-side: 1.25rem
+  --spacing-between-images: 1.25rem
   --spacing-base: 1.25rem
   --spacing-half: 0.625rem
+  @media (max-width: 770px)
+    --spacing-side: 0.5rem
+    --spacing-between-images: 0.5rem
+    --spacing-base: 1rem
 
   // Transition
   --transition-project-hover: .2s ease
