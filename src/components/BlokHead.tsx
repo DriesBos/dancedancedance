@@ -285,16 +285,10 @@ const BlokHead = ({ blok, float, params }: Props) => {
         <div className="column column-Icons">
           {pathName === 'home' && (
             <>
-              {/* <div className="icon" onClick={handlePickIndex}>
-                {index === 'TXT' ? <IconText /> : <IconImage />}
-              </div> */}
-
               <StoreSwitcher />
-              <div className="icon">
-                <Link href="/about">
-                  <IconAbout />
-                </Link>
-              </div>
+              <Link href="/about" className="icon">
+                <IconAbout />
+              </Link>
             </>
           )}
           {pathName === 'about' && (
@@ -304,55 +298,49 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   <IconMail />
                 </Link>
               </div> */}
-              <div className="icon">
-                <Link href="/">
-                  <IconClose />
-                </Link>
-              </div>
+              <Link href="/" className="icon">
+                <IconClose />
+              </Link>
             </>
           )}
           {pathName === 'projects' && (
             <>
               <div
+                onClick={clickPrev}
                 className={`${
                   hasPrev ? 'active' : 'disabled'
                 } icon icon-Wide icon-Rotate desktop`}
               >
-                <div onClick={clickPrev}>
-                  <IconArrowLong />
-                </div>
+                <IconArrowLong />
               </div>
               <div
+                onClick={clickPrev}
                 className={`${
                   hasPrev ? 'active' : 'disabled'
                 } icon icon-Rotate mobile`}
               >
-                <div onClick={clickPrev}>
-                  <IconArrow />
-                </div>
+                <IconArrow />
               </div>
-              <div className="projectNumber">
+              <div className="projectNumbe">
                 {currentProjectIndex + 1}/{hyperLink.length}
               </div>
               <div
+                onClick={clickNext}
                 className={`${
                   hasNext ? 'active' : 'disabled'
                 } icon icon-Wide desktop`}
               >
-                <div onClick={clickNext}>
-                  <IconArrowLong />
-                </div>
+                <IconArrowLong />
               </div>
-              <div className={`${hasNext ? 'active' : 'disabled'} icon mobile`}>
-                <div onClick={clickNext}>
-                  <IconArrow />
-                </div>
+              <div
+                onClick={clickNext}
+                className={`${hasNext ? 'active' : 'disabled'} icon mobile`}
+              >
+                <IconArrow />
               </div>
-              <div className="icon">
-                <Link href="/">
-                  <IconClose />
-                </Link>
-              </div>
+              <Link href="/" className="icon">
+                <IconClose />
+              </Link>
             </>
           )}
         </div>
