@@ -11,14 +11,14 @@ html, body
   
 body
   color: var(--theme-type)
-  background: var(--theme-bg)
+  background-color: var(--theme-bg)
   display: flex
   justify-content: center
   align-items: flex-start
   padding: 0
   min-height: 100dvh
-  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
-  will-change: padding-top, padding-bottom, color
+  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background-color var(--transition-theme)
+  will-change: padding-top, padding-bottom, color, background-color
 
 main
   position: relative
@@ -32,9 +32,9 @@ main
   max-height: calc-size(auto)
   border: 0 solid var(--border-color)
   border-radius: 0
-  background: var(--theme-container)
-  transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background var(--transition-theme)
-  will-change: border, border-radius, width, max-width, height, max-height, transform, background
+  background-color: var(--theme-container)
+  transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background-color var(--transition-theme)
+  will-change: border, border-radius, width, max-width, height, max-height, transform, background-color
   transform-style: preserve-3d
   // Safe envs
   padding-top: env(safe-area-inset-top)
@@ -54,14 +54,15 @@ main
 
 .blok
   // position: sticky
+  // border: 1px solid green !important
   top: 0
   display: flex
   flex-direction: column
   border: var(--border-width) solid var(--border-color)
-  background: transparent
+  background-color: var(--theme-blok)
   overflow: visible
-  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme)
-  will-change: border, border-left, border-right, border-top, border-bottom, background, opacity
+  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme)
+  will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity
   transform-style: preserve-3d
   &.inactive
     display: none
@@ -144,7 +145,7 @@ main
           height: auto
           height: calc-size(auto)
       &-Year
-        width: 4.375em
+        width: calc(2.9em + var(--spacing-side))
       &-Icons
         display: flex
         justify-content: flex-end
@@ -188,17 +189,77 @@ main
     position: relative
     border-top: 1px solid var(--border-color)
     transform: translateY(0)
-    transition: 0.165s ease-out
+    padding-bottom: calc(3.95rem * 0.5)
+    margin-bottom: calc(-3.95rem * 0.5)
+    // height: calc(3.95rem * 1.5)
+    transition: transform 0.165s ease-out, background-color var(--transition-theme), border-top var(--transition-theme), z-index 0s 0s
+    will-change: transform, background-color, border-top
+    // overflow: visible
+    .row
+      // position: absolute
+      // left: 0
+      // bottom: 0
+      // width: 100%
+      // height: calc(3.95rem * 1)
     &:hover
       @media (hover: hover)
-        transform: translateY(-50%)
-        transition: transform var(--transition-project-hover)
+        transform: translateY(calc(-3.95rem * 0.5))
+        z-index: -1
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color var(--transition-theme), border-top var(--transition-theme), z-index 0s 0s
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
   &-ProjectImagesList
     display: flex
     flex-direction: column
+  &-ProjectList
+    position: relative
+    padding-top: var(--spacing-base)
+    padding-bottom: calc(3.95rem * 0.5)
+    // Incrementing z-index for each project item
+    .blok-Project
+      &:nth-child(1)
+        z-index: 1
+      &:nth-child(2)
+        z-index: 2
+      &:nth-child(3)
+        z-index: 3
+      &:nth-child(4)
+        z-index: 4
+      &:nth-child(5)
+        z-index: 5
+      &:nth-child(6)
+        z-index: 6
+      &:nth-child(7)
+        z-index: 7
+      &:nth-child(8)
+        z-index: 8
+      &:nth-child(9)
+        z-index: 9
+      &:nth-child(10)
+        z-index: 10
+      &:nth-child(11)
+        z-index: 11
+      &:nth-child(12)
+        z-index: 12
+      &:nth-child(13)
+        z-index: 13
+      &:nth-child(14)
+        z-index: 14
+      &:nth-child(15)
+        z-index: 15
+      &:nth-child(16)
+        z-index: 16
+      &:nth-child(17)
+        z-index: 17
+      &:nth-child(18)
+        z-index: 18
+      &:nth-child(19)
+        z-index: 19
+      &:nth-child(20)
+        z-index: 20
+      &:hover
+        z-index: 100 !important
   &-ProjectImages
     display: flex
     flex-wrap: wrap
@@ -212,6 +273,8 @@ main
       width: calc((100vw - (#{var(--spacing-side)} * 3)) / 2)
       // @media (max-width: 770px)
       //   width: 100%
+  &-ProjectList
+    padding-top: var(--spacing-base)
   &-ProjectSlider
     width: 100%
     height: calc((100vw * 0.5625) + (2 * #{var(--spacing-base)}))
