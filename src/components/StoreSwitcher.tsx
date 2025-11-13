@@ -53,7 +53,16 @@ const StoreSwitcher = () => {
     }
   }
 
-  return <div className="icon IconTheme" onClick={handlePickTheme} />;
+  return (
+    <div
+      className="icon IconTheme"
+      data-theme={theme}
+      onClick={handlePickTheme}
+    >
+      <div className="IconTheme-Line" />
+      <div className="IconTheme-Circle" />
+    </div>
+  );
 };
 
 export default StoreSwitcher;
