@@ -14,6 +14,7 @@ import BlokFilter from '@/components/BlokFilter';
 import BlokFooter from '@/components/BlokFooter';
 import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
+import FaviconSwitcher from '@/components/FaviconSwitcher';
 
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
@@ -57,6 +58,7 @@ export default async function RootLayout({
       </head>
       <AppInitializer className={`body ${myFont.className}`}>
         <TitleSwitcher />
+        <FaviconSwitcher />
         <StoryblokProvider>
           <ThemeFilter />
           {/* <ThemeBackground /> */}
