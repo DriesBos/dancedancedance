@@ -197,17 +197,16 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   // Reveal on scroll up header pattern
   useGSAP(() => {
-    // Only when in landscape
-    const isLandscape = () =>
-      window.matchMedia('(orientation: landscape)').matches;
-
-    if (!isLandscape()) return; // Exit early in portrait mode
+    const mediaQuery = window.matchMedia('(orientation: landscape)');
+    let isEnabled = mediaQuery.matches;
 
     let lastScrollY = window.scrollY;
     let scrollStartY = window.scrollY;
     let isScrollingDown = false;
 
     const updateHeaderVisibility = () => {
+      if (!isEnabled) return; // Skip if not in landscape
+
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const scrollThreshold = windowHeight * 0.1; // 10% of window height
@@ -259,8 +258,21 @@ const BlokHead = ({ blok, float, params }: Props) => {
       window.requestAnimationFrame(updateHeaderVisibility);
     };
 
+    const handleOrientationChange = (e: MediaQueryListEvent) => {
+      isEnabled = e.matches;
+      
+      // Reset header position when switching to portrait
+      if (!isEnabled) {
+        gsap.set('.blok-Head', { y: 0 });
+      }
+    };
+
+    // Listen for orientation changes
+    mediaQuery.addEventListener('change', handleOrientationChange);
     window.addEventListener('scroll', handleScroll, { passive: true });
+
     return () => {
+      mediaQuery.removeEventListener('change', handleOrientationChange);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
