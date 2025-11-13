@@ -17,7 +17,7 @@ export default async function BlokProjectList() {
     <div className="blok blok-ProjectList">
       {data.map((item: any, index: number) => (
         <BlokProject
-          key={index}
+          key={item.slug}
           slug={item.slug}
           year={item.year}
           title={item.title}

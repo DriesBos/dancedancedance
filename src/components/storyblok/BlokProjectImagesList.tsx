@@ -44,8 +44,8 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       <div className="blok-ProjectImages">
         {highlights.map((item: any, index: number) => (
           <Link
+            key={item.slug}
             className="blok blok-ProjectImages-Item blok-Animate"
-            key={index}
             href={`/projects/${item.slug}`}
           >
             <div className="blok-ProjectImages-Item-Image">
@@ -66,7 +66,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       <div className="blok-ProjectList">
         {data.map((item: any, index: number) => (
           <BlokProject
-            key={index + 4}
+            key={item.slug}
             slug={item.slug}
             year={item.year}
             title={item.title}
