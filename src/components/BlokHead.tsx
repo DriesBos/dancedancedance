@@ -50,6 +50,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
+  const [hasScrollBorder, setHasScrollBorder] = useState(false);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -196,6 +197,12 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   // Reveal on scroll up header pattern
   useGSAP(() => {
+    // Only when in landscape
+    const isLandscape = () =>
+      window.matchMedia('(orientation: landscape)').matches;
+
+    if (!isLandscape()) return; // Exit early in portrait mode
+
     let lastScrollY = window.scrollY;
     let scrollStartY = window.scrollY;
     let isScrollingDown = false;
@@ -258,6 +265,29 @@ const BlokHead = ({ blok, float, params }: Props) => {
     };
   }, []);
 
+  // Scroll border state
+  useEffect(() => {
+    const handleScrollBorder = () => {
+      const scrollY = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const threshold = viewportHeight * 0.2; // 20% of viewport height
+
+      if (scrollY > threshold) {
+        setHasScrollBorder(true);
+      } else {
+        setHasScrollBorder(false);
+      }
+    };
+
+    // Check initial state
+    handleScrollBorder();
+
+    window.addEventListener('scroll', handleScrollBorder, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollBorder);
+    };
+  }, []);
+
   // function handlePickIndex() {
   //   if (index === 'TXT') {
   //     setIndex('IMG');
@@ -267,7 +297,10 @@ const BlokHead = ({ blok, float, params }: Props) => {
   // }
 
   return (
-    <div className={`blok blok-Head blok-AnimateHead`}>
+    <div
+      className={`blok blok-Head blok-AnimateHead`}
+      data-scrollborder={hasScrollBorder}
+    >
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">
