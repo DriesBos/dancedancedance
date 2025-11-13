@@ -90,8 +90,6 @@ export default async function Home({ params }: { params: Params }) {
       );
     }
 
-    console.log('Page data:', pageData);
-
     return (
       <PageTransition>
         <StoryblokStory story={pageData.story} />
