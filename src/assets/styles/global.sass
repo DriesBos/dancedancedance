@@ -68,12 +68,18 @@ main
   .row
     display: flex
     flex-direction: row
-    row-wrap: nowrap
+    flex-wrap: nowrap
     & > *:nth-last-child(2):first-child
       padding-right: calc(var(--spacing-base) / 2)
     & > *:nth-last-child(2):first-child ~ *
       padding-left: calc(var(--spacing-base) / 2)
-    
+    &[data-wide-columns='true']
+      @media (max-width: 770px)
+        flex-wrap: wrap
+        & > div
+          width: 100%
+          padding-left: var(--spacing-side) !important
+          padding-right: var(--spacing-side) !important
     .column
       text-align: left
       padding: var(--blok-padding) var(--spacing-side)
