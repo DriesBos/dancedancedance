@@ -53,11 +53,13 @@ $break-desktop: 1370px
   // Theme Light
   --color-light-bg: var(--color-white)
   --color-light-type: var(--color-black)
+  --color-light-type-inverted: var(--color-white)
   --color-light-type-secondary: #BFBFBF
   --color-light-border: #EDEDED
   // Theme Dark
   --color-dark-bg: #1A1A1A
   --color-dark-type: var(--color-white)
+  --color-dark-type-inverted: var(--color-black)
   --color-dark-type-secondary: #7A7A7A
   --color-dark-border: #2C2C2C
   /* theme */
@@ -81,7 +83,6 @@ $break-desktop: 1370px
 
   // Sizing
   --icon-size: 1.25em
-
   /* container & bloks */
   --blok-padding: 1.25rem
   --spacing-side: 1.25rem
@@ -112,6 +113,7 @@ body[data-theme='LIGHT']
   --theme-blok: var(--color-white)
   --theme-blok-project: var(--color-white)
   --theme-type: var(--color-light-type)
+  --theme-type-inverted: var(--color-light-type-inverted)
   --theme-type-inactive: var(--color-light-type-secondary)
   --border-color: var(--color-light-border)
 
@@ -121,6 +123,7 @@ body[data-theme='DARK']
   --theme-blok: var(--color-dark-bg)
   --theme-blok-project: var(--color-dark-bg)
   --theme-type: var(--color-dark-type)
+  --theme-type-inverted: var(--color-dark-type-inverted)
   --theme-type-inactive: var(--color-dark-type-secondary)
   --border-color: var(--color-dark-border)
 
