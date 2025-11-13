@@ -78,7 +78,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
                   height={0}
                   sizes="100vw"
                   quality={90}
-                  priority={index === 0}
+                  priority={index === 0 || index === 1}
                   style={{ width: '100%', height: 'auto' }}
                 />
               )}
