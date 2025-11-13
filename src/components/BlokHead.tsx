@@ -260,7 +260,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
     const handleOrientationChange = (e: MediaQueryListEvent) => {
       isEnabled = e.matches;
-      
+
       // Reset header position when switching to portrait
       if (!isEnabled) {
         gsap.set('.blok-Head', { y: 0 });
