@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
-import BlokProject from '../BlokProject';
+import BlokProject from './BlokProject';
 
 interface ProjectData {
   slug: string;
@@ -31,16 +31,17 @@ const BlokProjectListClient = ({ data }: BlokProjectListClientProps) => {
 
     projectItems.forEach((item, index) => {
       const element = item as HTMLElement;
-      
+
       // Get the element's current z-index from CSS
       const currentZIndex = window.getComputedStyle(element).zIndex;
-      const zIndexValue = currentZIndex !== 'auto' ? parseInt(currentZIndex) : index + 1;
+      const zIndexValue =
+        currentZIndex !== 'auto' ? parseInt(currentZIndex) : index + 1;
 
       const handleMouseEnter = () => {
         gsap.to(element, {
           y: hoverDistance,
-          duration: 0.3,
-          ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          duration: 0.15,
+          ease: 'cubic-bezier(0.16, 1, 0.16, 1)',
           force3D: false, // Prevent transform3d which can affect stacking
           zIndex: zIndexValue, // Explicitly set z-index to maintain stacking order
         });
@@ -49,8 +50,8 @@ const BlokProjectListClient = ({ data }: BlokProjectListClientProps) => {
       const handleMouseLeave = () => {
         gsap.to(element, {
           y: 0,
-          duration: 0.3,
-          ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          duration: 0.5,
+          ease: 'cubic-bezier(0, 0, 0.58, 1)',
           force3D: false,
           zIndex: zIndexValue,
         });

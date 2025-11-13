@@ -4,7 +4,7 @@ import {
   getStoryblokApi,
   storyblokEditable,
 } from '@storyblok/react/rsc';
-import BlokProjectListClient from './BlokProjectListClient';
+import BlokProjectListClient from '../BlokProjectListClient';
 import Image from 'next/image';
 import Link from 'next/link';
 
