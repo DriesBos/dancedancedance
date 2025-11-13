@@ -41,14 +41,14 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
-      <div className="blok-ProjectImages">
+      <div className="blok-Highlights">
         {highlights.map((item: any, index: number) => (
           <Link
             key={item.slug}
-            className="blok blok-ProjectImages-Item blok-Animate"
+            className="blok blok-Highlights-Item blok-Animate"
             href={`/projects/${item.slug}`}
           >
-            <div className="blok-ProjectImages-Item-Image">
+            <div className="blok-Highlights-Item-Image">
               <Image
                 src={item.thumbnail.filename}
                 alt={item.title || 'Project Image'}
@@ -59,7 +59,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
                 style={{ width: '100%', height: 'auto' }}
               />
             </div>
-            <div className="blok-ProjectImages-Item-Title">{item.title}</div>
+            <div className="blok-Highlights-Item-Title">{item.title}</div>
           </Link>
         ))}
       </div>
