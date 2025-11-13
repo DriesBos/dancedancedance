@@ -13,9 +13,9 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const hasAnimatedHeader = useRef(false);
 
-  // Scroll to top on route change
+  // Scroll to top on route change - instant, no smooth behavior
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [pathname]);
 
   // Animate header only on initial load
@@ -41,13 +41,13 @@ export default function PageTransition({ children }: PageTransitionProps) {
     // Set initial state for all animated blocks
     gsap.set('.blok-Animate', {
       opacity: 0,
-      // y: 68,
+      y: 20,
     });
 
-    // Animate in with stagger
+    // Animate in with stagger - faster duration for snappier feel
     gsap.to('.blok-Animate', {
       opacity: 1,
-      // y: 0,
+      y: 0,
       duration: 0.33,
       stagger: 0.165,
       ease: 'power1.inOut',

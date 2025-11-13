@@ -60,7 +60,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
     const currentSlug = nextPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
     if (currentIndex !== -1 && currentIndex < hyperLink.length - 1) {
-      router.push(hyperLink[currentIndex + 1]);
+      const nextSlug = `/projects/${hyperLink[currentIndex + 1]}`;
+      router.push(nextSlug);
     } else {
       return false;
     }
@@ -83,7 +84,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
     const currentSlug = prevPath.split('/')[2];
     const currentIndex = hyperLink.indexOf(currentSlug);
     if (currentIndex > 0) {
-      router.push(hyperLink[currentIndex - 1]);
+      const prevSlug = `/projects/${hyperLink[currentIndex - 1]}`;
+      router.push(prevSlug);
     } else {
       return false;
     }
@@ -103,7 +105,23 @@ const BlokHead = ({ blok, float, params }: Props) => {
   useEffect(() => {
     checkNext();
     checkPrev();
-  }, [path, checkNext, checkPrev]);
+
+    // Prefetch adjacent routes for instant navigation
+    if (pathName === 'projects') {
+      const currentSlug = path.split('/')[2];
+      const currentIndex = hyperLink.indexOf(currentSlug);
+
+      // Prefetch next route
+      if (currentIndex !== -1 && currentIndex < hyperLink.length - 1) {
+        router.prefetch(`/projects/${hyperLink[currentIndex + 1]}`);
+      }
+
+      // Prefetch previous route
+      if (currentIndex > 0) {
+        router.prefetch(`/projects/${hyperLink[currentIndex - 1]}`);
+      }
+    }
+  }, [path, checkNext, checkPrev, pathName, router]);
 
   // const handleTopPanel = useCallback((e: any) => {
   //   if (e.type === 'mouseenter') {
