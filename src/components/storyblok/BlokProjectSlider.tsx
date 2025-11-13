@@ -2,8 +2,10 @@
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 interface SbPageData extends SbBlokData {
   body: Array<{
@@ -25,7 +27,23 @@ interface BlokProjectSliderProps {
 
 const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const items = useMemo(() => blok.body, [blok.body]);
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  // Animate progress bar in sync with slide changes
+  useGSAP(() => {
+    if (!progressRef.current) return;
+
+    // Reset to 0 and animate to 100%
+    gsap.fromTo(
+      progressRef.current,
+      { width: '0%' },
+      {
+        width: '100%',
+        duration: 2.5,
+        ease: 'linear',
+      }
+    );
+  }, [activeIndex]); // Re-run when activeIndex changes
 
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
@@ -65,7 +83,17 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
                 />
               )}
           </div>
-          <div className="blok-ProjectSlider-Title">{String(item.name)}</div>
+          <div className="blok-ProjectSlider-Title">
+            <span>{String(item.name)}</span>
+            {index === activeIndex && (
+              <div className="blok-ProjectSlider-ProgressWrapper">
+                <div
+                  className="blok-ProjectSlider-Progress"
+                  ref={progressRef}
+                />
+              </div>
+            )}
+          </div>
         </Link>
       ))}
     </div>
