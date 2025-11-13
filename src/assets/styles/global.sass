@@ -237,15 +237,18 @@ main
         pointer-events: auto
     &-Title
       position: absolute
-      top: calc(var(--blok-padding) / 2)
-      left: calc(var(--spacing-side) / 2)
       transition: background var(--transition-theme)
       will-change: background
       background: hsla(0, 0%, 0%, 0.165)
       border-radius: .25rem
       padding: 0.25rem 0.5rem
+      @media (min-width: 770px)
+        top: calc(var(--spacing-base) / 2)
+        left: calc(var(--spacing-side) / 2)
       @media (max-width: 770px)
         background: hsla(0, 0%, 0%, 0.33)
+        bottom: calc(var(--spacing-side))
+        right: calc(var(--spacing-side))
       span
         position: relative
         color: white
