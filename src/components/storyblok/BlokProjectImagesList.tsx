@@ -4,7 +4,7 @@ import {
   getStoryblokApi,
   storyblokEditable,
 } from '@storyblok/react/rsc';
-import BlokProject from '../BlokProject';
+import BlokProjectListClient from './BlokProjectListClient';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -63,17 +63,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
           </Link>
         ))}
       </div>
-      <div className="blok-ProjectList">
-        {data.map((item: any, index: number) => (
-          <BlokProject
-            key={item.slug}
-            slug={item.slug}
-            year={item.year}
-            title={item.title}
-            category={item.category}
-          />
-        ))}
-      </div>
+      <BlokProjectListClient data={data} />
     </div>
   );
 };

@@ -188,24 +188,13 @@ main
   &-Project
     position: relative
     border-top: 1px solid var(--border-color)
-    transform: translateY(0)
     padding-bottom: calc(3.95rem * 0.5)
     margin-bottom: calc(-3.95rem * 0.5)
-    // height: calc(3.95rem * 1.5)
-    transition: transform 0.165s ease-out, background-color var(--transition-theme), border-top var(--transition-theme), z-index 0s 0s
-    will-change: transform, background-color, border-top
-    // overflow: visible
+    will-change: transform
+    background-color: transparent !important
     .row
-      // position: absolute
-      // left: 0
-      // bottom: 0
-      // width: 100%
-      // height: calc(3.95rem * 1)
-    &:hover
-      @media (hover: hover)
-        transform: translateY(calc(-3.95rem * 0.5))
-        z-index: -1
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color var(--transition-theme), border-top var(--transition-theme), z-index 0s 0s
+      background-color: var(--theme-blok)
+      transition: background-color var(--transition-theme)
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none 
