@@ -1,6 +1,7 @@
 import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import PageTransition from '@/components/PageTransition';
+import type { Metadata } from 'next';
 
 // Enable dynamic params for catch-all route
 export const dynamicParams = true;
@@ -11,6 +12,64 @@ export async function generateStaticParams() {
 }
 
 type Params = Promise<{ slug?: string[] }>;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  try {
+    const slug = (await params).slug;
+    const version =
+      process.env.NODE_ENV === 'development' ? 'draft' : 'published';
+    const pageData = await fetchStory(version, slug);
+
+    if (!pageData || !pageData.story) {
+      return {
+        title: 'Dries Bos',
+      };
+    }
+
+    const story = pageData.story as any;
+    const storyName = story.name || '';
+    const storySlug = slug ? slug.join('/') : '';
+
+    // Home page
+    if (!slug || slug.length === 0 || storySlug === 'home') {
+      return {
+        title: 'Dries Bos — Design & Code Partner',
+        description: 'Dries Bos — Design & Code Partner',
+      };
+    }
+
+    // About page
+    if (storySlug === 'about') {
+      return {
+        title: 'About Dries Bos',
+        description: 'About Dries Bos — Design & Code Partner',
+      };
+    }
+
+    // Project pages (assuming they have component type 'pageProject' or similar)
+    if (story.content?.component === 'pageProject') {
+      return {
+        title: `Dries Bos — ${storyName}`,
+        description: `${storyName} — Project by Dries Bos`,
+      };
+    }
+
+    // Default for other pages
+    return {
+      title: `Dries Bos — ${storyName}`,
+      description: `${storyName} — Dries Bos`,
+    };
+  } catch (error) {
+    console.error('Error generating metadata:', error);
+    return {
+      title: 'Dries Bos',
+    };
+  }
+}
 
 export default async function Home({ params }: { params: Params }) {
   try {

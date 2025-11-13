@@ -21,10 +21,9 @@ const myFont = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Dries Bos',
   description: 'Dries Bos — Design & Code Partner',
   appleWebApp: {
-    title: 'Minka Haus',
+    title: 'Dries Bos',
     statusBarStyle: 'black-translucent',
   },
   other: {
