@@ -69,6 +69,12 @@ main
     display: flex
     flex-direction: row
     row-wrap: nowrap
+
+    & > *:nth-last-child(2):first-child
+      padding-right: calc(var(--spacing-base) / 2)
+    & > *:nth-last-child(2):first-child ~ *
+      padding-left: calc(var(--spacing-base) / 2)
+    
     .column
       text-align: left
       padding: var(--blok-padding) var(--spacing-side)
@@ -260,7 +266,7 @@ main
       z-index: 0
       will-change: width
   &-Exp
-    padding: var(--blok-padding) 0
+    padding: var(--spacing-base) 0
     display: flex
     flex-direction: row
     flex-wrap: nowrap

@@ -3,14 +3,17 @@
   padding-left: var(--spacing-side)
   @media (max-width: 770px)
     width: 100%
-    padding: var(--blok-padding) var(--spacing-side)
+    padding: var(--spacing-base) var(--spacing-side)
+    padding-top: 0
 
 .content
   width: 75%
   @media (max-width: 770px)
     width: 100%
   & > div
-    margin-bottom: var(--blok-padding)
+    margin-bottom: var(--spacing-base)
+    &:last-child
+      margin-bottom: 0
 
 .row
   display: flex
@@ -19,7 +22,7 @@
   &:first-child
     width: 25vw
     color: var(--theme-type-inactive)
-    padding-left: var(--spacing-side)
+    padding-left: calc(var(--spacing-base) / 2)
     @media (max-width: 770px)
       width: 50vw
   &:last-child
@@ -31,7 +34,7 @@
 .rowName, 
 .rowRole
   width: 25vw
-  padding-left: var(--spacing-side)
+  padding-left: calc(var(--spacing-base) / 2)
   @media (max-width: 770px)
     width: 100%
 
