@@ -30,21 +30,24 @@ export default function TitleSwitcher() {
 
   // Update originalTitle whenever the document title changes
   useEffect(() => {
-    if (!document.hidden) {
-      const observer = new MutationObserver(() => {
-        if (!document.hidden) {
-          setOriginalTitle(document.title);
-        }
-      });
+    if (document.hidden) return;
 
-      observer.observe(document.querySelector('title')!, {
-        childList: true,
-        characterData: true,
-        subtree: true,
-      });
+    const titleElement = document.querySelector('title');
+    if (!titleElement) return;
 
-      return () => observer.disconnect();
-    }
+    const observer = new MutationObserver(() => {
+      if (!document.hidden) {
+        setOriginalTitle(document.title);
+      }
+    });
+
+    observer.observe(titleElement, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return null;
