@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
 import '@/assets/styles/vars.sass';
@@ -76,6 +77,9 @@ export default async function RootLayout({
       <AppInitializer className={`body ${myFont.className}`}>
         <TitleSwitcher />
         <FaviconSwitcher />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
         <StoryblokProvider>
           <ThemeFilter />
           {/* <ThemeBackground /> */}
