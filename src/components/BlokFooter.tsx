@@ -12,7 +12,14 @@ const BlokFooter = () => {
   };
   return (
     <div className="blok blok-Footer blok-Animate">
-      <Row>
+      <Row className="row-Footer">
+        <div className="column column-Copyright">
+          &copy; {new Date().getFullYear()}
+        </div>
+        <div className="column column-Email">
+          <a href="mailto:info@driesbos.com">info@driesbos.com</a>
+        </div>
+        {/* <div className="column column-Subscribe">Subscribe</div> */}
         <div className="column column-Icons">
           <div onClick={ScrollToTop} className="icon icon-High icon-Footer">
             <IconArrowLongUp />
