@@ -445,10 +445,10 @@ main
     transform: translateY(-50%)
   &-Circle
     position: absolute
-    top: calc(var(--spacing-base) )
+    top: calc(var(--spacing-base) + (var(--icon-size) / 10 * 1))
     left: calc(var(--spacing-base) / 2)
-    width: calc(var(--icon-size) / 5 * 4)
-    height: calc(var(--icon-size) / 5 * 4)
+    width: calc(var(--icon-size) / 5 * 4) !important
+    height: calc(var(--icon-size) / 5 * 4) !important
     background-color: var(--theme-type)
     border-radius: 1000px
     transition: left 0.25s ease, background-color var(--transition-theme)
@@ -457,7 +457,7 @@ main
       left: calc(var(--spacing-base) / 2)
   &[data-theme='DARK']
     .IconTheme-Circle
-      left: calc(var(--spacing-base) / 2 + (var(--icon-size) * 1))
+      left: calc(var(--spacing-base) / 2 + ((var(--icon-size) * 2)) - (var(--icon-size) / 5 * 4))
 
 // .themeBackground
 //   position: fixed
