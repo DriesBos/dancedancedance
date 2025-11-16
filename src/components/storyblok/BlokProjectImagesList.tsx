@@ -59,7 +59,10 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
                 style={{ width: '100%', height: 'auto' }}
               />
             </div>
-            <div className="blok-Highlights-Item-Title">{item.title}</div>
+            <div className="blok-Highlights-Item-Caption">
+              <div className="blok-Highlights-Item-Title">{item.title}</div>
+              <div className="blok-Highlights-Item-Year">{item.year}</div>
+            </div>
           </Link>
         ))}
       </div>

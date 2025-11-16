@@ -297,13 +297,17 @@ main
     justify-content: flex-start
     gap: var(--spacing-between-images)
     padding: var(--spacing-base) var(--spacing-side)
+    padding-bottom: calc(var(--spacing-base) * 2)
     &-Item
       display: flex 
       flex-direction: column
-      gap: 0.5rem
+      gap: 0.4545454546rem // 10px for 22px font size
       width: calc((100vw - (#{var(--spacing-side)} * 3)) / 2)
       // @media (max-width: 770px)
       //   width: 100%
+      &-Caption
+        display: flex
+        justify-content: space-between
   &-ProjectList
     padding-top: var(--spacing-base)
   &-ProjectSlider
