@@ -341,16 +341,16 @@ main
         gap: 0.5rem
     &-ProgressWrapper
       position: relative
-      background: var(--theme-type-inactive) !important
+      // background: var(--theme-type-inactive) !important
       width: 0.8em
-      height: 2px
-
+      height: var(--border-hyperlink)
+      overflow: hidden
     &-Progress
       position: absolute
       right: 0
       bottom: 0
       width: 0%
-      height: 2px
+      height: 100%
       background: currentColor
       z-index: 0
       will-change: width
