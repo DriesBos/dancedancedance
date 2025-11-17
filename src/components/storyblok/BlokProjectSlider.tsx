@@ -72,7 +72,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
     const interval = setInterval(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
-    }, 1800);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [blok.body]);
@@ -100,7 +100,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
                 width={0}
                 height={0}
                 sizes="100vw"
-                quality={90}
+                quality={85}
                 priority
                 style={{ width: '100%', height: 'auto' }}
               />
@@ -132,7 +132,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
               width={0}
               height={0}
               sizes="100vw"
-              quality={90}
+              quality={85}
               priority
               style={{ width: '100%', height: 'auto' }}
             />
