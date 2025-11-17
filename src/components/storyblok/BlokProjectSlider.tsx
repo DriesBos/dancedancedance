@@ -11,6 +11,7 @@ interface SbPageData extends SbBlokData {
   body: Array<{
     _uid: string;
     name: string;
+    year: string;
     media?: {
       filename: string;
       alt: string;
@@ -28,6 +29,12 @@ interface BlokProjectSliderProps {
 const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const progressRef = useRef<HTMLDivElement>(null);
+  const itemRef = useRef<HTMLAnchorElement>(null);
+
+  // Get current and next items for conditional rendering
+  const currentItem = blok.body?.[activeIndex];
+  const nextIndex = blok.body ? (activeIndex + 1) % blok.body.length : 0;
+  const nextItem = blok.body?.[nextIndex];
 
   // Animate progress bar in sync with slide changes
   useGSAP(() => {
@@ -45,6 +52,21 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     );
   }, [activeIndex]); // Re-run when activeIndex changes
 
+  // Fade in animation on slide change
+  useGSAP(() => {
+    if (!itemRef.current) return;
+
+    gsap.fromTo(
+      itemRef.current,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        duration: 0,
+        ease: 'linear',
+      }
+    );
+  }, [activeIndex]);
+
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
 
@@ -55,47 +77,67 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     return () => clearInterval(interval);
   }, [blok.body]);
 
+  if (!currentItem) return null;
+
   return (
     <div
       className="blok blok-ProjectSlider blok-Animate"
       {...storyblokEditable(blok)}
     >
-      {blok.body.map((item, index) => (
-        <Link
-          key={item._uid}
-          className="blok-ProjectSlider-Item"
-          data-active={index === activeIndex}
-          href={item.link?.cached_url || '#'}
-        >
-          <div className="blok-ProjectSlider-Image">
-            {item.media &&
-              typeof item.media === 'object' &&
-              'filename' in item.media && (
-                <Image
-                  src={(item.media as any).filename}
-                  alt={(item.name as string) || 'Project Image'}
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  quality={90}
-                  priority={index === 0 || index === 1}
-                  style={{ width: '100%', height: 'auto' }}
-                />
-              )}
-          </div>
-          <div className="blok-ProjectSlider-Title">
-            <span>{String(item.name)}</span>
-            {index === activeIndex && (
-              <div className="blok-ProjectSlider-ProgressWrapper">
-                <div
-                  className="blok-ProjectSlider-Progress"
-                  ref={progressRef}
-                />
-              </div>
+      {/* Current slide */}
+      <Link
+        ref={itemRef}
+        className="blok-ProjectSlider-Item"
+        href={currentItem.link?.cached_url || '#'}
+      >
+        <div className="blok-ProjectSlider-Image">
+          {currentItem.media &&
+            typeof currentItem.media === 'object' &&
+            'filename' in currentItem.media && (
+              <Image
+                src={(currentItem.media as any).filename}
+                alt={(currentItem.name as string) || 'Project Image'}
+                width={0}
+                height={0}
+                sizes="100vw"
+                quality={90}
+                priority
+                style={{ width: '100%', height: 'auto' }}
+              />
             )}
+        </div>
+        <div className="blok-ProjectSlider-Caption">
+          <div className="blok-ProjectSlider-Caption-Title">
+            <span>Featured</span>
+            <div className="blok-ProjectSlider-ProgressWrapper">
+              <div className="blok-ProjectSlider-Progress" ref={progressRef} />
+            </div>
+            {String(currentItem.name)}
           </div>
-        </Link>
-      ))}
+          <div className="blok-ProjectSlider-Caption-Year">
+            {currentItem.year}
+          </div>
+        </div>
+      </Link>
+
+      {/* Preload next image (hidden, but loads in background) */}
+      {nextItem &&
+        nextItem.media &&
+        typeof nextItem.media === 'object' &&
+        'filename' in nextItem.media && (
+          <div style={{ display: 'none' }}>
+            <Image
+              src={(nextItem.media as any).filename}
+              alt={(nextItem.name as string) || 'Project Image'}
+              width={0}
+              height={0}
+              sizes="100vw"
+              quality={90}
+              priority
+              style={{ width: '100%', height: 'auto' }}
+            />
+          </div>
+        )}
     </div>
   );
 };

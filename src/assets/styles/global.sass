@@ -311,58 +311,47 @@ main
   &-ProjectList
     padding-top: var(--spacing-base)
   &-ProjectSlider
+    position: relative
     width: 100%
-    height: calc((100vw * 0.5625) + (2 * #{var(--spacing-base)}))
+    height: 100%
+    padding: var(--spacing-base) var(--spacing-side)
     &-Item
-      position: absolute
-      top: var(--spacing-base)
-      left: var(--spacing-side)
-      width: calc(100vw - (2 * #{var(--spacing-side)}))
-      height: calc(100% - (2 * #{var(--spacing-side)}))
-      object-fit: cover
-      opacity: 0
-      transition: opacity 0s ease-in-out
-      will-change: opacity
-      pointer-events: none
+      width: 100%
+      display: flex
+      flex-direction: column
+      gap: 0.4545454546rem // 10px for 22px font size
+    &-Image
+      position: relative
+      width: 100%
+      aspect-ratio: 16 / 9
       overflow: hidden
       img
+        position: absolute
+        top: 0
+        left: 0
         width: 100%
         height: 100%
         object-fit: cover
-      &[data-active='true']
-        opacity: 1
-        pointer-events: auto
-    &-Title
-      position: absolute
-      transition: background var(--transition-theme)
-      will-change: background
-      background: hsla(0, 0%, 0%, 0.165)
-      border-radius: .25rem
-      padding: 0.25rem 0.5rem
-      @media (min-width: 770px)
-        top: calc(var(--spacing-base) / 2)
-        left: calc(var(--spacing-side) / 2)
-      @media (max-width: 770px)
-        background: hsla(0, 0%, 0%, 0.33)
-        bottom: calc(var(--spacing-side))
-        right: calc(var(--spacing-side))
-      span
-        position: relative
-        color: white
-        z-index: 1
+    &-Caption
+      display: flex
+      justify-content: space-between
+      &-Title
+        display: flex
+        align-items: center
+        gap: 0.5rem
     &-ProgressWrapper
-      position: absolute
-      left: 0.5rem
-      bottom: calc(0.25rem + 2px)
-      width: calc(100% - 1rem)
-      height: 1.5px
+      position: relative
+      background: var(--theme-type-inactive) !important
+      width: 0.8em
+      height: 2px
+
     &-Progress
       position: absolute
-      left: 0
+      right: 0
       bottom: 0
       width: 0%
-      height: var(--border-hyperlink)
-      background: white
+      height: 2px
+      background: currentColor
       z-index: 0
       will-change: width
   &-Exp
