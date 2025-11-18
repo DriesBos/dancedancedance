@@ -46,7 +46,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       { width: '0%' },
       {
         width: '100%',
-        duration: 0.66,
+        duration: 0.8,
         ease: 'power1.out',
       }
     );
@@ -72,7 +72,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
     const interval = setInterval(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
-    }, 660);
+    }, 800);
 
     return () => clearInterval(interval);
   }, [blok.body]);

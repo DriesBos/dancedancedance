@@ -47,7 +47,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
 
     const interval = setInterval(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % blok.images!.length);
-    }, 660);
+    }, 800);
 
     return () => clearInterval(interval);
   }, [blok.images]);
