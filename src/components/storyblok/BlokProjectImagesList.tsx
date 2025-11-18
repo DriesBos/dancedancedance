@@ -37,12 +37,20 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
     };
   });
 
-  const highlights = data.filter((item: any) => item.highlight === true);
+  const dataFilteredByYear = [...data].sort((a: any, b: any) => {
+    return parseInt(b.year) - parseInt(a.year);
+  });
+
+  const highlights = data
+    .filter((item: any) => item.highlight === true)
+    .sort((a: any, b: any) => {
+      return parseInt(b.year) - parseInt(a.year);
+    });
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
       <div className="blok-Highlights">
-        {highlights.map((item: any, index: number) => (
+        {highlights.map((item: any) => (
           <Link
             key={item.slug}
             className="blok blok-Highlights-Item blok-Animate"
@@ -66,7 +74,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
           </Link>
         ))}
       </div>
-      <BlokProjectListClient data={data} />
+      <BlokProjectListClient data={dataFilteredByYear} />
     </div>
   );
 };
