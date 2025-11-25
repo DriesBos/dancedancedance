@@ -21,7 +21,7 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
         width={0}
         height={0}
         sizes="100vw"
-        quality={90}
+        quality={80}
         style={{ width: '100%', height: 'auto' }}
       />
     </div>
