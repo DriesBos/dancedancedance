@@ -1,4 +1,6 @@
-import Link from 'next/link';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
@@ -12,14 +14,21 @@ interface Props {
 }
 
 const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/projects/${slug}`);
+  };
+
   console.log('BlokProject props:', {
     title,
     external_link,
   });
   return (
-    <Link
+    <div
       className={`blok blok-Project blok-Animate}`}
-      href={`/projects/${slug}`}
+      onClick={handleClick}
+      style={{ cursor: 'pointer' }}
     >
       <Row>
         {year && <div className="column column-Year">{year}</div>}
@@ -28,23 +37,22 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
           <div className="column column-Category">{category.join(', ')}</div>
         )}
         <div className="column column-Icons">
-          {external_link && (
-            <a
-              className="icon external-link"
-              href={external_link.cached_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <IconLinkOutside />
-            </a>
-          )}
+          <a
+            className="icon external-link"
+            href={external_link?.cached_url ? external_link.cached_url : '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            data-active={external_link?.cached_url ? true : false}
+          >
+            <IconLinkOutside />
+          </a>
           <div className="icon">
             <IconArrow />
           </div>
         </div>
       </Row>
-    </Link>
+    </div>
   );
 };
 

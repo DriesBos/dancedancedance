@@ -9,7 +9,7 @@ interface ProjectData {
   year: string;
   title: string;
   category?: string[];
-  external_link?: string;
+  external_link?: { cached_url: string };
 }
 
 interface BlokProjectListClientProps {
