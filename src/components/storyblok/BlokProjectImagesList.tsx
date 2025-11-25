@@ -18,6 +18,7 @@ interface SbPageData extends SbBlokData {
     filename: string;
     alt: string;
   };
+  externalLink?: string;
 }
 
 interface BlokProjectImagesListProps {
@@ -25,6 +26,8 @@ interface BlokProjectImagesListProps {
 }
 const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
   const projects = await fetchProjects();
+
+  console.log('Fetched projects:', projects);
 
   const data = projects.data.stories.map((story: any) => {
     return {
@@ -34,8 +37,11 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       category: story.content.category,
       highlight: story.content.highlight,
       thumbnail: story.content.thumbnail,
+      external_link: story.content.external_link,
     };
   });
+
+  console.log('Fetched project data:', data);
 
   const dataFilteredByYear = [...data].sort((a: any, b: any) => {
     return parseInt(b.year) - parseInt(a.year);

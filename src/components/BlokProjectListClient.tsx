@@ -8,7 +8,8 @@ interface ProjectData {
   slug: string;
   year: string;
   title: string;
-  category: string[];
+  category?: string[];
+  external_link?: string;
 }
 
 interface BlokProjectListClientProps {
@@ -76,6 +77,7 @@ const BlokProjectListClient = ({ data }: BlokProjectListClientProps) => {
           year={item.year}
           title={item.title}
           category={item.category}
+          external_link={item.external_link}
         />
       ))}
     </div>
