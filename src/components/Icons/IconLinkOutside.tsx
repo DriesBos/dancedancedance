@@ -1,9 +1,9 @@
 const IconLinkOutside = () => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 25 25">
       <path
         fill="currentColor"
-        d="M12 2v2H4v17h17v-8h2v10H2V2h10Zm11 8h-2V5.414L9.707 16.707l-1.414-1.414L19.586 4H15V2h8v8Z"
+        d="M12 1v2H3v19h19v-9h2v11H1V1h11Zm12 7h-2V4.414L9.374 17.04 7.96 15.626 20.585 3H17V1h7v7Z"
       />
     </svg>
   );
