@@ -14,19 +14,10 @@ export default function CustomCursor() {
     const follower = followerRef.current;
     if (!cursor || !follower) return;
 
-    // Initial scale
-    gsap.set(cursor, { scale: 1 });
-    gsap.set(follower, { scale: 1, opacity: 0 });
+    // Initial state - both cursors hidden
+    gsap.set([cursor, follower], { opacity: 0 });
 
-    // QuickTo for smooth cursor movement
-    const xCursorTo = gsap.quickTo(cursor, 'x', {
-      duration: 0.01,
-      ease: 'power3',
-    });
-    const yCursorTo = gsap.quickTo(cursor, 'y', {
-      duration: 0.01,
-      ease: 'power3',
-    });
+    // QuickTo for smooth follower movement
     const xFollowerTo = gsap.quickTo(follower, 'x', {
       duration: 0.33,
       ease: 'power3',
@@ -127,9 +118,8 @@ export default function CustomCursor() {
         yFollowerTo(cursorPosition.y);
       }
 
-      // Main cursor always follows mouse directly
-      xCursorTo(cursorPosition.x);
-      yCursorTo(cursorPosition.y);
+      // Main cursor always follows mouse directly (no delay)
+      gsap.set(cursor, { x: cursorPosition.x, y: cursorPosition.y });
     };
 
     // Hover handlers for magnetic targets (magnetic + size)
@@ -152,8 +142,23 @@ export default function CustomCursor() {
       sizeAnimInteract.reverse();
     };
 
+    // Hide cursors when mouse leaves window
+    const handleMouseLeaveWindow = () => {
+      gsap.set([cursor, follower], { opacity: 0 });
+      isVisible.current = false;
+    };
+
+    // Reset size animations on click (for route changes where leave isn't triggered)
+    const handleClick = () => {
+      sizeAnimMagnetic.reverse();
+      sizeAnimInteract.reverse();
+      mouseInTarget.current = false;
+    };
+
     // Add listeners
     document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseleave', handleMouseLeaveWindow);
+    document.addEventListener('click', handleClick);
 
     const addTargetListeners = () => {
       const magneticTargets = document.querySelectorAll('.cursorMagnetic');
@@ -177,6 +182,8 @@ export default function CustomCursor() {
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeaveWindow);
+      document.removeEventListener('click', handleClick);
       const magneticTargets = document.querySelectorAll('.cursorMagnetic');
       magneticTargets.forEach((target) => {
         target.removeEventListener('mouseenter', handleMagneticEnter);
