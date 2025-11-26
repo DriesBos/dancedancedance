@@ -121,24 +121,24 @@ export default function CustomCursor() {
       yCursorTo(cursorPosition.y);
     };
 
-    // Hover handlers for magnetic targets (magnetic + scale)
+    // Hover handlers for magnetic targets (magnetic + size)
     const handleMagneticEnter = () => {
       mouseInTarget.current = true;
-      scaleAnim.play();
+      sizeAnim.play();
     };
 
     const handleMagneticLeave = () => {
       mouseInTarget.current = false;
-      scaleAnim.reverse();
+      sizeAnim.reverse();
     };
 
-    // Hover handlers for interact targets (scale only, no magnetic)
+    // Hover handlers for interact targets (size only, no magnetic)
     const handleInteractEnter = () => {
-      scaleAnim.play();
+      sizeAnim.play();
     };
 
     const handleInteractLeave = () => {
-      scaleAnim.reverse();
+      sizeAnim.reverse();
     };
 
     // Add listeners
