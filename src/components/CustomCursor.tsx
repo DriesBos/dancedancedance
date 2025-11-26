@@ -36,10 +36,9 @@ export default function CustomCursor() {
       ease: 'power3',
     });
 
-    // Scale animation timeline
-    const scaleAnim = gsap.timeline({ paused: true });
-    scaleAnim.to(follower, { scale: 1.5, duration: 0.35 });
-    // .to(cursor, { scale: 1.5, duration: 0.35 }, 0);
+    // Size animation timeline (width/height instead of scale)
+    const sizeAnim = gsap.timeline({ paused: true });
+    sizeAnim.to(follower, { width: '2rem', height: '2rem', duration: 0.35 });
 
     const handleMouseMove = (e: MouseEvent) => {
       // Show cursor on first move
@@ -122,14 +121,23 @@ export default function CustomCursor() {
       yCursorTo(cursorPosition.y);
     };
 
-    // Hover handlers for magnetic targets
-    const handleMouseEnter = () => {
+    // Hover handlers for magnetic targets (magnetic + scale)
+    const handleMagneticEnter = () => {
       mouseInTarget.current = true;
       scaleAnim.play();
     };
 
-    const handleMouseLeave = () => {
+    const handleMagneticLeave = () => {
       mouseInTarget.current = false;
+      scaleAnim.reverse();
+    };
+
+    // Hover handlers for interact targets (scale only, no magnetic)
+    const handleInteractEnter = () => {
+      scaleAnim.play();
+    };
+
+    const handleInteractLeave = () => {
       scaleAnim.reverse();
     };
 
@@ -137,10 +145,16 @@ export default function CustomCursor() {
     document.addEventListener('mousemove', handleMouseMove);
 
     const addTargetListeners = () => {
-      const targets = document.querySelectorAll('.cursorMagnetic');
-      targets.forEach((target) => {
-        target.addEventListener('mouseenter', handleMouseEnter);
-        target.addEventListener('mouseleave', handleMouseLeave);
+      const magneticTargets = document.querySelectorAll('.cursorMagnetic');
+      magneticTargets.forEach((target) => {
+        target.addEventListener('mouseenter', handleMagneticEnter);
+        target.addEventListener('mouseleave', handleMagneticLeave);
+      });
+
+      const interactTargets = document.querySelectorAll('.cursorInteract');
+      interactTargets.forEach((target) => {
+        target.addEventListener('mouseenter', handleInteractEnter);
+        target.addEventListener('mouseleave', handleInteractLeave);
       });
     };
 
@@ -152,10 +166,15 @@ export default function CustomCursor() {
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
-      const targets = document.querySelectorAll('.cursorMagnetic');
-      targets.forEach((target) => {
-        target.removeEventListener('mouseenter', handleMouseEnter);
-        target.removeEventListener('mouseleave', handleMouseLeave);
+      const magneticTargets = document.querySelectorAll('.cursorMagnetic');
+      magneticTargets.forEach((target) => {
+        target.removeEventListener('mouseenter', handleMagneticEnter);
+        target.removeEventListener('mouseleave', handleMagneticLeave);
+      });
+      const interactTargets = document.querySelectorAll('.cursorInteract');
+      interactTargets.forEach((target) => {
+        target.removeEventListener('mouseenter', handleInteractEnter);
+        target.removeEventListener('mouseleave', handleInteractLeave);
       });
       observer.disconnect();
     };
