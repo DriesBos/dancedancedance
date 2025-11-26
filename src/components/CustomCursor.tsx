@@ -81,7 +81,7 @@ export default function CustomCursor() {
         const angle = Math.atan2(distance.adj, distance.opp);
 
         // Inside trigger area
-        if (hypotenuse * 2 < triggerDistance) {
+        if (hypotenuse * 1.5 < triggerDistance) {
           foundTarget = true;
 
           // Tween follower position towards target (magnetic)
