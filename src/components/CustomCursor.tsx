@@ -28,17 +28,28 @@ export default function CustomCursor() {
       ease: 'power3',
     });
     const xFollowerTo = gsap.quickTo(follower, 'x', {
-      duration: 0.3,
+      duration: 0.33,
       ease: 'power3',
     });
     const yFollowerTo = gsap.quickTo(follower, 'y', {
-      duration: 0.3,
+      duration: 0.33,
       ease: 'power3',
     });
 
     // Size animation timeline (width/height instead of scale)
-    const sizeAnim = gsap.timeline({ paused: true });
-    sizeAnim.to(follower, { width: '2rem', height: '2rem', duration: 0.35 });
+    const sizeAnimInteract = gsap.timeline({ paused: true });
+    sizeAnimInteract.to(follower, {
+      width: '1.8181818182rem',
+      height: '1.8181818182rem',
+      duration: 0.165,
+    });
+
+    const sizeAnimMagnetic = gsap.timeline({ paused: true });
+    sizeAnimMagnetic.to(follower, {
+      width: '2.7272727273rem',
+      height: '2.7272727273rem',
+      duration: 0.165,
+    });
 
     const handleMouseMove = (e: MouseEvent) => {
       // Show cursor on first move
@@ -124,21 +135,21 @@ export default function CustomCursor() {
     // Hover handlers for magnetic targets (magnetic + size)
     const handleMagneticEnter = () => {
       mouseInTarget.current = true;
-      sizeAnim.play();
+      sizeAnimMagnetic.play();
     };
 
     const handleMagneticLeave = () => {
       mouseInTarget.current = false;
-      sizeAnim.reverse();
+      sizeAnimMagnetic.reverse();
     };
 
     // Hover handlers for interact targets (size only, no magnetic)
     const handleInteractEnter = () => {
-      sizeAnim.play();
+      sizeAnimInteract.play();
     };
 
     const handleInteractLeave = () => {
-      sizeAnim.reverse();
+      sizeAnimInteract.reverse();
     };
 
     // Add listeners

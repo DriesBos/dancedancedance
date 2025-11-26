@@ -355,10 +355,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
           {pathName === 'home' && (
             <>
               <StoreSwitcher />
-              <Link
-                href="/about"
-                className="icon cursorInteract cursorMagnetic"
-              >
+              <Link href="/about" className="icon cursorMagnetic">
                 <IconAbout />
               </Link>
             </>
@@ -370,7 +367,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   <IconMail />
                 </Link>
               </div> */}
-              <Link href="/" className="icon cursorInteract cursorMagnetic">
+              <Link href="/" className="icon cursorMagnetic">
                 <IconClose />
               </Link>
             </>
@@ -381,7 +378,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 onClick={clickPrev}
                 className={`${
                   hasPrev ? 'active' : 'disabled'
-                } icon icon-Wide icon-Rotate desktop cursorInteract cursorMagnetic`}
+                } icon icon-Wide icon-Rotate desktop cursorMagnetic`}
               >
                 <IconArrowLong />
               </div>
@@ -389,7 +386,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 onClick={clickPrev}
                 className={`${
                   hasPrev ? 'active' : 'disabled'
-                } icon icon-Rotate mobile cursorInteract cursorMagnetic`}
+                } icon icon-Rotate mobile cursorMagnetic`}
               >
                 <IconArrow />
               </div>
@@ -400,7 +397,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 onClick={clickNext}
                 className={`${
                   hasNext ? 'active' : 'disabled'
-                } icon icon-Wide desktop cursorInteract cursorMagnetic`}
+                } icon icon-Wide desktop cursorMagnetic`}
               >
                 <IconArrowLong />
               </div>
@@ -408,11 +405,11 @@ const BlokHead = ({ blok, float, params }: Props) => {
                 onClick={clickNext}
                 className={`${
                   hasNext ? 'active' : 'disabled'
-                } icon mobile cursorInteract cursorMagnetic`}
+                } icon mobile cursorMagnetic`}
               >
                 <IconArrow />
               </div>
-              <Link href="/" className="icon cursorInteract cursorMagnetic">
+              <Link href="/" className="icon cursorMagnetic">
                 <IconClose />
               </Link>
             </>

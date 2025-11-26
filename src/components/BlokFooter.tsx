@@ -25,7 +25,7 @@ const BlokFooter = () => {
         <div className="column column-Icons">
           <div
             onClick={ScrollToTop}
-            className="icon icon-High icon-Footer cursorInteract cursorMagnetic"
+            className="icon icon-High icon-Footer cursorMagnetic"
           >
             <IconArrowLongUp />
           </div>

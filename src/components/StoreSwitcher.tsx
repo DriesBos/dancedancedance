@@ -55,7 +55,7 @@ const StoreSwitcher = () => {
 
   return (
     <div
-      className="icon IconTheme cursorInteract cursorMagnetic"
+      className="icon IconTheme cursorMagnetic"
       data-theme={theme}
       onClick={handlePickTheme}
     >
