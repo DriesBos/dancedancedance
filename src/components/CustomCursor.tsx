@@ -167,7 +167,9 @@ export default function CustomCursor() {
         target.addEventListener('mouseleave', handleMagneticLeave);
       });
 
-      const interactTargets = document.querySelectorAll('.cursorInteract');
+      const interactTargets = document.querySelectorAll(
+        '.cursorInteract, .markdown a'
+      );
       interactTargets.forEach((target) => {
         target.addEventListener('mouseenter', handleInteractEnter);
         target.addEventListener('mouseleave', handleInteractLeave);
@@ -189,7 +191,9 @@ export default function CustomCursor() {
         target.removeEventListener('mouseenter', handleMagneticEnter);
         target.removeEventListener('mouseleave', handleMagneticLeave);
       });
-      const interactTargets = document.querySelectorAll('.cursorInteract');
+      const interactTargets = document.querySelectorAll(
+        '.cursorInteract, .markdown a'
+      );
       interactTargets.forEach((target) => {
         target.removeEventListener('mouseenter', handleInteractEnter);
         target.removeEventListener('mouseleave', handleInteractLeave);
