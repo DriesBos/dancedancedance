@@ -38,7 +38,7 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
         )}
         <div className="column column-Icons">
           <a
-            className="icon external-link"
+            className="icon external-link cursorMagnetic"
             href={external_link?.cached_url ? external_link.cached_url : '#'}
             target="_blank"
             rel="noopener noreferrer"
@@ -47,7 +47,7 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
           >
             <IconLinkOutside />
           </a>
-          <div className="icon">
+          <div className="icon cursorMagnetic">
             <IconArrow />
           </div>
         </div>
