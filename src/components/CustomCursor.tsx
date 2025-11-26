@@ -10,6 +10,9 @@ export default function CustomCursor() {
   const mouseInTarget = useRef(false);
 
   useEffect(() => {
+    // Skip on touch devices - no hover support
+    if (window.matchMedia('(hover: none)').matches) return;
+
     const cursor = cursorRef.current;
     const follower = followerRef.current;
     if (!cursor || !follower) return;

@@ -1,6 +1,8 @@
 *
   overscroll-behavior: none
   cursor: none !important
+  @media (hover: none)
+    cursor: auto !important
   &::-webkit-scrollbar 
     display: none
     scrollbar-width: none
@@ -15,8 +17,8 @@
   z-index: 9999
   transform: translate(-50%, -50%)
   will-change: transform
-  @media (hover: none)
-    opacity: 0
+  @media (hover: none) or (pointer: coarse) 
+    display: none
 
   &-Main
     width: 0.9090909091rem
