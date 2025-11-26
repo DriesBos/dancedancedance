@@ -59,7 +59,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
         {highlights.map((item: any) => (
           <Link
             key={item.slug}
-            className="blok blok-Highlights-Item blok-Animate"
+            className="blok blok-Highlights-Item blok-Animate cursorInteract"
             href={`/projects/${item.slug}`}
           >
             <div className="blok-Highlights-Item-Image">

@@ -1,8 +1,27 @@
 *
   overscroll-behavior: none
+  cursor: none !important
   &::-webkit-scrollbar 
     display: none
     scrollbar-width: none
+
+// Custom Cursor
+.customCursor
+  position: fixed
+  width: calc(var(--icon-size) / 5 * 4) 
+  height: calc(var(--icon-size) / 5 * 4) 
+  background-color: currentColor
+  border-radius: 50%
+  border: 1px solid var(--border-color)
+  pointer-events: none
+  cursor: none
+  z-index: 9999
+  transform: translate(-50%, -50%) scale(1)
+  will-change: width, height
+  transition: width 0.165s ease, height 0.165s ease
+  &.cursorInteract
+    width: calc(var(--icon-size) / 5 * 6) 
+    height: calc(var(--icon-size) / 5 * 6) 
   
 html, body
   position: relative

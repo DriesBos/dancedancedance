@@ -26,7 +26,7 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
   });
   return (
     <div
-      className={`blok blok-Project blok-Animate}`}
+      className="blok blok-Project blok-Animate cursorInteract"
       onClick={handleClick}
       style={{ cursor: 'pointer' }}
     >

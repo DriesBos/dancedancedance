@@ -87,7 +87,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       {/* Current slide */}
       <Link
         ref={itemRef}
-        className="blok-ProjectSlider-Item"
+        className="blok-ProjectSlider-Item cursorInteract"
         href={currentItem.link?.cached_url || '#'}
       >
         <div className="blok-ProjectSlider-Image">
