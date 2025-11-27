@@ -105,7 +105,7 @@ main
       align-items: flex-end
     &[data-wide-columns='true']
       @media (max-width: 770px)
-        flex-wrap: wrap
+        flex-direction: column
         & > div
           width: 100%
           padding-left: var(--spacing-side) !important
@@ -180,6 +180,8 @@ main
         padding-bottom: var(--spacing-base)
         // flex-grow: 1
         flex: 1
+        // @media (max-width: 770px)
+        //   flex-grow: 1
         img, video
           width: 100%
           height: auto
