@@ -22,23 +22,29 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!videoRef.current || !blok.pause || !blok.loop) return;
+    if (!videoRef.current || !blok.loop) return;
 
     const video = videoRef.current;
 
-    const handleEnded = () => {
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      }, blok.pause); // Use pause prop directly as milliseconds
-    };
+    // If pause > 0, add delay between loops; otherwise use native loop
+    if (blok.pause && blok.pause > 0) {
+      const handleEnded = () => {
+        setTimeout(() => {
+          if (videoRef.current) {
+            videoRef.current.play();
+          }
+        }, blok.pause * 1000); // 3 second delay between plays
+      };
 
-    video.addEventListener('ended', handleEnded);
+      video.addEventListener('ended', handleEnded);
 
-    return () => {
-      video.removeEventListener('ended', handleEnded);
-    };
+      return () => {
+        video.removeEventListener('ended', handleEnded);
+      };
+    } else {
+      // No pause, use native loop
+      video.loop = true;
+    }
   }, [blok.pause, blok.loop]);
 
   console.log('blok.video', blok);
