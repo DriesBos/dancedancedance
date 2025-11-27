@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/store/store';
+import { useProjects } from '@/providers/projects-provider';
 import Link from 'next/link';
 import React, { useState, useEffect, useCallback, use } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
@@ -15,25 +16,6 @@ import StoreSwitcher from './StoreSwitcher';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
-const hyperLink = [
-  'mmerch',
-  'minka-haus',
-  'encounter',
-  'anatha-wallet',
-  'hello-comrade',
-  'fotomat',
-  'van-hooff-architects',
-  'close-my-eyes',
-  'made-of-web',
-  'ko',
-  'cris-mannen',
-  'jasper-rens-van-es',
-  'jakob-johanna',
-  'leon',
-  'ilovethatphoto',
-  'de-fotohal',
-];
-
 interface Props {
   blok?: any;
   float?: boolean;
@@ -43,6 +25,7 @@ interface Props {
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
   const router = useRouter();
+  const { projectSlugs } = useProjects();
   const space = useStore((state: any) => state.space);
   const index = useStore((state: any) => state.index);
   const setIndex = useStore((state: any) => state.setIndex);
@@ -60,49 +43,49 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const clickNext = useCallback(() => {
     const nextPath = path;
     const currentSlug = nextPath.split('/')[2];
-    const currentIndex = hyperLink.indexOf(currentSlug);
-    if (currentIndex !== -1 && currentIndex < hyperLink.length - 1) {
-      const nextSlug = `/projects/${hyperLink[currentIndex + 1]}`;
+    const currentIndex = projectSlugs.indexOf(currentSlug);
+    if (currentIndex !== -1 && currentIndex < projectSlugs.length - 1) {
+      const nextSlug = `/projects/${projectSlugs[currentIndex + 1]}`;
       router.push(nextSlug);
     } else {
       return false;
     }
-  }, [path, router]);
+  }, [path, router, projectSlugs]);
 
   const checkNext = useCallback(() => {
     const checkNextPath = path;
     const currentSlug = checkNextPath.split('/')[2];
-    const currentIndex = hyperLink.indexOf(currentSlug);
+    const currentIndex = projectSlugs.indexOf(currentSlug);
     setCurrentProjectIndex(currentIndex);
-    if (currentIndex === -1 || currentIndex >= hyperLink.length - 1) {
+    if (currentIndex === -1 || currentIndex >= projectSlugs.length - 1) {
       setHasNext(false);
     } else {
       setHasNext(true);
     }
-  }, [path]);
+  }, [path, projectSlugs]);
 
   const clickPrev = useCallback(() => {
     const prevPath = path;
     const currentSlug = prevPath.split('/')[2];
-    const currentIndex = hyperLink.indexOf(currentSlug);
+    const currentIndex = projectSlugs.indexOf(currentSlug);
     if (currentIndex > 0) {
-      const prevSlug = `/projects/${hyperLink[currentIndex - 1]}`;
+      const prevSlug = `/projects/${projectSlugs[currentIndex - 1]}`;
       router.push(prevSlug);
     } else {
       return false;
     }
-  }, [path, router]);
+  }, [path, router, projectSlugs]);
 
   const checkPrev = useCallback(() => {
     const checkPrevPath = path;
     const currentSlug = checkPrevPath.split('/')[2];
-    const currentIndex = hyperLink.indexOf(currentSlug);
+    const currentIndex = projectSlugs.indexOf(currentSlug);
     if (currentIndex <= 0) {
       setHasPrev(false);
     } else {
       setHasPrev(true);
     }
-  }, [path]);
+  }, [path, projectSlugs]);
 
   useEffect(() => {
     checkNext();
@@ -111,19 +94,19 @@ const BlokHead = ({ blok, float, params }: Props) => {
     // Prefetch adjacent routes for instant navigation
     if (pathName === 'projects') {
       const currentSlug = path.split('/')[2];
-      const currentIndex = hyperLink.indexOf(currentSlug);
+      const currentIndex = projectSlugs.indexOf(currentSlug);
 
       // Prefetch next route
-      if (currentIndex !== -1 && currentIndex < hyperLink.length - 1) {
-        router.prefetch(`/projects/${hyperLink[currentIndex + 1]}`);
+      if (currentIndex !== -1 && currentIndex < projectSlugs.length - 1) {
+        router.prefetch(`/projects/${projectSlugs[currentIndex + 1]}`);
       }
 
       // Prefetch previous route
       if (currentIndex > 0) {
-        router.prefetch(`/projects/${hyperLink[currentIndex - 1]}`);
+        router.prefetch(`/projects/${projectSlugs[currentIndex - 1]}`);
       }
     }
-  }, [path, checkNext, checkPrev, pathName, router]);
+  }, [path, checkNext, checkPrev, pathName, router, projectSlugs]);
 
   // const handleTopPanel = useCallback((e: any) => {
   //   if (e.type === 'mouseenter') {
@@ -390,8 +373,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
               >
                 <IconArrow />
               </div>
-              <div className="projectNumbe">
-                {currentProjectIndex + 1}/{hyperLink.length}
+              <div className="projectNumber">
+                {currentProjectIndex + 1}/{projectSlugs.length}
               </div>
               <div
                 onClick={clickNext}

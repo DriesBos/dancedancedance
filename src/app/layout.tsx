@@ -8,6 +8,8 @@ import '@/assets/styles/typography.sass';
 import '@/assets/styles/transitions.sass';
 import '@/assets/styles/global.sass';
 import StoryblokProvider from '@/providers/storyblok-provider';
+import { ProjectsProvider } from '@/providers/projects-provider';
+import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import AppInitializer from '@/components/AppInitStore';
 import ThemeBackground from '@/components/ThemeBackground';
 import BlokHead from '@/components/BlokHead';
@@ -64,6 +66,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch projects at build/request time
+  const projects = await fetchProjectSlugs();
+
   return (
     <html lang="en">
       <head>
@@ -76,31 +81,33 @@ export default async function RootLayout({
         />
       </head>
       <AppInitializer className={`body ${myFont.className}`}>
-        <CustomCursor />
-        <TitleSwitcher />
-        <FaviconSwitcher />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
-        <StoryblokProvider>
-          <ThemeFilter />
-          {/* <ThemeBackground /> */}
-          {/* <div className="laserBlok">
-            <div className="laserBlok-Line"></div>
-          </div> */}
-          {/* <div className="introText">
-            <h1>
-              Dries Bos, computational design, creative development & digital
-              partner
-            </h1>
-          </div> */}
-          <main className="main">
-            <BlokHead />
-            {/* <BlokFilter /> */}
-            {children}
-            <BlokFooter />
-          </main>
-        </StoryblokProvider>
+        <ProjectsProvider projects={projects}>
+          <CustomCursor />
+          <TitleSwitcher />
+          <FaviconSwitcher />
+          {process.env.NEXT_PUBLIC_GA_ID && (
+            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          )}
+          <StoryblokProvider>
+            <ThemeFilter />
+            {/* <ThemeBackground /> */}
+            {/* <div className="laserBlok">
+              <div className="laserBlok-Line"></div>
+            </div> */}
+            {/* <div className="introText">
+              <h1>
+                Dries Bos, computational design, creative development & digital
+                partner
+              </h1>
+            </div> */}
+            <main className="main">
+              <BlokHead />
+              {/* <BlokFilter /> */}
+              {children}
+              <BlokFooter />
+            </main>
+          </StoryblokProvider>
+        </ProjectsProvider>
       </AppInitializer>
     </html>
   );
