@@ -43,15 +43,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
 
   console.log('Fetched project data:', data);
 
-  const dataFilteredByYear = [...data].sort((a: any, b: any) => {
-    return parseInt(b.year) - parseInt(a.year);
-  });
-
-  const highlights = data
-    .filter((item: any) => item.highlight === true)
-    .sort((a: any, b: any) => {
-      return parseInt(b.year) - parseInt(a.year);
-    });
+  const highlights = data.filter((item: any) => item.highlight === true);
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
@@ -75,12 +67,14 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
             </div>
             <div className="blok-Highlights-Item-Caption cursorInteract">
               <div className="blok-Highlights-Item-Title">{item.title}</div>
-              <div className="blok-Highlights-Item-Year">{item.year}</div>
+              <div className="blok-Highlights-Item-Year">
+                {item.year ? new Date(item.year).getFullYear() : ''}
+              </div>
             </div>
           </Link>
         ))}
       </div>
-      <BlokProjectListClient data={dataFilteredByYear} />
+      <BlokProjectListClient data={data} />
     </div>
   );
 };
@@ -90,6 +84,7 @@ export async function fetchProjects() {
     version: 'published',
     starts_with: 'projects',
     is_startpage: false,
+    sort_by: 'content.year:desc', // Sort by year descending
   };
 
   const storyblokApi = getStoryblokApi();

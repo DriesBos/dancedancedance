@@ -24,6 +24,10 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
     title,
     external_link,
   });
+
+  // Extract just the year from the date value
+  const displayYear = year ? new Date(year).getFullYear() : null;
+
   return (
     <div
       className="blok blok-Project blok-Animate cursorInteract"
@@ -31,7 +35,7 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
       style={{ cursor: 'pointer' }}
     >
       <Row>
-        {year && <div className="column column-Year">{year}</div>}
+        {displayYear && <div className="column column-Year">{displayYear}</div>}
         {title && <div className="column column-Project">{title}</div>}
         {category && (
           <div className="column column-Category">{category.join(', ')}</div>

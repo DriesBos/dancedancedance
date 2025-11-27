@@ -11,6 +11,7 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
     version: 'published',
     starts_with: 'projects',
     is_startpage: false,
+    sort_by: 'content.year:desc', // Sort by year descending
   };
 
   const storyblokApi = getStoryblokApi();
@@ -19,16 +20,12 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
     next: { revalidate: 3600 }, // Revalidate every hour
   });
 
-  // Sort by year descending and return slugs
-  const projects = response.data.stories
-    .map((story: any) => ({
-      slug: story.slug,
-      year: story.content.year || '0',
-      title: story.content.title || story.name,
-    }))
-    .sort(
-      (a: ProjectData, b: ProjectData) => parseInt(b.year) - parseInt(a.year)
-    );
+  // Return projects in CMS order
+  const projects = response.data.stories.map((story: any) => ({
+    slug: story.slug,
+    year: story.content.year || '0',
+    title: story.content.title || story.name,
+  }));
 
   return projects;
 }
