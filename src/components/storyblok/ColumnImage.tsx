@@ -6,6 +6,7 @@ interface SbPageData extends SbBlokData {
     filename: string;
     alt: string;
   };
+  caption?: string;
 }
 
 interface ColumnImageProps {
@@ -24,6 +25,7 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
         quality={80}
         style={{ width: '100%', height: 'auto' }}
       />
+      {blok.caption && <span className="column-Caption">{blok.caption}</span>}
     </div>
   );
 };

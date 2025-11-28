@@ -12,6 +12,7 @@ interface SbPageData extends SbBlokData {
   };
   loop?: boolean;
   pause?: number;
+  caption?: string;
 }
 
 interface ColumnVideoProps {
@@ -62,6 +63,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
         width="100%"
         height="auto"
       />
+      {blok.caption && <span className="column-Caption">{blok.caption}</span>}
     </div>
   );
 };

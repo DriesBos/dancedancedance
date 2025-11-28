@@ -11,6 +11,7 @@ interface SbPageData extends SbBlokData {
     filename: string;
     alt: string;
   }[];
+  caption?: string;
 }
 
 interface ColumnSliderProps {
@@ -68,6 +69,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           priority
           style={{ width: '100%', height: 'auto' }}
         />
+        {blok.caption && <span className="column-Caption">{blok.caption}</span>}
       </div>
 
       {/* Preload next image (hidden, but loads in background) */}
