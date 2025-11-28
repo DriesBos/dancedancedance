@@ -12,6 +12,7 @@ interface SbPageData extends SbBlokData {
     _uid: string;
     name: string;
     year: string;
+    video_link?: string;
     media?: {
       filename: string;
       alt: string;
@@ -19,6 +20,7 @@ interface SbPageData extends SbBlokData {
     link?: {
       cached_url: string;
     };
+    duration?: number;
   }>;
 }
 
@@ -36,9 +38,14 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const nextIndex = blok.body ? (activeIndex + 1) % blok.body.length : 0;
   const nextItem = blok.body?.[nextIndex];
 
+  // Get duration for current slide (default to 800ms)
+  const currentDuration = currentItem?.duration || 800;
+
   // Animate progress bar in sync with slide changes
   useGSAP(() => {
-    if (!progressRef.current) return;
+    if (!progressRef.current || !currentItem) return;
+
+    const duration = (currentItem.duration || 800) / 1000; // Convert ms to seconds
 
     // Reset to 0 and animate to 100%
     gsap.fromTo(
@@ -46,11 +53,11 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       { width: '0%' },
       {
         width: '100%',
-        duration: 0.8,
-        ease: 'power1.out',
+        duration: duration,
+        ease: 'linear',
       }
     );
-  }, [activeIndex]); // Re-run when activeIndex changes
+  }, [activeIndex, currentItem]); // Re-run when activeIndex changes
 
   // Fade in animation on slide change
   useGSAP(() => {
@@ -70,12 +77,15 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
 
-    const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
-    }, 800);
+    // Use current slide's duration or default to 800ms
+    const slideDuration = currentItem?.duration || 800;
 
-    return () => clearInterval(interval);
-  }, [blok.body]);
+    const timeout = setTimeout(() => {
+      setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
+    }, slideDuration);
+
+    return () => clearTimeout(timeout);
+  }, [blok.body, activeIndex, currentItem]);
 
   if (!currentItem) return null;
 
@@ -91,7 +101,17 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         href={currentItem.link?.cached_url || '#'}
       >
         <div className="blok-ProjectSlider-Image">
-          {currentItem.media &&
+          {currentItem.video_link ? (
+            <video
+              src={currentItem.video_link}
+              muted
+              autoPlay
+              playsInline
+              preload="auto"
+              style={{ width: '100%', height: 'auto' }}
+            />
+          ) : (
+            currentItem.media &&
             typeof currentItem.media === 'object' &&
             'filename' in currentItem.media && (
               <Image
@@ -104,7 +124,8 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
                 priority
                 style={{ width: '100%', height: 'auto' }}
               />
-            )}
+            )
+          )}
         </div>
         <div className="blok-ProjectSlider-Caption">
           <div className="blok-ProjectSlider-Caption-Title">
@@ -120,24 +141,29 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         </div>
       </Link>
 
-      {/* Preload next image (hidden, but loads in background) */}
-      {nextItem &&
-        nextItem.media &&
-        typeof nextItem.media === 'object' &&
-        'filename' in nextItem.media && (
-          <div style={{ display: 'none' }}>
-            <Image
-              src={(nextItem.media as any).filename}
-              alt={(nextItem.name as string) || 'Project Image'}
-              width={0}
-              height={0}
-              sizes="100vw"
-              quality={80}
-              priority
-              style={{ width: '100%', height: 'auto' }}
-            />
-          </div>
-        )}
+      {/* Preload next media (hidden, but loads in background) */}
+      {nextItem && (
+        <div style={{ display: 'none' }}>
+          {nextItem.video_link ? (
+            <video src={nextItem.video_link} preload="auto" muted />
+          ) : (
+            nextItem.media &&
+            typeof nextItem.media === 'object' &&
+            'filename' in nextItem.media && (
+              <Image
+                src={(nextItem.media as any).filename}
+                alt={(nextItem.name as string) || 'Project Image'}
+                width={0}
+                height={0}
+                sizes="100vw"
+                quality={80}
+                priority
+                style={{ width: '100%', height: 'auto' }}
+              />
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 };
