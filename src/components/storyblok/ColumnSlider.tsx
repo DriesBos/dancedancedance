@@ -69,7 +69,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           priority
           style={{ width: '100%', height: 'auto' }}
         />
-        {blok.caption && <span className="column-Caption">{blok.caption}</span>}
+        {blok.caption && <div className="column-Caption">{blok.caption}</div>}
       </div>
 
       {/* Preload next image (hidden, but loads in background) */}

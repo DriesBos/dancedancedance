@@ -63,7 +63,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
         width="100%"
         height="auto"
       />
-      {blok.caption && <span className="column-Caption">{blok.caption}</span>}
+      {blok.caption && <div className="column-Caption">{blok.caption}</div>}
     </div>
   );
 };
