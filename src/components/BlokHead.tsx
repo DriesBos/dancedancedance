@@ -357,40 +357,42 @@ const BlokHead = ({ blok, float, params }: Props) => {
           )}
           {pathName === 'projects' && (
             <>
-              <div
-                onClick={clickPrev}
-                className={`${
-                  hasPrev ? 'active' : 'disabled'
-                } icon icon-Wide icon-Rotate desktop cursorMagnetic`}
-              >
-                <IconArrowLong />
-              </div>
-              <div
-                onClick={clickPrev}
-                className={`${
-                  hasPrev ? 'active' : 'disabled'
-                } icon icon-Rotate mobile cursorMagnetic`}
-              >
-                <IconArrow />
-              </div>
-              <div className="projectNumber">
-                {currentProjectIndex + 1}/{projectSlugs.length}
-              </div>
-              <div
-                onClick={clickNext}
-                className={`${
-                  hasNext ? 'active' : 'disabled'
-                } icon icon-Wide desktop cursorMagnetic`}
-              >
-                <IconArrowLong />
-              </div>
-              <div
-                onClick={clickNext}
-                className={`${
-                  hasNext ? 'active' : 'disabled'
-                } icon mobile cursorMagnetic`}
-              >
-                <IconArrow />
+              <div className="column-Icons_NextPrev">
+                <div
+                  onClick={clickPrev}
+                  className={`${
+                    hasPrev ? 'active' : 'disabled'
+                  } icon icon-Wide icon-Rotate desktop cursorMagnetic`}
+                >
+                  <IconArrowLong />
+                </div>
+                <div
+                  onClick={clickPrev}
+                  className={`${
+                    hasPrev ? 'active' : 'disabled'
+                  } icon icon-Rotate mobile cursorMagnetic`}
+                >
+                  <IconArrow />
+                </div>
+                <div className="projectNumber">
+                  {currentProjectIndex + 1}/{projectSlugs.length}
+                </div>
+                <div
+                  onClick={clickNext}
+                  className={`${
+                    hasNext ? 'active' : 'disabled'
+                  } icon icon-Wide desktop cursorMagnetic`}
+                >
+                  <IconArrowLong />
+                </div>
+                <div
+                  onClick={clickNext}
+                  className={`${
+                    hasNext ? 'active' : 'disabled'
+                  } icon mobile cursorMagnetic`}
+                >
+                  <IconArrow />
+                </div>
               </div>
               <Link href="/" className="icon cursorMagnetic">
                 <IconClose />
