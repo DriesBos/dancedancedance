@@ -362,7 +362,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   onClick={clickPrev}
                   className={`${
                     hasPrev ? 'active' : 'disabled'
-                  } icon icon-Wide icon-Rotate desktop cursorMagnetic`}
+                  } icon icon-Wide icon-Rotate headerDesktop cursorMagnetic`}
                 >
                   <IconArrowLong />
                 </div>
@@ -370,18 +370,18 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   onClick={clickPrev}
                   className={`${
                     hasPrev ? 'active' : 'disabled'
-                  } icon icon-Rotate mobile cursorMagnetic`}
+                  } icon icon-Rotate headerMobile cursorMagnetic`}
                 >
                   <IconArrow />
                 </div>
-                <div className="projectNumber">
+                <div className="projectNumber headerDesktop">
                   {currentProjectIndex + 1}/{projectSlugs.length}
                 </div>
                 <div
                   onClick={clickNext}
                   className={`${
                     hasNext ? 'active' : 'disabled'
-                  } icon icon-Wide desktop cursorMagnetic`}
+                  } icon icon-Wide headerDesktop cursorMagnetic`}
                 >
                   <IconArrowLong />
                 </div>
@@ -389,7 +389,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   onClick={clickNext}
                   className={`${
                     hasNext ? 'active' : 'disabled'
-                  } icon mobile cursorMagnetic`}
+                  } icon headerMobile cursorMagnetic`}
                 >
                   <IconArrow />
                 </div>
