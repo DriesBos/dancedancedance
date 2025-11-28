@@ -1,4 +1,5 @@
-import { ISbStoriesParams, getStoryblokApi } from '@storyblok/react/rsc';
+import { ISbStoriesParams } from '@storyblok/react/rsc';
+import { getStoryblokApi } from '@/lib/storyblok';
 import BlokProject from '../BlokProject';
 
 export default async function BlokProjectList() {

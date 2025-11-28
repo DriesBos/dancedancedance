@@ -1,9 +1,9 @@
 import {
   ISbStoriesParams,
   SbBlokData,
-  getStoryblokApi,
   storyblokEditable,
 } from '@storyblok/react/rsc';
+import { getStoryblokApi } from '@/lib/storyblok';
 import BlokProjectListClient from '../BlokProjectListClient';
 import Image from 'next/image';
 import Link from 'next/link';

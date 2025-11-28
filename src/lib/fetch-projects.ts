@@ -1,4 +1,5 @@
-import { ISbStoriesParams, getStoryblokApi } from '@storyblok/react/rsc';
+import { ISbStoriesParams } from '@storyblok/react/rsc';
+import { getStoryblokApi } from '@/lib/storyblok';
 
 export interface ProjectData {
   slug: string;
@@ -15,6 +16,11 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
   };
 
   const storyblokApi = getStoryblokApi();
+  if (!storyblokApi) {
+    console.warn('Storyblok API not initialized, returning empty projects');
+    return [];
+  }
+
   const response = await storyblokApi.get(`cdn/stories`, sbParams, {
     cache: 'force-cache',
     next: { revalidate: 3600 }, // Revalidate every hour
