@@ -214,6 +214,7 @@ main
         margin-top: 4px
       &-Copyright
         position: relative
+        line-height: 1.32
         span
           font-size: var(--font-size-caption)
           line-height: 1
@@ -289,34 +290,6 @@ main
           width: 100%
           height: auto
           height: calc-size(auto)
-      &-Email
-        flex-grow: 1
-        --var: 0%
-        a
-          line-height: 1
-          position: relative
-          overflow: visible
-          &::before
-            content: ''
-            position: absolute
-            left: 0
-            bottom: 0
-            display: inline-block
-            width: var(--var)
-            height: 100%
-            border-bottom: var(--border-hyperlink) solid currentColor !important
-            transform: translateY(var(--border-hyperlink))
-            box-sizing: border-box
-            z-index: 0
-            will-change: width, border-bottom
-            overflow: visible
-            // animation: hyperLink .66s ease
-          &:hover
-            &::before
-              @media ( hover: hover )
-                animation: hyperLink .33s ease
-                animation-iteration-count: 1
-                animation-fill-mode: forwards
       &-Year
         width: calc(2.9em + var(--spacing-side))
       &-Icons
