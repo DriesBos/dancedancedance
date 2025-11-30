@@ -1,0 +1,52 @@
+.newsletter
+  display: flex
+  gap: 2px
+  // @media screen and (max-width: 850px) 
+  //   width: 100%
+
+.form
+  display: flex
+  transition: width 1s ease-out
+
+.inputWrapper
+  position: relative
+  &::after
+    content: ''
+    position: absolute
+    bottom: -2px
+    left: 0
+    width: 100%
+    height: 1px
+    background: currentColor
+
+.input
+  all: unset
+  outline: none
+  padding-bottom: 2px
+  width: 100%
+  max-width: 0
+  transition: max-width 0.165s ease
+  &::placeholder
+    padding-left: 2px
+    color: currentColor
+    opacity: 0
+    transition: opacity 0.5s ease-in
+  &:disabled
+    pointer-events: none
+  &[data-active="true"]
+    transition: max-width 0.5s ease-out
+    max-width: 333px
+    &::placeholder
+      opacity: 0.66
+
+.button
+  all: unset
+
+.activateButton
+  all: unset
+  cursor: pointer
+  text-transform: uppercase
+
+.message
+  pointer-events: none
+  text-transform: uppercase

@@ -5,6 +5,7 @@ import Row from './Row';
 import Link from 'next/link';
 import IconLinkOutside from './Icons/IconLinkOutside';
 import IconExternal from './Icons/IconExternal';
+import Newsletter from './Newsletter/Newsletter';
 
 const BlokFooter = () => {
   const ScrollToTop = () => {
@@ -50,7 +51,9 @@ const BlokFooter = () => {
             Instagram
             <IconExternal />
           </a>
-          <div className="column-Subscribe">Subscribe</div>
+          <div className="column-Subscribe">
+            <Newsletter className="cursorInteract" />
+          </div>
         </div>
         <div className="column column-Icons">
           <div className="icon icon-ExternalLink">
