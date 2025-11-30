@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Remove the default Next.js loading indicator
+  devIndicators: false,
   // Performance optimizations
   compress: true, // Gzip compression
   poweredByHeader: false, // Remove X-Powered-By header
