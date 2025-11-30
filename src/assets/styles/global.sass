@@ -80,6 +80,57 @@ main
     &-Thumbnail
       padding: 0 var(--spacing-base)
 
+
+.icon
+  position: relative
+  cursor: pointer
+  user-select: none
+  flex-shrink: 0
+  width: var(--icon-size)
+  height: var(--icon-size)
+  box-sizing: content-box
+  & > div, & > a
+    width: var(--icon-size)
+    height: var(--icon-size)
+  svg
+    position: relative
+    width: var(--icon-size)
+    height: var(--icon-size)
+  &-ExternalLink
+    opacity: 0
+    &[data-active='true']
+      opacity: 1
+  &-Wide
+    width: calc(2 * #{var(--icon-size)})
+    & > div, & > a
+      width: calc(2 * #{var(--icon-size)})
+    svg
+      width: calc(2 * #{var(--icon-size)})
+  &-High
+    height: calc(2 * #{var(--icon-size)})
+    & > div, & > a
+      height: calc(2 * #{var(--icon-size)})
+    svg
+      height: calc(2 * #{var(--icon-size)})
+  &-Rotate
+    transform: rotate(180deg)
+  &.disabled
+    pointer-events: none
+    color: var(--theme-type-inactive)
+    transition: color var(--transition-theme)
+    will-change: color
+
+.hasExternalIcon
+  position: relative
+  & > svg
+    position: absolute  
+    top: 0
+    right: 0
+    width: calc(var(--icon-size) / 2)
+    height: calc(var(--icon-size) / 2)
+    transform: translate(75%, 50%)
+
+
 .blok
   // position: sticky
   top: 0
@@ -101,8 +152,6 @@ main
       padding-right: calc(var(--spacing-base) / 2)
     & > *:nth-last-child(2):first-child ~ *
       padding-left: calc(var(--spacing-base) / 2)
-    &-Footer
-      align-items: flex-end
     &[data-wide-columns='true']
       @media (max-width: 770px)
         flex-direction: column
@@ -119,10 +168,10 @@ main
       &-Empty
         @media (max-width: 770px)
           display: none
-      &-Project, &-Title, &-Category, &-Agency, &-Empty, &-Text
+      &-Project, &-Title, &-Category, &-Agency, &-Empty, &-Text, &-FooterColumn
         flex: 1 1 0
         width: 0
-      &-Title, &-Category, &-Agency
+      &-Title, &-Category, &-Agency, &-FooterColumn, &-Copyright
         user-select: none
       &-Slider
         position: relative
@@ -136,6 +185,26 @@ main
         font-weight: 300
         padding-right: var(--spacing-side)
         margin-top: 4px
+      &-Copyright
+        position: relative
+        span
+          font-size: var(--font-size-caption)
+          line-height: 1
+          font-weight: 300
+          position: absolute
+          top: var(--spacing-base)
+          right: calc(var(--spacing-side) / 2)
+          transform: translateX(100%)
+      &-FooterColumn
+        flex-grow: 1
+        display: flex
+        flex-direction: column
+        align-items: flex-start
+        gap: var(--spacing-half)
+        & > div
+      &-Sitemap
+        @media (max-width: 770px)
+          display: none
       &-Text
         --var: 0%
         min-width: 0 // Ellipsis hack
@@ -188,10 +257,7 @@ main
       &-Image, &-Thumbnail, &-Video, &-Slider
         padding: 0 var(--spacing-side)
         padding-bottom: var(--spacing-base)
-        // flex-grow: 1
         flex: 1
-        // @media (max-width: 770px)
-        //   flex-grow: 1
         img, video
           width: 100%
           height: auto
@@ -224,9 +290,6 @@ main
                 animation: hyperLink .33s ease
                 animation-iteration-count: 1
                 animation-fill-mode: forwards
-      &-Subscribe
-        flex-grow: 1
-        user-select: none
       &-Year
         width: calc(2.9em + var(--spacing-side))
       &-Icons
@@ -278,6 +341,11 @@ main
       &-Title
         padding-right: 0
         user-select: none
+  &-Footer
+    margin-top: 3.5rem
+    padding-top: 3.5rem
+    .column-Icons
+      align-items: flex-start !important
   &-Filter
     transition: padding-top var(--transition-space)
     padding-top: var(--top-padding-filter)
@@ -366,8 +434,6 @@ main
       &-Caption
         display: flex
         justify-content: space-between
-  &-ProjectList
-    padding-top: var(--spacing-base)
   &-ProjectSlider
     position: relative
     width: 100%
@@ -421,46 +487,6 @@ main
     flex-wrap: nowrap
     @media (max-width: 770px)
       flex-direction: column
-  &-Footer
-    // align-items: flex-end
-    // justify-content: flex-end
-    height: calc(#{var(--blok-height)} * 2)
-    border-bottom: var(--border-width) solid var(--border-color)
-
-.icon
-  position: relative
-  cursor: pointer
-  user-select: none
-  flex-shrink: 0
-  width: var(--icon-size)
-  height: var(--icon-size)
-  box-sizing: content-box
-  & > div, & > a
-    width: var(--icon-size)
-    height: var(--icon-size)
-  svg
-    position: relative
-    width: var(--icon-size)
-    height: var(--icon-size)
-  &-Wide
-    width: calc(2 * #{var(--icon-size)})
-    & > div, & > a
-      width: calc(2 * #{var(--icon-size)})
-    svg
-      width: calc(2 * #{var(--icon-size)})
-  &-High
-    height: calc(2 * #{var(--icon-size)})
-    & > div, & > a
-      height: calc(2 * #{var(--icon-size)})
-    svg
-      height: calc(2 * #{var(--icon-size)})
-  &-Rotate
-    transform: rotate(180deg)
-  &.disabled
-    pointer-events: none
-    color: var(--theme-type-inactive)
-    transition: color var(--transition-theme)
-    will-change: color
 
 // .side 
 //   position: absolute
@@ -663,11 +689,6 @@ body
         overflow: hidden
       &-Filter
         border-top-width: 0
-      &-Footer
-        height: calc(68px * 2)
-        justify-content: flex-end
-        border-bottom-width: 0
-        flex-grow: 1
 
   // 3D
   // &[data-space="3D"]
