@@ -21,6 +21,7 @@ export default function Newsletter({ className }: NewsletterProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const buttonTextRef = useRef<HTMLSpanElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Playful scramble animation with random characters
   useGSAP(
@@ -143,12 +144,15 @@ export default function Newsletter({ className }: NewsletterProps) {
 
   const subscribeUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = formRef.current;
+    if (!form) return;
+
     setIsLoading(true);
     setMessage('');
     setIsActive(false);
     setInputValue('');
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const email = formData.get('email');
 
     const response = await fetch('/api/newsletter/subscribe', {
@@ -165,7 +169,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     if (error) {
       setIsLoading(false);
       setMessage(error);
-      e.currentTarget.reset();
+      form.reset();
       setInputValue('');
       setIsActive(false);
       return;
@@ -174,7 +178,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     setMessage('Thank you!');
     setIsLoading(false);
     // Reset form and input value
-    e.currentTarget.reset();
+    form.reset();
     setInputValue('');
     setIsActive(false);
     return data;
@@ -192,6 +196,7 @@ export default function Newsletter({ className }: NewsletterProps) {
       data-active={isActive}
     >
       <form
+        ref={formRef}
         id="newsletter-form"
         onSubmit={subscribeUser}
         className={styles.form}
