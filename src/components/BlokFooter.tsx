@@ -6,6 +6,7 @@ import Link from 'next/link';
 import IconLinkOutside from './Icons/IconLinkOutside';
 import IconExternal from './Icons/IconExternal';
 import Newsletter from './Newsletter/Newsletter';
+import IconArrowHead from './Icons/IconArrowHead';
 
 const BlokFooter = () => {
   const ScrollToTop = () => {
@@ -63,7 +64,8 @@ const BlokFooter = () => {
             onClick={ScrollToTop}
             className="icon icon-High icon-Footer cursorMagnetic"
           >
-            <IconArrowLongUp />
+            <div className="iconLine" />
+            <IconArrowHead />
           </div>
         </div>
       </Row>

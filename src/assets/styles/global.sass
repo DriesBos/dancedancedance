@@ -114,6 +114,18 @@ main
       height: calc(2 * #{var(--icon-size)})
   &-Rotate
     transform: rotate(180deg)
+  &-Footer
+    position: relative
+    & .iconLine
+      position: absolute
+      top: calc(var(--spacing-base) + 1px)
+      left: var(--spacing-base) 
+      width: 0.1rem
+      height: calc(100% - (var(--spacing-base) * 2) - 1px)
+      background: currentColor
+      transform: translateX(-100%)
+      @media (max-width: 770px)
+        left: calc(var(--spacing-base) / 2 + var(--icon-size) / 2 + 0.75px)
   &.disabled
     pointer-events: none
     color: var(--theme-type-inactive)
@@ -345,7 +357,8 @@ main
     margin-top: 3.5rem
     padding-top: 3.5rem
     .column-Icons
-      align-items: flex-start !important
+      & > .icon-Footer
+        height: calc(100% - (var(--spacing-base) * 2))
   &-Filter
     transition: padding-top var(--transition-space)
     padding-top: var(--top-padding-filter)
