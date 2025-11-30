@@ -17,8 +17,8 @@ export default function CustomCursor() {
     const follower = followerRef.current;
     if (!cursor || !follower) return;
 
-    // Initial state - both cursors hidden
-    gsap.set([cursor, follower], { opacity: 0 });
+    // Initial state - both cursors hidden and centered on cursor point
+    gsap.set([cursor, follower], { opacity: 0, xPercent: -50, yPercent: -50 });
 
     // QuickTo for smooth follower movement
     const xFollowerTo = gsap.quickTo(follower, 'x', {
