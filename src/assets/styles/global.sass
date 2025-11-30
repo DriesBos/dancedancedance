@@ -120,6 +120,7 @@ main
     transition: color var(--transition-theme)
     will-change: color
 
+// SPECIFICS ELEMENTS
 .hasExternalIcon
   position: relative
   & > svg
@@ -130,7 +131,33 @@ main
     height: calc(var(--icon-size) / 2)
     transform: translate(75%, 50%)
 
+.linkAnimation
+  --var: 0%
+  position: relative
+  overflow: visible
+  &::before
+    content: ''
+    position: absolute
+    left: 0
+    bottom: 0
+    display: inline-block
+    width: var(--var)
+    height: 100%
+    border-bottom: var(--border-hyperlink) solid currentColor !important
+    transform: translateY(var(--border-hyperlink))
+    box-sizing: border-box
+    z-index: 0
+    will-change: width, border-bottom
+    overflow: visible
+    pointer-events: none
+  &:hover
+    &::before
+      @media ( hover: hover )
+        animation: hyperLink .66s ease
+        animation-iteration-count: 1
+        animation-fill-mode: forwards
 
+// BLOKS
 .blok
   // position: sticky
   top: 0

@@ -3,6 +3,34 @@
   gap: 2px
   // @media screen and (max-width: 850px) 
   //   width: 100%
+  --var: 0%
+  position: relative
+  overflow: visible
+  &::before
+    content: ''
+    position: absolute
+    left: 0
+    bottom: 0
+    display: inline-block
+    width: var(--var)
+    height: 100%
+    border-bottom: var(--border-hyperlink) solid currentColor !important
+    transform: translateY(var(--border-hyperlink))
+    box-sizing: border-box
+    z-index: 0
+    will-change: width, border-bottom
+    overflow: visible
+    pointer-events: none
+  &[data-active="false"]
+    &:hover
+      &::before
+        @media ( hover: hover )
+          animation: hyperLink .66s ease
+          animation-iteration-count: 1
+          animation-fill-mode: forwards
+  &[data-active="true"]
+    &::before
+      width: 100%
 
 .form
   display: flex
@@ -13,10 +41,10 @@
   &::after
     content: ''
     position: absolute
-    bottom: -2px
+    bottom: calc(0px - var(--border-hyperlink))
     left: 0
     width: 100%
-    height: 1px
+    height: var(--border-hyperlink)
     background: currentColor
 
 .input
@@ -45,8 +73,12 @@
 .activateButton
   all: unset
   cursor: pointer
-  text-transform: uppercase
 
 .message
   pointer-events: none
-  text-transform: uppercase
+
+@keyframes hyperLink
+  0%
+    width: 0%
+  100%
+    width: 100%

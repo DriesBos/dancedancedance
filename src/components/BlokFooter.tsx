@@ -22,21 +22,21 @@ const BlokFooter = () => {
           <span>&copy;</span>
         </div>
         <div className="column column-FooterColumn column-Sitemap">
-          <Link href="/" className="cursorInteract">
+          <Link href="/" className="cursorInteract linkAnimation">
             Work
           </Link>
-          <Link href="/about" className="cursorInteract">
+          <Link href="/about" className="cursorInteract linkAnimation">
             About
           </Link>
-          <Link href="/thoughts" className="cursorInteract">
+          {/* <Link href="/thoughts" className="cursorInteract linkAnimation">
             Thoughts
-          </Link>
+          </Link> */}
         </div>
         <div className="column column-FooterColumn ">
           <a
             href="mailto:info@driesbos.com"
             target="_blank"
-            className="cursorInteract"
+            className="cursorInteract linkAnimation"
           >
             <div className="hasExternalIcon">
               info@driesbos.com
@@ -46,7 +46,7 @@ const BlokFooter = () => {
           <a
             href="https://www.instagram.com/dries_bos"
             target="blank"
-            className="cursorInteract hasExternalIcon"
+            className="cursorInteract linkAnimation hasExternalIcon"
           >
             Instagram
             <IconExternal />

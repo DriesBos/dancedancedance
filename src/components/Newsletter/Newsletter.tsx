@@ -187,7 +187,10 @@ export default function Newsletter({ className }: NewsletterProps) {
   };
 
   return (
-    <div className={`${styles.newsletter} ${className || ''}`}>
+    <div
+      className={`${styles.newsletter} ${className || ''}`}
+      data-active={isActive}
+    >
       <form
         id="newsletter-form"
         onSubmit={subscribeUser}
