@@ -28,7 +28,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     () => {
       if (buttonTextRef.current) {
         const targetText = buttonText;
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const chars = 'abcdefghijklmnopqrstuvwxyz';
         const iterations = 8; // Number of scramble iterations per character
 
         let iteration = 0;
@@ -67,7 +67,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     () => {
       if (messageRef.current && message) {
         const targetText = message;
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const chars = 'abcdefghijklmnopqrstuvwxyz';
         const iterations = 8;
 
         let iteration = 0;
@@ -104,11 +104,11 @@ export default function Newsletter({ className }: NewsletterProps) {
   // Update button text based on state
   useEffect(() => {
     if (!isActive && !isLoading) {
-      setButtonText('Newsletter');
+      setButtonText('newsletter');
     } else if (isLoading) {
-      setButtonText('Submitting..');
+      setButtonText('submitting..');
     } else {
-      setButtonText('Submit');
+      setButtonText('submit');
     }
   }, [isActive, isLoading]);
 
@@ -175,7 +175,7 @@ export default function Newsletter({ className }: NewsletterProps) {
       return;
     }
 
-    setMessage('Thank you!');
+    setMessage('thank you!');
     setIsLoading(false);
     // Reset form and input value
     form.reset();
