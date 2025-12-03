@@ -24,23 +24,24 @@ const BlokFooter = () => {
         </div>
         <div className="column column-FooterColumn column-Sitemap">
           <Link href="/" className="cursorInteract linkAnimation">
-            work
+            Work
           </Link>
           <Link href="/about" className="cursorInteract linkAnimation">
-            about
+            About
           </Link>
           {/* <Link href="/thoughts" className="cursorInteract linkAnimation">
             Thoughts
           </Link> */}
         </div>
-        <div className="column column-FooterColumn ">
+        <div className="column column-FooterColumn">
           <a
             href="mailto:info@driesbos.com"
             target="_blank"
             className="cursorInteract linkAnimation"
           >
             <div className="hasExternalIcon">
-              info@driesbos.com
+              <span className="mailMobile">Email</span>
+              <span className="mailDesktop">info@driesbos.com</span>
               <IconExternal />
             </div>
           </a>
@@ -49,7 +50,7 @@ const BlokFooter = () => {
             target="blank"
             className="cursorInteract linkAnimation hasExternalIcon"
           >
-            instagram
+            Instagram
             <IconExternal />
           </a>
           <div className="column-Subscribe">

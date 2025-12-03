@@ -104,11 +104,11 @@ export default function Newsletter({ className }: NewsletterProps) {
   // Update button text based on state
   useEffect(() => {
     if (!isActive && !isLoading) {
-      setButtonText('newsletter');
+      setButtonText('Newsletter');
     } else if (isLoading) {
-      setButtonText('submitting..');
+      setButtonText('Submitting..');
     } else {
-      setButtonText('submit');
+      setButtonText('Submit');
     }
   }, [isActive, isLoading]);
 
