@@ -7,7 +7,7 @@ export const fetchStory = async (
 ) => {
   try {
     getStoryblokApi();
-    const correctSlug = `/${slug ? slug.join('/') : 'home'}`;
+    const correctSlug = slug ? slug.join('/') : 'home';
 
     const token =
       version === 'published'
@@ -18,7 +18,7 @@ export const fetchStory = async (
       throw new Error(`Missing Storyblok token for version: ${version}`);
     }
 
-    const url = `https://api.storyblok.com/v2/cdn/stories${correctSlug}?version=${version}&token=${token}`;
+    const url = `https://api.storyblok.com/v2/cdn/stories/${correctSlug}?version=${version}&token=${token}`;
 
     const response = await fetch(url, {
       next: {
