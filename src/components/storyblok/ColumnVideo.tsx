@@ -13,6 +13,7 @@ interface SbPageData extends SbBlokData {
   loop?: boolean;
   pause?: number;
   caption?: string;
+  side_caption?: boolean;
 }
 
 interface ColumnVideoProps {
@@ -49,7 +50,11 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
   }, [blok.pause, blok.loop]);
 
   return (
-    <div className="column column-Video" {...storyblokEditable(blok)}>
+    <div
+      className="column column-Video"
+      {...storyblokEditable(blok)}
+      data-caption-side={blok.side_caption}
+    >
       <video
         ref={videoRef}
         src={blok.link}

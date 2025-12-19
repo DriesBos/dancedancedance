@@ -317,6 +317,19 @@ main
           width: 100%
           height: auto
           height: calc-size(auto)
+        &[data-caption-side='true']
+          @media (min-width: 770px)
+            display: flex
+            flex-direction: row-reverse
+            align-items: flex-end
+            gap: calc(var(--spacing-base) / 2)
+            img, video
+              width: calc(100% - 9rem)
+            .column-Caption
+              position: sticky
+              padding: calc(var(--spacing-base) / 2) 0
+              top: 0
+              left: 0
       &-Year
         width: calc(2.9em + var(--spacing-side))
       &-Icons

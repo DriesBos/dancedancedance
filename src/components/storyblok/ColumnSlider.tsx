@@ -8,8 +8,10 @@ import { useGSAP } from '@gsap/react';
 
 interface SbPageData extends SbBlokData {
   images?: {
-    filename: string;
-    alt: string;
+    id?: string;
+    filename?: string;
+    alt?: string;
+    name?: string;
   }[];
   caption?: string;
 }
@@ -69,6 +71,9 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           priority
           style={{ width: '100%', height: 'auto' }}
         />
+        {currentImage.name && (
+          <div className="column-Caption">{currentImage.name}</div>
+        )}
         {blok.caption && <div className="column-Caption">{blok.caption}</div>}
       </div>
 
