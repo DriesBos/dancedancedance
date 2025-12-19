@@ -1,5 +1,3 @@
-import styles from './PageProject.module.sass';
-
 import {
   SbBlokData,
   storyblokEditable,

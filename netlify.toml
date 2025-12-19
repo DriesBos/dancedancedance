@@ -5,6 +5,8 @@
 [build.environment]
   NODE_VERSION = "20"
   NEXT_TELEMETRY_DISABLED = "1"
+  # Force cache clear - update this date to clear cache
+  CACHE_BUST = "2025-12-19"
 
 [functions]
   node_bundler = "esbuild"
