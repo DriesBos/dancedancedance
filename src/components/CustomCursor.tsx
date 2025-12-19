@@ -166,7 +166,7 @@ export default function CustomCursor() {
       const deltaY = cursorPosition.y - prevMousePos.current.y;
       // Clamp rotation between -15 and 15 degrees based on vertical velocity
       // Negative deltaY (upward) = positive rotation, positive deltaY (downward) = negative rotation
-      const rotation = Math.max(-25, Math.min(25, -deltaY * 0.5));
+      const rotation = Math.max(-50, Math.min(50, -deltaY * 0.5));
       rotateMessageTo(rotation);
 
       // Update previous position
@@ -199,7 +199,8 @@ export default function CustomCursor() {
       const messageText = target.getAttribute('data-cursor-message');
       if (messageText) {
         setMessage(messageText);
-        messageFadeAnim.play();
+        // Restart from beginning to ensure it shows even if already playing
+        messageFadeAnim.restart();
       }
     };
 
@@ -220,6 +221,35 @@ export default function CustomCursor() {
       sizeAnimInteract.reverse();
       mouseInTarget.current = false;
     };
+
+    // Show navigation hint on project pages (first time only per session)
+    const showProjectNavigationHint = () => {
+      const isProjectPage = document.querySelector('.page-Project');
+      const hasSeenHint = sessionStorage.getItem('cursorNavigationHintShown');
+      const isDevelopment = process.env.NODE_ENV === 'development';
+
+      // In development, always show. In production, only show once per session
+      if (isProjectPage && (!hasSeenHint || isDevelopment)) {
+        // Wait a moment for page to settle
+        setTimeout(() => {
+          setMessage('tip: use ← → or esc');
+          messageFadeAnim.play();
+
+          // Auto-hide after 6 seconds
+          setTimeout(() => {
+            messageFadeAnim.reverse();
+          }, 6000);
+
+          // Mark as shown for this session (except in development)
+          if (!isDevelopment) {
+            sessionStorage.setItem('cursorNavigationHintShown', 'true');
+          }
+        }, 500);
+      }
+    };
+
+    // Check for project page hint
+    showProjectNavigationHint();
 
     // Add listeners
     document.addEventListener('mousemove', handleMouseMove);
@@ -250,8 +280,11 @@ export default function CustomCursor() {
 
     addTargetListeners();
 
-    // MutationObserver for dynamic elements
-    const observer = new MutationObserver(addTargetListeners);
+    // MutationObserver for dynamic elements and route changes
+    const observer = new MutationObserver(() => {
+      addTargetListeners();
+      showProjectNavigationHint(); // Check for project page on route change
+    });
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
