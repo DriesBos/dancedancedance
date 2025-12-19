@@ -10,6 +10,7 @@ export default function CustomCursor() {
   const isVisible = useRef(false);
   const mouseInTarget = useRef(false);
   const prevMousePos = useRef({ x: 0, y: 0 });
+  const rotationResetTimeout = useRef<NodeJS.Timeout | null>(null);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -164,10 +165,20 @@ export default function CustomCursor() {
 
       // Calculate velocity for tilt effect
       const deltaY = cursorPosition.y - prevMousePos.current.y;
-      // Clamp rotation between -15 and 15 degrees based on vertical velocity
+      // Clamp rotation between -25 and 25 degrees based on vertical velocity
       // Negative deltaY (upward) = positive rotation, positive deltaY (downward) = negative rotation
       const rotation = Math.max(-25, Math.min(25, -deltaY * 0.5));
       rotateMessageTo(rotation);
+
+      // Clear any existing rotation reset timeout
+      if (rotationResetTimeout.current) {
+        clearTimeout(rotationResetTimeout.current);
+      }
+
+      // Reset rotation to horizontal after movement stops
+      rotationResetTimeout.current = setTimeout(() => {
+        rotateMessageTo(0);
+      }, 150);
 
       // Update previous position
       prevMousePos.current = { x: cursorPosition.x, y: cursorPosition.y };
@@ -212,6 +223,11 @@ export default function CustomCursor() {
     const handleMouseLeaveWindow = () => {
       gsap.set([cursor, follower], { opacity: 0 });
       isVisible.current = false;
+
+      // Clear rotation reset timeout and reset rotation
+      if (rotationResetTimeout.current) {
+        clearTimeout(rotationResetTimeout.current);
+      }
       rotateMessageTo(0); // Reset rotation when leaving window
     };
 
@@ -226,13 +242,11 @@ export default function CustomCursor() {
     const showProjectNavigationHint = () => {
       const isProjectPage = document.querySelector('.page-Project');
       const hasSeenHint = sessionStorage.getItem('cursorNavigationHintShown');
-      const isDevelopment = process.env.NODE_ENV === 'development';
 
-      // In development, always show. In production, only show once per session
-      if (isProjectPage && (!hasSeenHint || isDevelopment)) {
+      if (isProjectPage && !hasSeenHint) {
         // Wait a moment for page to settle
         setTimeout(() => {
-          setMessage('tip: use ← → or esc');
+          setMessage("tip: use ←, → or 'esc'");
           messageFadeAnim.play();
 
           // Auto-hide after 6 seconds
@@ -240,10 +254,8 @@ export default function CustomCursor() {
             messageFadeAnim.reverse();
           }, 6000);
 
-          // Mark as shown for this session (except in development)
-          if (!isDevelopment) {
-            sessionStorage.setItem('cursorNavigationHintShown', 'true');
-          }
+          // Mark as shown for this session
+          sessionStorage.setItem('cursorNavigationHintShown', 'true');
         }, 500);
       }
     };
@@ -308,6 +320,12 @@ export default function CustomCursor() {
         target.removeEventListener('mouseenter', handleMessageEnter);
         target.removeEventListener('mouseleave', handleMessageLeave);
       });
+
+      // Clear rotation reset timeout
+      if (rotationResetTimeout.current) {
+        clearTimeout(rotationResetTimeout.current);
+      }
+
       observer.disconnect();
     };
   }, []);
