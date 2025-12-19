@@ -27,8 +27,6 @@ interface BlokProjectImagesListProps {
 const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
   const projects = await fetchProjects();
 
-  console.log('Fetched projects:', projects);
-
   const data = projects.data.stories.map((story: any) => {
     return {
       slug: story.slug,
@@ -40,8 +38,6 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
       external_link: story.content.external_link,
     };
   });
-
-  console.log('Fetched project data:', data);
 
   const highlights = data.filter((item: any) => item.highlight === true);
 

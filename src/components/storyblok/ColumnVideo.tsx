@@ -48,7 +48,6 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
     }
   }, [blok.pause, blok.loop]);
 
-  console.log('blok.video', blok);
   return (
     <div className="column column-Video" {...storyblokEditable(blok)}>
       <video

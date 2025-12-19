@@ -20,11 +20,6 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
     router.push(`/projects/${slug}`);
   };
 
-  console.log('BlokProject props:', {
-    title,
-    external_link,
-  });
-
   // Extract just the year from the date value
   const displayYear = year ? new Date(year).getFullYear() : null;
 
