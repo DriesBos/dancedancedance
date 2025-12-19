@@ -166,7 +166,7 @@ export default function CustomCursor() {
       const deltaY = cursorPosition.y - prevMousePos.current.y;
       // Clamp rotation between -15 and 15 degrees based on vertical velocity
       // Negative deltaY (upward) = positive rotation, positive deltaY (downward) = negative rotation
-      const rotation = Math.max(-50, Math.min(50, -deltaY * 0.5));
+      const rotation = Math.max(-25, Math.min(25, -deltaY * 0.5));
       rotateMessageTo(rotation);
 
       // Update previous position
