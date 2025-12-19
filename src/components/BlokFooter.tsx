@@ -37,7 +37,8 @@ const BlokFooter = () => {
           <a
             href="mailto:info@driesbos.com"
             target="_blank"
-            className="cursorInteract linkAnimation"
+            className="linkAnimation cursorMessage"
+            data-cursor-message="Let's talk"
           >
             <div className="hasExternalIcon">
               <span className="mailMobile">Email</span>

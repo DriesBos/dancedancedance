@@ -1,13 +1,16 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
   const isVisible = useRef(false);
   const mouseInTarget = useRef(false);
+  const prevMousePos = useRef({ x: 0, y: 0 });
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     // Skip on touch devices - no hover support
@@ -15,10 +18,12 @@ export default function CustomCursor() {
 
     const cursor = cursorRef.current;
     const follower = followerRef.current;
-    if (!cursor || !follower) return;
+    const messageContainer = messageRef.current;
+    if (!cursor || !follower || !messageContainer) return;
 
-    // Initial state - both cursors hidden and centered on cursor point
+    // Initial state - both cursors and message hidden and centered on cursor point
     gsap.set([cursor, follower], { opacity: 0, xPercent: -50, yPercent: -50 });
+    gsap.set(messageContainer, { opacity: 0, xPercent: 0, yPercent: 0 });
 
     // QuickTo for smooth follower movement
     const xFollowerTo = gsap.quickTo(follower, 'x', {
@@ -27,6 +32,22 @@ export default function CustomCursor() {
     });
     const yFollowerTo = gsap.quickTo(follower, 'y', {
       duration: 0.33,
+      ease: 'power3',
+    });
+
+    // QuickTo for smooth message container movement
+    const xMessageTo = gsap.quickTo(messageContainer, 'x', {
+      duration: 0.6,
+      ease: 'power3',
+    });
+    const yMessageTo = gsap.quickTo(messageContainer, 'y', {
+      duration: 0.6,
+      ease: 'power3',
+    });
+
+    // QuickTo for message rotation based on velocity
+    const rotateMessageTo = gsap.quickTo(messageContainer, 'rotation', {
+      duration: 0.6,
       ease: 'power3',
     });
 
@@ -43,6 +64,14 @@ export default function CustomCursor() {
       width: '2.7272727273rem',
       height: '2.7272727273rem',
       duration: 0.165,
+    });
+
+    // Message fade animation
+    const messageFadeAnim = gsap.timeline({ paused: true });
+    messageFadeAnim.to(messageContainer, {
+      opacity: 1,
+      duration: 0.3,
+      ease: 'power2.out',
     });
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -123,6 +152,25 @@ export default function CustomCursor() {
 
       // Main cursor always follows mouse directly (no delay)
       gsap.set(cursor, { x: cursorPosition.x, y: cursorPosition.y });
+
+      // Message container follows cursor with delay and slight offset
+      const remInPixels = parseFloat(
+        getComputedStyle(document.documentElement).fontSize
+      );
+      const xOffset = 0.4545454545 + 0.909090909 * remInPixels;
+      const yOffset = 0.4545454545 * remInPixels;
+      xMessageTo(cursorPosition.x + xOffset);
+      yMessageTo(cursorPosition.y + 0); // Offset below cursor
+
+      // Calculate velocity for tilt effect
+      const deltaY = cursorPosition.y - prevMousePos.current.y;
+      // Clamp rotation between -15 and 15 degrees based on vertical velocity
+      // Negative deltaY (upward) = positive rotation, positive deltaY (downward) = negative rotation
+      const rotation = Math.max(-25, Math.min(25, -deltaY * 0.5));
+      rotateMessageTo(rotation);
+
+      // Update previous position
+      prevMousePos.current = { x: cursorPosition.x, y: cursorPosition.y };
     };
 
     // Hover handlers for magnetic targets (magnetic + size)
@@ -145,10 +193,25 @@ export default function CustomCursor() {
       sizeAnimInteract.reverse();
     };
 
+    // Hover handlers for message targets
+    const handleMessageEnter = (e: Event) => {
+      const target = e.currentTarget as HTMLElement;
+      const messageText = target.getAttribute('data-cursor-message');
+      if (messageText) {
+        setMessage(messageText);
+        messageFadeAnim.play();
+      }
+    };
+
+    const handleMessageLeave = () => {
+      messageFadeAnim.reverse();
+    };
+
     // Hide cursors when mouse leaves window
     const handleMouseLeaveWindow = () => {
       gsap.set([cursor, follower], { opacity: 0 });
       isVisible.current = false;
+      rotateMessageTo(0); // Reset rotation when leaving window
     };
 
     // Reset size animations on click (for route changes where leave isn't triggered)
@@ -177,6 +240,12 @@ export default function CustomCursor() {
         target.addEventListener('mouseenter', handleInteractEnter);
         target.addEventListener('mouseleave', handleInteractLeave);
       });
+
+      const messageTargets = document.querySelectorAll('.cursorMessage');
+      messageTargets.forEach((target) => {
+        target.addEventListener('mouseenter', handleMessageEnter);
+        target.addEventListener('mouseleave', handleMessageLeave);
+      });
     };
 
     addTargetListeners();
@@ -201,12 +270,20 @@ export default function CustomCursor() {
         target.removeEventListener('mouseenter', handleInteractEnter);
         target.removeEventListener('mouseleave', handleInteractLeave);
       });
+      const messageTargets = document.querySelectorAll('.cursorMessage');
+      messageTargets.forEach((target) => {
+        target.removeEventListener('mouseenter', handleMessageEnter);
+        target.removeEventListener('mouseleave', handleMessageLeave);
+      });
       observer.disconnect();
     };
   }, []);
 
   return (
     <>
+      <div ref={messageRef} className="customCursor customCursor-Message">
+        {message}
+      </div>
       <div ref={followerRef} className="customCursor customCursor-Follower" />
       <div ref={cursorRef} className="customCursor customCursor-Main" />
     </>

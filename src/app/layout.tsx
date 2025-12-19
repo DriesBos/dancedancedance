@@ -18,7 +18,7 @@ import BlokFooter from '@/components/BlokFooter';
 import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
-import CustomCursor from '@/components/CustomCursor';
+import CursorLoader from '@/components/CursorLoader';
 
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
@@ -82,7 +82,7 @@ export default async function RootLayout({
       </head>
       <AppInitializer className={`body ${myFont.className}`}>
         <ProjectsProvider projects={projects}>
-          <CustomCursor />
+          <CursorLoader />
           <TitleSwitcher />
           <FaviconSwitcher />
           {process.env.NEXT_PUBLIC_GA_ID && (
