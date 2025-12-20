@@ -7,6 +7,7 @@ interface SbPageData extends SbBlokData {
     alt: string;
   };
   caption?: string;
+  side_caption?: boolean;
 }
 
 interface ColumnImageProps {
@@ -15,7 +16,11 @@ interface ColumnImageProps {
 
 const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
   return (
-    <div className="column column-Image" {...storyblokEditable(blok)}>
+    <div
+      className="column column-Image"
+      {...storyblokEditable(blok)}
+      data-caption-side={blok.side_caption}
+    >
       <Image
         src={blok.image.filename}
         alt={blok.image.alt}
