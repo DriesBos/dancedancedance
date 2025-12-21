@@ -33,7 +33,6 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const progressRef = useRef<HTMLDivElement>(null);
   const itemRef = useRef<HTMLAnchorElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const preloadedVideosRef = useRef<Map<string, HTMLVideoElement>>(new Map());
 
   // Get current and next items for conditional rendering
   const currentItem = blok.body?.[activeIndex];
@@ -76,65 +75,6 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     );
   }, [activeIndex]);
 
-  // Preload all videos on mount
-  useEffect(() => {
-    if (!blok.body) return;
-
-    blok.body.forEach((item) => {
-      if (item.video_link && !preloadedVideosRef.current.has(item._uid)) {
-        const video = document.createElement('video');
-        video.src = item.video_link;
-        video.muted = true;
-        video.playsInline = true;
-        video.preload = 'auto';
-        if (item.media?.filename) {
-          video.poster = item.media.filename;
-        }
-
-        // Load the video
-        video.load();
-
-        preloadedVideosRef.current.set(item._uid, video);
-      }
-    });
-
-    // Cleanup on unmount
-    return () => {
-      preloadedVideosRef.current.forEach((video) => {
-        video.src = '';
-        video.load();
-      });
-      preloadedVideosRef.current.clear();
-    };
-  }, [blok.body]);
-
-  // Play video when slide becomes active
-  useEffect(() => {
-    if (!videoRef.current || !currentItem?.video_link) return;
-
-    const video = videoRef.current;
-
-    // Reset video to start
-    video.currentTime = 0;
-
-    // Safari sometimes needs a manual play() call after src is set
-    const playPromise = video.play();
-
-    if (playPromise !== undefined) {
-      playPromise.catch((error) => {
-        // Auto-play was prevented, but muted+playsInline should work
-        console.warn('Video autoplay failed:', error);
-      });
-    }
-
-    // Pause video when component unmounts or slide changes
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
-    };
-  }, [activeIndex, currentItem?.video_link]);
-
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
 
@@ -164,18 +104,14 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         <div className="blok-ProjectSlider-Image">
           {currentItem.video_link && currentItem.media.filename ? (
             <video
-              key={`video-${activeIndex}-${currentItem._uid}`}
               ref={videoRef}
               src={currentItem.video_link}
               muted
               autoPlay
               playsInline
               preload="auto"
-              loop={false}
               poster={currentItem.media?.filename}
               style={{ width: '100%', height: 'auto' }}
-              // Safari-specific attributes
-              webkit-playsinline="true"
             />
           ) : (
             currentItem.media &&
@@ -216,6 +152,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
               src={nextItem.video_link}
               preload="auto"
               muted
+              playsInline
               poster={nextItem.media?.filename}
             />
           ) : (
@@ -236,34 +173,6 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           )}
         </div>
       )}
-
-      {/* Preload all videos in hidden container */}
-      <div
-        style={{
-          position: 'absolute',
-          opacity: 0,
-          pointerEvents: 'none',
-          width: 0,
-          height: 0,
-          overflow: 'hidden',
-        }}
-      >
-        {blok.body?.map((item, index) => {
-          if (!item.video_link || index === activeIndex) return null;
-
-          return (
-            <video
-              key={`preload-${item._uid}`}
-              src={item.video_link}
-              muted
-              playsInline
-              preload="auto"
-              poster={item.media?.filename}
-              webkit-playsinline="true"
-            />
-          );
-        })}
-      </div>
     </div>
   );
 };
