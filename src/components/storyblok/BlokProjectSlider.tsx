@@ -32,6 +32,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const progressRef = useRef<HTMLDivElement>(null);
   const itemRef = useRef<HTMLAnchorElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Get current and next items for conditional rendering
   const currentItem = blok.body?.[activeIndex];
@@ -74,6 +75,33 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     );
   }, [activeIndex]);
 
+  // Play video when slide becomes active
+  useEffect(() => {
+    if (!videoRef.current || !currentItem?.video_link) return;
+
+    const video = videoRef.current;
+
+    // Reset video to start
+    video.currentTime = 0;
+
+    // Safari sometimes needs a manual play() call after src is set
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        // Auto-play was prevented, but muted+playsInline should work
+        console.warn('Video autoplay failed:', error);
+      });
+    }
+
+    // Pause video when component unmounts or slide changes
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+    };
+  }, [activeIndex, currentItem?.video_link]);
+
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
 
@@ -101,15 +129,20 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         href={currentItem.link?.cached_url || '#'}
       >
         <div className="blok-ProjectSlider-Image">
-          {currentItem.video_link && currentItem.media ? (
+          {currentItem.video_link && currentItem.media.filename ? (
             <video
+              key={`video-${activeIndex}-${currentItem._uid}`}
+              ref={videoRef}
               src={currentItem.video_link}
               muted
               autoPlay
               playsInline
               preload="auto"
+              loop={false}
               poster={currentItem.media?.filename}
               style={{ width: '100%', height: 'auto' }}
+              // Safari-specific attributes
+              webkit-playsinline="true"
             />
           ) : (
             currentItem.media &&

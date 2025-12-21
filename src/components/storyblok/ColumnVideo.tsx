@@ -28,6 +28,14 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
 
     const video = videoRef.current;
 
+    // Ensure video plays on Safari
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn('Video autoplay failed:', error);
+      });
+    }
+
     // If pause > 0, add delay between loops; otherwise use native loop
     if (blok.pause && blok.pause > 0) {
       const handleEnded = () => {
@@ -59,13 +67,15 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
         ref={videoRef}
         src={blok.link}
         muted
-        loop={false} // Disable native loop to control custom loop
+        loop={blok.loop}
         autoPlay
         playsInline
         preload="auto"
         poster={blok.placeholder?.filename}
         width="100%"
         height="auto"
+        // Safari-specific attributes
+        webkit-playsinline="true"
       />
       {blok.caption && <div className="column-Caption">{blok.caption}</div>}
     </div>
