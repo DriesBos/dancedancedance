@@ -1,0 +1,49 @@
+/* Mux Player Custom Styles */
+
+/* Ensure mux-player web component takes full width and maintains aspect ratio */
+mux-player {
+  display: block !important;
+  width: 100% !important;
+  aspect-ratio: 16 / 9; /* Default aspect ratio, will be overridden by video */
+  max-width: 100% !important;
+  background: transparent !important;
+  position: relative !important;
+}
+
+/* Target the shadow DOM video element */
+mux-player::part(video) {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Alternative: Target via the player's internal structure */
+mux-player video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  max-width: 100% !important;
+}
+
+/* Ensure poster image also fills properly */
+mux-player img,
+mux-player::part(poster) {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Remove any default player container sizing */
+mux-player .player-container,
+mux-player [part~="layer"] {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Custom class for our implementation */
+.muxPlayer {
+  display: block !important;
+  width: 100% !important;
+  aspect-ratio: 16 / 9;
+}
+

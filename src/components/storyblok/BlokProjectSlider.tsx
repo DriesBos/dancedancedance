@@ -6,13 +6,16 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import MuxPlayer from '../MuxPlayer';
 
 interface SbPageData extends SbBlokData {
   body: Array<{
     _uid: string;
     name: string;
     year: string;
-    video_link?: string;
+    video_link?: string; // Legacy: direct video URL
+    mux_playback_id?: string; // New: Mux playback ID
+    aspect_ratio?: string; // Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
     media?: {
       filename: string;
       alt: string;
@@ -102,7 +105,18 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         href={currentItem.link?.cached_url || '#'}
       >
         <div className="blok-ProjectSlider-Image">
-          {currentItem.video_link && currentItem.media.filename ? (
+          {currentItem.mux_playback_id ? (
+            <MuxPlayer
+              playbackId={currentItem.mux_playback_id}
+              poster={currentItem.media?.filename}
+              className="muxPlayer"
+              aspectRatio={currentItem.aspect_ratio || '16 / 9'}
+              muted
+              autoPlay
+              playsInline
+              preload="auto"
+            />
+          ) : currentItem.video_link && currentItem.media?.filename ? (
             <video
               ref={videoRef}
               src={currentItem.video_link}
@@ -147,7 +161,16 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       {/* Preload next media (hidden, but loads in background) */}
       {nextItem && (
         <div style={{ display: 'none' }}>
-          {nextItem.video_link && nextItem.media ? (
+          {nextItem.mux_playback_id ? (
+            <MuxPlayer
+              playbackId={nextItem.mux_playback_id}
+              poster={nextItem.media?.filename}
+              aspectRatio={nextItem.aspect_ratio || '16 / 9'}
+              preload="auto"
+              muted
+              playsInline
+            />
+          ) : nextItem.video_link && nextItem.media ? (
             <video
               src={nextItem.video_link}
               preload="auto"
