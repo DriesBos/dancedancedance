@@ -60,8 +60,6 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
 }) => {
   const playerRef = useRef<any>(null);
 
-  console.log('aspectRatio', aspectRatio);
-
   // Handle pause between loops (custom feature)
   useEffect(() => {
     if (!playerRef.current || !loop || !pause || pause <= 0) return;

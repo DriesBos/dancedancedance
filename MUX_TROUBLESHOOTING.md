@@ -54,36 +54,6 @@ Look for the `playback_ids` array in the response:
 }
 ```
 
-#### Option C: Create API Route (Automated)
-Create a Next.js API route to fetch the playback ID:
-
-```typescript
-// app/api/mux/get-playback-id/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { getPlaybackIdFromAsset } from '@/lib/mux-utils';
-
-export async function GET(request: NextRequest) {
-  const assetId = request.nextSearchParams.get('assetId');
-  
-  if (!assetId) {
-    return NextResponse.json({ error: 'Asset ID required' }, { status: 400 });
-  }
-  
-  const playbackId = await getPlaybackIdFromAsset(assetId);
-  
-  if (!playbackId) {
-    return NextResponse.json({ error: 'Playback ID not found' }, { status: 404 });
-  }
-  
-  return NextResponse.json({ playbackId });
-}
-```
-
-Then call it:
-```bash
-curl http://localhost:3000/api/mux/get-playback-id?assetId=YOUR_ASSET_ID
-```
-
 ---
 
 ## 2. Asset Has "Signed" Playback Policy 🔒
@@ -218,13 +188,13 @@ This will show you all the details including playback IDs.
 
 ---
 
-## Need to Install Mux SDK?
+## Advanced: Programmatic Access
 
-If you want to use the API utilities:
+If you need to programmatically fetch playback IDs from asset IDs, you can install the Mux Node SDK:
 
 ```bash
 pnpm add @mux/mux-node
 ```
 
-This allows you to programmatically fetch playback IDs from asset IDs.
+Then create server-side utilities to interact with the Mux API. This is only needed for advanced use cases where you're managing videos programmatically.
 
