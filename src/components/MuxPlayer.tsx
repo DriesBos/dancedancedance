@@ -1,7 +1,7 @@
 'use client';
 
 import MuxPlayerReact from '@mux/mux-player-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '@/assets/styles/mux-player.css';
 
 interface MuxPlayerProps {
@@ -14,6 +14,8 @@ interface MuxPlayerProps {
   pause?: number; // Delay in seconds between loops (only works when loop is true)
   preload?: 'auto' | 'metadata' | 'none';
   aspectRatio?: string; // Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
+  dynamicAspectRatio?: boolean; // Auto-detect aspect ratio from video metadata (default: true)
+  noControls?: boolean; // Hide player controls (default: false)
   style?: React.CSSProperties;
   className?: string;
   accentColor?: string;
@@ -35,6 +37,8 @@ interface MuxPlayerProps {
  * @param pause - Optional delay in seconds between loops (custom feature)
  * @param preload - Preload strategy: 'auto', 'metadata', or 'none'
  * @param aspectRatio - Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
+ * @param dynamicAspectRatio - Auto-detect aspect ratio from video metadata (default: true)
+ * @param noControls - Hide player controls (default: false)
  * @param style - Inline styles
  * @param className - CSS class name
  * @param accentColor - Mux Player accent color
@@ -51,6 +55,8 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
   pause,
   preload = 'auto',
   aspectRatio = '16 / 9',
+  dynamicAspectRatio = true,
+  noControls = true,
   style,
   className,
   accentColor,
@@ -59,6 +65,44 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
   ...rest
 }) => {
   const playerRef = useRef<any>(null);
+  const [detectedAspectRatio, setDetectedAspectRatio] = useState<string | null>(
+    null
+  );
+
+  // Handle metadata loaded to detect aspect ratio
+  useEffect(() => {
+    if (!playerRef.current || !dynamicAspectRatio) return;
+
+    const player = playerRef.current;
+
+    const handleLoadedMetadata = () => {
+      // Access the internal video element
+      const video = player.media || player.querySelector('video');
+
+      if (video && video.videoWidth && video.videoHeight) {
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        const calculatedRatio = `${width} / ${height}`;
+
+        console.log('Detected video dimensions:', {
+          width,
+          height,
+          ratio: calculatedRatio,
+        });
+        setDetectedAspectRatio(calculatedRatio);
+      }
+    };
+
+    // Try to get metadata immediately if already loaded
+    handleLoadedMetadata();
+
+    // Listen for loadedmetadata event
+    player.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      player.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [dynamicAspectRatio, playbackId]);
 
   // Handle pause between loops (custom feature)
   useEffect(() => {
@@ -89,6 +133,12 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
   // Determine if we should use native loop or custom pause loop
   const shouldUseNativeLoop = loop && (!pause || pause <= 0);
 
+  // Use detected aspect ratio if available and dynamicAspectRatio is enabled, otherwise use provided aspectRatio
+  const finalAspectRatio =
+    dynamicAspectRatio && detectedAspectRatio
+      ? detectedAspectRatio
+      : aspectRatio;
+
   return (
     <MuxPlayerReact
       ref={playerRef}
@@ -100,9 +150,10 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
       playsInline={playsInline}
       preload={preload}
       streamType="on-demand"
+      nohotkeys={noControls}
       style={{
         width: '100%',
-        aspectRatio: aspectRatio,
+        aspectRatio: finalAspectRatio,
         display: 'block',
         position: 'relative',
         ...style,
@@ -111,6 +162,7 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
       accentColor={accentColor}
       primaryColor={primaryColor}
       secondaryColor={secondaryColor}
+      {...(noControls ? { controls: false } : {})}
       {...rest}
     />
   );

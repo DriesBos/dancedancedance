@@ -3,15 +3,34 @@
  * 
  * This file shows various ways to use the MuxPlayer component
  * in your Next.js + Storyblok project
+ * 
+ * NEW: Dynamic aspect ratio detection from video metadata!
  */
 
 import MuxPlayer from '@/components/MuxPlayer';
 
-// Example 1: Basic usage with autoplay and loop
-export function BasicVideoExample() {
+// Example 1: Auto-detect aspect ratio (RECOMMENDED - Default behavior)
+export function AutoAspectRatioExample() {
   return (
     <MuxPlayer
       playbackId="your-mux-playback-id"
+      autoPlay
+      loop
+      muted
+      playsInline
+      // dynamicAspectRatio defaults to true
+      // Aspect ratio is automatically detected from video metadata!
+    />
+  );
+}
+
+// Example 2: Force specific aspect ratio (override auto-detection)
+export function ForceAspectRatioExample() {
+  return (
+    <MuxPlayer
+      playbackId="your-mux-playback-id"
+      aspectRatio="1 / 1"
+      dynamicAspectRatio={false} // Disable auto-detection
       autoPlay
       loop
       muted
@@ -20,26 +39,27 @@ export function BasicVideoExample() {
   );
 }
 
-// Example 2: With poster image and custom aspect ratio
+// Example 3: With poster image (auto-detect aspect ratio)
 export function VideoWithPosterExample() {
   return (
     <MuxPlayer
       playbackId="your-mux-playback-id"
       poster="https://example.com/poster.jpg"
-      aspectRatio="16 / 9"
       autoPlay
       muted
       playsInline
+      // Aspect ratio auto-detected from video
     />
   );
 }
 
-// Example 3: Square video (1:1) for social media
+// Example 4: Square video with forced aspect ratio for Instagram
 export function SquareVideoExample() {
   return (
     <MuxPlayer
       playbackId="your-mux-playback-id"
       aspectRatio="1 / 1"
+      dynamicAspectRatio={false}
       autoPlay
       loop
       muted
@@ -48,26 +68,12 @@ export function SquareVideoExample() {
   );
 }
 
-// Example 4: Portrait video (9:16) for mobile
+// Example 5: Portrait video - auto-detected as 9:16
 export function PortraitVideoExample() {
   return (
     <MuxPlayer
       playbackId="your-mux-playback-id"
-      aspectRatio="9 / 16"
-      autoPlay
-      muted
-      playsInline
-    />
-  );
-}
-
-// Example 5: Cinematic widescreen (21:9)
-export function CinematicVideoExample() {
-  return (
-    <MuxPlayer
-      playbackId="your-mux-playback-id"
-      aspectRatio="21 / 9"
-      poster="https://example.com/poster.jpg"
+      // If video is 1080x1920, it will auto-detect as "1080 / 1920" (9:16)
       autoPlay
       muted
       playsInline
@@ -154,7 +160,7 @@ export function FullFeaturedVideoExample() {
   );
 }
 
-// Example 10: Use in a Storyblok component with dynamic aspect ratio
+// Example 10: Use in Storyblok with smart aspect ratio handling
 export function StoryblokVideoExample({ blok }: any) {
   // Check if Mux playback ID exists
   if (!blok.mux_playback_id) {
@@ -166,7 +172,8 @@ export function StoryblokVideoExample({ blok }: any) {
       <MuxPlayer
         playbackId={blok.mux_playback_id}
         poster={blok.poster_image?.filename}
-        aspectRatio={blok.aspect_ratio || '16 / 9'} // Dynamic from Storyblok
+        aspectRatio={blok.aspect_ratio || '16 / 9'} // Fallback if not detected
+        dynamicAspectRatio={!blok.aspect_ratio} // Auto-detect only if not manually set
         loop={blok.loop}
         pause={blok.pause_duration}
         muted
@@ -176,6 +183,26 @@ export function StoryblokVideoExample({ blok }: any) {
       {blok.caption && (
         <p className="video-caption">{blok.caption}</p>
       )}
+    </div>
+  );
+}
+
+// Example 11: Mixed content with auto-detection
+export function MixedContentExample({ videos }: { videos: any[] }) {
+  return (
+    <div className="video-grid">
+      {videos.map((video) => (
+        <MuxPlayer
+          key={video.id}
+          playbackId={video.mux_playback_id}
+          aspectRatio={video.aspect_ratio} // Use manual if provided
+          dynamicAspectRatio={!video.aspect_ratio} // Auto-detect if not provided
+          poster={video.poster}
+          autoPlay={false}
+          muted
+          playsInline
+        />
+      ))}
     </div>
   );
 }

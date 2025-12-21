@@ -10,6 +10,30 @@ mux-player {
   position: relative !important;
 }
 
+/* Hide controls completely */
+mux-player[controls="false"],
+mux-player[nocontrols] {
+  pointer-events: none;
+}
+
+/* Target control elements and hide them */
+mux-player::part(bottom),
+mux-player::part(center),
+mux-player::part(top),
+mux-player::part(gesture-layer),
+mux-player::part(play-button),
+mux-player::part(seek-backward-button),
+mux-player::part(seek-forward-button),
+mux-player::part(volume-range),
+mux-player::part(time-range),
+mux-player::part(time-display),
+mux-player::part(duration-display),
+mux-player::part(mute-button) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
 /* Target the shadow DOM video element */
 mux-player::part(video) {
   object-fit: cover !important;
@@ -45,5 +69,11 @@ mux-player [part~="layer"] {
   display: block !important;
   width: 100% !important;
   aspect-ratio: 16 / 9;
+}
+
+/* Remove pointer events from controls when hidden */
+.muxPlayer[controls="false"],
+.muxPlayer[nocontrols] {
+  pointer-events: none;
 }
 

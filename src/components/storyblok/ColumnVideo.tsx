@@ -39,6 +39,8 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
           className="muxPlayer"
           pause={blok.pause}
           aspectRatio={blok.aspect_ratio || '16 / 9'}
+          dynamicAspectRatio={!blok.aspect_ratio} // Auto-detect if not manually set
+          noControls={true} // Hide video controls
           muted
           autoPlay
           playsInline

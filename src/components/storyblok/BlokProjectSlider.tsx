@@ -111,6 +111,8 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
               poster={currentItem.media?.filename}
               className="muxPlayer"
               aspectRatio={currentItem.aspect_ratio || '16 / 9'}
+              dynamicAspectRatio={!currentItem.aspect_ratio} // Auto-detect if not manually set
+              noControls={true} // Hide video controls
               muted
               autoPlay
               playsInline
@@ -166,6 +168,8 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
               playbackId={nextItem.mux_playback_id}
               poster={nextItem.media?.filename}
               aspectRatio={nextItem.aspect_ratio || '16 / 9'}
+              dynamicAspectRatio={!nextItem.aspect_ratio} // Auto-detect if not manually set
+              noControls={true} // Hide video controls
               preload="auto"
               muted
               playsInline
