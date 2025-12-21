@@ -101,13 +101,14 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         href={currentItem.link?.cached_url || '#'}
       >
         <div className="blok-ProjectSlider-Image">
-          {currentItem.video_link ? (
+          {currentItem.video_link && currentItem.media ? (
             <video
               src={currentItem.video_link}
               muted
               autoPlay
               playsInline
               preload="auto"
+              poster={currentItem.media?.filename}
               style={{ width: '100%', height: 'auto' }}
             />
           ) : (
@@ -144,8 +145,13 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       {/* Preload next media (hidden, but loads in background) */}
       {nextItem && (
         <div style={{ display: 'none' }}>
-          {nextItem.video_link ? (
-            <video src={nextItem.video_link} preload="auto" muted />
+          {nextItem.video_link && nextItem.media ? (
+            <video
+              src={nextItem.video_link}
+              preload="auto"
+              muted
+              poster={nextItem.media?.filename}
+            />
           ) : (
             nextItem.media &&
             typeof nextItem.media === 'object' &&
