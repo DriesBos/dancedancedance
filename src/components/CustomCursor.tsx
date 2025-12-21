@@ -252,7 +252,7 @@ export default function CustomCursor() {
           // Auto-hide after 6 seconds
           setTimeout(() => {
             messageFadeAnim.reverse();
-          }, 6000);
+          }, 4000);
 
           // Mark as shown for this session
           sessionStorage.setItem('cursorNavigationHintShown', 'true');
