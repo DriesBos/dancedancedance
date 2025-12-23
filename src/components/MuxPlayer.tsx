@@ -7,6 +7,7 @@ import '@/assets/styles/mux-player.css';
 interface MuxPlayerProps {
   playbackId: string;
   poster?: string;
+  placeholderTime?: number; // Time in seconds for Mux auto-generated placeholder (default: 0)
   loop?: boolean;
   muted?: boolean;
   autoPlay?: boolean;
@@ -30,7 +31,8 @@ interface MuxPlayerProps {
  * Reusable Mux Player component for Next.js + Storyblok
  *
  * @param playbackId - The Mux playback ID (required)
- * @param poster - URL for the poster image
+ * @param poster - URL for custom poster image (if not provided, Mux auto-generates one)
+ * @param placeholderTime - Time in seconds for Mux auto-generated placeholder (default: 0)
  * @param loop - Whether to loop the video
  * @param muted - Whether to mute the video
  * @param autoPlay - Whether to autoplay the video
@@ -50,6 +52,7 @@ interface MuxPlayerProps {
 const MuxPlayer: React.FC<MuxPlayerProps> = ({
   playbackId,
   poster,
+  placeholderTime = 0,
   loop = false,
   muted = true,
   autoPlay = false,
@@ -149,6 +152,11 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
       ref={playerRef}
       playbackId={playbackId}
       poster={poster}
+      placeholder={
+        poster
+          ? undefined
+          : `https://image.mux.com/${playbackId}/thumbnail.jpg?time=${placeholderTime}`
+      }
       loop={shouldUseNativeLoop}
       muted={muted}
       autoPlay={autoPlay}
