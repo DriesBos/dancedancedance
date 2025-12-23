@@ -2,12 +2,20 @@
 
 import MuxPlayerReact from '@mux/mux-player-react/lazy';
 import { useEffect, useRef, useState } from 'react';
+import { createBlurUp } from '@mux/blurup';
 import '@/assets/styles/mux-player.css';
 
 interface MuxPlayerProps {
   playbackId: string;
   poster?: string;
   placeholderTime?: number; // Time in seconds for Mux auto-generated placeholder (default: 0)
+  blurUpOptions?: {
+    // BlurUp customization options
+    width?: string; // Width of blur placeholder (default: 100%)
+    height?: string; // Height of blur placeholder (default: 100%)
+    blur?: number; // Gaussian blur standard deviation (default: 20)
+    quality?: number; // Output quality, >= 1 (default: 1)
+  };
   loop?: boolean;
   muted?: boolean;
   autoPlay?: boolean;
@@ -33,6 +41,7 @@ interface MuxPlayerProps {
  * @param playbackId - The Mux playback ID (required)
  * @param poster - URL for custom poster image (if not provided, Mux auto-generates one)
  * @param placeholderTime - Time in seconds for Mux auto-generated placeholder (default: 0)
+ * @param blurUpOptions - Options for BlurUp placeholder generation
  * @param loop - Whether to loop the video
  * @param muted - Whether to mute the video
  * @param autoPlay - Whether to autoplay the video
@@ -53,6 +62,7 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
   playbackId,
   poster,
   placeholderTime = 0,
+  blurUpOptions,
   loop = false,
   muted = true,
   autoPlay = false,
@@ -74,6 +84,40 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
   const [detectedAspectRatio, setDetectedAspectRatio] = useState<string | null>(
     null
   );
+  const [blurDataURL, setBlurDataURL] = useState<string | null>(null);
+
+  // Generate BlurUp placeholder for smooth loading experience
+  useEffect(() => {
+    let isMounted = true;
+
+    const generateBlurUp = async () => {
+      try {
+        const options = {
+          time: placeholderTime,
+          ...blurUpOptions,
+        };
+
+        const { blurDataURL: generatedBlurDataURL } = await createBlurUp(
+          playbackId,
+          options
+        );
+
+        if (isMounted) {
+          setBlurDataURL(generatedBlurDataURL);
+        }
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Failed to generate BlurUp placeholder:', error);
+        }
+      }
+    };
+
+    generateBlurUp();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [playbackId, placeholderTime, blurUpOptions]);
 
   // Handle metadata loaded to detect aspect ratio
   useEffect(() => {
@@ -147,16 +191,19 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
       ? detectedAspectRatio
       : aspectRatio;
 
+  // Determine the placeholder strategy:
+  // 1. If poster provided, show blurDataURL as background while poster loads
+  // 2. If no poster, show blurDataURL then Mux thumbnail
+  const placeholderImage = poster
+    ? undefined
+    : `https://image.mux.com/${playbackId}/thumbnail.jpg?time=${placeholderTime}`;
+
   return (
     <MuxPlayerReact
       ref={playerRef}
       playbackId={playbackId}
       poster={poster}
-      placeholder={
-        poster
-          ? undefined
-          : `https://image.mux.com/${playbackId}/thumbnail.jpg?time=${placeholderTime}`
-      }
+      placeholder={blurDataURL || placeholderImage}
       loop={shouldUseNativeLoop}
       muted={muted}
       autoPlay={autoPlay}

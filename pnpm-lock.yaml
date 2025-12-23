@@ -18,6 +18,9 @@ importers:
       '@mailchimp/mailchimp_marketing':
         specifier: ^3.0.80
         version: 3.0.80
+      '@mux/blurup':
+        specifier: ^1.0.2
+        version: 1.0.2
       '@mux/mux-player-react':
         specifier: ^3.10.2
         version: 3.10.2(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -294,6 +297,9 @@ packages:
   '@mailchimp/mailchimp_marketing@3.0.80':
     resolution: {integrity: sha512-Cgz0xPb+1DUjmrl5whAsmqfAChBko+Wf4/PLQE4RvwfPlcq2agfHr1QFiXEhZ8e+GQwQ3hZQn9iLGXwIXwxUCg==}
     engines: {node: '>=10.0.0'}
+
+  '@mux/blurup@1.0.2':
+    resolution: {integrity: sha512-MKn4yyXmmP2YM7CxmJgWq/COsK/YD/+y6pL56lIPHHF/QjFoW3iEpA7rYFy1/BcU0IwJ1ppLRNjksGFOhmIYKQ==}
 
   '@mux/mux-data-google-ima@0.2.8':
     resolution: {integrity: sha512-0ZEkHdcZ6bS8QtcjFcoJeZxJTpX7qRIledf4q1trMWPznugvtajCjCM2kieK/pzkZj1JM6liDRFs1PJSfVUs2A==}
@@ -1368,6 +1374,11 @@ packages:
   ignore@7.0.5:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
+
+  image-dimensions@2.5.0:
+    resolution: {integrity: sha512-CKZPHjAEtSg9lBV9eER0bhNn/yrY7cFEQEhkwjLhqLY+Na8lcP1pEyWsaGMGc8t2qbKWA/tuqbhFQpOKGN72Yw==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   immutable@5.1.4:
     resolution: {integrity: sha512-p6u1bG3YSnINT5RQmx/yRZBpenIl30kVxkTLDyHLIMk0gict704Q9n+thfDI7lTRm9vXdDYutVzXhzcThxTnXA==}
@@ -2527,6 +2538,10 @@ snapshots:
       superagent: 3.8.1
     transitivePeerDependencies:
       - supports-color
+
+  '@mux/blurup@1.0.2':
+    dependencies:
+      image-dimensions: 2.5.0
 
   '@mux/mux-data-google-ima@0.2.8':
     dependencies:
@@ -3776,6 +3791,8 @@ snapshots:
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
+
+  image-dimensions@2.5.0: {}
 
   immutable@5.1.4: {}
 
