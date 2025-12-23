@@ -1,5 +1,17 @@
 /* Mux Player Custom Styles */
 
+/*
+ * iOS Safari Black Line Fix
+ * -------------------------
+ * iOS Safari sometimes shows 1px black lines around videos due to
+ * subpixel rendering and aspect ratio rounding issues.
+ * 
+ * Solution: Scale video elements by 1.002 (0.2% larger) with overflow: hidden
+ * - transform: scale(1.002) = 2px larger on a 1000px video
+ * - Imperceptible zoom, completely hides black lines
+ * - Alternative values if needed: 1.001 (1px) or 1.003 (3px)
+ */
+
 /* Ensure mux-player web component takes full width and maintains aspect ratio */
 mux-player {
   display: block !important;
@@ -8,6 +20,7 @@ mux-player {
   max-width: 100% !important;
   background: transparent !important;
   position: relative !important;
+  overflow: hidden !important; /* Prevent black lines from showing */
 }
 
 /* Hide controls completely */
@@ -39,6 +52,9 @@ mux-player::part(video) {
   object-fit: cover !important;
   width: 100% !important;
   height: 100% !important;
+  /* Scale slightly larger to prevent 1px black lines on iOS Safari */
+  transform: scale(1.002) !important;
+  transform-origin: center center !important;
 }
 
 /* Alternative: Target via the player's internal structure */
@@ -47,6 +63,9 @@ mux-player video {
   height: 100% !important;
   object-fit: cover !important;
   max-width: 100% !important;
+  /* Scale slightly larger to prevent 1px black lines on iOS Safari */
+  transform: scale(1.002) !important;
+  transform-origin: center center !important;
 }
 
 /* Ensure poster image also fills properly */
@@ -55,6 +74,9 @@ mux-player::part(poster) {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
+  /* Scale slightly larger to prevent 1px black lines on iOS Safari */
+  transform: scale(1.002) !important;
+  transform-origin: center center !important;
 }
 
 /* Remove any default player container sizing */
@@ -70,6 +92,12 @@ mux-player [part~='layer'] {
   width: 100% !important;
   aspect-ratio: 16 / 9;
   --loading-indicator: none;
+  overflow: hidden !important; /* Prevent black lines from showing */
+  /* iOS Safari specific fixes */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* Remove pointer events from controls when hidden */
