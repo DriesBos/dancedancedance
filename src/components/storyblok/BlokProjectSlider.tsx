@@ -31,27 +31,139 @@ interface BlokProjectSliderProps {
   blok: SbPageData;
 }
 
+// Separate component for each slide item
+interface SlideItemProps {
+  item: SbPageData['body'][0];
+  isActive: boolean;
+  index: number;
+  progressRef?: React.RefObject<HTMLDivElement>;
+}
+
+const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const muxPlayerRef = useRef<any>(null);
+
+  // Control video playback based on isActive state
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (item.video_link && video) {
+      if (isActive) {
+        // Play video when active
+        video.currentTime = 0; // Reset to start
+        video.play().catch((err) => {
+          console.warn('Video play failed:', err);
+        });
+      } else {
+        // Pause and reset when inactive
+        video.pause();
+        video.currentTime = 0;
+      }
+    }
+  }, [isActive, item.video_link]);
+
+  // Control MuxPlayer playback
+  useEffect(() => {
+    const muxPlayer = muxPlayerRef.current;
+
+    if (item.mux_playback_id && muxPlayer) {
+      if (isActive) {
+        muxPlayer.currentTime = 0;
+        muxPlayer.play().catch((err: any) => {
+          console.warn('MuxPlayer play failed:', err);
+        });
+      } else {
+        muxPlayer.pause();
+        muxPlayer.currentTime = 0;
+      }
+    }
+  }, [isActive, item.mux_playback_id]);
+
+  const renderMedia = () => {
+    if (item.mux_playback_id) {
+      return (
+        <MuxPlayer
+          ref={muxPlayerRef}
+          playbackId={item.mux_playback_id}
+          poster={item.media?.filename}
+          className="muxPlayer"
+          aspectRatio={item.aspect_ratio || '16 / 9'}
+          dynamicAspectRatio={!item.aspect_ratio}
+          noControls={true}
+          muted
+          playsInline
+          preload="auto"
+        />
+      );
+    } else if (item.video_link && item.media?.filename) {
+      return (
+        <video
+          ref={videoRef}
+          src={item.video_link}
+          muted
+          playsInline
+          preload="auto"
+          poster={item.media?.filename}
+          style={{ width: '100%', height: 'auto' }}
+        />
+      );
+    } else if (
+      item.media &&
+      typeof item.media === 'object' &&
+      'filename' in item.media
+    ) {
+      return (
+        <Image
+          src={(item.media as any).filename}
+          alt={(item.name as string) || 'Project Image'}
+          width={0}
+          height={0}
+          sizes="100vw"
+          quality={80}
+          priority={index === 0} // Only prioritize first image
+          style={{ width: '100%', height: 'auto' }}
+        />
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Link
+      className="blok-ProjectSlider-Item cursorInteract"
+      href={item.link?.cached_url || '#'}
+      data-active={isActive}
+    >
+      <div className="blok-ProjectSlider-Image">{renderMedia()}</div>
+      <div className="blok-ProjectSlider-Caption">
+        <div className="blok-ProjectSlider-Caption-Title">
+          <span>Featured</span>
+          {isActive && progressRef && (
+            <div className="blok-ProjectSlider-ProgressWrapper">
+              <div className="blok-ProjectSlider-Progress" ref={progressRef} />
+            </div>
+          )}
+          {String(item.name)}
+        </div>
+        <div className="blok-ProjectSlider-Caption-Year">{item.year}</div>
+      </div>
+    </Link>
+  );
+};
+
 const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const progressRef = useRef<HTMLDivElement>(null);
-  const itemRef = useRef<HTMLAnchorElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Get current and next items for conditional rendering
   const currentItem = blok.body?.[activeIndex];
-  const nextIndex = blok.body ? (activeIndex + 1) % blok.body.length : 0;
-  const nextItem = blok.body?.[nextIndex];
-
-  // Get duration for current slide (default to 800ms)
   const currentDuration = currentItem?.duration || 800;
 
-  // Animate progress bar in sync with slide changes
+  // Animate progress bar
   useGSAP(() => {
     if (!progressRef.current || !currentItem) return;
 
-    const duration = (currentItem.duration || 800) / 1000; // Convert ms to seconds
+    const duration = currentDuration / 1000;
 
-    // Reset to 0 and animate to 100%
     gsap.fromTo(
       progressRef.current,
       { width: '0%' },
@@ -61,145 +173,35 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         ease: 'linear',
       }
     );
-  }, [activeIndex, currentItem]); // Re-run when activeIndex changes
+  }, [activeIndex, currentItem, currentDuration]);
 
-  // Fade in animation on slide change
-  useGSAP(() => {
-    if (!itemRef.current) return;
-
-    gsap.fromTo(
-      itemRef.current,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0,
-        ease: 'linear',
-      }
-    );
-  }, [activeIndex]);
-
+  // Auto-advance slides
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
 
-    // Use current slide's duration or default to 800ms
-    const slideDuration = currentItem?.duration || 800;
-
     const timeout = setTimeout(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
-    }, slideDuration);
+    }, currentDuration);
 
     return () => clearTimeout(timeout);
-  }, [blok.body, activeIndex, currentItem]);
+  }, [blok.body, activeIndex, currentDuration]);
 
-  if (!currentItem) return null;
+  if (!blok.body || blok.body.length === 0) return null;
 
   return (
     <div
       className="blok blok-ProjectSlider blok-Animate"
       {...storyblokEditable(blok)}
     >
-      {/* Current slide */}
-      <Link
-        ref={itemRef}
-        className="blok-ProjectSlider-Item cursorInteract"
-        href={currentItem.link?.cached_url || '#'}
-      >
-        <div className="blok-ProjectSlider-Image">
-          {currentItem.mux_playback_id ? (
-            <MuxPlayer
-              playbackId={currentItem.mux_playback_id}
-              poster={currentItem.media?.filename}
-              className="muxPlayer"
-              aspectRatio={currentItem.aspect_ratio || '16 / 9'}
-              dynamicAspectRatio={!currentItem.aspect_ratio} // Auto-detect if not manually set
-              noControls={true} // Hide video controls
-              muted
-              autoPlay
-              playsInline
-              preload="auto"
-            />
-          ) : currentItem.video_link && currentItem.media?.filename ? (
-            <video
-              ref={videoRef}
-              src={currentItem.video_link}
-              muted
-              autoPlay
-              playsInline
-              preload="auto"
-              poster={currentItem.media?.filename}
-              style={{ width: '100%', height: 'auto' }}
-            />
-          ) : (
-            currentItem.media &&
-            typeof currentItem.media === 'object' &&
-            'filename' in currentItem.media && (
-              <Image
-                src={(currentItem.media as any).filename}
-                alt={(currentItem.name as string) || 'Project Image'}
-                width={0}
-                height={0}
-                sizes="100vw"
-                quality={80}
-                priority
-                style={{ width: '100%', height: 'auto' }}
-              />
-            )
-          )}
-        </div>
-        <div className="blok-ProjectSlider-Caption">
-          <div className="blok-ProjectSlider-Caption-Title">
-            <span>Featured</span>
-            <div className="blok-ProjectSlider-ProgressWrapper">
-              <div className="blok-ProjectSlider-Progress" ref={progressRef} />
-            </div>
-            {String(currentItem.name)}
-          </div>
-          <div className="blok-ProjectSlider-Caption-Year">
-            {currentItem.year}
-          </div>
-        </div>
-      </Link>
-
-      {/* Preload next media (hidden, but loads in background) */}
-      {nextItem && (
-        <div style={{ display: 'none' }}>
-          {nextItem.mux_playback_id ? (
-            <MuxPlayer
-              playbackId={nextItem.mux_playback_id}
-              poster={nextItem.media?.filename}
-              aspectRatio={nextItem.aspect_ratio || '16 / 9'}
-              dynamicAspectRatio={!nextItem.aspect_ratio} // Auto-detect if not manually set
-              noControls={true} // Hide video controls
-              preload="auto"
-              muted
-              playsInline
-            />
-          ) : nextItem.video_link && nextItem.media ? (
-            <video
-              src={nextItem.video_link}
-              preload="auto"
-              muted
-              playsInline
-              poster={nextItem.media?.filename}
-            />
-          ) : (
-            nextItem.media &&
-            typeof nextItem.media === 'object' &&
-            'filename' in nextItem.media && (
-              <Image
-                src={(nextItem.media as any).filename}
-                alt={(nextItem.name as string) || 'Project Image'}
-                width={0}
-                height={0}
-                sizes="100vw"
-                quality={80}
-                priority
-                style={{ width: '100%', height: 'auto' }}
-              />
-            )
-          )}
-        </div>
-      )}
+      {blok.body.map((item, index) => (
+        <SlideItem
+          key={item._uid}
+          item={item}
+          isActive={activeIndex === index}
+          index={index}
+          progressRef={activeIndex === index ? progressRef : undefined}
+        />
+      ))}
     </div>
   );
 };

@@ -504,10 +504,22 @@ mux-player, .muxPlayer
     height: 100%
     padding: var(--spacing-base) var(--spacing-side)
     &-Item
-      width: 100%
+      position: absolute
+      top: var(--spacing-base)
+      left: var(--spacing-side)
+      width: calc(100% - (var(--spacing-side) * 2))
       display: flex
       flex-direction: column
       gap: 0.4545454546rem // 10px for 22px font size
+      opacity: 0
+      pointer-events: none
+      &[data-active='true']
+        opacity: 1
+        pointer-events: auto
+        position: relative
+        top: 0
+        left: 0
+        width: 100%
     &-Image
       position: relative
       width: 100%
