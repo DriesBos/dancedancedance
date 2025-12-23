@@ -13,6 +13,12 @@ interface SbPageData extends SbBlokData {
     alt?: string;
     name?: string;
   }[];
+  images_mobile?: {
+    id?: string;
+    filename?: string;
+    alt?: string;
+    name?: string;
+  }[];
   caption?: string;
 }
 
@@ -22,13 +28,32 @@ interface ColumnSliderProps {
 
 const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
   const itemRef = useRef<HTMLDivElement>(null);
 
+  // Determine if we should use mobile images
+  useEffect(() => {
+    const checkWidth = () => {
+      setIsMobile(window.innerWidth < 770);
+    };
+
+    // Check on mount
+    checkWidth();
+
+    // Listen to resize events
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
+  }, []);
+
+  // Select the appropriate images array based on screen width
+  const activeImages =
+    isMobile && blok.images_mobile?.length ? blok.images_mobile : blok.images;
+
   // Get current and next items for conditional rendering
-  const currentImage = blok.images?.[activeIndex];
-  const nextIndex = blok.images ? (activeIndex + 1) % blok.images.length : 0;
-  const nextImage = blok.images?.[nextIndex];
+  const currentImage = activeImages?.[activeIndex];
+  const nextIndex = activeImages ? (activeIndex + 1) % activeImages.length : 0;
+  const nextImage = activeImages?.[nextIndex];
 
   // Fade in animation on slide change
   useGSAP(() => {
@@ -46,14 +71,14 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   }, [activeIndex]);
 
   useEffect(() => {
-    if (!blok.images || blok.images.length === 0) return;
+    if (!activeImages || activeImages.length === 0) return;
 
     const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % blok.images!.length);
+      setActiveIndex((prevIndex) => (prevIndex + 1) % activeImages.length);
     }, 800);
 
     return () => clearInterval(interval);
-  }, [blok.images]);
+  }, [activeImages]);
 
   if (!currentImage) return null;
 
