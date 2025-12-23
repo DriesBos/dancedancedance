@@ -11,7 +11,7 @@ mux-player {
 }
 
 /* Hide controls completely */
-mux-player[controls="false"],
+mux-player[controls='false'],
 mux-player[nocontrols] {
   pointer-events: none;
 }
@@ -59,7 +59,7 @@ mux-player::part(poster) {
 
 /* Remove any default player container sizing */
 mux-player .player-container,
-mux-player [part~="layer"] {
+mux-player [part~='layer'] {
   width: 100% !important;
   height: 100% !important;
 }
@@ -69,11 +69,11 @@ mux-player [part~="layer"] {
   display: block !important;
   width: 100% !important;
   aspect-ratio: 16 / 9;
+  --loading-indicator: none;
 }
 
 /* Remove pointer events from controls when hidden */
-.muxPlayer[controls="false"],
+.muxPlayer[controls='false'],
 .muxPlayer[nocontrols] {
   pointer-events: none;
 }
-
