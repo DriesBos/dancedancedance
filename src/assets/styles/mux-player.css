@@ -53,7 +53,7 @@ mux-player::part(video) {
   width: 100% !important;
   height: 100% !important;
   /* Scale slightly larger to prevent 1px black lines on iOS Safari */
-  transform: scale(1.01) !important;
+  transform: scale(1.02) !important;
   transform-origin: center center !important;
 }
 
@@ -64,7 +64,7 @@ mux-player video {
   object-fit: cover !important;
   max-width: 100% !important;
   /* Scale slightly larger to prevent 1px black lines on iOS Safari */
-  transform: scale(1.01) !important;
+  transform: scale(1.02) !important;
   transform-origin: center center !important;
 }
 
@@ -75,7 +75,7 @@ mux-player::part(poster) {
   height: 100% !important;
   object-fit: cover !important;
   /* Scale slightly larger to prevent 1px black lines on iOS Safari */
-  transform: scale(1.01) !important;
+  transform: scale(1.02) !important;
   transform-origin: center center !important;
 }
 
