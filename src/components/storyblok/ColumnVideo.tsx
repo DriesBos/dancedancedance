@@ -44,7 +44,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
           muted
           autoPlay
           playsInline
-          preload="auto"
+          preload="metadata"
         />
       ) : (
         // Fallback for legacy direct video URLs

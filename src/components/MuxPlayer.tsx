@@ -1,6 +1,6 @@
 'use client';
 
-import MuxPlayerReact from '@mux/mux-player-react';
+import MuxPlayerReact from '@mux/mux-player-react/lazy';
 import { useEffect, useRef, useState } from 'react';
 import '@/assets/styles/mux-player.css';
 
@@ -16,6 +16,7 @@ interface MuxPlayerProps {
   aspectRatio?: string; // Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
   dynamicAspectRatio?: boolean; // Auto-detect aspect ratio from video metadata (default: true)
   noControls?: boolean; // Hide player controls (default: false)
+  loading?: 'page' | 'viewport'; // When to load the player (default: 'viewport')
   style?: React.CSSProperties;
   className?: string;
   accentColor?: string;
@@ -39,6 +40,7 @@ interface MuxPlayerProps {
  * @param aspectRatio - Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
  * @param dynamicAspectRatio - Auto-detect aspect ratio from video metadata (default: true)
  * @param noControls - Hide player controls (default: false)
+ * @param loading - When to load the player: 'page' (after page load) or 'viewport' (when visible)
  * @param style - Inline styles
  * @param className - CSS class name
  * @param accentColor - Mux Player accent color
@@ -57,6 +59,7 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
   aspectRatio = '16 / 9',
   dynamicAspectRatio = true,
   noControls = true,
+  loading = 'viewport',
   style,
   className,
   accentColor,
@@ -84,11 +87,13 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
         const height = video.videoHeight;
         const calculatedRatio = `${width} / ${height}`;
 
-        console.log('Detected video dimensions:', {
-          width,
-          height,
-          ratio: calculatedRatio,
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Detected video dimensions:', {
+            width,
+            height,
+            ratio: calculatedRatio,
+          });
+        }
         setDetectedAspectRatio(calculatedRatio);
       }
     };
@@ -149,6 +154,7 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
       autoPlay={autoPlay}
       playsInline={playsInline}
       preload={preload}
+      loading={loading}
       streamType="on-demand"
       nohotkeys={noControls}
       style={{

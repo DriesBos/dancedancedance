@@ -92,7 +92,7 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
           noControls={true}
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
         />
       );
     } else if (item.video_link && item.media?.filename) {
