@@ -17,6 +17,7 @@ const nextConfig = {
         hostname: 'a.storyblok.com',
       },
     ],
+    qualities: [50, 75, 80, 90],
   },
   // Ensure proper handling on Netlify
   typescript: {
