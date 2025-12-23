@@ -156,35 +156,6 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
     };
   }, [dynamicAspectRatio, playbackId]);
 
-  // Handle pause between loops (custom feature)
-  useEffect(() => {
-    if (!playerRef.current || !loop || !pause || pause <= 0) return;
-
-    const player = playerRef.current;
-
-    const handleEnded = () => {
-      // Disable native loop temporarily
-      player.loop = false;
-
-      setTimeout(() => {
-        if (playerRef.current) {
-          playerRef.current.play().catch((error: Error) => {
-            console.warn('Video play after pause failed:', error);
-          });
-        }
-      }, pause * 1000);
-    };
-
-    player.addEventListener('ended', handleEnded);
-
-    return () => {
-      player.removeEventListener('ended', handleEnded);
-    };
-  }, [pause, loop]);
-
-  // Determine if we should use native loop or custom pause loop
-  const shouldUseNativeLoop = loop && (!pause || pause <= 0);
-
   // Use detected aspect ratio if available and dynamicAspectRatio is enabled, otherwise use provided aspectRatio
   const finalAspectRatio =
     dynamicAspectRatio && detectedAspectRatio
@@ -204,7 +175,7 @@ const MuxPlayer: React.FC<MuxPlayerProps> = ({
       playbackId={playbackId}
       poster={poster}
       placeholder={blurDataURL || placeholderImage}
-      loop={shouldUseNativeLoop}
+      loop={loop}
       muted={muted}
       autoPlay={autoPlay}
       playsInline={playsInline}
