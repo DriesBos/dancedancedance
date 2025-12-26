@@ -5,6 +5,7 @@ export interface ProjectData {
   slug: string;
   year: string;
   title: string;
+  external_link?: { cached_url: string };
 }
 
 export async function fetchProjectSlugs(): Promise<ProjectData[]> {
@@ -31,6 +32,7 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
     slug: story.slug,
     year: story.content.year || '0',
     title: story.content.title || story.name,
+    external_link: story.content.external_link,
   }));
 
   return projects;

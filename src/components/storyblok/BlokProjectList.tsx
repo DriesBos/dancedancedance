@@ -11,6 +11,7 @@ export default async function BlokProjectList() {
       year: story.content.year,
       title: story.content.title,
       category: story.content.category,
+      external_link: story.content.external_link,
     };
   });
 
@@ -23,6 +24,7 @@ export default async function BlokProjectList() {
           year={item.year}
           title={item.title}
           category={item.category}
+          external_link={item.external_link}
         />
       ))}
     </div>

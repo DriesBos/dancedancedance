@@ -6,6 +6,7 @@ interface ProjectData {
   slug: string;
   year: string;
   title: string;
+  external_link?: { cached_url: string };
 }
 
 interface ProjectsContextType {

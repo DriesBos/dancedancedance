@@ -10,6 +10,7 @@ import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
+import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from './Row';
 import BlokSidePanels from './BlokSides';
 import StoreSwitcher from './StoreSwitcher';
@@ -25,7 +26,7 @@ interface Props {
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
   const router = useRouter();
-  const { projectSlugs } = useProjects();
+  const { projectSlugs, projects } = useProjects();
   const space = useStore((state: any) => state.space);
   const index = useStore((state: any) => state.index);
   const setIndex = useStore((state: any) => state.setIndex);
@@ -39,6 +40,11 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
+  const [externalLink, setExternalLink] = useState<
+    { cached_url: string } | undefined
+  >(undefined);
+
+  console.log(blok, float, params, 'PROJECT PAGE');
 
   const clickNext = useCallback(() => {
     const nextPath = path;
@@ -151,15 +157,17 @@ const BlokHead = ({ blok, float, params }: Props) => {
   //   setTopPanelFalse(false);
   // }, [space, setTopPanelFalse]);
 
-  // Set Header Blok Title
+  // Set Header Blok Title and External Link
   useEffect(() => {
     let tempPathName = path.split('/')[1];
     switch (tempPathName) {
       case '':
         setPathName('home');
+        setExternalLink(undefined);
         break;
       case 'about':
         setPathName('about');
+        setExternalLink(undefined);
         break;
       case 'projects':
         setPathName('projects');
@@ -172,9 +180,18 @@ const BlokHead = ({ blok, float, params }: Props) => {
           )
           .join(' ');
         setProjectName(tempProjectName);
+
+        // Fetch external link for current project
+        const currentSlug = path.split('/')[2];
+        const currentProject = projects.find((p) => p.slug === currentSlug);
+        if (currentProject) {
+          setExternalLink(currentProject.external_link);
+        } else {
+          setExternalLink(undefined);
+        }
         break;
     }
-  }, [path]);
+  }, [path, projects]);
 
   // Set Escape Key and Arrow Keys
   useEffect(() => {
@@ -394,6 +411,17 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   <IconArrow />
                 </div>
               </div>
+              {externalLink?.cached_url && (
+                <a
+                  href={externalLink.cached_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="icon cursorMagnetic"
+                  data-external-link="true"
+                >
+                  <IconLinkOutside />
+                </a>
+              )}
               <Link href="/" className="icon cursorMagnetic">
                 <IconClose />
               </Link>
