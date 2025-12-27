@@ -129,11 +129,7 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
   };
 
   return (
-    <Link
-      className="blok-ProjectSlider-Item cursorInteract"
-      href={item.link?.cached_url || '#'}
-      data-active={isActive}
-    >
+    <div className="blok-ProjectSlider-Item" data-active={isActive}>
       <div className="blok-ProjectSlider-Image">{renderMedia()}</div>
       <div className="blok-ProjectSlider-Caption">
         <div className="blok-ProjectSlider-Caption-Title">
@@ -147,7 +143,7 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
         </div>
         <div className="blok-ProjectSlider-Caption-Year">{item.year}</div>
       </div>
-    </Link>
+    </div>
   );
 };
 
@@ -234,9 +230,10 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           onMouseLeave={handleZoneLeave}
         >
           {blok.body.map((item, index) => (
-            <div
+            <Link
               key={`zone-${item._uid}`}
-              className="blok-ProjectSlider-HoverZone"
+              href={item.link?.cached_url || '#'}
+              className="blok-ProjectSlider-HoverZone cursorInteract"
               style={{ width: `${100 / blok.body.length}%` }}
               onMouseEnter={() => handleZoneEnter(index)}
             />
