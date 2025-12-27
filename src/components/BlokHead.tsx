@@ -401,6 +401,17 @@ const BlokHead = ({ blok, float, params }: Props) => {
           )}
           {pathName === 'projects' && (
             <>
+              {externalLink?.cached_url && (
+                <a
+                  href={externalLink.cached_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="icon cursorMagnetic"
+                  data-external-link="true"
+                >
+                  <IconLinkOutside />
+                </a>
+              )}
               <div className="column-Icons_NextPrev">
                 <div
                   onClick={clickPrev}
@@ -438,17 +449,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   <IconArrow />
                 </div>
               </div>
-              {externalLink?.cached_url && (
-                <a
-                  href={externalLink.cached_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="icon cursorMagnetic"
-                  data-external-link="true"
-                >
-                  <IconLinkOutside />
-                </a>
-              )}
               <Link href="/" className="icon cursorMagnetic">
                 <IconClose />
               </Link>
