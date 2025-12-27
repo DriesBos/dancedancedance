@@ -20,6 +20,8 @@ interface SbPageData extends SbBlokData {
     name?: string;
   }[];
   caption?: string;
+  caption_side?: boolean;
+  speed?: number;
 }
 
 interface ColumnSliderProps {
@@ -73,9 +75,12 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   useEffect(() => {
     if (!activeImages || activeImages.length === 0) return;
 
-    const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => (prevIndex + 1) % activeImages.length);
-    }, 800);
+    const interval = setInterval(
+      () => {
+        setActiveIndex((prevIndex) => (prevIndex + 1) % activeImages.length);
+      },
+      blok.speed ? blok.speed : 800
+    );
 
     return () => clearInterval(interval);
   }, [activeImages]);
