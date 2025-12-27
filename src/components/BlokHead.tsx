@@ -47,18 +47,21 @@ const BlokHead = ({ blok, float, params }: Props) => {
   console.log(blok, float, params, 'PROJECT PAGE');
 
   const clickNext = useCallback(() => {
+    if (!projectSlugs || projectSlugs.length === 0) return;
     const nextPath = path;
     const currentSlug = nextPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
     if (currentIndex !== -1 && currentIndex < projectSlugs.length - 1) {
       const nextSlug = `/projects/${projectSlugs[currentIndex + 1]}`;
       router.push(nextSlug);
-    } else {
-      return false;
     }
   }, [path, router, projectSlugs]);
 
   const checkNext = useCallback(() => {
+    if (!projectSlugs || projectSlugs.length === 0) {
+      setHasNext(false);
+      return;
+    }
     const checkNextPath = path;
     const currentSlug = checkNextPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
@@ -71,18 +74,21 @@ const BlokHead = ({ blok, float, params }: Props) => {
   }, [path, projectSlugs]);
 
   const clickPrev = useCallback(() => {
+    if (!projectSlugs || projectSlugs.length === 0) return;
     const prevPath = path;
     const currentSlug = prevPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
     if (currentIndex > 0) {
       const prevSlug = `/projects/${projectSlugs[currentIndex - 1]}`;
       router.push(prevSlug);
-    } else {
-      return false;
     }
   }, [path, router, projectSlugs]);
 
   const checkPrev = useCallback(() => {
+    if (!projectSlugs || projectSlugs.length === 0) {
+      setHasPrev(false);
+      return;
+    }
     const checkPrevPath = path;
     const currentSlug = checkPrevPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
@@ -94,25 +100,31 @@ const BlokHead = ({ blok, float, params }: Props) => {
   }, [path, projectSlugs]);
 
   useEffect(() => {
-    checkNext();
-    checkPrev();
-
-    // Prefetch adjacent routes for instant navigation
-    if (pathName === 'projects') {
-      const currentSlug = path.split('/')[2];
-      const currentIndex = projectSlugs.indexOf(currentSlug);
-
-      // Prefetch next route
-      if (currentIndex !== -1 && currentIndex < projectSlugs.length - 1) {
-        router.prefetch(`/projects/${projectSlugs[currentIndex + 1]}`);
-      }
-
-      // Prefetch previous route
-      if (currentIndex > 0) {
-        router.prefetch(`/projects/${projectSlugs[currentIndex - 1]}`);
-      }
+    if (!projectSlugs || projectSlugs.length === 0) {
+      setHasNext(false);
+      setHasPrev(false);
+      return;
     }
-  }, [path, checkNext, checkPrev, pathName, router, projectSlugs]);
+
+    const currentSlug = path.split('/')[2];
+    const currentIndex = projectSlugs.indexOf(currentSlug);
+
+    setCurrentProjectIndex(currentIndex);
+
+    // Check next
+    if (currentIndex === -1 || currentIndex >= projectSlugs.length - 1) {
+      setHasNext(false);
+    } else {
+      setHasNext(true);
+    }
+
+    // Check prev
+    if (currentIndex <= 0) {
+      setHasPrev(false);
+    } else {
+      setHasPrev(true);
+    }
+  }, [path, projectSlugs]);
 
   // const handleTopPanel = useCallback((e: any) => {
   //   if (e.type === 'mouseenter') {
@@ -172,22 +184,27 @@ const BlokHead = ({ blok, float, params }: Props) => {
       case 'projects':
         setPathName('projects');
         let tempProjectName = path.split('/')[2];
-        tempProjectName = tempProjectName
-          .replace(/-/g, ' ')
-          .split(' ')
-          .map(
-            (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          )
-          .join(' ');
-        setProjectName(tempProjectName);
+        if (tempProjectName) {
+          tempProjectName = tempProjectName
+            .replace(/-/g, ' ')
+            .split(' ')
+            .map(
+              (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join(' ');
+          setProjectName(tempProjectName);
 
-        // Fetch external link for current project
-        const currentSlug = path.split('/')[2];
-        const currentProject = projects.find((p) => p.slug === currentSlug);
-        if (currentProject) {
-          setExternalLink(currentProject.external_link);
-        } else {
-          setExternalLink(undefined);
+          // Fetch external link for current project
+          if (projects && projects.length > 0) {
+            const currentSlug = path.split('/')[2];
+            const currentProject = projects.find((p) => p.slug === currentSlug);
+            if (currentProject && currentProject.external_link) {
+              setExternalLink(currentProject.external_link);
+            } else {
+              setExternalLink(undefined);
+            }
+          }
         }
         break;
     }
@@ -198,13 +215,23 @@ const BlokHead = ({ blok, float, params }: Props) => {
     const handleKeyDown = (e: any) => {
       if (e.key === 'Escape') {
         router.push('/');
+        return;
       }
 
-      if (pathName === 'projects') {
-        if (e.key === 'ArrowLeft') {
-          clickPrev();
-        } else if (e.key === 'ArrowRight') {
-          clickNext();
+      if (pathName === 'projects' && projectSlugs && projectSlugs.length > 0) {
+        const currentSlug = path.split('/')[2];
+        const currentIndex = projectSlugs.indexOf(currentSlug);
+
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+          const prevSlug = `/projects/${projectSlugs[currentIndex - 1]}`;
+          router.push(prevSlug);
+        } else if (
+          e.key === 'ArrowRight' &&
+          currentIndex !== -1 &&
+          currentIndex < projectSlugs.length - 1
+        ) {
+          const nextSlug = `/projects/${projectSlugs[currentIndex + 1]}`;
+          router.push(nextSlug);
         }
       }
     };
@@ -213,7 +240,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [router, pathName, clickPrev, clickNext]);
+  }, [router, pathName, path, projectSlugs]);
 
   // Reveal on scroll up header pattern
   useGSAP(() => {
