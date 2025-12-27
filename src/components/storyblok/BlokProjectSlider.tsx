@@ -153,10 +153,19 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
 
 const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const [hasCursor, setHasCursor] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
 
   const currentItem = blok.body?.[activeIndex];
   const currentDuration = currentItem?.duration || 800;
+
+  // Detect if device has a cursor (not mobile/tablet)
+  useEffect(() => {
+    // Check if the device has fine pointer capability (mouse)
+    const hasFineCursor = window.matchMedia('(pointer: fine)').matches;
+    setHasCursor(hasFineCursor);
+  }, []);
 
   // Animate progress bar
   useGSAP(() => {
@@ -175,16 +184,31 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     );
   }, [activeIndex, currentItem, currentDuration]);
 
-  // Auto-advance slides
+  // Auto-advance slides (paused when hovering)
   useEffect(() => {
     if (!blok.body || blok.body.length === 0) return;
+
+    // Don't auto-advance if user is hovering
+    if (isHovering) return;
 
     const timeout = setTimeout(() => {
       setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
     }, currentDuration);
 
     return () => clearTimeout(timeout);
-  }, [blok.body, activeIndex, currentDuration]);
+  }, [blok.body, activeIndex, currentDuration, isHovering]);
+
+  // Handle hover zone interaction
+  const handleZoneEnter = (index: number) => {
+    if (!hasCursor) return;
+    setIsHovering(true);
+    setActiveIndex(index);
+  };
+
+  const handleZoneLeave = () => {
+    if (!hasCursor) return;
+    setIsHovering(false);
+  };
 
   if (!blok.body || blok.body.length === 0) return null;
 
@@ -202,6 +226,23 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           progressRef={activeIndex === index ? progressRef : undefined}
         />
       ))}
+
+      {/* Invisible hover zones - only rendered on devices with cursor */}
+      {hasCursor && blok.body.length > 1 && (
+        <div
+          className="blok-ProjectSlider-HoverZones"
+          onMouseLeave={handleZoneLeave}
+        >
+          {blok.body.map((item, index) => (
+            <div
+              key={`zone-${item._uid}`}
+              className="blok-ProjectSlider-HoverZone"
+              style={{ width: `${100 / blok.body.length}%` }}
+              onMouseEnter={() => handleZoneEnter(index)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
