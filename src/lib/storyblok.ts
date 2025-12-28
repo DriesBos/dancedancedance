@@ -13,17 +13,21 @@ import ColumnVideo from '@/components/storyblok/ColumnVideo';
 import ColumnText from '@/components/storyblok/ColumnText';
 import ColumnTextExpandable from '@/components/storyblok/ColumnTextExpandable';
 import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
+import BlokBlurb from '@/components/storyblok/BlokBlurb';
+import PageBlurb from '@/components/storyblok/PageBlurb';
 
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
   components: {
     Page: Page,
+    'Page Blurb': PageBlurb,
     'Page Project': Project,
     'Blok Project List': BlokProjectList,
     'Blok Project Slider': BlokProjectSlider,
     'Blok Project Images List': BlokProjectImagesList,
     'Blok Experience': BlokExperience,
     'Blok Container': BlokContainer,
+    'Blok Blurb': BlokBlurb,
     'Column Image': ColumnImage,
     'Column Slider': ColumnSlider,
     'Column Video': ColumnVideo,
