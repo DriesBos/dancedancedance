@@ -7,6 +7,7 @@ import Link from 'next/link';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import MuxPlayer from '../MuxPlayer';
+import SliderIndicators from '../SliderIndicators';
 
 interface SbPageData extends SbBlokData {
   body: Array<{
@@ -130,7 +131,9 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
 
   return (
     <div className="blok-ProjectSlider-Item" data-active={isActive}>
-      <div className="blok-ProjectSlider-Image">{renderMedia()}</div>
+      <div className="blok-ProjectSlider-Image">
+        <div className="blok-ProjectSlider-ImageWrapper">{renderMedia()}</div>
+      </div>
       <div className="blok-ProjectSlider-Caption">
         <div className="blok-ProjectSlider-Caption-Title">
           <span>Featured</span>
@@ -222,6 +225,12 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           progressRef={activeIndex === index ? progressRef : undefined}
         />
       ))}
+
+      <SliderIndicators
+        total={blok.body.length}
+        activeIndex={activeIndex}
+        className="blok-ProjectSlider-Indicators"
+      />
 
       {/* Invisible hover zones - only rendered on devices with cursor */}
       {hasCursor && blok.body.length > 1 && (

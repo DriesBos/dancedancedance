@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import SliderIndicators from '../SliderIndicators';
 
 interface SbPageData extends SbBlokData {
   images?: {
@@ -102,18 +103,11 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
             priority
             style={{ width: '100%', height: 'auto' }}
           />
-          {/* Slider indicators */}
-          {activeImages && activeImages.length > 1 && (
-            <div className="column-Slider-Indicators">
-              {activeImages.map((_, index) => (
-                <div
-                  key={index}
-                  className="column-Slider-Indicator"
-                  data-active={index === activeIndex}
-                />
-              ))}
-            </div>
-          )}
+          <SliderIndicators
+            total={activeImages?.length || 0}
+            activeIndex={activeIndex}
+            className="column-Slider-Indicators"
+          />
         </div>
         {currentImage.name && (
           <div className="column-Caption">{currentImage.name}</div>

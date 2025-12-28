@@ -354,27 +354,25 @@ mux-player, .muxPlayer
               padding: calc(var(--spacing-base) / 2) 0
               max-width: 9rem
       &-Slider
-        position: relative
         &-ImageWrapper
           position: relative
-          isolation: isolate
-        &-Indicators
-          position: absolute
-          bottom: var(--spacing-base)
-          right: var(--spacing-side)
-          display: flex
-          gap: calc(var(--spacing-side) / 2)
-          z-index: 1
-          mix-blend-mode: difference
-        &-Indicator
-          width: 0.33rem
-          height: 0.33rem
-          border-radius: 50%
-          background: white
-          transition: opacity 0.33s ease-in
-          opacity: 0.25
-          &[data-active='true']
-            opacity: 1
+      //   &-Indicators
+      //     position: absolute
+      //     bottom: var(--spacing-base)
+      //     right: var(--spacing-side)
+      //     display: flex
+      //     gap: calc(var(--spacing-side) / 2)
+      //     z-index: 1
+      //     mix-blend-mode: difference
+      //   &-Indicator
+      //     width: 0.33rem
+      //     height: 0.33rem
+      //     border-radius: 50%
+      //     background: white
+      //     transition: opacity 0.33s ease-in
+      //     opacity: 0.25
+      //     &[data-active='true']
+      //       opacity: 1
       &-Year
         width: calc(2.9em + var(--spacing-side))
       &-Icons
@@ -561,6 +559,9 @@ mux-player, .muxPlayer
         width: 100%
         height: 100% !important
         object-fit: cover
+    &-Indicators
+      bottom: calc(var(--spacing-base) + 6px + 0.454545rem + 1.45em) !important
+      right: calc(var(--spacing-side) + 6px) !important
     &-Caption
       display: flex
       justify-content: space-between
@@ -873,6 +874,25 @@ body
 .clickable
   cursor: pointer
   user-select: none
+
+// General slider indicators (reusable across components)
+.slider
+  &-Indicators
+    position: absolute
+    bottom: 6px
+    right: 6px
+    display: flex
+    gap: 3px
+    z-index: 1
+    mix-blend-mode: difference
+  &-Indicator
+    width: 0.33rem
+    height: 0.33rem
+    background: white
+    transition: opacity 0.33s ease-in
+    opacity: 0.33
+    &[data-active='true']
+      opacity: 1
 
 @keyframes hyperLink
   0%
