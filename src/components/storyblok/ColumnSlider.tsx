@@ -91,16 +91,30 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
     <div className="column column-Slider" {...storyblokEditable(blok)}>
       {/* Current slide */}
       <div ref={itemRef} className="column-Slider-Item">
-        <Image
-          src={currentImage.filename}
-          alt={currentImage.alt}
-          width={0}
-          height={0}
-          sizes="100vw"
-          quality={80}
-          priority
-          style={{ width: '100%', height: 'auto' }}
-        />
+        <div className="column-Slider-ImageWrapper">
+          <Image
+            src={currentImage.filename}
+            alt={currentImage.alt}
+            width={0}
+            height={0}
+            sizes="100vw"
+            quality={80}
+            priority
+            style={{ width: '100%', height: 'auto' }}
+          />
+          {/* Slider indicators */}
+          {activeImages && activeImages.length > 1 && (
+            <div className="column-Slider-Indicators">
+              {activeImages.map((_, index) => (
+                <div
+                  key={index}
+                  className="column-Slider-Indicator"
+                  data-active={index === activeIndex}
+                />
+              ))}
+            </div>
+          )}
+        </div>
         {currentImage.name && (
           <div className="column-Caption">{currentImage.name}</div>
         )}

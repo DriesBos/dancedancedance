@@ -353,6 +353,26 @@ mux-player, .muxPlayer
             .column-Caption
               padding: calc(var(--spacing-base) / 2) 0
               max-width: 9rem
+      &-Slider
+        position: relative
+        &-ImageWrapper
+          position: relative
+        &-Indicators
+          position: absolute
+          bottom: var(--spacing-base)
+          right: var(--spacing-side)
+          display: flex
+          gap: calc(var(--spacing-side) / 2)
+          z-index: 1
+        &-Indicator
+          width: 0.33rem
+          height: 0.33rem
+          border-radius: 50%
+          background: white
+          transition: opacity 0.33s ease-in
+          opacity: 0.25
+          &[data-active='true']
+            opacity: 1
       &-Year
         width: calc(2.9em + var(--spacing-side))
       &-Icons
