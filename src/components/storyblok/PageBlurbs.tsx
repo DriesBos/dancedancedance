@@ -4,18 +4,18 @@ import {
   StoryblokServerComponent,
 } from '@storyblok/react/rsc';
 
-interface SbPageBlurbData extends SbBlokData {
+interface SbPageBlurbsData extends SbBlokData {
   body: SbBlokData[];
 }
 
-interface ProjectProps {
-  blok: SbPageBlurbData;
+interface PageBlurbsProps {
+  blok: SbPageBlurbsData;
 }
 
-const PageBlurb = ({ blok }: ProjectProps) => {
+const PageBlurbs = ({ blok }: PageBlurbsProps) => {
+  console.log(blok.body);
   return (
-    <div className="page page-Blurb" {...storyblokEditable(blok)}>
-      {}
+    <div className="page page-Blurbs" {...storyblokEditable(blok)}>
       {blok.body.map((nestedBlok: any) => (
         <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
       ))}
@@ -23,4 +23,4 @@ const PageBlurb = ({ blok }: ProjectProps) => {
   );
 };
 
-export default PageBlurb;
+export default PageBlurbs;

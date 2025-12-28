@@ -14,20 +14,20 @@ import ColumnText from '@/components/storyblok/ColumnText';
 import ColumnTextExpandable from '@/components/storyblok/ColumnTextExpandable';
 import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
 import BlokBlurb from '@/components/storyblok/BlokBlurb';
-import PageBlurb from '@/components/storyblok/PageBlurb';
+import PageBlurbs from '@/components/storyblok/PageBlurbs';
 
 export const getStoryblokApi = storyblokInit({
   accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
   components: {
     Page: Page,
-    'Page Blurb': PageBlurb,
+    'Page Blurbs': PageBlurbs,
     'Page Project': Project,
     'Blok Project List': BlokProjectList,
     'Blok Project Slider': BlokProjectSlider,
     'Blok Project Images List': BlokProjectImagesList,
     'Blok Experience': BlokExperience,
     'Blok Container': BlokContainer,
-    'Blok Blurb': BlokBlurb,
+    'Blok Blurp': BlokBlurb,
     'Column Image': ColumnImage,
     'Column Slider': ColumnSlider,
     'Column Video': ColumnVideo,
