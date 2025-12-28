@@ -357,6 +357,7 @@ mux-player, .muxPlayer
         position: relative
         &-ImageWrapper
           position: relative
+          isolation: isolate
         &-Indicators
           position: absolute
           bottom: var(--spacing-base)
@@ -364,6 +365,7 @@ mux-player, .muxPlayer
           display: flex
           gap: calc(var(--spacing-side) / 2)
           z-index: 1
+          mix-blend-mode: difference
         &-Indicator
           width: 0.33rem
           height: 0.33rem
