@@ -370,11 +370,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
               Dries Bos&nbsp;
             </Link>
           )}
-          {pathName === 'blurbs' && (
-            <Link href="/" className="cursorInteract">
-              Blurbs..
-            </Link>
-          )}
           <Link href="/" className="cursorInteract">
             {(pathName === 'home' || pathName === 'about') && (
               <span className="cursorInteract">— Design & Code Partner</span>
@@ -392,9 +387,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
             <>
               <StoreSwitcher />
               <Link href="/about" className="icon cursorMagnetic">
-                <IconAbout />
-              </Link>
-              <Link href="/blurbs" className="icon cursorMagnetic">
                 <IconAbout />
               </Link>
             </>
