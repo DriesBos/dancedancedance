@@ -560,8 +560,8 @@ mux-player, .muxPlayer
         height: 100% !important
         object-fit: cover
     &-Indicators
-      bottom: calc(var(--spacing-base) + 6px + 0.454545rem + 1.45em) !important
-      right: calc(var(--spacing-side) + 6px) !important
+      bottom: calc(var(--spacing-base) + 0.5rem + 0.454545rem + 1.45em) !important
+      right: calc(var(--spacing-side) + 0.5rem) !important
     &-Caption
       display: flex
       justify-content: space-between
@@ -879,15 +879,15 @@ body
 .slider
   &-Indicators
     position: absolute
-    bottom: 6px
-    right: 6px
+    bottom: 0.5rem
+    right: 0.5rem
     display: flex
-    gap: 3px
+    gap: 4px
     z-index: 1
     mix-blend-mode: difference
   &-Indicator
-    width: 0.33rem
-    height: 0.33rem
+    width: 0.5rem
+    height: 0.5rem
     background: white
     transition: opacity 0.33s ease-in
     opacity: 0.33
