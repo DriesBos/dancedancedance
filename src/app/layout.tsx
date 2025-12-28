@@ -12,9 +12,9 @@ import { ProjectsProvider } from '@/providers/projects-provider';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import AppInitializer from '@/components/AppInitStore';
 import ThemeBackground from '@/components/ThemeBackground';
-import BlokHead from '@/components/BlokHead';
+import BlokHeadWrapper from '@/components/BlokHeadWrapper';
 import BlokFilter from '@/components/BlokFilter';
-import BlokFooter from '@/components/BlokFooter';
+import BlokFooterWrapper from '@/components/BlokFooterWrapper';
 import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
@@ -101,10 +101,10 @@ export default async function RootLayout({
               </h1>
             </div> */}
             <main className="main">
-              <BlokHead />
+              <BlokHeadWrapper />
               {/* <BlokFilter /> */}
               {children}
-              <BlokFooter />
+              <BlokFooterWrapper />
             </main>
           </StoryblokProvider>
         </ProjectsProvider>
