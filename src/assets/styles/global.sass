@@ -102,7 +102,7 @@ main
       cursor: grabbing
     // During intro animation
     &-Header
-      position: absolute
+      position: fixed
       top: 0
       left: 0
       width: 100%
@@ -111,7 +111,12 @@ main
       display: flex
       flex-direction: column
       justify-content: space-between
-
+      pointer-events: none
+      mix-blend-mode: difference
+      color: black
+      // Ensure all children can receive pointer events
+      a, button, .icon, .cursorInteract, .cursorMagnetic
+        pointer-events: auto
       &-Top
         display: flex
         flex-direction: row
@@ -130,12 +135,13 @@ main
         cursor: default
     &-Canvas
       position: absolute
-      width: 300vw
-      height: 300vh
+      width: 200vw
+      height: 200vh
       display: block
       // Offset so items positioned at 100vw,100vh appear in center of viewport
-      top: calc(-100vh + 50vh)
-      left: calc(-100vw + 50vw)
+      // Canvas is 200vw x 200vh, we want center (100vw, 100vh) to align with viewport center
+      top: -50vh
+      left: -50vw
       will-change: transform
       // GSAP Draggable handles transforms
     &-Item

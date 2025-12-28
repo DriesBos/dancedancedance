@@ -29,50 +29,104 @@ interface Position {
   y: number;
 }
 
-// Generate deterministic positions for items across the canvas
-// Canvas is 300vw x 300vh, items positioned using vw/vh units
+// Seeded pseudo-random number generator for consistent positions
+const seededRandom = (seed: number): number => {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+};
+
+// Generate item size based on index (deterministic)
+const getItemSize = (index: number): { width: number; height: number } => {
+  const variant = Math.floor(seededRandom(index * 777) * 3);
+  const sizes = [
+    { width: 12, height: 15 }, // small
+    { width: 18, height: 22 }, // medium
+    { width: 25, height: 30 }, // large
+  ];
+  return sizes[variant];
+};
+
+// Zone-based scatter algorithm with collision detection
+// Canvas is 200vw x 200vh, items positioned using vw/vh units
 function generateItemPositions(itemCount: number): Position[] {
+  if (itemCount === 0) return [];
+
   const positions: Position[] = [];
-  const canvasWidth = 300; // in vw
-  const canvasHeight = 300; // in vh
-  const padding = 10; // padding from edges in vw/vh
-  const itemSpread = 20; // minimum spread between items
 
-  // Seed-based pseudo-random for consistent positions
-  const seededRandom = (seed: number) => {
-    const x = Math.sin(seed * 9999) * 10000;
-    return x - Math.floor(x);
-  };
+  // Canvas dimensions
+  const canvasWidth = 200; // vw
+  const canvasHeight = 200; // vh
 
+  // Safe padding from canvas edges (viewport is centered at 100vw, 100vh)
+  // We want items visible when user is at center, so keep them within reachable area
+  const edgePadding = 15; // vw/vh - keeps items away from absolute edges
+
+  // Usable area for placing items
+  const usableLeft = edgePadding;
+  const usableTop = edgePadding;
+  const usableWidth = canvasWidth - edgePadding * 2;
+  const usableHeight = canvasHeight - edgePadding * 2;
+
+  // Calculate grid dimensions for zones
+  // Aim for roughly square zones, with some flexibility
+  const aspectRatio = usableWidth / usableHeight;
+  const cols = Math.ceil(Math.sqrt(itemCount * aspectRatio));
+  const rows = Math.ceil(itemCount / cols);
+
+  // Zone dimensions
+  const zoneWidth = usableWidth / cols;
+  const zoneHeight = usableHeight / rows;
+
+  // Internal zone padding (prevents overlap between items in adjacent zones)
+  const zonePadding = 2; // vw/vh
+
+  // Create list of available zones
+  const zones: { row: number; col: number }[] = [];
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      zones.push({ row, col });
+    }
+  }
+
+  // Shuffle zones for more organic distribution (using seeded random)
+  for (let i = zones.length - 1; i > 0; i--) {
+    const j = Math.floor(seededRandom(i * 123) * (i + 1));
+    [zones[i], zones[j]] = [zones[j], zones[i]];
+  }
+
+  // Place each item in a zone
   for (let i = 0; i < itemCount; i++) {
-    let attempts = 0;
-    let pos: Position;
+    const zone = zones[i % zones.length];
+    const { row, col } = zone;
 
-    do {
-      // Use index-based seeding for deterministic positions
-      const seedX = seededRandom(i * 127 + 1 + attempts * 17);
-      const seedY = seededRandom(i * 311 + 2 + attempts * 23);
+    // Get estimated item size for this index
+    const itemSize = getItemSize(i);
 
-      pos = {
-        x: padding + seedX * (canvasWidth - padding * 2 - 25),
-        y: padding + seedY * (canvasHeight - padding * 2 - 25),
-      };
+    // Calculate zone boundaries (with padding)
+    const zoneLeft = usableLeft + col * zoneWidth + zonePadding;
+    const zoneTop = usableTop + row * zoneHeight + zonePadding;
+    const zoneInnerWidth = zoneWidth - zonePadding * 2 - itemSize.width;
+    const zoneInnerHeight = zoneHeight - zonePadding * 2 - itemSize.height;
 
-      attempts++;
-    } while (
-      attempts < 100 &&
-      positions.some(
-        (existing) =>
-          Math.abs(existing.x - pos.x) < itemSpread &&
-          Math.abs(existing.y - pos.y) < itemSpread
-      )
+    // Random offset within the safe zone area
+    const offsetX = seededRandom(i * 127 + 1) * Math.max(0, zoneInnerWidth);
+    const offsetY = seededRandom(i * 311 + 2) * Math.max(0, zoneInnerHeight);
+
+    // Final position
+    const x = zoneLeft + offsetX;
+    const y = zoneTop + offsetY;
+
+    // Clamp to ensure items stay within canvas bounds
+    const clampedX = Math.max(
+      edgePadding,
+      Math.min(canvasWidth - edgePadding - itemSize.width, x)
+    );
+    const clampedY = Math.max(
+      edgePadding,
+      Math.min(canvasHeight - edgePadding - itemSize.height, y)
     );
 
-    // Clamp to canvas bounds
-    pos.x = Math.max(padding, Math.min(canvasWidth - padding - 25, pos.x));
-    pos.y = Math.max(padding, Math.min(canvasHeight - padding - 25, pos.y));
-
-    positions.push(pos);
+    positions.push({ x: clampedX, y: clampedY });
   }
 
   return positions;
@@ -91,16 +145,18 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
   const itemPositions = generateItemPositions(blok.body.length);
 
   // Get canvas bounds (how far user can drag)
+  // Canvas is 200vw x 200vh, positioned at -50vw, -50vh
+  // User can drag 50vw in each direction (half a viewport on each side)
   const getBounds = useCallback(() => {
     if (typeof window === 'undefined')
       return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     return {
-      minX: -vw,
-      maxX: vw,
-      minY: -vh,
-      maxY: vh,
+      minX: -vw * 0.5,
+      maxX: vw * 0.5,
+      minY: -vh * 0.5,
+      maxY: vh * 0.5,
     };
   }, []);
 
@@ -111,12 +167,28 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
 
+    // Calculate transform origin to keep viewport center fixed during zoom
+    // Canvas is 200vw x 200vh, positioned at -50vw, -50vh
+    // Viewport center relative to canvas: 50vw from canvas left, 50vh from canvas top
+    // As percentage of canvas: 50vw / 200vw = 25%, 50vh / 200vh = 25%
+    // But canvas is offset by -50vw, -50vh, so viewport sees center of canvas
+    // Transform origin should be at the point that maps to viewport center: 50% 50%
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // The viewport center corresponds to this point on the canvas (in pixels)
+    // Canvas top-left is at (-50vw, -50vh) relative to viewport
+    // So viewport center (50vw, 50vh) on screen = (50vw + 50vw, 50vh + 50vh) = (100vw, 100vh) on canvas
+    // As percentage of 200vw x 200vh canvas: 100/200 = 50%
+    const originX = ((vw / 2 + vw / 2) / (vw * 2)) * 100; // 50%
+    const originY = ((vh / 2 + vh / 2) / (vh * 2)) * 100; // 50%
+
     // Start with zoomed out view (scale 0.5 = seeing 2x viewport)
     gsap.set(canvas, {
       scale: 0.5,
       x: 0,
       y: 0,
-      transformOrigin: 'center center',
+      transformOrigin: `${originX}% ${originY}%`,
     });
 
     // Disable pointer events during intro
@@ -285,12 +357,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       className={`page page-Blurbs ${!introComplete ? 'is-intro' : ''}`}
       {...storyblokEditable(blok)}
     >
-      {/* Drag hint - only shows after intro */}
-      {showHint && introComplete && (
-        <div className="page-Blurbs-Hint">Drag to explore</div>
-      )}
-
-      {/* Explorable canvas */}
+      {/* Explorable canvas - must come BEFORE header for mix-blend-mode to work */}
       <div ref={canvasRef} className="page-Blurbs-Canvas">
         {blok.body.map((nestedBlok, index: number) => (
           <BlokBlurb
@@ -298,9 +365,17 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
             blok={nestedBlok as any}
             position={itemPositions[index]}
             canvasOffset={canvasOffset}
+            index={index}
           />
         ))}
       </div>
+
+      {/* Drag hint - only shows after intro */}
+      {showHint && introComplete && (
+        <div className="page-Blurbs-Hint">Drag to explore</div>
+      )}
+
+      {/* Header with mix-blend-mode - must come AFTER canvas in DOM */}
       <div className="page-Blurbs-Header">
         <div className="page-Blurbs-Header-Top">
           <Link href="/" className="cursorInteract">

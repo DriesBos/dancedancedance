@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 
@@ -25,29 +25,35 @@ interface BlokBlurbProps {
   blok: SbBlurpData;
   position: Position;
   canvasOffset: Position;
+  index: number; // Item index for consistent sizing
 }
+
+// Same seeded random as in PageBlurbs for consistency
+const seededRandom = (seed: number): number => {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+};
+
+// Size variants matching the positioning algorithm
+const SIZE_VARIANTS = [
+  { name: 'small', width: '12vw' },
+  { name: 'medium', width: '18vw' },
+  { name: 'large', width: '25vw' },
+] as const;
 
 const BlokBlurb: React.FunctionComponent<BlokBlurbProps> = ({
   blok,
   position,
   canvasOffset,
+  index,
 }) => {
   const itemRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Generate size variation based on position (deterministic)
-  const sizeVariant = useMemo(() => {
-    const hash = Math.floor((position.x * 7 + position.y * 13) % 3);
-    return ['small', 'medium', 'large'][hash];
-  }, [position]);
-
-  // Width classes for size variants
-  const widthMap: Record<string, string> = {
-    small: '12vw',
-    medium: '18vw',
-    large: '25vw',
-  };
+  // Get size variant using same algorithm as positioning
+  const variantIndex = Math.floor(seededRandom(index * 777) * 3);
+  const sizeVariant = SIZE_VARIANTS[variantIndex];
 
   // Check visibility based on canvas offset
   // Items near the viewport should be loaded
@@ -112,7 +118,7 @@ const BlokBlurb: React.FunctionComponent<BlokBlurbProps> = ({
       style={{
         left: `${position.x}vw`,
         top: `${position.y}vh`,
-        width: widthMap[sizeVariant],
+        width: sizeVariant.width,
         minWidth: '180px',
         maxWidth: '450px',
       }}
