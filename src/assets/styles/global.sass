@@ -91,9 +91,10 @@ main
     &-Thumbnail
       padding: 0 var(--spacing-base)
   &-Blurbs
-    position: fixed
-    top: 0
-    left: 0
+    position: relative
+    background: var(--theme-bg)
+    // top: 0
+    // left: 0
     width: 100vw
     height: 100dvh
     overflow: hidden
@@ -103,28 +104,21 @@ main
       cursor: grabbing
     // During intro animation
     &-Header
-      position: fixed
+      position: absolute
       top: 0
       left: 0
       width: 100%
       height: 100%
-      z-index: 999
       display: flex
       flex-direction: column
       justify-content: space-between
       pointer-events: none
       mix-blend-mode: difference
-      color: black
+      color: white
       // Ensure all children can receive pointer events
       a, button, .icon, .cursorInteract, .cursorMagnetic
         pointer-events: auto
-      &-Top
-        display: flex
-        flex-direction: row
-        justify-content: space-between
-        align-items: center
-        padding: var(--spacing-base) var(--spacing-side)
-      &-Bottom
+      & > div
         display: flex
         flex-direction: row
         justify-content: space-between
@@ -143,6 +137,7 @@ main
       // Canvas is 200vw x 200vh, we want center (100vw, 100vh) to align with viewport center
       top: -50vh
       left: -50vw
+      // z-index: 1
       // GSAP Draggable handles transforms and GPU layer promotion
     &-Item
       position: absolute
@@ -157,7 +152,6 @@ main
         position: relative
         display: flex
         flex-direction: column
-        gap: 0.5rem
       &-Media
         position: relative
         overflow: hidden
@@ -168,11 +162,12 @@ main
           height: auto
           object-fit: cover
       &-Caption
+        color: var(--theme-type-inactive)
         font-size: var(--font-size-caption)
-        color: var(--theme-type)
-        opacity: 0.7
-        max-width: 20rem
-        line-height: 1.4
+        letter-spacing: 0.02em
+        line-height: 1.32
+        padding-right: var(--spacing-side)
+        margin-top: 4px
     &-Hint
       position: fixed
       bottom: var(--spacing-base)
@@ -367,7 +362,6 @@ mux-player, .muxPlayer
         font-size: var(--font-size-caption)
         letter-spacing: 0.02em
         line-height: 1.32
-        padding-right: var(--spacing-side)
         margin-top: 4px
       &-Copyright
         position: relative

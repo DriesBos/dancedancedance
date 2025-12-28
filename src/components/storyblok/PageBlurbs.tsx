@@ -39,9 +39,9 @@ const seededRandom = (seed: number): number => {
 const getItemSize = (index: number): { width: number; height: number } => {
   const variant = Math.floor(seededRandom(index * 777) * 3);
   const sizes = [
-    { width: 12, height: 15 }, // small
+    { width: 16, height: 20 }, // small
     { width: 18, height: 22 }, // medium
-    { width: 25, height: 30 }, // large
+    { width: 20, height: 24 }, // large
   ];
   return sizes[variant];
 };
