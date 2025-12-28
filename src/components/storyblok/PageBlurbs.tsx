@@ -35,13 +35,15 @@ const seededRandom = (seed: number): number => {
   return x - Math.floor(x);
 };
 
-// Generate item size based on index (deterministic)
+// Generate item size based on index (deterministic) - 5 depth layers
 const getItemSize = (index: number): { width: number; height: number } => {
-  const variant = Math.floor(seededRandom(index * 777) * 3);
+  const variant = Math.floor(seededRandom(index * 777) * 5);
   const sizes = [
-    { width: 16, height: 20 }, // small
+    { width: 10, height: 12 }, // xs - furthest back
+    { width: 14, height: 17 }, // small
     { width: 18, height: 22 }, // medium
-    { width: 20, height: 24 }, // large
+    { width: 22, height: 27 }, // large
+    { width: 26, height: 32 }, // xl - closest
   ];
   return sizes[variant];
 };
