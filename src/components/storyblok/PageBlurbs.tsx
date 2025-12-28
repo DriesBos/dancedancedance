@@ -134,6 +134,12 @@ function generateItemPositions(itemCount: number): Position[] {
   return positions;
 }
 
+// Zoom levels
+const ZOOM_LEVELS = {
+  standard: 1,
+  overview: 0.5, // Shows full 200vw canvas
+} as const;
+
 const PageBlurbs = ({ blok }: PageBlurbsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -142,6 +148,9 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
   const [showHint, setShowHint] = useState(false); // Start hidden, show after intro
   const [canvasOffset, setCanvasOffset] = useState<Position>({ x: 0, y: 0 });
   const [introComplete, setIntroComplete] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState<'standard' | 'overview'>(
+    'standard'
+  );
 
   // Generate positions for all items
   const itemPositions = generateItemPositions(blok.body.length);
@@ -353,6 +362,52 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
     });
   }, []);
 
+  // Toggle zoom level
+  const toggleZoom = useCallback(() => {
+    if (!canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const newZoomLevel = zoomLevel === 'standard' ? 'overview' : 'standard';
+    const targetScale = ZOOM_LEVELS[newZoomLevel];
+
+    // When zooming out, center the canvas first
+    if (newZoomLevel === 'overview' && draggableRef.current[0]) {
+      // Disable dragging when zoomed out
+      draggableRef.current[0].disable();
+    }
+
+    // Animate zoom
+    gsap.to(canvas, {
+      scale: targetScale,
+      x: 0, // Center when zooming
+      y: 0,
+      duration: 1,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        setZoomLevel(newZoomLevel);
+        setCanvasOffset({ x: 0, y: 0 });
+
+        // Re-enable dragging when zooming back in
+        if (newZoomLevel === 'standard' && draggableRef.current[0]) {
+          draggableRef.current[0].enable();
+          draggableRef.current[0].update();
+        }
+      },
+    });
+  }, [zoomLevel]);
+
+  // Zoom in (to standard)
+  const zoomIn = useCallback(() => {
+    if (zoomLevel === 'standard') return;
+    toggleZoom();
+  }, [zoomLevel, toggleZoom]);
+
+  // Zoom out (to overview)
+  const zoomOut = useCallback(() => {
+    if (zoomLevel === 'overview') return;
+    toggleZoom();
+  }, [zoomLevel, toggleZoom]);
+
   return (
     <div
       ref={containerRef}
@@ -383,6 +438,43 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
           <Link href="/" className="cursorInteract">
             Blurbs..
           </Link>
+          <div className="page-Blurbs-Header-Zoom">
+            <button
+              onClick={zoomOut}
+              className={`page-Blurbs-Header-Zoom-Button cursorInteract ${
+                zoomLevel === 'overview' ? 'is-active' : ''
+              }`}
+              aria-label="Zoom out to overview"
+              title="Overview"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <rect x="7" y="7" width="10" height="10" rx="1" />
+              </svg>
+            </button>
+            <button
+              onClick={zoomIn}
+              className={`page-Blurbs-Header-Zoom-Button cursorInteract ${
+                zoomLevel === 'standard' ? 'is-active' : ''
+              }`}
+              aria-label="Zoom in to standard"
+              title="Standard"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+              </svg>
+            </button>
+          </div>
           <Link href="/" className="icon cursorMagnetic">
             <IconClose />
           </Link>
