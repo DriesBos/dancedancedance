@@ -35,10 +35,11 @@ const seededRandom = (seed: number): number => {
 };
 
 // Size variants matching the positioning algorithm
+// parallaxFactor < 1 means slower movement (appears further away)
 const SIZE_VARIANTS = [
-  { name: 'small', width: '12vw' },
-  { name: 'medium', width: '18vw' },
-  { name: 'large', width: '25vw' },
+  { name: 'small', width: '16vw', parallaxFactor: 0.95 },
+  { name: 'medium', width: '18vw', parallaxFactor: 1 },
+  { name: 'large', width: '20vw', parallaxFactor: 1.05 },
 ] as const;
 
 const BlokBlurb: React.FunctionComponent<BlokBlurbProps> = ({
@@ -54,6 +55,13 @@ const BlokBlurb: React.FunctionComponent<BlokBlurbProps> = ({
   // Get size variant using same algorithm as positioning
   const variantIndex = Math.floor(seededRandom(index * 777) * 3);
   const sizeVariant = SIZE_VARIANTS[variantIndex];
+
+  // Calculate parallax counter-offset for depth effect
+  // Small items move slower (parallaxFactor < 1), so we counter-offset them
+  const parallaxOffset = {
+    x: canvasOffset.x * (1 - sizeVariant.parallaxFactor),
+    y: canvasOffset.y * (1 - sizeVariant.parallaxFactor),
+  };
 
   // Check visibility based on canvas offset
   // Items near the viewport should be loaded
@@ -111,41 +119,52 @@ const BlokBlurb: React.FunctionComponent<BlokBlurbProps> = ({
     return () => clearTimeout(timer);
   }, [isLoaded]);
 
+  // Parallax transform (instant - no transition)
+  const parallaxTransform = `translate(${-parallaxOffset.x}px, ${-parallaxOffset.y}px)`;
+
   return (
+    // Outer wrapper: position + parallax (instant, no transition)
     <div
       ref={itemRef}
-      className={`page-Blurbs-Item ${isVisible ? 'is-visible' : ''}`}
+      className="page-Blurbs-Item-Wrapper"
       style={{
+        position: 'absolute',
         left: `${position.x}vw`,
         top: `${position.y}vh`,
         width: sizeVariant.width,
         minWidth: '180px',
         maxWidth: '450px',
+        transform: parallaxTransform,
       }}
-      data-cursor={blok.caption || 'View'}
       {...storyblokEditable(blok)}
     >
-      <div className="page-Blurbs-Item-Inner">
-        {isVisible &&
-          blok.media &&
-          blok.media.length > 0 &&
-          blok.media[0].filename && (
-            <div className="page-Blurbs-Item-Media">
-              <Image
-                src={blok.media[0].filename}
-                alt={blok.media[0].alt || blok.caption || ''}
-                width={0}
-                height={0}
-                sizes="(max-width: 768px) 50vw, 25vw"
-                quality={80}
-                style={{ width: '100%', height: 'auto' }}
-                loading="lazy"
-              />
-            </div>
+      {/* Inner element: visibility animation (with transition) */}
+      <div
+        className={`page-Blurbs-Item ${isVisible ? 'is-visible' : ''}`}
+        data-cursor={blok.caption || 'View'}
+      >
+        <div className="page-Blurbs-Item-Inner">
+          {isVisible &&
+            blok.media &&
+            blok.media.length > 0 &&
+            blok.media[0].filename && (
+              <div className="page-Blurbs-Item-Media">
+                <Image
+                  src={blok.media[0].filename}
+                  alt={blok.media[0].alt || blok.caption || ''}
+                  width={0}
+                  height={0}
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  quality={80}
+                  style={{ width: '100%', height: 'auto' }}
+                  loading="lazy"
+                />
+              </div>
+            )}
+          {isVisible && blok.caption && (
+            <div className="page-Blurbs-Item-Caption">{blok.caption}</div>
           )}
-        {isVisible && blok.caption && (
-          <div className="page-Blurbs-Item-Caption">{blok.caption}</div>
-        )}
+        </div>
       </div>
     </div>
   );
