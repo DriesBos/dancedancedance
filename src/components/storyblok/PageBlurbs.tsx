@@ -252,6 +252,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       inertia: true, // Enables throw physics with InertiaPlugin
       edgeResistance: 0.85,
       throwResistance: 2000,
+      zIndexBoost: false, // Prevent canvas from jumping above header
       onDragStart: () => {
         setShowHint(false);
       },
