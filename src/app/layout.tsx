@@ -27,26 +27,26 @@ const myFont = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Dries Bos — Design & Code Partner',
-  description: 'Dries Bos — Design & Code Partner',
+  title: 'Dries Bos — Code & Design Partner',
+  description: 'Dries Bos — Code & Design Partner',
   appleWebApp: {
     title: 'Dries Bos',
     statusBarStyle: 'black-translucent',
   },
   openGraph: {
-    title: 'Dries Bos — Design & Code Partner',
-    description: 'Dries Bos — Design & Code Partner',
+    title: 'Dries Bos — Code & Design Partner',
+    description: 'Dries Bos — Code & Design Partner',
     images: [
       {
         url: '/og-image.png',
-        alt: 'Dries Bos — Design & Code Partner',
+        alt: 'Dries Bos — Code & Design Partner',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Dries Bos — Design & Code Partner',
-    description: 'Dries Bos — Design & Code Partner',
+    title: 'Dries Bos — Code & Design Partner',
+    description: 'Dries Bos — Code & Design Partner',
     images: ['/og-image.png'],
   },
   other: {
