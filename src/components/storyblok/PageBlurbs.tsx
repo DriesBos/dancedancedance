@@ -10,6 +10,9 @@ import Link from 'next/link';
 import IconClose from '@/components/Icons/IconClose';
 import IconExternal from '../Icons/IconExternal';
 import IconArrowHead from '../Icons/IconArrowHead';
+import Row from '../Row';
+import IconCenter from '../Icons/IconCenter';
+import IconZoomToggle from '../Icons/IconZoomToggle';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -477,75 +480,60 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       {/* Header with mix-blend-mode - must come AFTER canvas in DOM */}
       <div className="page-Blurbs-Header">
         <div className="page-Blurbs-Header-Top">
-          <Link href="/" className="cursorInteract">
-            Blurbs..
-          </Link>
-          <div className="page-Blurbs-Header-Zoom">
-            <button
-              onClick={zoomOut}
-              className={`page-Blurbs-Header-Zoom-Button cursorInteract ${
-                zoomLevel === 'overview' ? 'is-active' : ''
-              }`}
-              aria-label="Zoom out to overview"
-              title="Overview"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <rect x="7" y="7" width="10" height="10" rx="1" />
-              </svg>
-            </button>
-            <button
-              onClick={zoomIn}
-              className={`page-Blurbs-Header-Zoom-Button cursorInteract ${
-                zoomLevel === 'standard' ? 'is-active' : ''
-              }`}
-              aria-label="Zoom in to standard"
-              title="Standard"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-              </svg>
-            </button>
+          <div>
+            <Link href="/" className="cursorInteract">
+              Blurbs..
+            </Link>
           </div>
-          <Link href="/" className="icon cursorMagnetic">
-            <IconClose />
-          </Link>
+          <div>
+            <Link href="/" className="icon cursorMagnetic">
+              <IconClose />
+            </Link>
+          </div>
         </div>
         <div className="page-Blurbs-Header-Bottom">
-          <div className="column column-Year column-Copyright">
+          <div className="page-Blurbs-Header-Bottom-Left">
             {new Date().getFullYear()}
             <span>&copy;</span>
           </div>
-          <a
-            href="mailto:info@driesbos.com"
-            target="_blank"
-            className="linkAnimation cursorMessage"
-            data-cursor-message="Let's talk"
-          >
-            <div className="hasExternalIcon">
-              <span className="mailMobile">Email</span>
-              <span className="mailDesktop">info@driesbos.com</span>
-              <IconExternal />
+          <div className="page-Blurbs-Header-Bottom-Right">
+            <div className="page-Blurbs-Header-Bottom-Icons-Email">
+              <a
+                href="mailto:info@driesbos.com"
+                target="_blank"
+                className="linkAnimation cursorMessage"
+                data-cursor-message="Let's talk"
+              >
+                <div className="hasExternalIcon">
+                  <span className="mailDesktop">info@driesbos.com</span>
+                  <IconExternal />
+                </div>
+              </a>
             </div>
-          </a>
-          <button
-            onClick={scrollToCenter}
-            className="icon icon-High icon-Footer cursorMagnetic"
-            aria-label="Scroll to center"
-          >
-            <div className="iconLine" />
-            <IconArrowHead />
-          </button>
+            <div className="page-Blurbs-Header-Bottom-Icons">
+              <div className="page-Blurbs-Header-Zoom">
+                <button
+                  onClick={zoomLevel === 'standard' ? zoomOut : zoomIn}
+                  className="icon cursorMagnetic"
+                  aria-label={
+                    zoomLevel === 'standard'
+                      ? 'Zoom in to standard'
+                      : 'Zoom out to overview'
+                  }
+                  title={zoomLevel === 'standard' ? 'Standard' : 'Overview'}
+                >
+                  <IconZoomToggle />
+                </button>
+              </div>
+              <button
+                onClick={scrollToCenter}
+                className="icon cursorMagnetic"
+                aria-label="Scroll to center"
+              >
+                <IconCenter />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

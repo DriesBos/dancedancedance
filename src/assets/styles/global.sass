@@ -121,9 +121,30 @@ main
       & > div
         display: flex
         flex-direction: row
+      &-Top
+        display: flex
+        flex-direction: row
         justify-content: space-between
         align-items: center
-        padding: var(--spacing-base) var(--spacing-side)
+        gap: var(--spacing-base)
+        & > div
+          padding: var(--spacing-base) var(--spacing-side)
+      &-Bottom
+        display: flex
+        & > div
+          padding: var(--spacing-base) var(--spacing-side)
+          flex: 1
+        &-Right
+          display: flex
+          justify-content: space-between
+          align-items: center
+        &-Icons
+          display: flex
+          flex-direction: row
+          justify-content: space-between
+          align-items: center
+          gap: var(--spacing-base)
+
       &-Zoom
         display: flex
         gap: 0.5rem
