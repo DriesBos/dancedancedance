@@ -16,6 +16,8 @@ import BlokSidePanels from './BlokSides';
 import StoreSwitcher from './StoreSwitcher';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import IconCloud from './Icons/IconCloud';
+import IconThoughts from './Icons/IconThoughts';
 
 interface Props {
   blok?: any;
@@ -389,6 +391,9 @@ const BlokHead = ({ blok, float, params }: Props) => {
               <Link href="/about" className="icon cursorMagnetic">
                 <IconAbout />
               </Link>
+              {/* <Link href="/blurbs" className="icon cursorMagnetic">
+                <IconThoughts />
+              </Link> */}
             </>
           )}
           {pathName === 'about' && (
