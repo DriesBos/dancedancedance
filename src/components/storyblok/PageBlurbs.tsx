@@ -144,6 +144,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const draggableRef = useRef<Draggable[]>([]);
+  const zoomLevelRef = useRef<'standard' | 'overview'>('standard'); // Ref for closures
 
   const [showHint, setShowHint] = useState(false); // Start hidden, show after intro
   const [canvasOffset, setCanvasOffset] = useState<Position>({ x: 0, y: 0 });
@@ -269,6 +270,10 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
     // Handle wheel/trackpad scrolling
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
+
+      // Skip wheel handling when zoomed out
+      if (zoomLevelRef.current === 'overview') return;
+
       setShowHint(false);
 
       if (!draggableRef.current[0]) return;
@@ -370,11 +375,15 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
     const canvas = canvasRef.current;
     const newZoomLevel = zoomLevel === 'standard' ? 'overview' : 'standard';
     const targetScale = ZOOM_LEVELS[newZoomLevel];
+    const bounds = getBounds();
 
-    // When zooming out, center the canvas first
+    // Update ref immediately so wheel handler knows the new state
+    zoomLevelRef.current = newZoomLevel;
+
+    // When zooming out, kill Draggable to prevent stale state issues
     if (newZoomLevel === 'overview' && draggableRef.current[0]) {
-      // Disable dragging when zoomed out
-      draggableRef.current[0].disable();
+      draggableRef.current[0].kill();
+      draggableRef.current = [];
     }
 
     // Animate zoom
@@ -384,18 +393,50 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       y: 0,
       duration: 1,
       ease: 'power3.inOut',
+      onUpdate: () => {
+        // Keep parallax in sync during animation
+        const currentX = gsap.getProperty(canvas, 'x') as number;
+        const currentY = gsap.getProperty(canvas, 'y') as number;
+        setCanvasOffset({ x: currentX, y: currentY });
+      },
       onComplete: () => {
         setZoomLevel(newZoomLevel);
         setCanvasOffset({ x: 0, y: 0 });
 
         // Re-enable dragging when zooming back in
-        if (newZoomLevel === 'standard' && draggableRef.current[0]) {
-          draggableRef.current[0].enable();
-          draggableRef.current[0].update();
+        if (newZoomLevel === 'standard') {
+          // Ensure canvas is at 0,0
+          gsap.set(canvas, { x: 0, y: 0 });
+
+          // Create new Draggable instance with clean state
+          draggableRef.current = Draggable.create(canvas, {
+            type: 'x,y',
+            bounds: {
+              minX: bounds.minX,
+              maxX: bounds.maxX,
+              minY: bounds.minY,
+              maxY: bounds.maxY,
+            },
+            inertia: true,
+            edgeResistance: 0.85,
+            throwResistance: 2000,
+            zIndexBoost: false,
+            onDragStart: () => {
+              setShowHint(false);
+            },
+            onDrag: function () {
+              setCanvasOffset({ x: this.x, y: this.y });
+            },
+            onThrowUpdate: function () {
+              setCanvasOffset({ x: this.x, y: this.y });
+            },
+            cursor: 'grab',
+            activeCursor: 'grabbing',
+          });
         }
       },
     });
-  }, [zoomLevel]);
+  }, [zoomLevel, getBounds]);
 
   // Zoom in (to standard)
   const zoomIn = useCallback(() => {
