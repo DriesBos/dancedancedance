@@ -93,16 +93,13 @@ main
   &-Blurbs
     position: relative
     background: var(--theme-bg)
-    // top: 0
-    // left: 0
     width: 100vw
     height: 100dvh
     overflow: hidden
     cursor: grab
     isolation: isolate
-    &:active
-      cursor: grabbing
-    // During intro animation
+    // &:active
+    //   cursor: grabbing
     &-Header
       position: absolute
       top: 0
@@ -183,7 +180,7 @@ main
       // No transition - parallax movement should be instant
     &-Item
       opacity: 0
-      transform: scale(0.9)
+      transform: scale(0.5)
       transition: opacity 0.5s ease, transform 0.5s ease
       will-change: opacity, transform
       &.is-visible
@@ -196,12 +193,11 @@ main
       &-Media
         position: relative
         overflow: hidden
-        border-radius: 0.25rem
         img
           display: block
           width: 100%
           height: auto
-          object-fit: cover
+          // object-fit: cover
       &-Caption
         color: var(--theme-type-inactive)
         font-size: var(--font-size-caption)
@@ -209,6 +205,7 @@ main
         line-height: 1.32
         padding-right: var(--spacing-side)
         margin-top: 4px
+        user-select: none
     &-Hint
       position: fixed
       bottom: var(--spacing-base)

@@ -38,11 +38,11 @@ const seededRandom = (seed: number): number => {
 // parallaxFactor < 1 means slower movement (appears further away)
 // parallaxFactor > 1 means faster movement (appears closer)
 const SIZE_VARIANTS = [
-  { name: 'xs', width: '10vw', parallaxFactor: 0.7 }, // furthest back
-  { name: 'small', width: '14vw', parallaxFactor: 0.85 },
+  { name: 'xs', width: '16vw', parallaxFactor: 0.9 }, // furthest back
+  { name: 'small', width: '17vw', parallaxFactor: 0.95 },
   { name: 'medium', width: '18vw', parallaxFactor: 1 }, // middle ground
-  { name: 'large', width: '22vw', parallaxFactor: 1.15 },
-  { name: 'xl', width: '26vw', parallaxFactor: 1.3 }, // closest
+  { name: 'large', width: '19vw', parallaxFactor: 1.05 },
+  { name: 'xl', width: '20vw', parallaxFactor: 1.1 }, // closest
 ] as const;
 
 const BlokBlurb: React.FunctionComponent<BlokBlurbProps> = ({
