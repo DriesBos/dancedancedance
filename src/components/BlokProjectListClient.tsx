@@ -70,7 +70,7 @@ const BlokProjectListClient = ({ data }: BlokProjectListClientProps) => {
 
   return (
     <div className="blok-ProjectList" ref={listRef}>
-      {data.map((item, index) => (
+      {data.map((item) => (
         <BlokProject
           key={item.slug}
           slug={item.slug}
