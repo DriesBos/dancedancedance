@@ -22,7 +22,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Dries Bos Studio</span>
-            <span className={styles.rowRole}>Freelance</span>
+            <span className={styles.rowRole}>Freelance Creative Developer</span>
           </div>
         </div>
 
@@ -42,7 +42,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Anatha</span>
-            <span className={styles.rowRole}>Lead UX Design</span>
+            <span className={styles.rowRole}>Lead UX Engineer</span>
           </div>
         </div>
 
@@ -62,7 +62,9 @@ const BlokExperience = ({ blok }: BlokProps) => {
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Close My Eyes</span>
-            <span className={styles.rowRole}>Designer, Developer, Founder</span>
+            <span className={styles.rowRole}>
+              E-Commerce Developer, Founder
+            </span>
           </div>
         </div>
       </div>

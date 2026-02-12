@@ -38,8 +38,8 @@ export async function generateMetadata({
     // Home page
     if (!slug || slug.length === 0 || storySlug === 'home') {
       return {
-        title: 'Dries Bos — Code & Design Partner',
-        description: 'Dries Bos — Code & Design Partner',
+        title: 'Dries Bos — Creative Developer',
+        description: 'Dries Bos — Creative Developer',
       };
     }
 
@@ -47,7 +47,7 @@ export async function generateMetadata({
     if (storySlug === 'about') {
       return {
         title: 'About Dries Bos',
-        description: 'About Dries Bos — Code & Design Partner',
+        description: 'About Dries Bos — Creative Developer',
       };
     }
 

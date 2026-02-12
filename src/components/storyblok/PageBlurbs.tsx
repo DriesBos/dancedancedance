@@ -482,7 +482,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
         <div className="page-Blurbs-Header-Top">
           <div>
             <Link href="/" className="cursorInteract">
-              Thoughts on Code & Design..
+              Thoughts..
             </Link>
           </div>
           <div>

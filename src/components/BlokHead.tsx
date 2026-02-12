@@ -192,7 +192,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
             .split(' ')
             .map(
               (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
             )
             .join(' ');
           setProjectName(tempProjectName);
@@ -374,7 +374,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
           )}
           <Link href="/" className="cursorInteract">
             {(pathName === 'home' || pathName === 'about') && (
-              <span className="cursorInteract">— Code & Design Partner</span>
+              <span className="cursorInteract">— Creative Developer</span>
             )}
           </Link>
           <Link href="/">
