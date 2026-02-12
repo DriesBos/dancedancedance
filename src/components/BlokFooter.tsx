@@ -10,10 +10,14 @@ import IconArrowHead from './Icons/IconArrowHead';
 
 const BlokFooter = () => {
   const ScrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    try {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    } catch {
+      window.scrollTo(0, 0);
+    }
   };
   return (
     <div className="blok blok-Footer blok-Animate">

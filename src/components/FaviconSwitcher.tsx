@@ -19,10 +19,18 @@ export default function FaviconSwitcher() {
       setBrowserTheme(e.matches ? 'dark' : 'light');
     };
 
-    darkModeMediaQuery.addEventListener('change', handleThemeChange);
+    if (typeof darkModeMediaQuery.addEventListener === 'function') {
+      darkModeMediaQuery.addEventListener('change', handleThemeChange);
+    } else {
+      darkModeMediaQuery.addListener(handleThemeChange);
+    }
 
     return () => {
-      darkModeMediaQuery.removeEventListener('change', handleThemeChange);
+      if (typeof darkModeMediaQuery.removeEventListener === 'function') {
+        darkModeMediaQuery.removeEventListener('change', handleThemeChange);
+      } else {
+        darkModeMediaQuery.removeListener(handleThemeChange);
+      }
     };
   }, []);
 

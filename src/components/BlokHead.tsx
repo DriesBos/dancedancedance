@@ -316,12 +316,20 @@ const BlokHead = ({ blok, float, params }: Props) => {
       }
     };
 
-    // Listen for orientation changes
-    mediaQuery.addEventListener('change', handleOrientationChange);
+    // Listen for orientation changes (Safari fallback)
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleOrientationChange);
+    } else {
+      mediaQuery.addListener(handleOrientationChange);
+    }
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      mediaQuery.removeEventListener('change', handleOrientationChange);
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', handleOrientationChange);
+      } else {
+        mediaQuery.removeListener(handleOrientationChange);
+      }
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);

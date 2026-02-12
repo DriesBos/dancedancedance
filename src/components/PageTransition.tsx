@@ -15,7 +15,11 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   // Scroll to top on route change - instant, no smooth behavior
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    } catch {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   // Animate header only on initial load
