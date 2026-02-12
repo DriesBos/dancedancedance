@@ -6,7 +6,6 @@ import { Suspense } from 'react';
 
 // Enable dynamic params for catch-all route
 export const dynamicParams = true;
-export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   return [];
