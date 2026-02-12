@@ -6,6 +6,11 @@ export default function FaviconSwitcher() {
   const [browserTheme, setBrowserTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
+    if (typeof window.matchMedia !== 'function') {
+      setBrowserTheme('light');
+      return;
+    }
+
     // Check browser's color scheme preference
     const darkModeMediaQuery = window.matchMedia(
       '(prefers-color-scheme: dark)'
@@ -41,7 +46,14 @@ export default function FaviconSwitcher() {
     );
 
     // Remove all existing favicons
-    existingFavicons.forEach((link) => link.remove());
+    for (let i = 0; i < existingFavicons.length; i += 1) {
+      const link = existingFavicons[i];
+      if (typeof link.remove === 'function') {
+        link.remove();
+      } else if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    }
 
     const prefix = browserTheme === 'dark' ? 'favicon-dark' : 'favicon-light';
 

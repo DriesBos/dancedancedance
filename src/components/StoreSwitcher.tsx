@@ -16,15 +16,29 @@ const StoreSwitcher = () => {
 
   // https://blog.codewithsky.in/screen-orientation-in-nextjs
   useEffect(() => {
+    const getOrientation = () => {
+      const screenOrientation = window.screen?.orientation;
+      if (screenOrientation && typeof screenOrientation.type === 'string') {
+        return screenOrientation.type;
+      }
+      return window.innerWidth >= window.innerHeight
+        ? 'landscape-primary'
+        : 'portrait-primary';
+    };
+
     function updateOrientation() {
-      setOrientation(window.screen.orientation.type);
+      setOrientation(getOrientation());
     }
+
     updateOrientation();
     window.addEventListener('orientationchange', updateOrientation);
+    window.addEventListener('resize', updateOrientation);
+
     return () => {
       window.removeEventListener('orientationchange', updateOrientation);
+      window.removeEventListener('resize', updateOrientation);
     };
-  }, [orientation]);
+  }, []);
 
   // Update theme-color meta tag when theme changes
   useEffect(() => {

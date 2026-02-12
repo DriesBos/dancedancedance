@@ -13,7 +13,9 @@ export default function CursorLoader() {
   useEffect(() => {
     // Check if device has a fine pointer (mouse, stylus)
     // This is more accurate than (hover: hover) for detecting cursor devices
-    const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+    const hasFinePointer =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(pointer: fine)').matches;
     setHasFinePointer(hasFinePointer);
   }, []);
 
@@ -22,4 +24,3 @@ export default function CursorLoader() {
 
   return <CustomCursor />;
 }
-

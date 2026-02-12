@@ -27,6 +27,7 @@ interface Props {
 
 const BlokHead = ({ blok, float, params }: Props) => {
   const path = usePathname();
+  const currentPath = path || '/';
   const router = useRouter();
   const { projectSlugs, projects } = useProjects();
   const space = useStore((state: any) => state.space);
@@ -48,21 +49,21 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   const clickNext = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) return;
-    const nextPath = path;
+    const nextPath = currentPath;
     const currentSlug = nextPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
     if (currentIndex !== -1 && currentIndex < projectSlugs.length - 1) {
       const nextSlug = `/projects/${projectSlugs[currentIndex + 1]}`;
       router.push(nextSlug);
     }
-  }, [path, router, projectSlugs]);
+  }, [currentPath, router, projectSlugs]);
 
   const checkNext = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) {
       setHasNext(false);
       return;
     }
-    const checkNextPath = path;
+    const checkNextPath = currentPath;
     const currentSlug = checkNextPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
     setCurrentProjectIndex(currentIndex);
@@ -71,25 +72,25 @@ const BlokHead = ({ blok, float, params }: Props) => {
     } else {
       setHasNext(true);
     }
-  }, [path, projectSlugs]);
+  }, [currentPath, projectSlugs]);
 
   const clickPrev = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) return;
-    const prevPath = path;
+    const prevPath = currentPath;
     const currentSlug = prevPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
     if (currentIndex > 0) {
       const prevSlug = `/projects/${projectSlugs[currentIndex - 1]}`;
       router.push(prevSlug);
     }
-  }, [path, router, projectSlugs]);
+  }, [currentPath, router, projectSlugs]);
 
   const checkPrev = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) {
       setHasPrev(false);
       return;
     }
-    const checkPrevPath = path;
+    const checkPrevPath = currentPath;
     const currentSlug = checkPrevPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
     if (currentIndex <= 0) {
@@ -97,7 +98,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     } else {
       setHasPrev(true);
     }
-  }, [path, projectSlugs]);
+  }, [currentPath, projectSlugs]);
 
   useEffect(() => {
     if (!projectSlugs || projectSlugs.length === 0) {
@@ -106,7 +107,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       return;
     }
 
-    const currentSlug = path.split('/')[2];
+    const currentSlug = currentPath.split('/')[2];
     const currentIndex = projectSlugs.indexOf(currentSlug);
 
     setCurrentProjectIndex(currentIndex);
@@ -124,7 +125,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     } else {
       setHasPrev(true);
     }
-  }, [path, projectSlugs]);
+  }, [currentPath, projectSlugs]);
 
   // const handleTopPanel = useCallback((e: any) => {
   //   if (e.type === 'mouseenter') {
@@ -171,7 +172,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   // Set Header Blok Title and External Link
   useEffect(() => {
-    let tempPathName = path.split('/')[1];
+    let tempPathName = currentPath.split('/')[1];
     switch (tempPathName) {
       case '':
         setPathName('home');
@@ -183,7 +184,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         break;
       case 'projects':
         setPathName('projects');
-        let tempProjectName = path.split('/')[2];
+        let tempProjectName = currentPath.split('/')[2];
         if (tempProjectName) {
           tempProjectName = tempProjectName
             .replace(/-/g, ' ')
@@ -197,7 +198,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
           // Fetch external link for current project
           if (projects && projects.length > 0) {
-            const currentSlug = path.split('/')[2];
+            const currentSlug = currentPath.split('/')[2];
             const currentProject = projects.find((p) => p.slug === currentSlug);
             if (currentProject && currentProject.external_link) {
               setExternalLink(currentProject.external_link);
@@ -208,7 +209,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         }
         break;
     }
-  }, [path, projects]);
+  }, [currentPath, projects]);
 
   // Set Escape Key and Arrow Keys
   useEffect(() => {
@@ -219,7 +220,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       }
 
       if (pathName === 'projects' && projectSlugs && projectSlugs.length > 0) {
-        const currentSlug = path.split('/')[2];
+        const currentSlug = currentPath.split('/')[2];
         const currentIndex = projectSlugs.indexOf(currentSlug);
 
         if (e.key === 'ArrowLeft' && currentIndex > 0) {
@@ -240,10 +241,12 @@ const BlokHead = ({ blok, float, params }: Props) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [router, pathName, path, projectSlugs]);
+  }, [router, pathName, currentPath, projectSlugs]);
 
   // Reveal on scroll up header pattern
   useGSAP(() => {
+    if (typeof window.matchMedia !== 'function') return;
+
     const mediaQuery = window.matchMedia('(orientation: landscape)');
     let isEnabled = mediaQuery.matches;
 

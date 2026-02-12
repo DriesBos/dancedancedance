@@ -31,6 +31,7 @@ export default function TitleSwitcher() {
   // Update originalTitle whenever the document title changes
   useEffect(() => {
     if (document.hidden) return;
+    if (typeof MutationObserver === 'undefined') return;
 
     const titleElement = document.querySelector('title');
     if (!titleElement) return;
