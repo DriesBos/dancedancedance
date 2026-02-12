@@ -14,6 +14,14 @@ export async function generateStaticParams() {
 
 type Params = Promise<{ slug?: string[] }>;
 
+const getStoryVersion = (): 'draft' | 'published' => {
+  const useDraftInDev =
+    process.env.NODE_ENV === 'development' &&
+    process.env.STORYBLOK_USE_DRAFT === 'true';
+
+  return useDraftInDev ? 'draft' : 'published';
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -21,8 +29,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const slug = (await params).slug;
-    const version =
-      process.env.NODE_ENV === 'development' ? 'draft' : 'published';
+    const version = getStoryVersion();
     const pageData = await fetchStory(version, slug);
 
     if (!pageData || !pageData.story) {
@@ -75,9 +82,7 @@ export async function generateMetadata({
 export default async function Home({ params }: { params: Params }) {
   try {
     const slug = (await params).slug;
-    // Use 'draft' in development, 'published' in production
-    const version =
-      process.env.NODE_ENV === 'development' ? 'draft' : 'published';
+    const version = getStoryVersion();
     const pageData = await fetchStory(version, slug);
 
     if (!pageData || !pageData.story) {

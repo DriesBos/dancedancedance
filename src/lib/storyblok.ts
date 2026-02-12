@@ -16,30 +16,54 @@ import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
 import BlokBlurb from '@/components/storyblok/BlokBlurb';
 import PageBlurbs from '@/components/storyblok/PageBlurbs';
 
-export const getStoryblokApi = storyblokInit({
-  accessToken: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN,
-  components: {
-    Page: Page,
-    'Page Blurbs': PageBlurbs,
-    'Page Project': Project,
-    'Blok Project List': BlokProjectList,
-    'Blok Project Slider': BlokProjectSlider,
-    'Blok Project Images List': BlokProjectImagesList,
-    'Blok Experience': BlokExperience,
-    'Blok Container': BlokContainer,
-    'Blok Blurp': BlokBlurb,
-    'Column Image': ColumnImage,
-    'Column Slider': ColumnSlider,
-    'Column Video': ColumnVideo,
-    'Column Text': ColumnText,
-    'Column Text Expandable': ColumnTextExpandable,
-    'Column Empty': ColumnEmpty,
-  },
-  use: [apiPlugin],
-  apiOptions: {
-    region: 'eu',
-    cache: {
-      type: 'memory',
+const components = {
+  Page: Page,
+  'Page Blurbs': PageBlurbs,
+  'Page Project': Project,
+  'Blok Project List': BlokProjectList,
+  'Blok Project Slider': BlokProjectSlider,
+  'Blok Project Images List': BlokProjectImagesList,
+  'Blok Experience': BlokExperience,
+  'Blok Container': BlokContainer,
+  'Blok Blurp': BlokBlurb,
+  'Column Image': ColumnImage,
+  'Column Slider': ColumnSlider,
+  'Column Video': ColumnVideo,
+  'Column Text': ColumnText,
+  'Column Text Expandable': ColumnTextExpandable,
+  'Column Empty': ColumnEmpty,
+};
+
+export const getStoryblokAccessToken = (preview = false): string | undefined => {
+  const publicToken =
+    process.env.STORYBLOK_PUBLIC_ACCESS_TOKEN ||
+    process.env.NEXT_PUBLIC_STORYBLOK_TOKEN;
+  const previewToken =
+    process.env.STORYBLOK_PREVIEW_ACCESS_TOKEN ||
+    process.env.NEXT_PREVIEW_STORYBLOK_TOKEN;
+
+  return preview ? previewToken || publicToken : publicToken;
+};
+
+export const getStoryblokApi = (preview = false) => {
+  const accessToken = getStoryblokAccessToken(preview);
+  if (!accessToken) {
+    throw new Error(
+      'Missing Storyblok token. Set STORYBLOK_PUBLIC_ACCESS_TOKEN (or NEXT_PUBLIC_STORYBLOK_TOKEN).'
+    );
+  }
+
+  return storyblokInit({
+    accessToken,
+    components: {
+      ...components,
     },
-  },
-});
+    use: [apiPlugin],
+    apiOptions: {
+      region: 'eu',
+      cache: {
+        type: 'memory',
+      },
+    },
+  })();
+};

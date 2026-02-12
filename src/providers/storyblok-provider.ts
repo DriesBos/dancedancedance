@@ -1,12 +1,16 @@
 'use client';
 
-import { getStoryblokApi } from '@/lib/storyblok';
+import { useEffect } from 'react';
+import { initStoryblokClient } from '@/lib/storyblok-client';
 
 export default function StoryblokProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  getStoryblokApi();
+  useEffect(() => {
+    initStoryblokClient();
+  }, []);
+
   return children;
 }
