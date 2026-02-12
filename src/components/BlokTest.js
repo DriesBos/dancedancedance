@@ -8,7 +8,6 @@ const BlokTest = ({ onRangeChange }) => {
   const [range, setRange] = useState(0.5);
 
   useEffect(() => {
-    console.log('range', range);
     if (onRangeChange) {
       onRangeChange(range);
     }

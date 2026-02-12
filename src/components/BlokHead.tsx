@@ -46,8 +46,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
     { cached_url: string } | undefined
   >(undefined);
 
-  console.log(blok, float, params, 'PROJECT PAGE');
-
   const clickNext = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) return;
     const nextPath = path;
