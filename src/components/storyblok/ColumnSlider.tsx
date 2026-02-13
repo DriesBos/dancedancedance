@@ -3,8 +3,7 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP } from '@/lib/gsap';
 import SliderIndicators from '../SliderIndicators';
 
 interface SbPageData extends SbBlokData {
@@ -59,19 +58,22 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   const nextImage = activeImages?.[nextIndex];
 
   // Fade in animation on slide change
-  useGSAP(() => {
-    if (!itemRef.current) return;
+  useGSAP(
+    () => {
+      if (!itemRef.current) return;
 
-    gsap.fromTo(
-      itemRef.current,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0,
-        ease: 'linear',
-      }
-    );
-  }, [activeIndex]);
+      gsap.fromTo(
+        itemRef.current,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0,
+          ease: 'linear',
+        }
+      );
+    },
+    { dependencies: [activeIndex], revertOnUpdate: true }
+  );
 
   useEffect(() => {
     if (!activeImages || activeImages.length === 0) return;

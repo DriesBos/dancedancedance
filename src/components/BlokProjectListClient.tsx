@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import gsap from 'gsap';
+import { useRef } from 'react';
+import { gsap, useGSAP } from '@/lib/gsap';
 import BlokProject from './BlokProject';
 
 interface ProjectData {
@@ -19,54 +19,68 @@ interface BlokProjectListClientProps {
 const BlokProjectListClient = ({ data }: BlokProjectListClientProps) => {
   const listRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!listRef.current) return;
+  useGSAP(
+    (_context, contextSafe) => {
+      if (!listRef.current) return;
 
-    const projectItems = listRef.current.querySelectorAll('.blok-Project');
+      const projectItems = listRef.current.querySelectorAll('.blok-Project');
 
-    // Calculate the hover distance (3.95rem * 0.5)
-    const remValue = parseFloat(
-      getComputedStyle(document.documentElement).fontSize
-    );
-    const hoverDistance = -(3.95 * 0.5 * remValue);
+      // Calculate the hover distance (3.95rem * 0.5)
+      const remValue = parseFloat(
+        getComputedStyle(document.documentElement).fontSize
+      );
+      const hoverDistance = -(3.95 * 0.5 * remValue);
 
-    projectItems.forEach((item, index) => {
-      const element = item as HTMLElement;
+      const listeners: Array<{
+        element: HTMLElement;
+        handleMouseEnter: () => void;
+        handleMouseLeave: () => void;
+      }> = [];
 
-      // Get the element's current z-index from CSS
-      const currentZIndex = window.getComputedStyle(element).zIndex;
-      const zIndexValue =
-        currentZIndex !== 'auto' ? parseInt(currentZIndex) : index + 1;
+      projectItems.forEach((item, index) => {
+        const element = item as HTMLElement;
 
-      const handleMouseEnter = () => {
-        gsap.to(element, {
-          y: hoverDistance,
-          duration: 0.15,
-          ease: 'cubic-bezier(0.16, 1, 0.16, 1)',
-          force3D: false, // Prevent transform3d which can affect stacking
-          zIndex: zIndexValue, // Explicitly set z-index to maintain stacking order
+        // Get the element's current z-index from CSS
+        const currentZIndex = window.getComputedStyle(element).zIndex;
+        const zIndexValue =
+          currentZIndex !== 'auto' ? parseInt(currentZIndex) : index + 1;
+
+        const handleMouseEnter = contextSafe(() => {
+          gsap.to(element, {
+            y: hoverDistance,
+            duration: 0.15,
+            ease: 'cubic-bezier(0.16, 1, 0.16, 1)',
+            force3D: false, // Prevent transform3d which can affect stacking
+            zIndex: zIndexValue, // Explicitly set z-index to maintain stacking order
+          });
         });
-      };
 
-      const handleMouseLeave = () => {
-        gsap.to(element, {
-          y: 0,
-          duration: 0.5,
-          ease: 'cubic-bezier(0, 0, 0.58, 1)',
-          force3D: false,
-          zIndex: zIndexValue,
+        const handleMouseLeave = contextSafe(() => {
+          gsap.to(element, {
+            y: 0,
+            duration: 0.5,
+            ease: 'cubic-bezier(0, 0, 0.58, 1)',
+            force3D: false,
+            zIndex: zIndexValue,
+          });
         });
-      };
 
-      element.addEventListener('mouseenter', handleMouseEnter);
-      element.addEventListener('mouseleave', handleMouseLeave);
+        element.addEventListener('mouseenter', handleMouseEnter);
+        element.addEventListener('mouseleave', handleMouseLeave);
+        listeners.push({ element, handleMouseEnter, handleMouseLeave });
+      });
 
       return () => {
-        element.removeEventListener('mouseenter', handleMouseEnter);
-        element.removeEventListener('mouseleave', handleMouseLeave);
+        listeners.forEach(
+          ({ element, handleMouseEnter, handleMouseLeave }) => {
+            element.removeEventListener('mouseenter', handleMouseEnter);
+            element.removeEventListener('mouseleave', handleMouseLeave);
+          }
+        );
       };
-    });
-  }, [data]);
+    },
+    { scope: listRef, dependencies: [data], revertOnUpdate: true }
+  );
 
   return (
     <div className="blok-ProjectList" ref={listRef}>

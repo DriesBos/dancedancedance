@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
+import { gsap, useGSAP } from '@/lib/gsap';
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -41,22 +40,25 @@ export default function PageTransition({ children }: PageTransitionProps) {
     }
   }, []); // Empty dependency array = run once on mount
 
-  useGSAP(() => {
-    // Set initial state for all animated blocks
-    gsap.set('.blok-Animate', {
-      opacity: 0,
-      y: 20,
-    });
+  useGSAP(
+    () => {
+      // Set initial state for all animated blocks
+      gsap.set('.blok-Animate', {
+        opacity: 0,
+        y: 20,
+      });
 
-    // Animate in with stagger - faster duration for snappier feel
-    gsap.to('.blok-Animate', {
-      opacity: 1,
-      y: 0,
-      duration: 0.33,
-      stagger: 0.165,
-      ease: 'power1.inOut',
-    });
-  }, [pathname]); // Re-run animation on route change
+      // Animate in with stagger - faster duration for snappier feel
+      gsap.to('.blok-Animate', {
+        opacity: 1,
+        y: 0,
+        duration: 0.33,
+        stagger: 0.165,
+        ease: 'power1.inOut',
+      });
+    },
+    { dependencies: [pathname], revertOnUpdate: true }
+  ); // Re-run animation on route change
 
   return <>{children}</>;
 }

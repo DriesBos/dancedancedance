@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '@/store/store';
 import { useProjects } from '@/providers/projects-provider';
 import Link from 'next/link';
-import React, { useState, useEffect, useCallback, use } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
@@ -14,8 +14,7 @@ import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from './Row';
 import BlokSidePanels from './BlokSides';
 import StoreSwitcher from './StoreSwitcher';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP } from '@/lib/gsap';
 import IconCloud from './Icons/IconCloud';
 import IconThoughts from './Icons/IconThoughts';
 
@@ -26,6 +25,7 @@ interface Props {
 }
 
 const BlokHead = ({ blok, float, params }: Props) => {
+  const headRef = useRef<HTMLDivElement>(null);
   const path = usePathname();
   const currentPath = path || '/';
   const router = useRouter();
@@ -244,8 +244,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
   }, [router, pathName, currentPath, projectSlugs]);
 
   // Reveal on scroll up header pattern
-  useGSAP(() => {
-    if (typeof window.matchMedia !== 'function') return;
+  useGSAP((_, contextSafe) => {
+    if (typeof window.matchMedia !== 'function' || !headRef.current) return;
 
     const mediaQuery = window.matchMedia('(orientation: landscape)');
     let isEnabled = mediaQuery.matches;
@@ -254,7 +254,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     let scrollStartY = window.scrollY;
     let isScrollingDown = false;
 
-    const updateHeaderVisibility = () => {
+    const updateHeaderVisibility = contextSafe(() => {
       if (!isEnabled) return; // Skip if not in landscape
 
       const currentScrollY = window.scrollY;
@@ -263,7 +263,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
       // Always show header at the top
       if (currentScrollY < scrollThreshold) {
-        gsap.to('.blok-Head', {
+        gsap.to(headRef.current, {
           y: 0,
           duration: 0.33,
           ease: 'power1.inOut',
@@ -287,14 +287,14 @@ const BlokHead = ({ blok, float, params }: Props) => {
       // Check if we've scrolled enough in the current direction
       if (isScrollingDown && scrollDistance > scrollThreshold) {
         // Hide header - move up
-        gsap.to('.blok-Head', {
+        gsap.to(headRef.current, {
           y: -100,
           duration: 0.33,
           ease: 'power1.out',
         });
       } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
         // Show header - move to normal position
-        gsap.to('.blok-Head', {
+        gsap.to(headRef.current, {
           y: 0,
           duration: 0.33,
           ease: 'power1.out',
@@ -302,20 +302,20 @@ const BlokHead = ({ blok, float, params }: Props) => {
       }
 
       lastScrollY = currentScrollY;
-    };
+    });
 
     const handleScroll = () => {
       window.requestAnimationFrame(updateHeaderVisibility);
     };
 
-    const handleOrientationChange = (e: MediaQueryListEvent) => {
+    const handleOrientationChange = contextSafe((e: MediaQueryListEvent) => {
       isEnabled = e.matches;
 
       // Reset header position when switching to portrait
       if (!isEnabled) {
-        gsap.set('.blok-Head', { y: 0 });
+        gsap.set(headRef.current, { y: 0 });
       }
-    };
+    });
 
     // Listen for orientation changes (Safari fallback)
     if (typeof mediaQuery.addEventListener === 'function') {
@@ -333,7 +333,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       }
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, { scope: headRef });
 
   // Scroll border state
   useEffect(() => {
@@ -368,6 +368,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   return (
     <div
+      ref={headRef}
       className={`blok blok-Head blok-AnimateHead`}
       data-scrollborder={hasScrollBorder}
     >

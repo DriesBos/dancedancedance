@@ -2,11 +2,8 @@
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP } from '@/lib/gsap';
 import TheMarkdown from '../TheMarkdown/TheMarkdown';
-
-gsap.registerPlugin(useGSAP);
 
 interface SbPageData extends SbBlokData {
   text?: string;
@@ -19,18 +16,20 @@ interface ColumnTextProps {
 }
 
 const ColumnText: React.FunctionComponent<ColumnTextProps> = ({ blok }) => {
-  const container = useRef(null);
+  const container = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      gsap.to('.column-Text', {
+      if (!container.current) return;
+
+      gsap.to(container.current, {
         '--var': '100%',
         duration: 0.66,
         delay: 0.33,
         ease: 'ease',
       });
-    }
-    // { scope: container }
+    },
+    { scope: container }
   );
   return (
     <div

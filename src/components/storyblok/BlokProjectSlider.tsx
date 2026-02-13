@@ -4,8 +4,7 @@ import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP } from '@/lib/gsap';
 import MuxPlayer from '../MuxPlayer';
 import SliderIndicators from '../SliderIndicators';
 
@@ -167,21 +166,27 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   }, []);
 
   // Animate progress bar
-  useGSAP(() => {
-    if (!progressRef.current || !currentItem) return;
+  useGSAP(
+    () => {
+      if (!progressRef.current || !currentItem) return;
 
-    const duration = currentDuration / 1000;
+      const duration = currentDuration / 1000;
 
-    gsap.fromTo(
-      progressRef.current,
-      { width: '0%' },
-      {
-        width: '100%',
-        duration: duration,
-        ease: 'linear',
-      }
-    );
-  }, [activeIndex, currentItem, currentDuration]);
+      gsap.fromTo(
+        progressRef.current,
+        { width: '0%' },
+        {
+          width: '100%',
+          duration: duration,
+          ease: 'linear',
+        }
+      );
+    },
+    {
+      dependencies: [activeIndex, currentItem, currentDuration],
+      revertOnUpdate: true,
+    }
+  );
 
   // Auto-advance slides (paused when hovering)
   useEffect(() => {
