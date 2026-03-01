@@ -19,6 +19,7 @@ import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
+import ThemingToggles from '@/components/ThemingToggles';
 
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
@@ -86,6 +87,7 @@ export default async function RootLayout({
           <CursorLoader />
           <TitleSwitcher />
           <FaviconSwitcher />
+          <ThemingToggles />
           {process.env.NEXT_PUBLIC_GA_ID && (
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
           )}

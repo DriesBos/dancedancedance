@@ -31,8 +31,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const router = useRouter();
   const { projectSlugs, projects } = useProjects();
   const space = useStore((state: any) => state.space);
-  const index = useStore((state: any) => state.index);
-  const setIndex = useStore((state: any) => state.setIndex);
   var topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);

@@ -56,8 +56,22 @@ body
   align-items: flex-start
   padding: 0
   min-height: 100dvh
+  z-index: 0
   transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background-color var(--transition-theme)
   will-change: padding-top, padding-bottom, color, background-color
+  // Paper-like texture layer (enabled per theme via --theme-blok-gradient)
+  &::before
+    content: ''
+    position: fixed
+    inset: 0
+    z-index: -1
+    pointer-events: none
+    opacity: var(--theme-blok-gradient)
+    transition: opacity var(--transition-theme)
+    background-image: radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 45%), radial-gradient(circle at 82% 84%, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0) 52%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E")
+    background-repeat: no-repeat, no-repeat, repeat
+    background-size: 120% 120%, 120% 120%, 180px 180px
+    background-position: center, center, 0 0
 
 main
   position: relative
@@ -69,9 +83,8 @@ main
   height: calc-size(auto)
   max-height: auto
   max-height: calc-size(auto)
-  border: 0 solid var(--border-color)
-  border-radius: 0
-  background-color: var(--theme-container)
+  border: var(--main-border-width) solid var(--border-color)
+  border-radius: var(--main-border-radius)
   transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background-color var(--transition-theme)
   will-change: border, border-radius, width, max-width, height, max-height, transform, background-color
   transform-style: preserve-3d
@@ -84,12 +97,8 @@ main
     margin-top: calc(0px - (#{var(--border-hyperlink)}))
 
 .page
-  &-General
-    margin-top: 20vh
-  &-Project
-    margin-top: 20vh
-    &-Thumbnail
-      padding: 0 var(--spacing-base)
+  &-Thumbnail
+    padding: 0 var(--spacing-base)
   &-Blurbs
     position: relative
     background: var(--theme-bg)
@@ -757,25 +766,26 @@ mux-player, .muxPlayer
     @media (max-width: 770px)
       flex-direction: column
 
-// .side 
-//   position: absolute
-//   left: 0
-//   top: 0
-//   width: 100%
-//   height: 100%
-//   border: var(--border-width) solid var(--border-color)
-//   backdrop-filter: none
-//   transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
-//   will-change: background, border, backdrop-filter, opacity
-//   pointer-events: none
-//   opacity: 0
-//   &_Top
-//     left: calc(0px - #{var(--border-width)})
-//     top: 0
-//     height: 150px
-//     width: calc(100% + 2 * #{var(--border-width)})
-//     transform: rotateX(90deg) rotateY(0deg) translateY(-150px) 
-//     transform-origin: 0 0
+.side
+  position: absolute
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  border: var(--border-width) solid var(--border-color)
+  backdrop-filter: none
+  transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
+  will-change: background, border, backdrop-filter, opacity
+  pointer-events: none
+  opacity: 0
+  background: var(--theme-blok)
+  &_Top
+    left: calc(0px - #{var(--border-width)})
+    top: 0
+    height: 150px
+    width: calc(100% + 2 * #{var(--border-width)})
+    transform: rotateX(90deg) rotateY(0deg) translateY(-150px)
+    transform-origin: 0 0
 
 // Specific Elements
 .IconTheme
@@ -934,20 +944,24 @@ body
   //   .blok, .blok .row, .side
   //     background: var(--theme-blok)
 
-// Spaces
+// SPACE
 body
-  // OMNI
   main
     & > .blok:nth-child(2)
       z-index: -1
-  // LAPTOP
+  .page
+    &-General, &-Project
+      transition: margin-top var(--transition-space)
   &[data-space="DESKTOP"]
     padding: 0
     main
       max-width: 100%
       min-height: 100dvh
-    // .introText
-    //   opacity: 0
+    .page
+      &-General
+        margin-top: 20vh
+      &-Project
+        margin-top: 20vh
     .blok
       border-left-width: 0
       border-right-width: 0
@@ -959,64 +973,21 @@ body
       &-Filter
         border-top-width: 0
 
-  // 3D
-  // &[data-space="3D"]
-  //   padding-top: calc(191px + 68px + 20vh)
-  //   padding-bottom: 6rem
-  //   .laserBlok
-  //     opacity: 1
-  //   main
-  //     width: 88vw
-  //     max-width: 1150px
-  //     & > .blok
-  //       perspective: 1000px
-  //       perspective-origin: 50% -100vh
-  //     & > .blok
-  //       &:first-child, &:nth-child(2)
-  //         .side
-  //           opacity: 1
-
-  // PHONE
-  // &[data-space="MOBILE"]
-  //   align-items: center
-  //   font-size: var(--font-size-mobile)
-  //   h1, p, a, span
-  //     font-size: 1em
-  //   main
-  //     flex-grow: 1
-  //     width: 100%
-  //     max-width: 393px
-  //     height: 100%
-  //     max-height: 852px
-  //     border: 4px solid var(--border-color)
-  //     border-radius: 2em
-  //     overflow-y: auto
-  //   .introText
-  //     opacity: 0
-  //   .blok
-  //     border-left-width: 0
-  //     border-right-width: 0
-  //     &-Footer
-  //       border-bottom: 0
-  //       min-height: calc(68px * 2)
-  //       justify-content: flex-end
-  //     &-Head
-  //       border-top-width: 0
-  //       .column-Title
-  //         & > a:nth-child(2)
-  //           display: none
-  //     &-Filter
-  //       border-top-width: 0
-  //       .column:nth-child(n+3):not(.column-Icons)
-  //         display: none 
-  //     &-Project
-  //       .column:nth-child(n+3):not(.column-Icons)
-  //         display: none 
-  //     .column
-  //       &-Empty
-  //         display: none
-  //   .desktop
-  //     display: none
+  &[data-space="3D"]
+    padding-top: calc(191px + 68px + 20vh)
+    padding-bottom: 6rem
+    .laserBlok
+      opacity: 1
+    main
+      width: 88vw
+      max-width: 1150px
+      & > .blok
+        perspective: 1000px
+        perspective-origin: 50% -100vh
+      & > .blok
+        &:first-child, &:nth-child(2)
+          .side
+            opacity: 1
 
 .clickable
   cursor: pointer

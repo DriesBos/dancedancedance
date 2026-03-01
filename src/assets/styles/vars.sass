@@ -64,9 +64,8 @@ $break-desktop: 1370px
   --color-dark-border: #2C2C2C
   /* theme */
   --theme-bg: var(--color-black)
-  --theme-container: var(--color-black) 
   --theme-blok: hsla(0, 0%, 100%, 0)
-  --theme-blok-project: hsla(0, 0%, 100%, 0)
+  --theme-blok-gradient: 0
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0)
   --theme-type: var(--color-tron)
   --theme-type-inactive: var(--color-tron-inactive)
@@ -81,7 +80,9 @@ $break-desktop: 1370px
 
   // Sizing
   --icon-size: 1.1363636364rem
-  --border-width: 0px
+  --border-width: 0
+  --border-radius: 0
+  --border-gap: 0
   --border-hyperlink: 1.5px
   --blok-height: 3em
   --top-padding-filter: 0
@@ -104,68 +105,76 @@ $break-desktop: 1370px
   --transition-theme-quick: 0.33s ease
 
 // SPACES
-body[data-space='MOBILE']
-  --top-padding-filter: calc(#{var(--blok-height)} * 2)
-
 body[data-space='DESKTOP']
   --top-padding-filter: calc(#{var(--blok-height)} * 3)
 
 body[data-space='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
 
+// BORDERS
+body[data-border='none']
+  --border-width: 0px
+  --border-radius: 0px
+  --border-gap: 0
+body[data-border='minimal']
+  --border-width: 1px
+  --border-radius: 0
+  --border-gap: 0
+body[data-border='radius']
+  --border-width: 2px
+  --border-radius: 1rem
+  --border-gap: 0
+body[data-border='organic']
+  --border-width: 3px
+  --border-gap: 0
+
 // THEMES
 body[data-theme='LIGHT']
   --theme-bg: var(--color-light-bg)
-  --theme-container: var(--color-light-bg)
   --theme-blok: var(--color-white)
-  --theme-blok-project: var(--color-white)
   --theme-type: var(--color-light-type)
-  --theme-type-inverted: var(--color-light-type-inverted)
   --theme-type-inactive: var(--color-light-type-secondary)
   --border-color: var(--color-light-border)
 
 body[data-theme='DARK']
   --theme-bg: var(--color-dark-bg)
-  --theme-container: var(--color-dark-bg)
   --theme-blok: var(--color-dark-bg)
-  --theme-blok-project: var(--color-dark-bg)
   --theme-type: var(--color-dark-type)
-  --theme-type-inverted: var(--color-dark-type-inverted)
   --theme-type-inactive: var(--color-dark-type-secondary)
   --border-color: var(--color-dark-border)
 
+body[data-theme='STEDELIJK']
+  --theme-bg: black
+  --theme-blok: #62C853
+  --theme-blok-gradient: 1
+  --theme-type: black
+  --theme-type-inactive: var(--color-dark-type-secondary)
+  --border-color: black
+
 body[data-theme='TRON']
   --theme-bg: var(--color-black)
-  --theme-container: transparent
   --theme-blok: transparent
-  --theme-blok-project: var(--color-black)
-  --theme-type: var(--color-tron) 
+  --theme-type: var(--color-tron)
   --theme-type-inactive: var(--color-tron-inactive)
   --border-color: var(--color-tron)
 
 body[data-theme='NIGHTMODE']
   --theme-bg: var(--color-black)
-  --theme-container: transparent
   --theme-blok: transparent
-  --theme-blok-project: var(--color-black)
   --theme-type: var(--color-red)
   --theme-type-inactive: var(--color-red-inactive)
   --border-color: var(--color-red)
 
 body[data-theme='BASIC']
   --theme-bg: var(--color-white)
-  --theme-container: transparent
   --theme-blok: var(--color-white)
-  --theme-blok-project: var(--color-white)
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
   --border-color: var(--color-black)
 
 body[data-theme='IMAGE']
   --theme-bg: transparent
-  --theme-container: transparent
   --theme-blok: hsla(0, 0%, 0%, 0.66)
-  --theme-blok-project: hsla(0, 0%, 0%, 0.66)
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0.33)
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-grey-inactive)
@@ -173,31 +182,23 @@ body[data-theme='IMAGE']
 
 body[data-theme='BLACK']
   --theme-bg: transparent
-  --theme-container: transparent
   --theme-blok: var(--color-black)
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
 
 body[data-theme='GRADIENT']
   --theme-bg: radial-gradient(#D8DAD9, #BCBDC1)
-  --theme-container: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
   --theme-blok: transparent
-  --theme-blok-project: transparent
   --theme-blok-subpanel: transparent
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-white-inactive)
   --border-color: var(--color-white)
   &[data-space='3D']
-    --theme-container: transparent
     --theme-bg: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
-  &[data-space='MOBILE']
-    --theme-container: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
 
 body[data-theme='DONJUDD']
   --theme-bg: #DAD9E0
-  --theme-container: transparent
   --theme-blok: #DAD9E0
-  --theme-blok-project: #DAD9E0
   --theme-blok-subpanel: hsla(7, 95%, 62%, 0.4)
   --theme-type: #FA5942
   --theme-type-inactive: hsla(7, 95%, 62%, 0.4)
@@ -207,11 +208,8 @@ body[data-theme='DONJUDD']
 
 body[data-theme='GRUNGE']
   --theme-bg: transparent
-  --theme-container: transparent
   --theme-blok: transparent
-  --theme-blok-project: transparent
   --theme-blok-subpanel: transparent
   --theme-type: #4D53A0
-  --theme-type-inactive:transparent
+  --theme-type-inactive: transparent
   --border-color: #4D53A0
-
