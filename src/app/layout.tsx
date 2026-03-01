@@ -21,6 +21,7 @@ import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
 import ThemingToggles from '@/components/ThemingToggles';
 import GrainyGradient from '@/components/GrainyGradient';
+import IconStylesLoader from '@/components/Icons/IconStylesLoader';
 
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
@@ -85,6 +86,7 @@ export default async function RootLayout({
       </head>
       <AppInitializer className={`body ${myFont.className}`}>
         <GrainyGradient variant="page" />
+        <IconStylesLoader />
         <ProjectsProvider projects={projects}>
           <CursorLoader />
           <TitleSwitcher />

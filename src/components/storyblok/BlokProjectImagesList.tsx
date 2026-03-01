@@ -44,7 +44,6 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
-      <GrainyGradient variant="blok" />
       <div className="blok-Highlights">
         {highlights.map((item: any) => (
           <Link

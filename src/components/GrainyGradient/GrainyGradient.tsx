@@ -35,7 +35,7 @@ export default function GrainyGradient({ variant }: GrainyGradientProps) {
           width="100%"
           height="100%"
           filter={`url(#${noiseId})`}
-          opacity={isPage ? '0.16' : '0.14'}
+          opacity={1}
         />
       </svg>
     </div>

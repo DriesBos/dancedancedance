@@ -243,96 +243,99 @@ const BlokHead = ({ blok, float, params }: Props) => {
   }, [router, pathName, currentPath, projectSlugs]);
 
   // Reveal on scroll up header pattern
-  useGSAP((_, contextSafe) => {
-    if (typeof window.matchMedia !== 'function' || !headRef.current) return;
+  useGSAP(
+    (_, contextSafe) => {
+      if (typeof window.matchMedia !== 'function' || !headRef.current) return;
 
-    const mediaQuery = window.matchMedia('(orientation: landscape)');
-    let isEnabled = mediaQuery.matches;
+      const mediaQuery = window.matchMedia('(orientation: landscape)');
+      let isEnabled = mediaQuery.matches;
 
-    let lastScrollY = window.scrollY;
-    let scrollStartY = window.scrollY;
-    let isScrollingDown = false;
+      let lastScrollY = window.scrollY;
+      let scrollStartY = window.scrollY;
+      let isScrollingDown = false;
 
-    const updateHeaderVisibility = contextSafe(() => {
-      if (!isEnabled) return; // Skip if not in landscape
+      const updateHeaderVisibility = contextSafe(() => {
+        if (!isEnabled) return; // Skip if not in landscape
 
-      const currentScrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const scrollThreshold = windowHeight * 0.1; // 10% of window height
+        const currentScrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const scrollThreshold = windowHeight * 0.1; // 10% of window height
 
-      // Always show header at the top
-      if (currentScrollY < scrollThreshold) {
-        gsap.to(headRef.current, {
-          y: 0,
-          duration: 0.33,
-          ease: 'power1.inOut',
-        });
-        scrollStartY = currentScrollY;
+        // Always show header at the top
+        if (currentScrollY < scrollThreshold) {
+          gsap.to(headRef.current, {
+            y: 0,
+            duration: 0.33,
+            ease: 'power1.inOut',
+          });
+          scrollStartY = currentScrollY;
+          lastScrollY = currentScrollY;
+          return;
+        }
+
+        // Detect direction change
+        const scrollingDown = currentScrollY > lastScrollY;
+
+        if (scrollingDown !== isScrollingDown) {
+          // Direction changed, reset start point
+          scrollStartY = lastScrollY;
+          isScrollingDown = scrollingDown;
+        }
+
+        const scrollDistance = Math.abs(currentScrollY - scrollStartY);
+
+        // Check if we've scrolled enough in the current direction
+        if (isScrollingDown && scrollDistance > scrollThreshold) {
+          // Hide header - move up
+          gsap.to(headRef.current, {
+            y: -100,
+            duration: 0.33,
+            ease: 'power1.out',
+          });
+        } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
+          // Show header - move to normal position
+          gsap.to(headRef.current, {
+            y: 0,
+            duration: 0.33,
+            ease: 'power1.out',
+          });
+        }
+
         lastScrollY = currentScrollY;
-        return;
-      }
+      });
 
-      // Detect direction change
-      const scrollingDown = currentScrollY > lastScrollY;
+      const handleScroll = () => {
+        window.requestAnimationFrame(updateHeaderVisibility);
+      };
 
-      if (scrollingDown !== isScrollingDown) {
-        // Direction changed, reset start point
-        scrollStartY = lastScrollY;
-        isScrollingDown = scrollingDown;
-      }
+      const handleOrientationChange = contextSafe((e: MediaQueryListEvent) => {
+        isEnabled = e.matches;
 
-      const scrollDistance = Math.abs(currentScrollY - scrollStartY);
+        // Reset header position when switching to portrait
+        if (!isEnabled) {
+          gsap.set(headRef.current, { y: 0 });
+        }
+      });
 
-      // Check if we've scrolled enough in the current direction
-      if (isScrollingDown && scrollDistance > scrollThreshold) {
-        // Hide header - move up
-        gsap.to(headRef.current, {
-          y: -100,
-          duration: 0.33,
-          ease: 'power1.out',
-        });
-      } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
-        // Show header - move to normal position
-        gsap.to(headRef.current, {
-          y: 0,
-          duration: 0.33,
-          ease: 'power1.out',
-        });
-      }
-
-      lastScrollY = currentScrollY;
-    });
-
-    const handleScroll = () => {
-      window.requestAnimationFrame(updateHeaderVisibility);
-    };
-
-    const handleOrientationChange = contextSafe((e: MediaQueryListEvent) => {
-      isEnabled = e.matches;
-
-      // Reset header position when switching to portrait
-      if (!isEnabled) {
-        gsap.set(headRef.current, { y: 0 });
-      }
-    });
-
-    // Listen for orientation changes (Safari fallback)
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', handleOrientationChange);
-    } else {
-      mediaQuery.addListener(handleOrientationChange);
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      if (typeof mediaQuery.removeEventListener === 'function') {
-        mediaQuery.removeEventListener('change', handleOrientationChange);
+      // Listen for orientation changes (Safari fallback)
+      if (typeof mediaQuery.addEventListener === 'function') {
+        mediaQuery.addEventListener('change', handleOrientationChange);
       } else {
-        mediaQuery.removeListener(handleOrientationChange);
+        mediaQuery.addListener(handleOrientationChange);
       }
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, { scope: headRef });
+      window.addEventListener('scroll', handleScroll, { passive: true });
+
+      return () => {
+        if (typeof mediaQuery.removeEventListener === 'function') {
+          mediaQuery.removeEventListener('change', handleOrientationChange);
+        } else {
+          mediaQuery.removeListener(handleOrientationChange);
+        }
+        window.removeEventListener('scroll', handleScroll);
+      };
+    },
+    { scope: headRef },
+  );
 
   // Scroll border state
   useEffect(() => {
@@ -356,14 +359,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
       window.removeEventListener('scroll', handleScrollBorder);
     };
   }, []);
-
-  // function handlePickIndex() {
-  //   if (index === 'TXT') {
-  //     setIndex('IMG');
-  //   } else {
-  //     setIndex('TXT');
-  //   }
-  // }
 
   return (
     <div

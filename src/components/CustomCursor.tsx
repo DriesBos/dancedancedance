@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
+import styles from './CustomCursor.module.sass';
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -332,11 +333,11 @@ export default function CustomCursor() {
 
   return (
     <>
-      <div ref={messageRef} className="customCursor customCursor-Message">
+      <div ref={messageRef} className={`${styles.cursor} ${styles.message}`}>
         {message}
       </div>
-      <div ref={followerRef} className="customCursor customCursor-Follower" />
-      <div ref={cursorRef} className="customCursor customCursor-Main" />
+      <div ref={followerRef} className={`${styles.cursor} ${styles.follower}`} />
+      <div ref={cursorRef} className={`${styles.cursor} ${styles.main}`} />
     </>
   );
 }

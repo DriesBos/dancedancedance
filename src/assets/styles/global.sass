@@ -7,42 +7,6 @@
     display: none
     scrollbar-width: none
 
-// Custom Cursor
-.customCursor
-  position: fixed
-  top: 0
-  left: 0
-  border-radius: 50%
-  pointer-events: none
-  z-index: 9999
-  will-change: transform
-  @media (hover: none) or (pointer: coarse)
-    display: none
-  &-Main
-    width: 0.9090909091rem
-    height: 0.9090909091rem
-    background-color: currentColor
-  &-Follower
-    width: 0.9090909091rem
-    height: 0.9090909091rem
-    background-color: transparent
-    border: 1.5px solid currentColor
-  &-Message
-    opacity: 0
-    background-color: black
-    color: white
-    padding: 6px 1.25rem 10px
-    // height: 0.9090909091rem
-    // margin-top: 0.4545454545rem
-    display: flex
-    align-items: center
-    justify-content: center
-    border-radius: 10000px
-    // font-size: var(--font-size-caption)
-    line-height: 1
-    white-space: nowrap
-    width: auto
-
 html, body
   position: relative
   width: 100%
@@ -230,94 +194,6 @@ main
   to
     opacity: 0.9
     transform: translateX(-50%) translateY(0)
-
-.icon
-  position: relative
-  cursor: pointer
-  user-select: none
-  flex-shrink: 0
-  width: var(--icon-size)
-  height: var(--icon-size)
-  box-sizing: content-box
-  & > div, & > a
-    width: var(--icon-size)
-    height: var(--icon-size)
-  svg
-    position: relative
-    width: var(--icon-size)
-    height: var(--icon-size)
-  &-ExternalLink
-    opacity: 0
-    &[data-active='true']
-      opacity: 1
-  &-Wide
-    width: calc(2 * #{var(--icon-size)})
-    & > div, & > a
-      width: calc(2 * #{var(--icon-size)})
-    svg
-      width: calc(2 * #{var(--icon-size)})
-  &-High
-    height: calc(2 * #{var(--icon-size)})
-    & > div, & > a
-      height: calc(2 * #{var(--icon-size)})
-    svg
-      height: calc(2 * #{var(--icon-size)})
-  &-Rotate
-    transform: rotate(180deg)
-  &-Footer
-    position: relative
-    & .iconLine
-      position: absolute
-      top: calc(var(--spacing-base) + 1px)
-      left: var(--spacing-base)
-      width: 0.1rem
-      height: calc(100% - (var(--spacing-base) * 2) - 1px)
-      background: currentColor
-      transform: translateX(-100%)
-      @media (max-width: 770px)
-        left: calc(var(--spacing-base) / 2 + var(--icon-size) / 2 + 0.75px)
-  &.disabled
-    pointer-events: none
-    color: var(--theme-type-inactive)
-    transition: color var(--transition-theme)
-    will-change: color
-
-// SPECIFICS ELEMENTS
-.hasExternalIcon
-  position: relative
-  & > svg
-    position: absolute
-    top: 0
-    right: 0
-    width: calc(var(--icon-size) / 2)
-    height: calc(var(--icon-size) / 2)
-    transform: translate(75%, 50%)
-
-.linkAnimation
-  --var: 0%
-  position: relative
-  overflow: visible
-  &::before
-    content: ''
-    position: absolute
-    left: 0
-    bottom: 0
-    display: inline-block
-    width: var(--var)
-    height: 100%
-    border-bottom: var(--border-hyperlink) solid currentColor !important
-    transform: translateY(var(--border-hyperlink))
-    box-sizing: border-box
-    z-index: 0
-    will-change: width, border-bottom
-    overflow: visible
-    pointer-events: none
-  &:hover
-    &::before
-      @media ( hover: hover )
-        animation: hyperLink .66s ease
-        animation-iteration-count: 1
-        animation-fill-mode: forwards
 
 // Mux Player Styles
 mux-player, .muxPlayer
@@ -774,36 +650,6 @@ mux-player, .muxPlayer
     width: calc(100% + 2 * #{var(--border-width)})
     transform: rotateX(90deg) rotateY(0deg) translateY(-150px)
     transform-origin: 0 0
-
-// Specific Elements
-.IconTheme
-  position: relative
-  width: calc(var(--icon-size) * 2 )
-  height: var(--icon-size)
-  &-Line
-    position: absolute
-    top: 50%
-    left: calc(var(--spacing-base) / 2)
-    width: calc(100% - #{var(--spacing-base)}) !important
-    height: 1.5px !important
-    background-color: var(--theme-type)
-    transition: background-color var(--transition-theme)
-    transform: translateY(-50%)
-  &-Circle
-    position: absolute
-    top: calc(var(--spacing-base) + (var(--icon-size) / 10 * 1))
-    left: calc(var(--spacing-base) / 2)
-    width: calc(var(--icon-size) / 5 * 4) !important
-    height: calc(var(--icon-size) / 5 * 4) !important
-    background-color: var(--theme-type)
-    border-radius: 1000px
-    transition: left 0.25s ease, background-color var(--transition-theme)
-  &[data-theme='LIGHT']
-    .IconTheme-Circle
-      left: calc(var(--spacing-base) / 2)
-  &[data-theme='DARK']
-    .IconTheme-Circle
-      left: calc(var(--spacing-base) / 2 + ((var(--icon-size) * 2)) - (var(--icon-size) / 5 * 4))
 
 // .themeBackground
 //   position: fixed
