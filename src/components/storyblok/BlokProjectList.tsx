@@ -1,6 +1,7 @@
 import { ISbStoriesParams } from '@storyblok/react/rsc';
 import { getStoryblokApi } from '@/lib/storyblok';
 import BlokProject from '../BlokProject';
+import GrainyGradient from '@/components/GrainyGradient';
 
 export default async function BlokProjectList() {
   const projects = await fetchProjects();
@@ -17,6 +18,7 @@ export default async function BlokProjectList() {
 
   return (
     <div className="blok blok-ProjectList">
+      <GrainyGradient variant="blok" />
       {data.map((item: any) => (
         <BlokProject
           key={item.slug}

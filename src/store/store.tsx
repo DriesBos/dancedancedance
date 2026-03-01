@@ -53,8 +53,8 @@ const BORDER_ORDER: Border[] = ['none', 'minimal', 'radius', 'organic'];
 
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
-  theme: 'LIGHT',
-  space: 'DESKTOP',
+  theme: 'STEDELIJK',
+  space: '3D',
   topPanel: true,
   border: 'minimal',
   setNightmode: () => set({ theme: 'NIGHTMODE' }),

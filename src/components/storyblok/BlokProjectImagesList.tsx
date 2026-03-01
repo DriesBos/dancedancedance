@@ -7,6 +7,7 @@ import { getStoryblokApi } from '@/lib/storyblok';
 import BlokProjectListClient from '../BlokProjectListClient';
 import Image from 'next/image';
 import Link from 'next/link';
+import GrainyGradient from '@/components/GrainyGradient';
 
 interface SbPageData extends SbBlokData {
   slug?: string;
@@ -43,6 +44,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
 
   return (
     <div className="blok blok-ProjectImagesList" {...storyblokEditable(blok)}>
+      <GrainyGradient variant="blok" />
       <div className="blok-Highlights">
         {highlights.map((item: any) => (
           <Link
@@ -50,6 +52,7 @@ const BlokProjectImagesList = async ({ blok }: BlokProjectImagesListProps) => {
             className="blok blok-Highlights-Item blok-Animate"
             href={`/projects/${item.slug}`}
           >
+            <GrainyGradient variant="blok" />
             <div className="blok-Highlights-Item-Image cursorInteract">
               <Image
                 src={item.thumbnail.filename}

@@ -5,6 +5,7 @@ import {
 } from '@storyblok/react/rsc';
 import Row from '../Row';
 import BlokSidePanels from '../BlokSides';
+import GrainyGradient from '@/components/GrainyGradient';
 
 interface SbPageData extends SbBlokData {
   body: SbBlokData[];
@@ -18,6 +19,7 @@ interface BlokProps {
 const BlokContainer = ({ blok }: BlokProps) => {
   return (
     <div className="blok blok-Animate" {...storyblokEditable(blok)}>
+      <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row wideColumns={blok.wideColumns}>
         {blok.body.map((nestedBlok: any) => (

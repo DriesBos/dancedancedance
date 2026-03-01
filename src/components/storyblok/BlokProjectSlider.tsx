@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { gsap, useGSAP } from '@/lib/gsap';
 import MuxPlayer from '../MuxPlayer';
 import SliderIndicators from '../SliderIndicators';
+import GrainyGradient from '@/components/GrainyGradient';
 
 interface SbPageData extends SbBlokData {
   body: Array<{
@@ -221,6 +222,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       className="blok blok-ProjectSlider blok-Animate"
       {...storyblokEditable(blok)}
     >
+      <GrainyGradient variant="blok" />
       {blok.body.map((item, index) => (
         <SlideItem
           key={item._uid}

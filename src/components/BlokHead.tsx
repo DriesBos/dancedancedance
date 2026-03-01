@@ -17,6 +17,7 @@ import StoreSwitcher from './StoreSwitcher';
 import { gsap, useGSAP } from '@/lib/gsap';
 import IconCloud from './Icons/IconCloud';
 import IconThoughts from './Icons/IconThoughts';
+import GrainyGradient from '@/components/GrainyGradient';
 
 interface Props {
   blok?: any;
@@ -370,6 +371,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       className={`blok blok-Head blok-AnimateHead`}
       data-scrollborder={hasScrollBorder}
     >
+      <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">

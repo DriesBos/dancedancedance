@@ -4,6 +4,7 @@ import IconSearch from '@/components/Icons/IconSearch';
 import { usePathname } from 'next/navigation';
 import Row from './Row';
 import BlokSidePanels from './BlokSides';
+import GrainyGradient from '@/components/GrainyGradient';
 
 export default function BlokFilter() {
   const path = usePathname();
@@ -11,6 +12,7 @@ export default function BlokFilter() {
     <>
       {path === '/' && (
         <div className="blok blok-Filter blok-Animate">
+          <GrainyGradient variant="blok" />
           <BlokSidePanels />
           <Row>
             <div className="column column-Year" data-inactive={true}>

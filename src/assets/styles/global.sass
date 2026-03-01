@@ -56,22 +56,8 @@ body
   align-items: flex-start
   padding: 0
   min-height: 100dvh
-  z-index: 0
   transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background-color var(--transition-theme)
   will-change: padding-top, padding-bottom, color, background-color
-  // Paper-like texture layer (enabled per theme via --theme-blok-gradient)
-  &::before
-    content: ''
-    position: fixed
-    inset: 0
-    z-index: -1
-    pointer-events: none
-    opacity: var(--theme-blok-gradient)
-    transition: opacity var(--transition-theme)
-    background-image: radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 45%), radial-gradient(circle at 82% 84%, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0) 52%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E")
-    background-repeat: no-repeat, no-repeat, repeat
-    background-size: 120% 120%, 120% 120%, 180px 180px
-    background-position: center, center, 0 0
 
 main
   position: relative
@@ -360,6 +346,8 @@ mux-player, .muxPlayer
 // BLOKS
 .blok
   // position: sticky
+  position: relative
+  isolation: isolate
   top: 0
   display: flex
   flex-direction: column

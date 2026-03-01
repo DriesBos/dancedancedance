@@ -2,6 +2,7 @@ import styles from './BlokExperience.module.sass';
 import { SbBlokData } from '@storyblok/react/rsc';
 import BlokSidePanels from '../../BlokSides';
 import Row from '@/components/Row';
+import GrainyGradient from '@/components/GrainyGradient';
 
 interface SbPageData extends SbBlokData {
   body: SbBlokData[];
@@ -14,6 +15,7 @@ interface BlokProps {
 const BlokExperience = ({ blok }: BlokProps) => {
   return (
     <div className={`blok blok-Exp blok-Animate`}>
+      <GrainyGradient variant="blok" />
       <div className={styles.blokName}>Experience</div>
       <div className={styles.content}>
         <div className={styles.row}>

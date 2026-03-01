@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
+import GrainyGradient from '@/components/GrainyGradient';
 
 interface Props {
   slug?: String;
@@ -29,6 +30,7 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
       onClick={handleClick}
       style={{ cursor: 'pointer' }}
     >
+      <GrainyGradient variant="blok" />
       <Row>
         {displayYear && <div className="column column-Year">{displayYear}</div>}
         {title && <div className="column column-Project">{title}</div>}
