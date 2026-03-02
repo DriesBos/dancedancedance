@@ -31,7 +31,7 @@ const myFont = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://www.driesbos.com'
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://www.driesbos.com',
   ),
   title: 'Dries Bos — Creative Developer',
   description: 'Dries Bos — Creative Developer',

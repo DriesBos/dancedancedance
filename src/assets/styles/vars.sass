@@ -66,7 +66,7 @@ $break-desktop: 1370px
   --theme-bg: var(--color-black)
   --theme-bg-gradient: 0
   --theme-blok: hsla(0, 0%, 100%, 0)
-  --theme-blok-showlines: hsla(0, 0%, 100%, 0)
+  --theme-blok-showlines: var(--theme-blok)
   --theme-blok-gradient: 0
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0)
   --theme-type: var(--color-tron)
@@ -144,6 +144,7 @@ body[data-border='organic']
 body[data-theme='LIGHT']
   --theme-bg: var(--color-light-bg)
   --theme-blok: var(--color-white)
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: var(--color-light-type)
   --theme-type-inactive: var(--color-light-type-secondary)
   --theme-type-contrast: white
@@ -152,6 +153,7 @@ body[data-theme='LIGHT']
 body[data-theme='DARK']
   --theme-bg: var(--color-dark-bg)
   --theme-blok: var(--color-dark-bg)
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: var(--color-dark-type)
   --theme-type-inactive: var(--color-dark-type-secondary)
   --theme-type-contrast: white
@@ -161,6 +163,7 @@ body[data-theme='STEDELIJK']
   --theme-bg: black
   --theme-bg-gradient: 1
   --theme-blok: #62C853
+  --theme-blok-showlines: var(--theme-blok)
   --theme-blok-gradient: 1
   --theme-type: black
   --theme-type-inactive: var(--color-dark-type-secondary)
@@ -172,6 +175,7 @@ body[data-theme='STEDELIJK']
 body[data-theme='JAPANLIGHT']
   --theme-bg: #F8F2E9
   --theme-blok: #FFF9F1
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: #1F1A17
   --theme-type-inactive: #8A7E73
   --theme-type-contrast: white
@@ -182,6 +186,7 @@ body[data-theme='JAPANLIGHT']
 body[data-theme='JAPANDARK']
   --theme-bg: #1D1714
   --theme-blok: #2B231F
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: #F0E7DC
   --theme-type-inactive: #A79A8F
   --theme-type-contrast: white
@@ -192,21 +197,18 @@ body[data-theme='JAPANDARK']
 body[data-theme='BEIGE']
   --theme-bg: #E8E7E3
   --theme-blok: #E8E7E3
-  --theme-blok-showlines: transparent
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: black
   --theme-type-inactive: hsla(0, 0%, 0%, 0.33)
   --theme-type-contrast: white
   --cursor-color-bg: black
   --cursor-color-blok: black
   --border-color: black
-  .blok-Head
-    background: var(--theme-blok-showlines)
-    .side
-      background: var(--theme-blok-showlines)
 
 body[data-theme='TRON']
   --theme-bg: var(--color-black)
   --theme-blok: transparent
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: var(--color-tron)
   --theme-type-inactive: var(--color-tron-inactive)
   --theme-type-contrast: white
@@ -215,6 +217,7 @@ body[data-theme='TRON']
 body[data-theme='NIGHTMODE']
   --theme-bg: var(--color-black)
   --theme-blok: transparent
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: var(--color-red)
   --theme-type-inactive: var(--color-red-inactive)
   --theme-type-contrast: white
@@ -223,6 +226,7 @@ body[data-theme='NIGHTMODE']
 body[data-theme='BASIC']
   --theme-bg: var(--color-white)
   --theme-blok: var(--color-white)
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
   --theme-type-contrast: white
@@ -231,6 +235,7 @@ body[data-theme='BASIC']
 body[data-theme='IMAGE']
   --theme-bg: transparent
   --theme-blok: hsla(0, 0%, 0%, 0.66)
+  --theme-blok-showlines: var(--theme-blok)
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0.33)
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-grey-inactive)
@@ -240,6 +245,7 @@ body[data-theme='IMAGE']
 body[data-theme='BLACK']
   --theme-bg: transparent
   --theme-blok: var(--color-black)
+  --theme-blok-showlines: var(--theme-blok)
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
   --theme-type-contrast: white
@@ -247,6 +253,7 @@ body[data-theme='BLACK']
 body[data-theme='GRADIENT']
   --theme-bg: radial-gradient(#D8DAD9, #BCBDC1)
   --theme-blok: transparent
+  --theme-blok-showlines: var(--theme-blok)
   --theme-blok-subpanel: transparent
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-white-inactive)
@@ -258,6 +265,7 @@ body[data-theme='GRADIENT']
 body[data-theme='DONJUDD']
   --theme-bg: #DAD9E0
   --theme-blok: #DAD9E0
+  --theme-blok-showlines: var(--theme-blok)
   --theme-blok-subpanel: hsla(7, 95%, 62%, 0.4)
   --theme-type: #FA5942
   --theme-type-inactive: hsla(7, 95%, 62%, 0.4)
@@ -269,6 +277,7 @@ body[data-theme='DONJUDD']
 body[data-theme='GRUNGE']
   --theme-bg: transparent
   --theme-blok: transparent
+  --theme-blok-showlines: var(--theme-blok)
   --theme-blok-subpanel: transparent
   --theme-type: #4D53A0
   --theme-type-inactive: transparent
