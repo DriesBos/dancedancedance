@@ -15,7 +15,7 @@ export type Theme =
   | 'LIGHT'
   | 'DARK';
 
-export type Space = 'DESKTOP' | '3D' | '3DTWO';
+export type Space = 'DESKTOP' | '3D';
 
 export type Border = 'none' | 'minimal' | 'radius' | 'organic';
 
@@ -33,7 +33,6 @@ export type Actions = {
   cycleTheme: () => void;
   setTwoD: () => void;
   setThreeD: () => void;
-  setThreeDTwo: () => void;
   setTopPanelTrue: () => void;
   setTopPanelFalse: () => void;
   setBorder: (border: Border) => void;
@@ -60,12 +59,12 @@ const BORDER_ORDER: Border[] = ['none', 'minimal', 'radius', 'organic'];
 
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
-  theme: 'STEDELIJK',
+  theme: 'BEIGE',
   space: '3D',
   topPanel: true,
   border: 'minimal',
   setNightmode: () => set({ theme: 'NIGHTMODE' }),
-  setDefault: () => set({ theme: 'GRADIENT' }),
+  setDefault: () => set({ theme: 'BEIGE' }),
   setTheme: (theme: Theme) => set({ theme }),
   cycleTheme: () =>
     set((state) => {
@@ -75,7 +74,6 @@ export const useStore = create<Props & Actions>()((set) => ({
     }),
   setTwoD: () => set({ space: 'DESKTOP' }),
   setThreeD: () => set({ space: '3D' }),
-  setThreeDTwo: () => set({ space: '3DTWO' }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
   setBorder: (border: Border) => set({ border }),

@@ -16,6 +16,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
   return (
     <div className={`blok blok-Exp blok-Animate`}>
       <GrainyGradient variant="blok" />
+      <BlokSidePanels />
       <div className={styles.blokName}>Experience</div>
       <div className={styles.content}>
         <div className={styles.row}>

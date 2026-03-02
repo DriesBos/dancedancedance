@@ -3,7 +3,7 @@
 import IconSearch from '@/components/Icons/IconSearch';
 import { usePathname } from 'next/navigation';
 import Row from './Row';
-import { TopPanel } from './BlokSidePanels';
+import BlokSidePanels from './BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient';
 
 export default function BlokFilter() {
@@ -13,7 +13,7 @@ export default function BlokFilter() {
       {path === '/' && (
         <div className="blok blok-Filter blok-Animate">
           <GrainyGradient variant="blok" />
-          <TopPanel />
+          <BlokSidePanels />
           <Row>
             <div className="column column-Year" data-inactive={true}>
               Date

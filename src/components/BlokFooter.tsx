@@ -8,7 +8,6 @@ import IconExternal from './Icons/IconExternal';
 import Newsletter from './Newsletter/Newsletter';
 import IconArrowHead from './Icons/IconArrowHead';
 import GrainyGradient from '@/components/GrainyGradient';
-import { BottomPanel } from './BlokSidePanels';
 
 const BlokFooter = () => {
   const ScrollToTop = () => {
@@ -24,7 +23,6 @@ const BlokFooter = () => {
   return (
     <div className="blok blok-Footer blok-Animate">
       <GrainyGradient variant="blok" />
-      <BottomPanel />
       <Row>
         <div className="column column-Year column-Copyright">
           {new Date().getFullYear()}

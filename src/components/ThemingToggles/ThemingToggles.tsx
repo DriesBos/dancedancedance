@@ -3,7 +3,7 @@
 import { useStore } from '@/store/store';
 import styles from './ThemingToggles.module.sass';
 
-const SPACE_ORDER = ['DESKTOP', '3D', '3DTWO'] as const;
+const SPACE_ORDER = ['DESKTOP', '3D'] as const;
 
 export default function ThemingToggles() {
   const theme = useStore((state) => state.theme);
@@ -12,7 +12,6 @@ export default function ThemingToggles() {
   const cycleTheme = useStore((state) => state.cycleTheme);
   const setTwoD = useStore((state) => state.setTwoD);
   const setThreeD = useStore((state) => state.setThreeD);
-  const setThreeDTwo = useStore((state) => state.setThreeDTwo);
   const cycleBorder = useStore((state) => state.cycleBorder);
 
   const toggleSpace = () => {
@@ -21,7 +20,6 @@ export default function ThemingToggles() {
 
     if (nextSpace === 'DESKTOP') setTwoD();
     if (nextSpace === '3D') setThreeD();
-    if (nextSpace === '3DTWO') setThreeDTwo();
   };
 
   return (

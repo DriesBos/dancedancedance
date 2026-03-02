@@ -2,6 +2,7 @@ import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 import Link from 'next/link';
 import GrainyGradient from '@/components/GrainyGradient';
+import BlokSidePanels from '@/components/BlokSidePanels';
 import { fetchProjectData } from './projectsData';
 
 interface BlokHighlightsProps {
@@ -15,6 +16,7 @@ const BlokHighlights = async ({ blok }: BlokHighlightsProps) => {
   return (
     <div className="blok blok-Highlights" {...storyblokEditable(blok)}>
       <GrainyGradient variant="blok" />
+      <BlokSidePanels />
       {highlights.map((item) => (
         <Link
           key={item.slug}

@@ -3,7 +3,7 @@ import styles from './BlokSidePanels.module.sass';
 
 const BackPanel = () => {
   return (
-    <div className={`${styles.side} ${styles.side_Back} ${styles.back}`}>
+    <div className={`${styles.side} ${styles.side_Back} side side_Back`}>
       <GrainyGradient variant="blok" />
     </div>
   );

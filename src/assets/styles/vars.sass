@@ -67,6 +67,7 @@ $break-desktop: 1370px
   --theme-bg-gradient: 0
   --theme-blok: hsla(0, 0%, 100%, 0)
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-blok-gradient: 0
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0)
   --theme-type: var(--color-tron)
@@ -119,10 +120,6 @@ body[data-space='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
   --panel-perspective-origin: 50% -100vh
 
-body[data-space='3DTWO']
-  --top-padding-filter: calc(#{var(--blok-height)} * 2)
-  --panel-perspective-origin: -50vw -100vh
-
 // BORDERS
 body[data-border='none']
   --border-width: 0px
@@ -145,6 +142,7 @@ body[data-theme='LIGHT']
   --theme-bg: var(--color-light-bg)
   --theme-blok: var(--color-white)
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-type: var(--color-light-type)
   --theme-type-inactive: var(--color-light-type-secondary)
   --theme-type-contrast: white
@@ -154,6 +152,7 @@ body[data-theme='DARK']
   --theme-bg: var(--color-dark-bg)
   --theme-blok: var(--color-dark-bg)
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-type: var(--color-dark-type)
   --theme-type-inactive: var(--color-dark-type-secondary)
   --theme-type-contrast: white
@@ -164,6 +163,7 @@ body[data-theme='STEDELIJK']
   --theme-bg-gradient: 1
   --theme-blok: #62C853
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-blok-gradient: 1
   --theme-type: black
   --theme-type-inactive: var(--color-dark-type-secondary)
@@ -176,6 +176,7 @@ body[data-theme='JAPANLIGHT']
   --theme-bg: #F8F2E9
   --theme-blok: #FFF9F1
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-type: #1F1A17
   --theme-type-inactive: #8A7E73
   --theme-type-contrast: white
@@ -187,6 +188,7 @@ body[data-theme='JAPANDARK']
   --theme-bg: #1D1714
   --theme-blok: #2B231F
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-type: #F0E7DC
   --theme-type-inactive: #A79A8F
   --theme-type-contrast: white
@@ -198,6 +200,7 @@ body[data-theme='BEIGE']
   --theme-bg: #E8E7E3
   --theme-blok: #E8E7E3
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-type: black
   --theme-type-inactive: hsla(0, 0%, 0%, 0.33)
   --theme-type-contrast: white
@@ -209,6 +212,7 @@ body[data-theme='TRON']
   --theme-bg: var(--color-black)
   --theme-blok: transparent
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--color-black)
   --theme-type: var(--color-tron)
   --theme-type-inactive: var(--color-tron-inactive)
   --theme-type-contrast: white
@@ -218,6 +222,7 @@ body[data-theme='NIGHTMODE']
   --theme-bg: var(--color-black)
   --theme-blok: transparent
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--color-black)
   --theme-type: var(--color-red)
   --theme-type-inactive: var(--color-red-inactive)
   --theme-type-contrast: white
@@ -227,6 +232,7 @@ body[data-theme='BASIC']
   --theme-bg: var(--color-white)
   --theme-blok: var(--color-white)
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
   --theme-type-contrast: white
@@ -236,6 +242,7 @@ body[data-theme='IMAGE']
   --theme-bg: transparent
   --theme-blok: hsla(0, 0%, 0%, 0.66)
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0.33)
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-grey-inactive)
@@ -246,6 +253,7 @@ body[data-theme='BLACK']
   --theme-bg: transparent
   --theme-blok: var(--color-black)
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-type: var(--color-black)
   --theme-type-inactive: var(--color-grey-inactive)
   --theme-type-contrast: white
@@ -254,18 +262,20 @@ body[data-theme='GRADIENT']
   --theme-bg: radial-gradient(#D8DAD9, #BCBDC1)
   --theme-blok: transparent
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-blok-subpanel: transparent
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-white-inactive)
   --theme-type-contrast: white
   --border-color: var(--color-white)
-  &[data-space='3D'], &[data-space='3DTWO']
+  &[data-space='3D']
     --theme-bg: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
 
 body[data-theme='DONJUDD']
   --theme-bg: #DAD9E0
   --theme-blok: #DAD9E0
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-blok-subpanel: hsla(7, 95%, 62%, 0.4)
   --theme-type: #FA5942
   --theme-type-inactive: hsla(7, 95%, 62%, 0.4)
@@ -278,6 +288,7 @@ body[data-theme='GRUNGE']
   --theme-bg: transparent
   --theme-blok: transparent
   --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-solid: var(--theme-blok)
   --theme-blok-subpanel: transparent
   --theme-type: #4D53A0
   --theme-type-inactive: transparent

@@ -12,7 +12,7 @@ import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from './Row';
-import { BackPanel, BottomPanel, TopPanel } from './BlokSidePanels';
+import BlokSidePanels from './BlokSidePanels';
 import StoreSwitcher from './StoreSwitcher';
 import { gsap, useGSAP } from '@/lib/gsap';
 import IconCloud from './Icons/IconCloud';
@@ -32,7 +32,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const router = useRouter();
   const { projectSlugs, projects } = useProjects();
   const space = useStore((state: any) => state.space);
-  const isThreeDSpace = space === '3D' || space === '3DTWO';
+  const isThreeDSpace = space === '3D';
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasPrev, setHasPrev] = useState(false);
@@ -375,9 +375,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       data-scrollborder={hasScrollBorder}
     >
       <GrainyGradient variant="blok" />
-      <TopPanel />
-      <BackPanel />
-      <BottomPanel />
+      <BlokSidePanels />
       <Row>
         <div className="column column-Title ellipsis">
           {(pathName === 'home' ||
