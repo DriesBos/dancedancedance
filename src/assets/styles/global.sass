@@ -230,8 +230,8 @@ mux-player, .muxPlayer
   border: var(--border-width) solid var(--border-color)
   background-color: var(--theme-blok)
   overflow: visible
-  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme)
-  will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity
+  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme), perspective-origin var(--transition-theme)
+  will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity, perspective-origin
   transform-style: preserve-3d
   &.inactive
     display: none
@@ -433,8 +433,8 @@ mux-player, .muxPlayer
     border-bottom: var(--border-width) solid var(--border-color)
     border-left: var(--border-width) solid var(--border-color)
     border-right: var(--border-width) solid var(--border-color)
-    transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme)
-    will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity
+    transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme), perspective-origin var(--transition-theme)
+    will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity, perspective-origin
     &[data-scrollborder='true']
       border-bottom-width: 1px
     .column
@@ -640,12 +640,14 @@ mux-player, .muxPlayer
   transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
   will-change: background, border, backdrop-filter, opacity
   pointer-events: none
-  opacity: 1
+  opacity: 0 // Gets opacity when state space is 3D
   background: var(--theme-blok)
   &_Top
     left: calc(0px - #{var(--border-width)})
     top: 0
-    height: 150px
+    height: var(--panel-height)
+    will-change: height
+    transition: height var(--transition-theme)
     width: calc(100% + 2 * #{var(--border-width)})
     transform: rotateX(90deg) rotateY(0deg) translateY(-150px)
     transform-origin: 0 0
@@ -809,14 +811,12 @@ body
   &[data-space="3D"]
     padding-top: calc(191px + 68px + 20vh)
     padding-bottom: 6rem
-    .laserBlok
-      opacity: 1
-    .page-Project
+    // .laserBlok
+    //   opacity: 1
+    .page-Project, .page-General, .page-About
       .blok
         perspective: 1000px
-        perspective-origin: 50% -100vh
-        .side
-          opacity: 0
+        perspective-origin: var(--panel-perspective-origin)
       & > .blok
         &:first-child
           .side
@@ -826,9 +826,7 @@ body
       max-width: 1150px
       & > .blok
         perspective: 1000px
-        perspective-origin: 50% -100vh
-        .side
-          opacity: 0
+        perspective-origin: var(--panel-perspective-origin)
       & > .blok
         &:first-child
           .side

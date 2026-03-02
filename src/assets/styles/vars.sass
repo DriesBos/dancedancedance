@@ -88,6 +88,8 @@ $break-desktop: 1370px
   --border-gap: 0
   --border-hyperlink: 1.5px
   --blok-height: 3em
+  --panel-height: 150px
+  --panel-perspective-origin: 50% 0vh
   --top-padding-filter: 0
   --blok-padding: 1.25rem
   --spacing-side: 1.25rem
@@ -113,6 +115,8 @@ body[data-space='DESKTOP']
 
 body[data-space='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
+  --panel-height: 150px
+  --panel-perspective-origin: 50% -100vh
 
 // BORDERS
 body[data-border='none']
