@@ -8,6 +8,7 @@ const StoreSwitcher = () => {
   const setDefault = useStore((state: any) => state.setDefault);
   const setTwoD = useStore((state: any) => state.setTwoD);
   const setThreeD = useStore((state: any) => state.setThreeD);
+  const setThreeDTwo = useStore((state: any) => state.setThreeDTwo);
   const cycleTheme = useStore((state: any) => state.cycleTheme);
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
@@ -28,6 +29,8 @@ const StoreSwitcher = () => {
   function handlePickSpace() {
     if (space === 'DESKTOP') {
       setThreeD();
+    } else if (space === '3D') {
+      setThreeDTwo();
     } else {
       setTwoD();
     }

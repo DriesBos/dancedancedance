@@ -32,6 +32,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const router = useRouter();
   const { projectSlugs, projects } = useProjects();
   const space = useStore((state: any) => state.space);
+  const isThreeDSpace = space === '3D' || space === '3DTWO';
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasPrev, setHasPrev] = useState(false);
@@ -127,7 +128,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   const handleTopPanel = useCallback(
     (e: MouseEvent) => {
-      if (!headRef.current || space !== '3D') return;
+      if (!headRef.current || !isThreeDSpace) return;
 
       if (e.type === 'mouseenter') {
         gsap.to(headRef.current, {
@@ -145,14 +146,14 @@ const BlokHead = ({ blok, float, params }: Props) => {
         setTopPanelFalse();
       }
     },
-    [space, setTopPanelTrue, setTopPanelFalse],
+    [isThreeDSpace, setTopPanelTrue, setTopPanelFalse],
   );
 
   useEffect(() => {
     const main = document.querySelector('main');
     if (!main) return;
 
-    if (space === '3D') {
+    if (isThreeDSpace) {
       main.addEventListener('mouseleave', handleTopPanel);
       main.addEventListener('mouseenter', handleTopPanel);
       return () => {
@@ -168,7 +169,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       duration: 0.165,
     });
     setTopPanelFalse();
-  }, [handleTopPanel, setTopPanelFalse, space]);
+  }, [handleTopPanel, isThreeDSpace, setTopPanelFalse]);
 
   // Set Header Blok Title and External Link
   useEffect(() => {
@@ -249,7 +250,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
       if (typeof window.matchMedia !== 'function' || !headRef.current) return;
 
       // In 3D mode, header is controlled by handleTopPanel.
-      if (space === '3D') {
+      if (isThreeDSpace) {
         gsap.set(headRef.current, { y: 0 });
         return;
       }
@@ -341,7 +342,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         window.removeEventListener('scroll', handleScroll);
       };
     },
-    { scope: headRef, dependencies: [space], revertOnUpdate: true },
+    { scope: headRef, dependencies: [isThreeDSpace], revertOnUpdate: true },
   );
 
   // Scroll border state

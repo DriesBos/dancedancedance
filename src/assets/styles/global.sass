@@ -231,7 +231,7 @@ mux-player, .muxPlayer
   background-color: var(--theme-blok)
   overflow: visible
   perspective: 1000px
-  perspective-origin: 50% 0vh
+  perspective-origin: var(--panel-perspective-origin)
   transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme), perspective-origin var(--transition-theme), perspective var(--transition-theme)
   will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity, perspective-origin, perspective
   transform-style: preserve-3d
@@ -804,7 +804,7 @@ body
       &-Project
         margin-top: 20vh
     .blok
-      perspective-origin: 50% 0vh
+      // perspective-origin: var(--panel-perspective-origin)
       border-left-width: 0
       border-right-width: 0
       &-Project
@@ -812,7 +812,7 @@ body
       &-Filter
         border-top-width: 0
 
-  &[data-space="3D"]
+  &[data-space="3D"], &[data-space='3DTWO']
     padding-top: calc(191px + 68px + 20vh)
     padding-bottom: 6rem
     // .laserBlok
@@ -820,8 +820,9 @@ body
     main
       width: 88vw
       max-width: 1150px
-    .blok
-      perspective-origin: 50% -100vh
+  &[data-space='3DTWO']
+    main
+      transform: translate(5vw, 0)
 
 .clickable
   cursor: pointer
@@ -831,20 +832,19 @@ body
 .slider
   &-Indicators
     position: absolute
-    bottom: 0.5rem
+    bottom: 0.33rem
     right: 0.5rem
     display: flex
-    gap: 4px
+    gap: 3px
     z-index: 1
-    mix-blend-mode: difference
   &-Indicator
-    width: 0.5rem
-    height: 0.5rem
+    width: 2px
+    height: 8px
+    // border-radius: 1000px
     background: white
     transition: opacity 0.33s ease-in
-    opacity: 0.33
     &[data-active='true']
-      opacity: 1
+      background: var(--theme-type-contrast)
 
 @keyframes hyperLink
   0%

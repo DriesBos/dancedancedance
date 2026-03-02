@@ -8,11 +8,14 @@ export type Theme =
   | 'GRADIENT'
   | 'DONJUDD'
   | 'STEDELIJK'
+  | 'JAPANLIGHT'
+  | 'JAPANDARK'
+  | 'BEIGE'
   | 'GRUNGE'
   | 'LIGHT'
   | 'DARK';
 
-export type Space = 'DESKTOP' | '3D';
+export type Space = 'DESKTOP' | '3D' | '3DTWO';
 
 export type Border = 'none' | 'minimal' | 'radius' | 'organic';
 
@@ -30,6 +33,7 @@ export type Actions = {
   cycleTheme: () => void;
   setTwoD: () => void;
   setThreeD: () => void;
+  setThreeDTwo: () => void;
   setTopPanelTrue: () => void;
   setTopPanelFalse: () => void;
   setBorder: (border: Border) => void;
@@ -44,6 +48,9 @@ const THEME_ORDER: Theme[] = [
   'GRADIENT',
   'DONJUDD',
   'STEDELIJK',
+  'JAPANLIGHT',
+  'JAPANDARK',
+  'BEIGE',
   'GRUNGE',
   'LIGHT',
   'DARK',
@@ -68,6 +75,7 @@ export const useStore = create<Props & Actions>()((set) => ({
     }),
   setTwoD: () => set({ space: 'DESKTOP' }),
   setThreeD: () => set({ space: '3D' }),
+  setThreeDTwo: () => set({ space: '3DTWO' }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
   setBorder: (border: Border) => set({ border }),
