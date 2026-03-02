@@ -230,8 +230,10 @@ mux-player, .muxPlayer
   border: var(--border-width) solid var(--border-color)
   background-color: var(--theme-blok)
   overflow: visible
-  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme), perspective-origin var(--transition-theme)
-  will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity, perspective-origin
+  perspective: 1000px
+  perspective-origin: 50% 0vh
+  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme), perspective-origin var(--transition-theme), perspective var(--transition-theme)
+  will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity, perspective-origin, perspective
   transform-style: preserve-3d
   &.inactive
     display: none
@@ -433,8 +435,6 @@ mux-player, .muxPlayer
     border-bottom: var(--border-width) solid var(--border-color)
     border-left: var(--border-width) solid var(--border-color)
     border-right: var(--border-width) solid var(--border-color)
-    transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme), perspective-origin var(--transition-theme)
-    will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity, perspective-origin
     &[data-scrollborder='true']
       border-bottom-width: 1px
     .column
@@ -780,11 +780,19 @@ body
 // SPACE
 body
   main
+    & > .blok
+      &:first-child
+        .side
+          opacity: 1
     & > .blok:nth-child(2)
       z-index: -1
   .page
-    &-General, &-Project
+    &-General, &-Project, &-About
       transition: margin-top var(--transition-space)
+      & > .blok
+        &:first-child
+          .side
+            opacity: 1
   &[data-space="DESKTOP"]
     padding: 0
     main
@@ -796,11 +804,9 @@ body
       &-Project
         margin-top: 20vh
     .blok
+      perspective-origin: 50% 0vh
       border-left-width: 0
       border-right-width: 0
-      // &-Head
-      //   border-top-width: 0
-      //   border-bottom-width: 0
       &-Project
         overflow: hidden
       &-Filter
@@ -811,24 +817,11 @@ body
     padding-bottom: 6rem
     // .laserBlok
     //   opacity: 1
-    .page-Project, .page-General, .page-About
-      .blok
-        perspective: 1000px
-        perspective-origin: var(--panel-perspective-origin)
-      & > .blok
-        &:first-child
-          .side
-            opacity: 1
     main
       width: 88vw
       max-width: 1150px
-      & > .blok
-        perspective: 1000px
-        perspective-origin: var(--panel-perspective-origin)
-      & > .blok
-        &:first-child
-          .side
-            opacity: 1
+    .blok
+      perspective-origin: 50% -100vh
 
 .clickable
   cursor: pointer
