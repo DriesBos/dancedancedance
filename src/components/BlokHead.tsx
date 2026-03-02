@@ -32,7 +32,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const router = useRouter();
   const { projectSlugs, projects } = useProjects();
   const space = useStore((state: any) => state.space);
-  var topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasPrev, setHasPrev] = useState(false);
@@ -126,48 +125,50 @@ const BlokHead = ({ blok, float, params }: Props) => {
     }
   }, [currentPath, projectSlugs]);
 
-  // const handleTopPanel = useCallback((e: any) => {
-  //   if (e.type === 'mouseenter') {
-  //     gsap.to('.blok-Head', {
-  //       yPercent: -100,
-  //       ease: 'power1.inOut',
-  //       duration: 0.33,
-  //     });
-  //     setTopPanelTrue(true);
-  //   } else {
-  //     gsap.to('.blok-Head', {
-  //       yPercent: 0,
-  //       ease: 'power1.inOut',
-  //       duration: 0.33,
-  //     });
-  //     setTopPanelFalse(false);
-  //   }
-  // }, []);
+  const handleTopPanel = useCallback(
+    (e: MouseEvent) => {
+      if (!headRef.current || space !== '3D') return;
 
-  // useEffect(() => {
-  //   const main = document.querySelector('main');
-  //   const selection = main !== null;
-  //   if (selection && space === '3D') {
-  //     main.addEventListener('mouseleave', handleTopPanel);
-  //     main.addEventListener('mouseenter', handleTopPanel);
-  //     return () => {
-  //       main.removeEventListener('mouseleave', handleTopPanel);
-  //       main.removeEventListener('mouseenter', handleTopPanel);
-  //     };
-  //   }
-  // }, [handleTopPanel, space]);
+      if (e.type === 'mouseenter') {
+        gsap.to(headRef.current, {
+          yPercent: -100,
+          ease: 'power1.inOut',
+          duration: 0.33,
+        });
+        setTopPanelTrue();
+      } else {
+        gsap.to(headRef.current, {
+          yPercent: 0,
+          ease: 'power1.inOut',
+          duration: 0.33,
+        });
+        setTopPanelFalse();
+      }
+    },
+    [space, setTopPanelTrue, setTopPanelFalse],
+  );
 
-  // TopPanel to FALSE on 2D and PHONE
-  // useEffect(() => {
-  //   if (space === '2D' || space === 'MOBILE') {
-  //     gsap.to('.blok-Head', {
-  //       yPercent: 0,
-  //       ease: 'power1.inOut',
-  //       duration: 0.165,
-  //     });
-  //   }
-  //   setTopPanelFalse(false);
-  // }, [space, setTopPanelFalse]);
+  useEffect(() => {
+    const main = document.querySelector('main');
+    if (!main) return;
+
+    if (space === '3D') {
+      main.addEventListener('mouseleave', handleTopPanel);
+      main.addEventListener('mouseenter', handleTopPanel);
+      return () => {
+        main.removeEventListener('mouseleave', handleTopPanel);
+        main.removeEventListener('mouseenter', handleTopPanel);
+      };
+    }
+
+    gsap.to(headRef.current, {
+      y: 0,
+      yPercent: 0,
+      ease: 'power1.inOut',
+      duration: 0.165,
+    });
+    setTopPanelFalse();
+  }, [handleTopPanel, setTopPanelFalse, space]);
 
   // Set Header Blok Title and External Link
   useEffect(() => {
@@ -246,6 +247,12 @@ const BlokHead = ({ blok, float, params }: Props) => {
   useGSAP(
     (_, contextSafe) => {
       if (typeof window.matchMedia !== 'function' || !headRef.current) return;
+
+      // In 3D mode, header is controlled by handleTopPanel.
+      if (space === '3D') {
+        gsap.set(headRef.current, { y: 0 });
+        return;
+      }
 
       const mediaQuery = window.matchMedia('(orientation: landscape)');
       let isEnabled = mediaQuery.matches;
@@ -334,7 +341,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         window.removeEventListener('scroll', handleScroll);
       };
     },
-    { scope: headRef },
+    { scope: headRef, dependencies: [space], revertOnUpdate: true },
   );
 
   // Scroll border state
