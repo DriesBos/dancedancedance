@@ -1,6 +1,6 @@
 import styles from './BlokExperience.module.sass';
 import { SbBlokData } from '@storyblok/react/rsc';
-import BlokSidePanels from '../../BlokSides';
+import BlokSidePanels from '../../BlokSidePanels';
 import Row from '@/components/Row';
 import GrainyGradient from '@/components/GrainyGradient';
 

@@ -66,6 +66,7 @@ $break-desktop: 1370px
   --theme-bg: var(--color-black)
   --theme-bg-gradient: 0
   --theme-blok: hsla(0, 0%, 100%, 0)
+  --theme-blok-showlines: hsla(0, 0%, 100%, 0)
   --theme-blok-gradient: 0
   --theme-blok-subpanel: hsla(100, 100%, 100%, 0)
   --theme-type: var(--color-tron)
@@ -189,14 +190,19 @@ body[data-theme='JAPANDARK']
   --border-color: #574940
 
 body[data-theme='BEIGE']
-  --theme-bg: #E9DFC9
-  --theme-blok: #F4EBD8
-  --theme-type: #3A3129
-  --theme-type-inactive: #8F7F6C
+  --theme-bg: #E8E7E3
+  --theme-blok: #E8E7E3
+  --theme-blok-showlines: transparent
+  --theme-type: black
+  --theme-type-inactive: hsla(0, 0%, 0%, 0.33)
   --theme-type-contrast: white
-  --cursor-color-bg: #3A3129
-  --cursor-color-blok: #3A3129
-  --border-color: #C5B39C
+  --cursor-color-bg: black
+  --cursor-color-blok: black
+  --border-color: black
+  .blok-Head
+    background: var(--theme-blok-showlines)
+    .side
+      background: var(--theme-blok-showlines)
 
 body[data-theme='TRON']
   --theme-bg: var(--color-black)

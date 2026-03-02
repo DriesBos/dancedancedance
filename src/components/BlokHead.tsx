@@ -12,7 +12,7 @@ import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from './Row';
-import BlokSidePanels from './BlokSides';
+import { BottomPanel, TopPanel } from './BlokSidePanels';
 import StoreSwitcher from './StoreSwitcher';
 import { gsap, useGSAP } from '@/lib/gsap';
 import IconCloud from './Icons/IconCloud';
@@ -375,7 +375,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
       data-scrollborder={hasScrollBorder}
     >
       <GrainyGradient variant="blok" />
-      <BlokSidePanels />
+      <TopPanel />
+      <BottomPanel />
       <Row>
         <div className="column column-Title ellipsis">
           {(pathName === 'home' ||

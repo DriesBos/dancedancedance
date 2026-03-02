@@ -627,29 +627,6 @@ mux-player, .muxPlayer
     @media (max-width: 770px)
       flex-direction: column
 
-.side
-  position: absolute
-  left: 0
-  top: 0
-  width: 100%
-  height: 100%
-  border: var(--border-width) solid var(--border-color)
-  backdrop-filter: none
-  transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
-  will-change: background, border, backdrop-filter, opacity
-  pointer-events: none
-  opacity: 0 // Gets opacity when state space is 3D
-  background: var(--theme-blok)
-  &_Top
-    left: calc(0px - #{var(--border-width)})
-    top: 0
-    height: var(--panel-height)
-    will-change: height
-    transition: height var(--transition-theme)
-    width: calc(100% + 2 * #{var(--border-width)})
-    transform: rotateX(90deg) rotateY(0deg) translateY(-150px)
-    transform-origin: 0 0
-
 // .themeBackground
 //   position: fixed
 //   width: 100%
@@ -786,6 +763,10 @@ body
           opacity: 1
     & > .blok:nth-child(2)
       z-index: -1
+    .blok-Footer
+      .side
+        opacity: 1
+        z-index: -1
   .page
     &-General, &-Project, &-About
       transition: margin-top var(--transition-space)
