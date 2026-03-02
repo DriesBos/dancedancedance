@@ -9,6 +9,7 @@ export default function CustomCursor() {
   const followerRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const isVisible = useRef(false);
+  const cursorSurface = useRef<'bg' | 'blok'>('bg');
   const mouseInTarget = useRef(false);
   const prevMousePos = useRef({ x: 0, y: 0 });
   const rotationResetTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -22,6 +23,7 @@ export default function CustomCursor() {
     const follower = followerRef.current;
     const messageContainer = messageRef.current;
     if (!cursor || !follower || !messageContainer) return;
+    document.body.setAttribute('data-cursor-surface', 'bg');
 
     // Initial state - both cursors and message hidden and centered on cursor point
     gsap.set([cursor, follower], { opacity: 0, xPercent: -50, yPercent: -50 });
@@ -87,6 +89,18 @@ export default function CustomCursor() {
         x: e.clientX,
         y: e.clientY,
       };
+
+      const hoveredElement = document.elementFromPoint(
+        cursorPosition.x,
+        cursorPosition.y
+      );
+      const nextSurface: 'bg' | 'blok' = hoveredElement?.closest('.blok')
+        ? 'blok'
+        : 'bg';
+      if (nextSurface !== cursorSurface.current) {
+        cursorSurface.current = nextSurface;
+        document.body.setAttribute('data-cursor-surface', nextSurface);
+      }
 
       const targetElements = document.querySelectorAll('.cursorMagnetic');
       let foundTarget = false;
@@ -224,6 +238,8 @@ export default function CustomCursor() {
     const handleMouseLeaveWindow = () => {
       gsap.set([cursor, follower], { opacity: 0 });
       isVisible.current = false;
+      cursorSurface.current = 'bg';
+      document.body.setAttribute('data-cursor-surface', 'bg');
 
       // Clear rotation reset timeout and reset rotation
       if (rotationResetTimeout.current) {
@@ -327,6 +343,7 @@ export default function CustomCursor() {
         clearTimeout(rotationResetTimeout.current);
       }
 
+      document.body.removeAttribute('data-cursor-surface');
       observer.disconnect();
     };
   }, []);

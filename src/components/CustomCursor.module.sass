@@ -2,12 +2,17 @@
   position: fixed
   top: 0
   left: 0
+  color: var(--cursor-color-bg)
   border-radius: 50%
   pointer-events: none
   z-index: 9999
   will-change: transform
+  transition: color var(--transition-theme-quick)
   @media (hover: none) or (pointer: coarse)
     display: none
+
+:global(body[data-cursor-surface='blok']) .cursor
+  color: var(--cursor-color-blok)
 
 .main
   width: 0.9090909091rem

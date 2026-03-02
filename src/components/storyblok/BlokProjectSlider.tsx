@@ -8,6 +8,7 @@ import { gsap, useGSAP } from '@/lib/gsap';
 import MuxPlayer from '../MuxPlayer';
 import SliderIndicators from '../SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
+import BlokSidePanels from '../BlokSides';
 
 interface SbPageData extends SbBlokData {
   body: Array<{
@@ -180,13 +181,13 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           width: '100%',
           duration: duration,
           ease: 'linear',
-        }
+        },
       );
     },
     {
       dependencies: [activeIndex, currentItem, currentDuration],
       revertOnUpdate: true,
-    }
+    },
   );
 
   // Auto-advance slides (paused when hovering)
@@ -223,6 +224,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       {...storyblokEditable(blok)}
     >
       <GrainyGradient variant="blok" />
+      <BlokSidePanels />
       {blok.body.map((item, index) => (
         <SlideItem
           key={item._uid}

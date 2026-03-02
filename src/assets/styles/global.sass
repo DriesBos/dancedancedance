@@ -591,7 +591,6 @@ mux-player, .muxPlayer
         gap: 0.5rem
     &-ProgressWrapper
       position: relative
-      // background: var(--theme-type-inactive) !important
       width: 0.8em
       height: var(--border-hyperlink)
       overflow: hidden
@@ -641,7 +640,7 @@ mux-player, .muxPlayer
   transition: background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
   will-change: background, border, backdrop-filter, opacity
   pointer-events: none
-  opacity: 0
+  opacity: 1
   background: var(--theme-blok)
   &_Top
     left: calc(0px - #{var(--border-width)})
@@ -812,14 +811,26 @@ body
     padding-bottom: 6rem
     .laserBlok
       opacity: 1
+    .page-Project
+      .blok
+        perspective: 1000px
+        perspective-origin: 50% -100vh
+        .side
+          opacity: 0
+      & > .blok
+        &:first-child
+          .side
+            opacity: 1
     main
       width: 88vw
       max-width: 1150px
       & > .blok
         perspective: 1000px
         perspective-origin: 50% -100vh
+        .side
+          opacity: 0
       & > .blok
-        &:first-child, &:nth-child(2)
+        &:first-child
           .side
             opacity: 1
 
