@@ -1,25 +1,18 @@
-import { ISbStoriesParams } from '@storyblok/react/rsc';
-import { getStoryblokApi } from '@/lib/storyblok';
+import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import BlokProject from '../BlokProject';
-import GrainyGradient from '@/components/GrainyGradient';
+import { fetchProjectData } from './projectsData';
+import GrainyGradient from '../GrainyGradient';
 
-export default async function BlokProjectList() {
-  const projects = await fetchProjects();
+interface BlokProjectListProps {
+  blok: SbBlokData;
+}
 
-  const data = projects.data.stories.map((story: any) => {
-    return {
-      slug: story.slug,
-      year: story.content.year,
-      title: story.content.title,
-      category: story.content.category,
-      external_link: story.content.external_link,
-    };
-  });
+export default async function BlokProjectList({ blok }: BlokProjectListProps) {
+  const data = await fetchProjectData();
 
   return (
-    <div className="blok blok-ProjectList">
-      <GrainyGradient variant="blok" />
-      {data.map((item: any) => (
+    <div className="blok blok-ProjectList" {...storyblokEditable(blok)}>
+      {data.map((item) => (
         <BlokProject
           key={item.slug}
           slug={item.slug}
@@ -31,17 +24,4 @@ export default async function BlokProjectList() {
       ))}
     </div>
   );
-}
-
-export async function fetchProjects() {
-  let sbParams: ISbStoriesParams = {
-    version: 'published',
-    starts_with: 'projects',
-    is_startpage: false,
-  };
-
-  const storyblokApi = getStoryblokApi();
-  return await storyblokApi.get(`cdn/stories`, sbParams, {
-    cache: 'no-store',
-  });
 }

@@ -4,7 +4,7 @@ import Page from '@/components/storyblok/Page';
 import Project from '@/components/storyblok/PageProject';
 import BlokProjectList from '@/components/storyblok/BlokProjectList';
 import BlokProjectSlider from '@/components/storyblok/BlokProjectSlider';
-import BlokProjectImagesList from '@/components/storyblok/BlokProjectImagesList';
+import BlokHighlights from '@/components/storyblok/BlokHighlights';
 import BlokExperience from '@/components/storyblok/BlokExperience/BlokExperience';
 import BlokContainer from '@/components/storyblok/BlokContainer';
 import ColumnImage from '@/components/storyblok/ColumnImage';
@@ -20,9 +20,9 @@ const components = {
   Page: Page,
   'Page Blurbs': PageBlurbs,
   'Page Project': Project,
+  'Blok Highlights': BlokHighlights,
   'Blok Project List': BlokProjectList,
   'Blok Project Slider': BlokProjectSlider,
-  'Blok Project Images List': BlokProjectImagesList,
   'Blok Experience': BlokExperience,
   'Blok Container': BlokContainer,
   'Blok Blurp': BlokBlurb,
