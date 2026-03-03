@@ -351,8 +351,7 @@ mux-player, .muxPlayer
           @media (min-width: 770px)
             display: none
       &-Image, &-Thumbnail, &-Video, &-Slider
-        padding: 0 var(--spacing-side)
-        padding-bottom: var(--spacing-base)
+        padding: var(--spacing-base) var(--spacing-side)
         flex: 1
         img, video
           width: 100%
@@ -651,11 +650,6 @@ body
     main
       width: 88vw
       max-width: 1150px
-    .blok
-      .row
-        .column
-          &-Image, &-Thumbnail, &-Video, &-Slider
-            padding-top: var(--spacing-base)
 
 .clickable
   cursor: pointer
