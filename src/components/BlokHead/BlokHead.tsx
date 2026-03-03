@@ -47,6 +47,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const themeSpinTimeoutRef = useRef<number | null>(null);
+  const spaceToggleRafRef = useRef<number | null>(null);
+  const spaceToggleTimeoutRef = useRef<number | null>(null);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -55,11 +57,57 @@ const BlokHead = ({ blok, float, params }: Props) => {
   >(undefined);
 
   const toggleSpace = useCallback(() => {
-    if (space === '3D') {
-      setTwoD();
+    const applyNextSpace = () => {
+      if (space === '3D') {
+        setTwoD();
+        return;
+      }
+      setThreeD();
+    };
+
+    if (spaceToggleRafRef.current !== null) {
+      window.cancelAnimationFrame(spaceToggleRafRef.current);
+      spaceToggleRafRef.current = null;
+    }
+    if (spaceToggleTimeoutRef.current !== null) {
+      window.clearTimeout(spaceToggleTimeoutRef.current);
+      spaceToggleTimeoutRef.current = null;
+    }
+
+    if (window.scrollY <= 1) {
+      applyNextSpace();
       return;
     }
-    setThreeD();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+
+      if (spaceToggleRafRef.current !== null) {
+        window.cancelAnimationFrame(spaceToggleRafRef.current);
+        spaceToggleRafRef.current = null;
+      }
+      if (spaceToggleTimeoutRef.current !== null) {
+        window.clearTimeout(spaceToggleTimeoutRef.current);
+        spaceToggleTimeoutRef.current = null;
+      }
+
+      applyNextSpace();
+    };
+
+    const checkTop = () => {
+      if (window.scrollY <= 1) {
+        settle();
+        return;
+      }
+      spaceToggleRafRef.current = window.requestAnimationFrame(checkTop);
+    };
+
+    spaceToggleRafRef.current = window.requestAnimationFrame(checkTop);
+    spaceToggleTimeoutRef.current = window.setTimeout(settle, 1200);
   }, [space, setTwoD, setThreeD]);
 
   const handleCycleTheme = useCallback(() => {
@@ -209,6 +257,12 @@ const BlokHead = ({ blok, float, params }: Props) => {
     return () => {
       if (themeSpinTimeoutRef.current !== null) {
         window.clearTimeout(themeSpinTimeoutRef.current);
+      }
+      if (spaceToggleRafRef.current !== null) {
+        window.cancelAnimationFrame(spaceToggleRafRef.current);
+      }
+      if (spaceToggleTimeoutRef.current !== null) {
+        window.clearTimeout(spaceToggleTimeoutRef.current);
       }
     };
   }, []);
