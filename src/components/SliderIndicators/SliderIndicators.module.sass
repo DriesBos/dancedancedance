@@ -1,0 +1,19 @@
+.sliderIndicator
+  position: absolute
+  bottom: 0.33rem
+  right: 0.5rem
+  display: inline-flex
+  align-items: flex-end
+  gap: 3px
+  z-index: 1
+  height: 16px
+  &_Item
+    background: currentColor
+    transition: opacity 0.2s ease, transform 0.2s ease
+    width: 1.5px
+    height: 12px
+    background: var(--slider-indicator)
+    transition: all 0.33s ease-in
+    &[data-active='true']
+      height: 16px
+      background: var(--slider-indicator-active)

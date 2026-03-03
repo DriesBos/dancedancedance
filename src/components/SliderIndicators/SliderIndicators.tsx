@@ -1,4 +1,4 @@
-import React from 'react';
+import styles from './SliderIndicators.module.sass';
 
 interface SliderIndicatorsProps {
   total: number;
@@ -6,19 +6,19 @@ interface SliderIndicatorsProps {
   className?: string;
 }
 
-const SliderIndicators: React.FC<SliderIndicatorsProps> = ({
+const SliderIndicators = ({
   total,
   activeIndex,
   className = '',
-}) => {
+}: SliderIndicatorsProps) => {
   if (total <= 1) return null;
 
   return (
-    <div className={`slider-Indicators ${className}`.trim()}>
+    <div className={`${styles.sliderIndicator} ${className}`.trim()}>
       {Array.from({ length: total }).map((_, index) => (
         <div
           key={index}
-          className="slider-Indicator"
+          className={styles.sliderIndicator_Item}
           data-active={index === activeIndex}
         />
       ))}

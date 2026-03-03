@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
 export type Theme =
-  | 'BASIC'
   | 'NIGHTMODE'
   | 'IMAGE'
   | 'TRON'
@@ -35,7 +34,6 @@ export type Actions = {
 };
 
 const THEME_ORDER: Theme[] = [
-  'BASIC',
   'NIGHTMODE',
   'IMAGE',
   'TRON',

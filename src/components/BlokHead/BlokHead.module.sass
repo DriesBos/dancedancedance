@@ -8,7 +8,7 @@
   border-bottom: var(--border-width) solid var(--border-color)
   border-left: var(--border-width) solid var(--border-color)
   border-right: var(--border-width) solid var(--border-color)
-  background: var(--theme-blok-showlines)
+  background: var(--theme-blok-showlines) !important
   &[data-scrollborder='true']
     border-bottom-width: 1px
   :global(.column-Title)
@@ -22,7 +22,7 @@
   height: var(--icon-size)
   border-radius: 1000px
   border: 1.5px solid currentColor
-  background: conic-gradient(from -45deg, currentColor 0deg 180deg, var(--theme-bg) 180deg 360deg)
+  background: conic-gradient(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg), var(--theme-blok-solid)
   transition: transform 0.25s ease, border-color var(--transition-theme), background var(--transition-theme)
 
 .themeButton

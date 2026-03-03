@@ -14,14 +14,14 @@ html, body
 
 body
   color: var(--theme-type)
-  background-color: var(--theme-bg)
+  background: var(--theme-bg)
   display: flex
   justify-content: center
   align-items: flex-start
   padding: 0
   min-height: 100dvh
-  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background-color var(--transition-theme)
-  will-change: padding-top, padding-bottom, color, background-color
+  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
+  will-change: padding-top, padding-bottom, color, background
 
 main
   position: relative
@@ -438,7 +438,7 @@ mux-player, .muxPlayer
   &-Project
     position: relative
     border: 0
-    border-top: var(--border-width) solid var(--theme-type)
+    border-top: var(--border-width) solid var(--border-color)
     padding-bottom: calc(3.95rem * 0.5)
     margin-bottom: calc(-3.95rem * 0.5)
     transform: translateY(0)
@@ -455,8 +455,8 @@ mux-player, .muxPlayer
         display: none
   &-ProjectList
     position: relative
-    border-top: 0
-    border-bottom: 0
+    border-top: 0 !important
+    border-bottom: 0 !important
     @media (hover: hover)
       .blok-Project:hover
         transition-duration: 0.1s
@@ -594,7 +594,7 @@ body
   //       opacity: 1
   //     &-Color
   //       opacity: 0
-  // &[data-theme="GRADIENT"], &[data-theme="BASIC"], &[data-theme="DONJUDD"]
+  // &[data-theme="GRADIENT"], &[data-theme="DONJUDD"]
   //   .introText
   //     opacity: 1
   // &[data-theme="GRADIENT"], &[data-theme="IMAGE"]
@@ -602,7 +602,7 @@ body
   //     backdrop-filter: blur(#{var(--backdrop-filter)})
   //   .blok-Head .row, .blok-Project .row, .blok-Filter .row, .blok-Footer
   //     backdrop-filter: blur(#{var(--backdrop-filter)})
-  // &[data-theme="BASIC"], &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
+  // &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
   //   .blok, .blok .row, .side
   //     background: var(--theme-blok)
   // &[data-theme="GRUNGE"]
@@ -622,6 +622,7 @@ body
         background: transparent
         .side_Top
           opacity: 1
+          background: var(--theme-blok-showlines) !important
         .side_Top, .side_Back
           background: transparent
         .side_Bottom
@@ -666,24 +667,6 @@ body
 .clickable
   cursor: pointer
   user-select: none
-
-// General slider indicators (reusable across components)
-.slider
-  &-Indicators
-    position: absolute
-    bottom: 0.33rem
-    right: 0.5rem
-    display: flex
-    gap: 3px
-    z-index: 1
-  &-Indicator
-    width: 2px
-    height: 8px
-    // border-radius: 1000px
-    background: white
-    transition: opacity 0.33s ease-in
-    &[data-active='true']
-      background: var(--theme-type-contrast)
 
 @keyframes hyperLink
   0%

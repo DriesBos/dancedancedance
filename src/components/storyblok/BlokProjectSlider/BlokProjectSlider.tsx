@@ -244,10 +244,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
       {/* Invisible hover zones - only rendered on devices with cursor */}
       {hasCursor && blok.body.length > 1 && (
-        <div
-          className={styles.hoverZones}
-          onMouseLeave={handleZoneLeave}
-        >
+        <div className={styles.hoverZones} onMouseLeave={handleZoneLeave}>
           {blok.body.map((item, index) => (
             <Link
               key={`zone-${item._uid}`}
