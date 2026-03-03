@@ -83,6 +83,7 @@ $break-desktop: 1370px
   // typography
   --font-size-mobile: 16px
   --font-size-caption: 0.66rem
+  --line-height: 1.45
   @media (max-width: 770px)
     --font-size-caption: 0.8rem
 
@@ -92,11 +93,11 @@ $break-desktop: 1370px
   --border-radius: 0
   --border-gap: 0
   --border-hyperlink: 1.5px
-  --blok-height: 3em
+  --blok-padding: 1.25rem
+  --blok-height: calc(var(--blok-padding) * 2 + var(--line-height) * 1rem)
   --panel-height: 150px
   --panel-perspective-origin: 50% 0vh
   --top-padding-filter: 0
-  --blok-padding: 1.25rem
   --spacing-side: 1.25rem
   --spacing-between-images: 1.25rem
   --spacing-base: 1.25rem
