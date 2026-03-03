@@ -2,13 +2,10 @@ import { create } from 'zustand';
 
 export type Theme =
   | 'NIGHTMODE'
-  | 'IMAGE'
   | 'TRON'
   | 'GRADIENT'
   | 'DONJUDD'
   | 'STEDELIJK'
-  | 'JAPANLIGHT'
-  | 'JAPANDARK'
   | 'BEIGE'
   | 'GRUNGE'
   | 'LIGHT'
@@ -33,15 +30,12 @@ export type Actions = {
   setTopPanelFalse: () => void;
 };
 
-const THEME_ORDER: Theme[] = [
+export const THEME_ORDER: Theme[] = [
   'NIGHTMODE',
-  'IMAGE',
   'TRON',
   'GRADIENT',
   'DONJUDD',
   'STEDELIJK',
-  'JAPANLIGHT',
-  'JAPANDARK',
   'BEIGE',
   'GRUNGE',
   'LIGHT',

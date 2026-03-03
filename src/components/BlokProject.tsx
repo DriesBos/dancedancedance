@@ -39,9 +39,10 @@ const BlokProject = ({
       onClick={handleClick}
       style={{ cursor: 'pointer', zIndex: stackIndex }}
     >
-      <GrainyGradient variant="blok" />
       <BlokSidePanels />
+      <GrainyGradient variant="blok" />
       <Row>
+        <GrainyGradient variant="blok" className="grainyInRow" />
         {displayYear && <div className="column column-Year">{displayYear}</div>}
         {title && <div className="column column-Project">{title}</div>}
         {category && (

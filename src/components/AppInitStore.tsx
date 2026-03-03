@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { useStore } from '@/store/store';
+import { THEME_ORDER, useStore } from '@/store/store';
 
 type Props = {
   children: React.ReactNode;
@@ -11,13 +11,33 @@ type Props = {
 
 const AppInitializer = ({ children, className }: Props) => {
   const hasRunHomeIntroRef = useRef(false);
+  const hasSetInitialThemeRef = useRef(false);
   const setTwoD = useStore((state) => state.setTwoD);
   const setThreeD = useStore((state) => state.setThreeD);
+  const setNightmode = useStore((state) => state.setNightmode);
+  const setTheme = useStore((state) => state.setTheme);
   const theme = useStore((state: any) => state.theme);
   const space = useStore((state: any) => state.space);
   const path = usePathname();
   const slug = (path || '/').split('/')[1] || 'home';
   const pathname = path || '/';
+
+  useEffect(() => {
+    if (hasSetInitialThemeRef.current) return;
+    hasSetInitialThemeRef.current = true;
+
+    const hour = new Date().getHours();
+    if (hour >= 0 && hour < 5) {
+      setNightmode();
+      return;
+    }
+
+    const daytimeThemes = THEME_ORDER.filter((themeName) => themeName !== 'NIGHTMODE');
+    if (daytimeThemes.length === 0) return;
+    const randomTheme =
+      daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
+    setTheme(randomTheme);
+  }, [setNightmode, setTheme]);
 
   useEffect(() => {
     if (pathname !== '/' || hasRunHomeIntroRef.current) return;

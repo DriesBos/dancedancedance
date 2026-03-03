@@ -442,9 +442,16 @@ mux-player, .muxPlayer
     will-change: transform
     overscroll-behavior: auto
     .row
+      position: relative
+      overflow: hidden
       border: 0 !important
       background: var(--theme-blok-solid) !important
       transition: background var(--transition-theme)
+      .grainyInRow
+        z-index: 0
+      & > .column
+        position: relative
+        z-index: 1
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none
@@ -575,21 +582,15 @@ mux-player, .muxPlayer
 
   // Themes
 body
-  // &[data-theme="IMAGE"]
-  //   .themeBackground
-  //     &-Image
-  //       opacity: 1
-  //     &-Color
-  //       opacity: 0
   // &[data-theme="GRADIENT"], &[data-theme="DONJUDD"]
   //   .introText
   //     opacity: 1
-  // &[data-theme="GRADIENT"], &[data-theme="IMAGE"]
+  // &[data-theme="GRADIENT"]
   //   .side
   //     backdrop-filter: blur(#{var(--backdrop-filter)})
   //   .blok-Head .row, .blok-Project .row, .blok-Filter .row, .blok-Footer
   //     backdrop-filter: blur(#{var(--backdrop-filter)})
-  // &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"], &[data-theme="IMAGE"]
+  // &[data-theme="DONJUDD"], &[data-theme="TRON"], &[data-theme="NIGHTMODE"]
   //   .blok, .blok .row, .side
   //     background: var(--theme-blok)
   // &[data-theme="GRUNGE"]
@@ -629,10 +630,11 @@ body
       max-width: 100%
       min-height: 100dvh
     .page
+      background: var(--theme-blok)
       &-General
-        margin-top: 20vh
+        padding-top: 20vh
       &-Project
-        margin-top: 20vh
+        padding-top: 20vh
     .blok
       border-left-width: 0
       border-right-width: 0

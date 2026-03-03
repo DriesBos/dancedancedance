@@ -13,6 +13,7 @@ import IconArrowHead from '../Icons/IconArrowHead';
 import Row from '../Row';
 import IconCenter from '../Icons/IconCenter';
 import IconZoomToggle from '../Icons/IconZoomToggle';
+import GrainyGradient from '@/components/GrainyGradient';
 
 // Register once at module scope (idempotent in GSAP)
 gsap.registerPlugin(Draggable, InertiaPlugin);
@@ -469,6 +470,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       className={`page page-Blurbs ${!introComplete ? 'is-intro' : ''}`}
       {...storyblokEditable(blok)}
     >
+      <GrainyGradient variant="page" />
       {/* Explorable canvas - must come BEFORE header for mix-blend-mode to work */}
       <div ref={canvasRef} className="page-Blurbs-Canvas">
         {blok.body.map((nestedBlok, index: number) => (
