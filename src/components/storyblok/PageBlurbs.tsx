@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
-import { gsap } from 'gsap';
+import { gsap } from '@/lib/gsap';
 import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import BlokBlurb from './BlokBlurb';
@@ -14,10 +14,8 @@ import Row from '../Row';
 import IconCenter from '../Icons/IconCenter';
 import IconZoomToggle from '../Icons/IconZoomToggle';
 
-// Register GSAP plugins
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(Draggable, InertiaPlugin);
-}
+// Register once at module scope (idempotent in GSAP)
+gsap.registerPlugin(Draggable, InertiaPlugin);
 
 interface SbPageBlurbsData extends SbBlokData {
   body: SbBlokData[];
@@ -181,6 +179,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
 
     const canvas = canvasRef.current;
     const container = containerRef.current;
+    gsap.killTweensOf(canvas);
 
     // Calculate transform origin to keep viewport center fixed during zoom
     // Canvas is 200vw x 200vh, positioned at -50vw, -50vh
@@ -233,6 +232,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
 
     return () => {
       introTl.kill();
+      gsap.killTweensOf(canvas);
     };
   }, []);
 
@@ -243,6 +243,9 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
 
     const canvas = canvasRef.current;
     const bounds = getBounds();
+    draggableRef.current[0]?.kill();
+    draggableRef.current = [];
+    gsap.killTweensOf(canvas);
 
     // Create Draggable instance with inertia
     draggableRef.current = Draggable.create(canvas, {
@@ -299,6 +302,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
         y: newY,
         duration: 0.3,
         ease: 'power2.out',
+        overwrite: 'auto',
         onUpdate: () => {
           draggable.update();
           setCanvasOffset({ x: draggable.x, y: draggable.y });
@@ -334,6 +338,8 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       if (draggableRef.current[0]) {
         draggableRef.current[0].kill();
       }
+      draggableRef.current = [];
+      gsap.killTweensOf(canvas);
     };
   }, [introComplete, getBounds]);
 
@@ -353,6 +359,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
 
     const canvas = canvasRef.current;
     const draggable = draggableRef.current[0];
+    gsap.killTweensOf(canvas);
 
     // Animate canvas back to center (x: 0, y: 0)
     gsap.to(canvas, {
@@ -360,6 +367,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       y: 0,
       duration: 1,
       ease: 'power3.inOut',
+      overwrite: 'auto',
       onUpdate: () => {
         draggable.update();
         setCanvasOffset({ x: draggable.x, y: draggable.y });
@@ -379,6 +387,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
     const newZoomLevel = zoomLevel === 'standard' ? 'overview' : 'standard';
     const targetScale = ZOOM_LEVELS[newZoomLevel];
     const bounds = getBounds();
+    gsap.killTweensOf(canvas);
 
     // Update ref immediately so wheel handler knows the new state
     zoomLevelRef.current = newZoomLevel;
@@ -396,6 +405,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
       y: 0,
       duration: 1,
       ease: 'power3.inOut',
+      overwrite: 'auto',
       onUpdate: () => {
         // Keep parallax in sync during animation
         const currentX = gsap.getProperty(canvas, 'x') as number;
