@@ -14,6 +14,8 @@
   :global(.column-Title)
     padding-right: 0
     user-select: none
+  :global(.side_Top)
+    pointer-events: auto
 
 .themeCycle
   width: var(--icon-size)
@@ -45,7 +47,7 @@
     transform-origin: center
   @media (hover: hover)
     &:hover .rocketWrap
-      transform: rotate(-45deg)
+      transform: rotate(-15deg)
     &:hover .rocketWrap :global(svg)
       animation: rocketShake 0.5s ease-in-out infinite
     &:hover :global(.iconRocketTail)

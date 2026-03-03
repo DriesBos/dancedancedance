@@ -13,7 +13,6 @@ import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
-import StoreSwitcher from '@/components/StoreSwitcher';
 import { gsap, useGSAP } from '@/lib/gsap';
 import IconCloud from '@/components/Icons/IconCloud';
 import IconThoughts from '@/components/Icons/IconThoughts';
@@ -236,11 +235,32 @@ const BlokHead = ({ blok, float, params }: Props) => {
     if (!main) return;
 
     if (isThreeDSpace) {
-      main.addEventListener('mouseleave', handleTopPanel);
-      main.addEventListener('mouseenter', handleTopPanel);
+      const topPanel = headRef.current?.querySelector('.side_Top') || null;
+      const isWithinInteractiveZone = (node: EventTarget | null) => {
+        if (!(node instanceof Node)) return false;
+        return main.contains(node) || (topPanel ? topPanel.contains(node) : false);
+      };
+
+      const onEnter = (e: Event) => {
+        handleTopPanel(e as MouseEvent);
+      };
+
+      const onLeave = (e: Event) => {
+        const mouseEvent = e as MouseEvent;
+        if (isWithinInteractiveZone(mouseEvent.relatedTarget)) return;
+        handleTopPanel(mouseEvent);
+      };
+
+      main.addEventListener('mouseenter', onEnter);
+      main.addEventListener('mouseleave', onLeave);
+      topPanel?.addEventListener('mouseenter', onEnter);
+      topPanel?.addEventListener('mouseleave', onLeave);
+
       return () => {
-        main.removeEventListener('mouseleave', handleTopPanel);
-        main.removeEventListener('mouseenter', handleTopPanel);
+        main.removeEventListener('mouseenter', onEnter);
+        main.removeEventListener('mouseleave', onLeave);
+        topPanel?.removeEventListener('mouseenter', onEnter);
+        topPanel?.removeEventListener('mouseleave', onLeave);
       };
     }
 
