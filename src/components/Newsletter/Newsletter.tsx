@@ -1,12 +1,8 @@
 'use client';
 
 import { FormEvent, useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { TextPlugin } from 'gsap/TextPlugin';
+import { useGSAP } from '@/lib/gsap';
 import styles from './Newsletter.module.sass';
-
-gsap.registerPlugin(useGSAP, TextPlugin);
 
 interface NewsletterProps {
   className?: string;

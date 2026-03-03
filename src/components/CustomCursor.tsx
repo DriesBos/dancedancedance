@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import gsap from 'gsap';
+import { useRef, useState } from 'react';
+import { gsap, useGSAP } from '@/lib/gsap';
 import styles from './CustomCursor.module.sass';
 
 export default function CustomCursor() {
@@ -12,10 +12,14 @@ export default function CustomCursor() {
   const cursorSurface = useRef<'bg' | 'blok'>('bg');
   const mouseInTarget = useRef(false);
   const prevMousePos = useRef({ x: 0, y: 0 });
-  const rotationResetTimeout = useRef<NodeJS.Timeout | null>(null);
+  const rotationResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const hintShowTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hintHideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
+  useGSAP(() => {
     // Skip on touch devices - no hover support
     if (window.matchMedia('(hover: none)').matches) return;
 
@@ -78,6 +82,11 @@ export default function CustomCursor() {
       ease: 'power2.out',
     });
 
+    let magneticTargets: HTMLElement[] = [];
+    const boundMagneticTargets = new WeakSet<EventTarget>();
+    const boundInteractTargets = new WeakSet<EventTarget>();
+    const boundMessageTargets = new WeakSet<EventTarget>();
+
     const handleMouseMove = (e: MouseEvent) => {
       // Show cursor on first move
       if (!isVisible.current) {
@@ -102,10 +111,9 @@ export default function CustomCursor() {
         document.body.setAttribute('data-cursor-surface', nextSurface);
       }
 
-      const targetElements = document.querySelectorAll('.cursorMagnetic');
       let foundTarget = false;
 
-      targetElements.forEach((targetEle) => {
+      magneticTargets.forEach((targetEle) => {
         const rect = targetEle.getBoundingClientRect();
         const triggerDistance = rect.width;
 
@@ -149,13 +157,19 @@ export default function CustomCursor() {
               x: -((Math.sin(angle) * hypotenuse) / 8),
               y: -((Math.cos(angle) * hypotenuse) / 8),
               duration: 0.6,
+              overwrite: 'auto',
             });
           }
         } else {
           // Release text
           const textEl = targetEle.querySelector('.text');
           if (textEl) {
-            gsap.to(textEl, { x: 0, y: 0, duration: 0.6 });
+            gsap.to(textEl, {
+              x: 0,
+              y: 0,
+              duration: 0.6,
+              overwrite: 'auto',
+            });
           }
         }
       });
@@ -262,12 +276,18 @@ export default function CustomCursor() {
 
       if (isProjectPage && !hasSeenHint) {
         // Wait a moment for page to settle
-        setTimeout(() => {
+        if (hintShowTimeout.current) {
+          clearTimeout(hintShowTimeout.current);
+        }
+        if (hintHideTimeout.current) {
+          clearTimeout(hintHideTimeout.current);
+        }
+        hintShowTimeout.current = setTimeout(() => {
           setMessage("tip: use ←, → or 'esc'");
           messageFadeAnim.play();
 
           // Auto-hide after 6 seconds
-          setTimeout(() => {
+          hintHideTimeout.current = setTimeout(() => {
             messageFadeAnim.reverse();
           }, 4000);
 
@@ -286,24 +306,32 @@ export default function CustomCursor() {
     document.addEventListener('click', handleClick);
 
     const addTargetListeners = () => {
-      const magneticTargets = document.querySelectorAll('.cursorMagnetic');
+      magneticTargets = Array.from(
+        document.querySelectorAll<HTMLElement>('.cursorMagnetic')
+      );
       magneticTargets.forEach((target) => {
+        if (boundMagneticTargets.has(target)) return;
         target.addEventListener('mouseenter', handleMagneticEnter);
         target.addEventListener('mouseleave', handleMagneticLeave);
+        boundMagneticTargets.add(target);
       });
 
       const interactTargets = document.querySelectorAll(
         '.cursorInteract, .markdown a'
       );
       interactTargets.forEach((target) => {
+        if (boundInteractTargets.has(target)) return;
         target.addEventListener('mouseenter', handleInteractEnter);
         target.addEventListener('mouseleave', handleInteractLeave);
+        boundInteractTargets.add(target);
       });
 
       const messageTargets = document.querySelectorAll('.cursorMessage');
       messageTargets.forEach((target) => {
+        if (boundMessageTargets.has(target)) return;
         target.addEventListener('mouseenter', handleMessageEnter);
         target.addEventListener('mouseleave', handleMessageLeave);
+        boundMessageTargets.add(target);
       });
     };
 
@@ -342,11 +370,17 @@ export default function CustomCursor() {
       if (rotationResetTimeout.current) {
         clearTimeout(rotationResetTimeout.current);
       }
+      if (hintShowTimeout.current) {
+        clearTimeout(hintShowTimeout.current);
+      }
+      if (hintHideTimeout.current) {
+        clearTimeout(hintHideTimeout.current);
+      }
 
       document.body.removeAttribute('data-cursor-surface');
       observer.disconnect();
     };
-  }, []);
+  });
 
   return (
     <>

@@ -86,7 +86,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
     );
 
     return () => clearInterval(interval);
-  }, [activeImages]);
+  }, [activeImages, blok.speed]);
 
   if (!currentImage) return null;
 
