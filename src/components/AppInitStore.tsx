@@ -32,12 +32,17 @@ const AppInitializer = ({ children, className }: Props) => {
     const prevBodyTouchAction = body.style.touchAction;
     const prevBodyOverscrollBehavior = body.style.overscrollBehavior;
 
-    const preventScroll = (event: Event) => {
-      event.preventDefault();
+    const forceTop = () => {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      } catch {
+        window.scrollTo(0, 0);
+      }
     };
-    const preventInteraction = (event: Event) => {
-      event.preventDefault();
-      event.stopPropagation();
+    let keepTopRaf: number | null = null;
+    const keepTop = () => {
+      forceTop();
+      keepTopRaf = window.requestAnimationFrame(keepTop);
     };
 
     const unlockScroll = () => {
@@ -46,54 +51,25 @@ const AppInitializer = ({ children, className }: Props) => {
       body.style.pointerEvents = prevBodyPointerEvents;
       body.style.touchAction = prevBodyTouchAction;
       body.style.overscrollBehavior = prevBodyOverscrollBehavior;
-      window.removeEventListener('wheel', preventScroll);
-      window.removeEventListener('touchmove', preventScroll);
-      window.removeEventListener('pointerdown', preventInteraction, true);
-      window.removeEventListener('pointerup', preventInteraction, true);
-      window.removeEventListener('click', preventInteraction, true);
-      window.removeEventListener('touchstart', preventInteraction, true);
-      window.removeEventListener('touchend', preventInteraction, true);
-      window.removeEventListener('contextmenu', preventInteraction, true);
+      if (keepTopRaf !== null) {
+        window.cancelAnimationFrame(keepTopRaf);
+        keepTopRaf = null;
+      }
     };
 
-    setThreeD();
-    try {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    } catch {
-      window.scrollTo(0, 0);
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
     }
+
+    setThreeD();
+    forceTop();
 
     html.style.overflow = 'hidden';
     body.style.overflow = 'hidden';
     body.style.pointerEvents = 'none';
     body.style.touchAction = 'none';
     body.style.overscrollBehavior = 'none';
-    window.addEventListener('wheel', preventScroll, { passive: false });
-    window.addEventListener('touchmove', preventScroll, { passive: false });
-    window.addEventListener('pointerdown', preventInteraction, {
-      passive: false,
-      capture: true,
-    });
-    window.addEventListener('pointerup', preventInteraction, {
-      passive: false,
-      capture: true,
-    });
-    window.addEventListener('click', preventInteraction, {
-      passive: false,
-      capture: true,
-    });
-    window.addEventListener('touchstart', preventInteraction, {
-      passive: false,
-      capture: true,
-    });
-    window.addEventListener('touchend', preventInteraction, {
-      passive: false,
-      capture: true,
-    });
-    window.addEventListener('contextmenu', preventInteraction, {
-      passive: false,
-      capture: true,
-    });
+    keepTopRaf = window.requestAnimationFrame(keepTop);
 
     const blokCount = document.querySelectorAll('.blok-Animate').length;
     const blokEnterDurationMs = 330;

@@ -1,0 +1,97 @@
+.root
+  position: relative
+  width: 100%
+  height: 100%
+  padding: var(--spacing-base) var(--spacing-side)
+
+.item
+  position: absolute
+  top: var(--spacing-base)
+  left: var(--spacing-side)
+  width: calc(100% - (var(--spacing-side) * 2))
+  display: flex
+  flex-direction: column
+  gap: 0.4545454546rem // 10px for 22px font size
+  opacity: 0
+  pointer-events: none
+  &[data-active='true']
+    opacity: 1
+    pointer-events: auto
+    position: relative
+    top: 0
+    left: 0
+    width: 100%
+
+.image
+  position: relative
+  width: 100%
+  aspect-ratio: 16 / 9
+  overflow: hidden
+  :global(mux-player), :global(.muxPlayer)
+    aspect-ratio: 16 / 9 !important
+    object-fit: cover !important
+  @media (orientation: portrait)
+    aspect-ratio: 3 / 2
+    :global(mux-player), :global(.muxPlayer)
+      aspect-ratio: 3 / 2 !important
+  img, video, :global(mux-player)
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100% !important
+    object-fit: cover
+
+.imageWrapper
+  position: relative
+  width: 100%
+  height: 100%
+
+.indicators
+  bottom: calc(var(--spacing-base) + 0.5rem + 0.454545rem + 1.45em) !important
+  right: calc(var(--spacing-side) + 0.5rem) !important
+
+.caption
+  display: flex
+  justify-content: space-between
+
+.captionTitle
+  display: flex
+  align-items: center
+  gap: 0.5rem
+
+.progressWrapper
+  position: relative
+  width: 0.8em
+  height: var(--border-hyperlink)
+  overflow: hidden
+
+.progress
+  position: absolute
+  right: 0
+  bottom: 0
+  width: 0%
+  height: 100%
+  background: currentColor
+  z-index: 0
+  will-change: width
+
+.hoverZones
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  display: flex
+  flex-direction: row
+  pointer-events: auto
+  z-index: 10
+
+.hoverZone
+  position: relative
+  height: 100%
+  flex: 1
+  pointer-events: auto
+
+.captionYear
+  text-align: right

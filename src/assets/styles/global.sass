@@ -445,6 +445,7 @@ mux-player, .muxPlayer
     transition: transform 0.5s
     will-change: transform
     background-color: transparent !important
+    overscroll-behavior: auto
     .row
       border: 0 !important
       background-color: var(--theme-blok-solid) !important
@@ -478,89 +479,6 @@ mux-player, .muxPlayer
       &-Caption
         display: flex
         justify-content: space-between
-  &-ProjectSlider
-    position: relative
-    width: 100%
-    height: 100%
-    padding: var(--spacing-base) var(--spacing-side)
-    &-Item
-      position: absolute
-      top: var(--spacing-base)
-      left: var(--spacing-side)
-      width: calc(100% - (var(--spacing-side) * 2))
-      display: flex
-      flex-direction: column
-      gap: 0.4545454546rem // 10px for 22px font size
-      opacity: 0
-      pointer-events: none
-      &[data-active='true']
-        opacity: 1
-        pointer-events: auto
-        position: relative
-        top: 0
-        left: 0
-        width: 100%
-    &-Image
-      position: relative
-      width: 100%
-      aspect-ratio: 16 / 9
-      overflow: hidden
-      mux-player, .muxPlayer
-        aspect-ratio: 16 / 9 !important
-        object-fit: cover !important
-      @media (orientation: portrait)
-        aspect-ratio: 3 / 2
-        mux-player, .muxPlayer
-          aspect-ratio: 3 / 2 !important
-      img, video, mux-player
-        position: absolute
-        top: 0
-        left: 0
-        width: 100%
-        height: 100% !important
-        object-fit: cover
-    &-Indicators
-      bottom: calc(var(--spacing-base) + 0.5rem + 0.454545rem + 1.45em) !important
-      right: calc(var(--spacing-side) + 0.5rem) !important
-    &-Caption
-      display: flex
-      justify-content: space-between
-      &-Title
-        display: flex
-        align-items: center
-        gap: 0.5rem
-    &-ProgressWrapper
-      position: relative
-      width: 0.8em
-      height: var(--border-hyperlink)
-      overflow: hidden
-    &-Progress
-      position: absolute
-      right: 0
-      bottom: 0
-      width: 0%
-      height: 100%
-      background: currentColor
-      z-index: 0
-      will-change: width
-    &-HoverZones
-      position: absolute
-      top: 0
-      left: 0
-      width: 100%
-      height: 100%
-      display: flex
-      flex-direction: row
-      pointer-events: auto
-      z-index: 10
-    &-HoverZone
-      position: relative
-      height: 100%
-      flex: 1
-      pointer-events: auto
-      // Optional: Add visual debugging (remove in production)
-      // &:hover
-      //   background: rgba(255, 0, 0, 0.1)
   &-Exp
     padding: var(--spacing-base) 0
     display: flex

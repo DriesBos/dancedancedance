@@ -5,10 +5,11 @@ import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { gsap, useGSAP } from '@/lib/gsap';
-import MuxPlayer from '../MuxPlayer';
-import SliderIndicators from '../SliderIndicators';
+import MuxPlayer from '@/components/MuxPlayer';
+import SliderIndicators from '@/components/SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
-import BlokSidePanels from '../BlokSidePanels';
+import BlokSidePanels from '@/components/BlokSidePanels';
+import styles from './BlokProjectSlider.module.sass';
 
 interface SbPageData extends SbBlokData {
   body: Array<{
@@ -131,21 +132,21 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
   };
 
   return (
-    <div className="blok-ProjectSlider-Item" data-active={isActive}>
-      <div className="blok-ProjectSlider-Image">
-        <div className="blok-ProjectSlider-ImageWrapper">{renderMedia()}</div>
+    <div className={styles.item} data-active={isActive}>
+      <div className={styles.image}>
+        <div className={styles.imageWrapper}>{renderMedia()}</div>
       </div>
-      <div className="blok-ProjectSlider-Caption">
-        <div className="blok-ProjectSlider-Caption-Title">
+      <div className={styles.caption}>
+        <div className={styles.captionTitle}>
           <span>Featured</span>
           {isActive && progressRef && (
-            <div className="blok-ProjectSlider-ProgressWrapper">
-              <div className="blok-ProjectSlider-Progress" ref={progressRef} />
+            <div className={styles.progressWrapper}>
+              <div className={styles.progress} ref={progressRef} />
             </div>
           )}
           {String(item.name)}
         </div>
-        <div className="blok-ProjectSlider-Caption-Year">{item.year}</div>
+        <div className={styles.captionYear}>{item.year}</div>
       </div>
     </div>
   );
@@ -220,7 +221,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
   return (
     <div
-      className="blok blok-ProjectSlider blok-Animate"
+      className={`blok blok-Animate ${styles.root}`}
       {...storyblokEditable(blok)}
     >
       <GrainyGradient variant="blok" />
@@ -238,20 +239,20 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       <SliderIndicators
         total={blok.body.length}
         activeIndex={activeIndex}
-        className="blok-ProjectSlider-Indicators"
+        className={styles.indicators}
       />
 
       {/* Invisible hover zones - only rendered on devices with cursor */}
       {hasCursor && blok.body.length > 1 && (
         <div
-          className="blok-ProjectSlider-HoverZones"
+          className={styles.hoverZones}
           onMouseLeave={handleZoneLeave}
         >
           {blok.body.map((item, index) => (
             <Link
               key={`zone-${item._uid}`}
               href={item.link?.cached_url || '#'}
-              className="blok-ProjectSlider-HoverZone cursorInteract"
+              className={`${styles.hoverZone} cursorInteract`}
               style={{ width: `${100 / blok.body.length}%` }}
               onMouseEnter={() => handleZoneEnter(index)}
             />
