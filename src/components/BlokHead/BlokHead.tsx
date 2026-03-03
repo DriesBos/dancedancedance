@@ -458,10 +458,12 @@ const BlokHead = ({ blok, float, params }: Props) => {
               </button>
               <button
                 type="button"
-                className="icon iconRocket"
+                className={`icon iconRocket cursorMagnetic ${styles.spaceButton}`}
                 onClick={toggleSpace}
               >
-                <IconRocket />
+                <span className={styles.rocketWrap}>
+                  <IconRocket />
+                </span>
               </button>
               <Link href="/about" className="icon cursorMagnetic">
                 <IconAbout />
