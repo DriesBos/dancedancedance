@@ -38,6 +38,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const isThreeDSpace = space === '3D';
   const setTwoD = useStore((state) => state.setTwoD);
   const setThreeD = useStore((state) => state.setThreeD);
+  const topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasPrev, setHasPrev] = useState(false);
@@ -45,6 +46,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
+  const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
   const themeSpinTimeoutRef = useRef<number | null>(null);
   const spaceToggleRafRef = useRef<number | null>(null);
   const spaceToggleTimeoutRef = useRef<number | null>(null);
@@ -219,9 +221,11 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const handleTopPanel = useCallback(
     (e: MouseEvent) => {
       if (!headRef.current || !isThreeDSpace) return;
+      const pagePastTop = isPagePastTop();
 
       if (e.type === 'mouseenter') {
-        if (isPagePastTop()) {
+        if (pagePastTop) {
+          setIsTopPanelForcedClosed(true);
           gsap.to(headRef.current, {
             yPercent: 0,
             ease: 'power1.inOut',
@@ -231,6 +235,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
           return;
         }
 
+        setIsTopPanelForcedClosed(false);
         gsap.to(headRef.current, {
           yPercent: -100,
           ease: 'power1.inOut',
@@ -238,6 +243,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         });
         setTopPanelTrue();
       } else {
+        setIsTopPanelForcedClosed(pagePastTop);
         gsap.to(headRef.current, {
           yPercent: 0,
           ease: 'power1.inOut',
@@ -250,13 +256,17 @@ const BlokHead = ({ blok, float, params }: Props) => {
   );
 
   useEffect(() => {
-    if (!isThreeDSpace) return;
+    if (!isThreeDSpace) {
+      setIsTopPanelForcedClosed(false);
+      return;
+    }
 
     let rafId: number | null = null;
     let isForcedClosed = false;
 
     const syncTopPanelWithScroll = () => {
       const shouldForceClosed = isPagePastTop();
+      setIsTopPanelForcedClosed(shouldForceClosed);
       if (!shouldForceClosed) {
         isForcedClosed = false;
         return;
@@ -550,6 +560,8 @@ const BlokHead = ({ blok, float, params }: Props) => {
     <div
       ref={headRef}
       className={`${styles.root} blok blok-Head blok-AnimateHead`}
+      data-active={topPanel}
+      data-forced-closed={isTopPanelForcedClosed}
       data-scrollborder={hasScrollBorder}
     >
       <GrainyGradient variant="blok" />

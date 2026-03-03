@@ -9,6 +9,8 @@
   border-left: var(--border-width) solid var(--border-color)
   border-right: var(--border-width) solid var(--border-color)
   background: var(--theme-blok-showlines) !important
+  &[data-forced-closed='true']
+    background: var(--theme-blok-solid) !important
   &[data-scrollborder='true']
     border-bottom-width: 1px
   :global(.column-Title)
