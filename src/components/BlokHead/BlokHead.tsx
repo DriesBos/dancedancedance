@@ -11,13 +11,15 @@ import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
-import Row from './Row';
-import BlokSidePanels from './BlokSidePanels';
-import StoreSwitcher from './StoreSwitcher';
+import Row from '@/components/Row';
+import BlokSidePanels from '@/components/BlokSidePanels';
+import StoreSwitcher from '@/components/StoreSwitcher';
 import { gsap, useGSAP } from '@/lib/gsap';
-import IconCloud from './Icons/IconCloud';
-import IconThoughts from './Icons/IconThoughts';
+import IconCloud from '@/components/Icons/IconCloud';
+import IconThoughts from '@/components/Icons/IconThoughts';
 import GrainyGradient from '@/components/GrainyGradient';
+import IconRocket from '@/components/Icons/IconRocket';
+import styles from './BlokHead.module.sass';
 
 interface Props {
   blok?: any;
@@ -31,20 +33,52 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const currentPath = path || '/';
   const router = useRouter();
   const { projectSlugs, projects } = useProjects();
+  const theme = useStore((state) => state.theme);
+  const cycleTheme = useStore((state) => state.cycleTheme);
   const space = useStore((state: any) => state.space);
   const isThreeDSpace = space === '3D';
+  const setTwoD = useStore((state) => state.setTwoD);
+  const setThreeD = useStore((state) => state.setThreeD);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasPrev, setHasPrev] = useState(false);
   const [hasNext, setHasNext] = useState(false);
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
+  const [isThemeSpinning, setIsThemeSpinning] = useState(false);
+  const themeSpinTimeoutRef = useRef<number | null>(null);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
   const [externalLink, setExternalLink] = useState<
     { cached_url: string } | undefined
   >(undefined);
+
+  const toggleSpace = useCallback(() => {
+    if (space === '3D') {
+      setTwoD();
+      return;
+    }
+    setThreeD();
+  }, [space, setTwoD, setThreeD]);
+
+  const handleCycleTheme = useCallback(() => {
+    cycleTheme();
+
+    if (themeSpinTimeoutRef.current !== null) {
+      window.clearTimeout(themeSpinTimeoutRef.current);
+    }
+
+    setIsThemeSpinning(false);
+    requestAnimationFrame(() => {
+      setIsThemeSpinning(true);
+    });
+
+    themeSpinTimeoutRef.current = window.setTimeout(() => {
+      setIsThemeSpinning(false);
+      themeSpinTimeoutRef.current = null;
+    }, 700);
+  }, [cycleTheme]);
 
   const clickNext = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) return;
@@ -170,6 +204,14 @@ const BlokHead = ({ blok, float, params }: Props) => {
     });
     setTopPanelFalse();
   }, [handleTopPanel, isThreeDSpace, setTopPanelFalse]);
+
+  useEffect(() => {
+    return () => {
+      if (themeSpinTimeoutRef.current !== null) {
+        window.clearTimeout(themeSpinTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Set Header Blok Title and External Link
   useEffect(() => {
@@ -371,7 +413,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   return (
     <div
       ref={headRef}
-      className={`blok blok-Head blok-AnimateHead`}
+      className={`${styles.root} blok blok-Head blok-AnimateHead`}
       data-scrollborder={hasScrollBorder}
     >
       <GrainyGradient variant="blok" />
@@ -400,7 +442,27 @@ const BlokHead = ({ blok, float, params }: Props) => {
         <div className="column column-Icons">
           {pathName === 'home' && (
             <>
-              <StoreSwitcher />
+              {/* <StoreSwitcher /> */}
+              <button
+                type="button"
+                className={`icon cursorMagnetic ${styles.themeButton}`}
+                onClick={handleCycleTheme}
+                aria-label={`Cycle theme. Current theme: ${theme}`}
+                title={`Theme: ${theme}`}
+              >
+                <span
+                  className={`${styles.themeCycle} ${
+                    isThemeSpinning ? styles.themeCycleSpinning : ''
+                  }`}
+                />
+              </button>
+              <button
+                type="button"
+                className="icon iconRocket"
+                onClick={toggleSpace}
+              >
+                <IconRocket />
+              </button>
               <Link href="/about" className="icon cursorMagnetic">
                 <IconAbout />
               </Link>

@@ -17,13 +17,10 @@ export type Theme =
 
 export type Space = 'DESKTOP' | '3D';
 
-export type Border = 'none' | 'minimal' | 'radius' | 'organic';
-
 export type Props = {
   theme: Theme;
   space: Space;
   topPanel: boolean;
-  border: Border;
 };
 
 export type Actions = {
@@ -35,8 +32,6 @@ export type Actions = {
   setThreeD: () => void;
   setTopPanelTrue: () => void;
   setTopPanelFalse: () => void;
-  setBorder: (border: Border) => void;
-  cycleBorder: () => void;
 };
 
 const THEME_ORDER: Theme[] = [
@@ -55,14 +50,11 @@ const THEME_ORDER: Theme[] = [
   'DARK',
 ];
 
-const BORDER_ORDER: Border[] = ['none', 'minimal', 'radius', 'organic'];
-
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
   theme: 'BEIGE',
   space: '3D',
   topPanel: true,
-  border: 'minimal',
   setNightmode: () => set({ theme: 'NIGHTMODE' }),
   setDefault: () => set({ theme: 'BEIGE' }),
   setTheme: (theme: Theme) => set({ theme }),
@@ -76,11 +68,4 @@ export const useStore = create<Props & Actions>()((set) => ({
   setThreeD: () => set({ space: '3D' }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
-  setBorder: (border: Border) => set({ border }),
-  cycleBorder: () =>
-    set((state) => {
-      const currentIndex = BORDER_ORDER.indexOf(state.border);
-      const nextIndex = (currentIndex + 1) % BORDER_ORDER.length;
-      return { border: BORDER_ORDER[nextIndex] };
-    }),
 }));

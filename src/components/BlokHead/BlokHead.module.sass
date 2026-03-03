@@ -1,0 +1,40 @@
+.root
+  position: sticky
+  left: 0
+  top: 0
+  width: 100%
+  z-index: +1
+  border-top: var(--border-width) solid var(--border-color)
+  border-bottom: var(--border-width) solid var(--border-color)
+  border-left: var(--border-width) solid var(--border-color)
+  border-right: var(--border-width) solid var(--border-color)
+  background: var(--theme-blok-showlines)
+  &[data-scrollborder='true']
+    border-bottom-width: 1px
+  :global(.column-Title)
+    padding-right: 0
+    user-select: none
+
+.themeCycle
+  width: var(--icon-size)
+  height: var(--icon-size)
+  border-radius: 1000px
+  border: 1.5px solid currentColor
+  background: conic-gradient(from -45deg, currentColor 0deg 180deg, var(--theme-bg) 180deg 360deg)
+  transition: transform 0.25s ease, border-color var(--transition-theme), background var(--transition-theme)
+
+.themeButton
+  display: grid
+  place-items: center
+  @media (hover: hover)
+    &:hover .themeCycle
+      transform: rotate(45deg)
+
+.themeCycleSpinning
+  animation: themeCycleSpin360 0.7s cubic-bezier(0.22, 1, 0.36, 1)
+
+@keyframes themeCycleSpin360
+  from
+    transform: rotate(0deg)
+  to
+    transform: rotate(360deg)

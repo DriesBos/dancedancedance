@@ -19,7 +19,6 @@ import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
-import ThemingToggles from '@/components/ThemingToggles';
 import GrainyGradient from '@/components/GrainyGradient';
 import IconStylesLoader from '@/components/Icons/IconStylesLoader';
 
@@ -91,7 +90,6 @@ export default async function RootLayout({
           <CursorLoader />
           <TitleSwitcher />
           <FaviconSwitcher />
-          <ThemingToggles />
           {process.env.NEXT_PUBLIC_GA_ID && (
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
           )}
