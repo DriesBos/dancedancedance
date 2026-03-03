@@ -13,9 +13,17 @@ interface Props {
   title?: string;
   category?: string[];
   external_link?: { cached_url: string };
+  stackIndex?: number;
 }
 
-const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
+const BlokProject = ({
+  slug,
+  year,
+  title,
+  category,
+  external_link,
+  stackIndex,
+}: Props) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -29,7 +37,7 @@ const BlokProject = ({ slug, year, title, category, external_link }: Props) => {
     <div
       className="blok blok-Project blok-Animate cursorInteract"
       onClick={handleClick}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', zIndex: stackIndex }}
     >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />

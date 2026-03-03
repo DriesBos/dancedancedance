@@ -15,7 +15,7 @@ export default async function BlokProjectList({ blok }: BlokProjectListProps) {
     <div className="blok blok-ProjectList" {...storyblokEditable(blok)}>
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
-      {data.map((item) => (
+      {data.map((item, index) => (
         <BlokProject
           key={item.slug}
           slug={item.slug}
@@ -23,6 +23,7 @@ export default async function BlokProjectList({ blok }: BlokProjectListProps) {
           title={item.title}
           category={item.category}
           external_link={item.external_link}
+          stackIndex={index + 1}
         />
       ))}
     </div>

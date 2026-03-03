@@ -437,68 +437,80 @@ mux-player, .muxPlayer
         display: none
   &-Project
     position: relative
-    border-top: 1px solid var(--border-color)
+    border: 0
+    border-top: 1px solid var(--theme-type) !important
     padding-bottom: calc(3.95rem * 0.5)
     margin-bottom: calc(-3.95rem * 0.5)
+    transform: translateY(0)
+    transition: transform 0.5s
     will-change: transform
     background-color: transparent !important
     .row
-      background-color: var(--theme-blok-solid)
+      border: 0 !important
+      background-color: var(--theme-blok-solid) !important
       transition: background-color var(--transition-theme)
+      // background-color: red !important
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none
   &-ProjectList
     position: relative
-    padding-top: var(--spacing-base)
-    padding-bottom: calc(3.95rem * 0.5)
-    overscroll-behavior: auto
+    border-top: 0
+    border-bottom: 0
+    // padding-top: var(--spacing-base)
+    // padding-bottom: calc(3.95rem * 0.5)
+    // overscroll-behavior: auto
+    // background: rgba(black, 0.5)
     *
       overscroll-behavior: auto
     // Incrementing z-index for each project item
-    .blok-Project
-      &:nth-child(1)
-        z-index: 1
-      &:nth-child(2)
-        z-index: 2
-      &:nth-child(3)
-        z-index: 3
-      &:nth-child(4)
-        z-index: 4
-      &:nth-child(5)
-        z-index: 5
-      &:nth-child(6)
-        z-index: 6
-      &:nth-child(7)
-        z-index: 7
-      &:nth-child(8)
-        z-index: 8
-      &:nth-child(9)
-        z-index: 9
-      &:nth-child(10)
-        z-index: 10
-      &:nth-child(11)
-        z-index: 11
-      &:nth-child(12)
-        z-index: 12
-      &:nth-child(13)
-        z-index: 13
-      &:nth-child(14)
-        z-index: 14
-      &:nth-child(15)
-        z-index: 15
-      &:nth-child(16)
-        z-index: 16
-      &:nth-child(17)
-        z-index: 17
-      &:nth-child(18)
-        z-index: 18
-      &:nth-child(19)
-        z-index: 19
-      &:nth-child(20)
-        z-index: 20
-      &:hover
-        z-index: 100 !important
+    // .blok-Project
+    //   &:nth-child(1)
+    //     z-index: 1
+    //   &:nth-child(2)
+    //     z-index: 2
+    //   &:nth-child(3)
+    //     z-index: 3
+    //   &:nth-child(4)
+    //     z-index: 4
+    //   &:nth-child(5)
+    //     z-index: 5
+    //   &:nth-child(6)
+    //     z-index: 6
+    //   &:nth-child(7)
+    //     z-index: 7
+    //   &:nth-child(8)
+    //     z-index: 8
+    //   &:nth-child(9)
+    //     z-index: 9
+    //   &:nth-child(10)
+    //     z-index: 10
+    //   &:nth-child(11)
+    //     z-index: 11
+    //   &:nth-child(12)
+    //     z-index: 12
+    //   &:nth-child(13)
+    //     z-index: 13
+    //   &:nth-child(14)
+    //     z-index: 14
+    //   &:nth-child(15)
+    //     z-index: 15
+    //   &:nth-child(16)
+    //     z-index: 16
+      // &:nth-child(17)
+      //   z-index: 17
+      // &:nth-child(18)
+      //   z-index: 18
+      // &:nth-child(19)
+      //   z-index: 19
+      // &:nth-child(20)
+      //   z-index: 20
+      // &:hover
+      //   z-index: 100 !important
+    @media (hover: hover)
+      .blok-Project:hover
+        transition-duration: 0.1s
+        transform: translateY(-1.75rem) !important
   &-Highlights
     display: grid
     grid-template-columns: repeat(2, minmax(0, 1fr))
