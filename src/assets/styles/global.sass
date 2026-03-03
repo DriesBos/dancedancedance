@@ -435,6 +435,14 @@ mux-player, .muxPlayer
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none
+  &-ProjectList
+    position: relative
+    border-top: 0 !important
+    border-bottom: 0 !important
+    @media (hover: hover)
+      .blok-Project:hover
+        transition-duration: 0.1s
+        transform: translateY(-1.75rem) !important
   &-Project
     position: relative
     border: 0
@@ -444,23 +452,14 @@ mux-player, .muxPlayer
     transform: translateY(0)
     transition: transform 0.5s
     will-change: transform
-    background-color: transparent !important
     overscroll-behavior: auto
     .row
       border: 0 !important
-      background-color: var(--theme-blok-solid) !important
-      transition: background-color var(--transition-theme)
+      background: var(--theme-blok-solid) !important
+      transition: background var(--transition-theme)
     @media (max-width: 770px)
       .column:nth-child(n+3):not(.column-Icons)
         display: none
-  &-ProjectList
-    position: relative
-    border-top: 0 !important
-    border-bottom: 0 !important
-    @media (hover: hover)
-      .blok-Project:hover
-        transition-duration: 0.1s
-        transform: translateY(-1.75rem) !important
   &-Highlights
     display: grid
     grid-template-columns: repeat(2, minmax(0, 1fr))

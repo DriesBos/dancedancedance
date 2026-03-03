@@ -269,10 +269,10 @@ body[data-theme='BLACK']
   --theme-type-contrast: white
 
 body[data-theme='GRADIENT']
-  --theme-bg: radial-gradient(#D8DAD9, #BCBDC1)
-  --theme-blok: transparent
+  --theme-bg: linear-gradient(90deg, #A99DA7, #AA899E 32%, #47485A)
+  --theme-blok: linear-gradient(90deg, #A99DA7, #AA899E 32%, #47485A)
   --theme-blok-showlines: transparent
-  --theme-blok-solid: #AA899E
+  --theme-blok-solid: linear-gradient(90deg, #A99DA7, #AA899E 32%, #47485A)
   --theme-blok-subpanel: transparent
   --theme-type: var(--color-white)
   --theme-type-inactive: var(--color-white-inactive)
@@ -283,7 +283,8 @@ body[data-theme='GRADIENT']
   --slider-indicator: white
   --slider-indicator-active: #AA899E
   &[data-space='3D']
-    --theme-bg: linear-gradient(180deg, #A99DA7, #AA899E 32%, #47485A)
+    --theme-blok: transparent
+    --theme-blok-solid: transparent
 
 body[data-theme='DONJUDD']
   --theme-bg: #DAD9E0
