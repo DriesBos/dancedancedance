@@ -208,11 +208,29 @@ const BlokHead = ({ blok, float, params }: Props) => {
     }
   }, [currentPath, projectSlugs]);
 
+  const isPagePastTop = useCallback(() => {
+    const page = document.querySelector('.page');
+    if (page instanceof HTMLElement) {
+      return page.getBoundingClientRect().top < 0;
+    }
+    return window.scrollY > 0;
+  }, []);
+
   const handleTopPanel = useCallback(
     (e: MouseEvent) => {
       if (!headRef.current || !isThreeDSpace) return;
 
       if (e.type === 'mouseenter') {
+        if (isPagePastTop()) {
+          gsap.to(headRef.current, {
+            yPercent: 0,
+            ease: 'power1.inOut',
+            duration: 0.33,
+          });
+          setTopPanelFalse();
+          return;
+        }
+
         gsap.to(headRef.current, {
           yPercent: -100,
           ease: 'power1.inOut',
@@ -228,8 +246,51 @@ const BlokHead = ({ blok, float, params }: Props) => {
         setTopPanelFalse();
       }
     },
-    [isThreeDSpace, setTopPanelTrue, setTopPanelFalse],
+    [isThreeDSpace, isPagePastTop, setTopPanelTrue, setTopPanelFalse],
   );
+
+  useEffect(() => {
+    if (!isThreeDSpace) return;
+
+    let rafId: number | null = null;
+    let isForcedClosed = false;
+
+    const syncTopPanelWithScroll = () => {
+      const shouldForceClosed = isPagePastTop();
+      if (!shouldForceClosed) {
+        isForcedClosed = false;
+        return;
+      }
+
+      if (isForcedClosed) return;
+
+      gsap.to(headRef.current, {
+        yPercent: 0,
+        ease: 'power1.inOut',
+        duration: 0.33,
+      });
+      setTopPanelFalse();
+      isForcedClosed = true;
+    };
+
+    const onScroll = () => {
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        syncTopPanelWithScroll();
+      });
+    };
+
+    syncTopPanelWithScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
+  }, [isThreeDSpace, isPagePastTop, setTopPanelFalse]);
 
   useEffect(() => {
     const main = document.querySelector('main');
