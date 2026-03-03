@@ -111,6 +111,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   const handleCycleTheme = useCallback(() => {
     cycleTheme();
+    console.log('Theme cycled to:', useStore.getState().theme);
 
     if (themeSpinTimeoutRef.current !== null) {
       window.clearTimeout(themeSpinTimeoutRef.current);
