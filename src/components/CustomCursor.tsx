@@ -137,6 +137,11 @@ export default function CustomCursor() {
       yPreviewTo(y);
     };
 
+    const setPreviewToPointerInstant = (clientX: number, clientY: number) => {
+      const { x, y } = clampPreviewPosition(clientX, clientY);
+      gsap.set(previewContainer, { x, y });
+    };
+
     const showPreview = () => {
       if (isPreviewVisible.current) return;
       isPreviewVisible.current = true;
@@ -344,7 +349,11 @@ export default function CustomCursor() {
       }
       previewImage.setAttribute('alt', alt);
 
-      movePreviewToPointer(prevMousePos.current.x, prevMousePos.current.y);
+      const mouseEvent = e as MouseEvent;
+      const enterX = mouseEvent.clientX;
+      const enterY = mouseEvent.clientY;
+      prevMousePos.current = { x: enterX, y: enterY };
+      setPreviewToPointerInstant(enterX, enterY);
       showPreview();
     };
 
