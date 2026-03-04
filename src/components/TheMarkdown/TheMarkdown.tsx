@@ -2,7 +2,6 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
 import { useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 import styles from './TheMarkdown.module.sass';
@@ -38,7 +37,7 @@ const Markdown: React.FunctionComponent<MarkdownProps> = ({
 
   return (
     <div ref={markdownRef} className={`${className} ${styles.markdown} markdown`}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml>
         {content}
       </ReactMarkdown>
     </div>

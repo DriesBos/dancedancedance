@@ -7,6 +7,7 @@ import '@/assets/styles/vars.sass';
 import '@/assets/styles/typography.sass';
 import '@/assets/styles/transitions.sass';
 import '@/assets/styles/global.sass';
+import '@/assets/styles/icon-styles.sass';
 import StoryblokProvider from '@/providers/storyblok-provider';
 import { ProjectsProvider } from '@/providers/projects-provider';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
@@ -20,7 +21,6 @@ import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
 import GrainyGradient from '@/components/GrainyGradient';
-import IconStylesLoader from '@/components/Icons/IconStylesLoader';
 
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
@@ -86,7 +86,6 @@ export default async function RootLayout({
       <body className={`body ${myFont.className}`} data-border="minimal" data-page="home">
         <AppInitializer />
         <GrainyGradient variant="page" />
-        <IconStylesLoader />
         <ProjectsProvider projects={projects}>
           <CursorLoader />
           <TitleSwitcher />
