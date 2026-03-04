@@ -623,14 +623,16 @@ body
   &[data-space="3D"]
     // 124px panel height + blok height + desired margin
     padding-top: calc(124px + var(--blok-height) + 10vh)
+    padding-bottom: 6rem
     @media (orientation: portrait)
       padding-top: calc(124px + var(--blok-height) + 7.5vh)
-      padding-bottom: 6rem
     // .laserBlok
     //   opacity: 1
     main
       width: 88vw
       max-width: 1150px
+      @media (max-width: 770px)
+        width: calc(100% - 2 * var(--spacing-side))
     .blok
       &-Head
         background: var(--theme-blok-showlines)

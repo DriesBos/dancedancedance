@@ -62,7 +62,10 @@ const BlokHead = ({}: Props) => {
   const spaceToggleTimeoutRef = useRef<number | null>(null);
   const isHoveringTopPanelZoneRef = useRef(false);
 
-  const currentSlug = useMemo(() => currentPath.split('/')[2] || '', [currentPath]);
+  const currentSlug = useMemo(
+    () => currentPath.split('/')[2] || '',
+    [currentPath],
+  );
 
   const pathName = useMemo(() => {
     const route = currentPath.split('/')[1];
@@ -93,10 +96,16 @@ const BlokHead = ({}: Props) => {
   }, [currentSlug]);
 
   const externalLink = useMemo(() => {
-    if (pathName !== 'projects' || !projects || projects.length === 0 || !currentSlug) {
+    if (
+      pathName !== 'projects' ||
+      !projects ||
+      projects.length === 0 ||
+      !currentSlug
+    ) {
       return undefined;
     }
-    return projects.find((project) => project.slug === currentSlug)?.external_link;
+    return projects.find((project) => project.slug === currentSlug)
+      ?.external_link;
   }, [pathName, projects, currentSlug]);
 
   const toggleSpace = useCallback(() => {
@@ -173,7 +182,10 @@ const BlokHead = ({}: Props) => {
 
   const clickNext = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) return;
-    if (currentProjectIndex !== -1 && currentProjectIndex < projectSlugs.length - 1) {
+    if (
+      currentProjectIndex !== -1 &&
+      currentProjectIndex < projectSlugs.length - 1
+    ) {
       const nextSlug = `/projects/${projectSlugs[currentProjectIndex + 1]}`;
       router.push(nextSlug);
     }
@@ -432,7 +444,9 @@ const BlokHead = ({}: Props) => {
       const topPanel = headRef.current?.querySelector('.side_Top') || null;
       const isWithinInteractiveZone = (node: EventTarget | null) => {
         if (!(node instanceof Node)) return false;
-        return main.contains(node) || (topPanel ? topPanel.contains(node) : false);
+        return (
+          main.contains(node) || (topPanel ? topPanel.contains(node) : false)
+        );
       };
 
       const onEnter = (e: Event) => {
