@@ -50,6 +50,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const themeSpinTimeoutRef = useRef<number | null>(null);
   const spaceToggleRafRef = useRef<number | null>(null);
   const spaceToggleTimeoutRef = useRef<number | null>(null);
+  const isHoveringTopPanelZoneRef = useRef(false);
 
   const [pathName, setPathName] = useState('');
   const [projectName, setProjectName] = useState('');
@@ -224,6 +225,12 @@ const BlokHead = ({ blok, float, params }: Props) => {
       const pagePastTop = isPagePastTop();
 
       if (e.type === 'mouseenter') {
+        isHoveringTopPanelZoneRef.current = true;
+      } else if (e.type === 'mouseleave') {
+        isHoveringTopPanelZoneRef.current = false;
+      }
+
+      if (e.type === 'mouseenter') {
         if (pagePastTop) {
           setIsTopPanelForcedClosed(true);
           gsap.to(headRef.current, {
@@ -258,6 +265,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
   useEffect(() => {
     if (!isThreeDSpace) {
       setIsTopPanelForcedClosed(false);
+      isHoveringTopPanelZoneRef.current = false;
       return;
     }
 
@@ -268,6 +276,14 @@ const BlokHead = ({ blok, float, params }: Props) => {
       const shouldForceClosed = isPagePastTop();
       setIsTopPanelForcedClosed(shouldForceClosed);
       if (!shouldForceClosed) {
+        if (isForcedClosed && isHoveringTopPanelZoneRef.current && headRef.current) {
+          gsap.to(headRef.current, {
+            yPercent: -100,
+            ease: 'power1.inOut',
+            duration: 0.33,
+          });
+          setTopPanelTrue();
+        }
         isForcedClosed = false;
         return;
       }
@@ -300,7 +316,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [isThreeDSpace, isPagePastTop, setTopPanelFalse]);
+  }, [isThreeDSpace, isPagePastTop, setTopPanelFalse, setTopPanelTrue]);
 
   useEffect(() => {
     const main = document.querySelector('main');
