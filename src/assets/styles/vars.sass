@@ -101,23 +101,8 @@ body[data-space='DESKTOP']
 body[data-space='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
   --panel-perspective-origin: 50% -100vh
-
-// BORDERS
-body[data-border='none']
-  --border-width: 0px
-  --border-radius: 0px
-  --border-gap: 0
-body[data-border='minimal']
-  --border-width: 1px
-  --border-radius: 0
-  --border-gap: 0
-body[data-border='radius']
-  --border-width: 2px
-  --border-radius: 1rem
-  --border-gap: 0
-body[data-border='organic']
-  --border-width: 3px
-  --border-gap: 0
+  @media (orientation: portrait)
+    --panel-perspective-origin: 50% -75vh
 
 // THEMES
 body[data-theme='LIGHT']
