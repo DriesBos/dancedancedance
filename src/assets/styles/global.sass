@@ -21,7 +21,6 @@ body
   padding: 0
   min-height: 100dvh
   transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
-  will-change: padding-top, padding-bottom, color, background
 
 main
   position: relative
@@ -36,7 +35,6 @@ main
   // border: var(--main-border-width) solid var(--border-color)
   border-radius: var(--main-border-radius)
   transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), perspective-origin var(--transition-theme), perspective var(--transition-theme)
-  will-change: border, border-radius, width, max-width, height, max-height, transform, perspective, perspective-origin
   // Safe envs
   padding-top: env(safe-area-inset-top)
   padding-right: env(safe-area-inset-right)
@@ -46,8 +44,7 @@ main
     margin-top: calc(0px - (#{var(--border-width)}))
 
 .page
-  transition: background var(--transition-theme)
-  will-change: background
+  transition: background var(--transition-theme), margin-top var(--transition-space)
   & > .blok
     margin-top: calc(0px - (#{var(--border-width)}))
   &-Thumbnail
@@ -55,7 +52,6 @@ main
   &-Blurbs
     position: relative
     background: var(--theme-bg)
-    will-change: background
     transition: background var(--transition-theme)
     width: 100vw
     height: 100dvh
@@ -182,6 +178,7 @@ main
       font-size: var(--font-size-caption)
       pointer-events: none
       animation: hintPulse 2s ease-in-out infinite, hintFadeIn 0.5s ease-out
+      will-change: transform, opacity
 
 @keyframes hintPulse
   0%, 100%
@@ -236,7 +233,6 @@ mux-player, .muxPlayer
   perspective: 1500px
   perspective-origin: var(--panel-perspective-origin)
   transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme), perspective var(--transition-theme), perspective-origin var(--transition-theme)
-  will-change: border, border-left, border-right, border-top, border-bottom, background, opacity, perspective, perspective-origin
   &.inactive
     display: none
   .row
@@ -439,7 +435,6 @@ mux-player, .muxPlayer
     margin-bottom: calc(-3.95rem * 0.5)
     transform: translateY(0)
     transition: transform 0.5s
-    will-change: transform
     .row
       position: relative
       overflow: hidden
@@ -618,7 +613,6 @@ body
         z-index: -1
   .page
     &-General, &-Project, &-About
-      transition: margin-top var(--transition-space)
       & > .blok:first-child .side_Top,
       & > :first-child + .blok .side_Top
         opacity: 1

@@ -9,7 +9,6 @@
   border-left: var(--border-width) solid var(--border-color)
   border-right: var(--border-width) solid var(--border-color)
   background: var(--theme-blok-showlines) !important
-  will-change: background, border-left, border-right, border-top, border-bottom
   transition: background var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme)
   &[data-forced-closed='true']
     background: var(--theme-blok-solid) !important
@@ -28,6 +27,7 @@
   border: 1.5px solid currentColor
   background: conic-gradient(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg), var(--theme-blok-solid)
   transition: transform 0.25s ease, border-color var(--transition-theme), background var(--transition-theme)
+  will-change: transform
 
 .themeButton
   display: grid
@@ -44,6 +44,7 @@
     display: grid
     place-items: center
     transition: transform 0.2s ease
+    will-change: transform
   :global(svg)
     transform-origin: center
   :global(.iconRocketTail)
