@@ -1,4 +1,5 @@
 import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
+import { getStoryblokTagsForSlug } from '@/lib/storyblok-cache';
 
 type StoryblokResponse = { story: any };
 type StoryblokStartpageResponse = { stories?: any[] };
@@ -33,7 +34,7 @@ const fetchStoryByPath = async (
 
   const response = await fetch(url, {
     next: {
-      tags: ['cms'],
+      tags: ['cms', ...getStoryblokTagsForSlug(path)],
       revalidate: version === 'published' ? 3600 : 0,
     },
     cache: version === 'published' ? 'force-cache' : 'no-store',
@@ -64,7 +65,7 @@ const fetchStartpageStory = async (
 
   const response = await fetch(url, {
     next: {
-      tags: ['cms'],
+      tags: ['cms', ...getStoryblokTagsForSlug('home')],
       revalidate: version === 'published' ? 3600 : 0,
     },
     cache: version === 'published' ? 'force-cache' : 'no-store',

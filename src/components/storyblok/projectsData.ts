@@ -1,5 +1,6 @@
 import { ISbStoriesParams } from '@storyblok/react/rsc';
 import { getStoryblokApi } from '@/lib/storyblok';
+import { STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS } from '@/lib/storyblok-cache';
 
 export interface ProjectData {
   slug: string;
@@ -24,7 +25,11 @@ export async function fetchProjectData(): Promise<ProjectData[]> {
 
   const storyblokApi = getStoryblokApi();
   const projects = await storyblokApi.get('cdn/stories', sbParams, {
-    cache: 'no-store',
+    cache: 'force-cache',
+    next: {
+      revalidate: 3600,
+      tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS],
+    },
   });
 
   return projects.data.stories.map((story: any) => ({

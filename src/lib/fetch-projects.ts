@@ -1,5 +1,6 @@
 import { ISbStoriesParams } from '@storyblok/react/rsc';
 import { getStoryblokApi } from '@/lib/storyblok';
+import { STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS } from '@/lib/storyblok-cache';
 
 export interface ProjectData {
   slug: string;
@@ -24,7 +25,10 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
 
   const response = await storyblokApi.get(`cdn/stories`, sbParams, {
     cache: 'force-cache',
-    next: { revalidate: 3600 }, // Revalidate every hour
+    next: {
+      revalidate: 3600, // Revalidate every hour
+      tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS],
+    },
   });
 
   // Return projects in CMS order

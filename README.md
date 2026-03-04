@@ -34,3 +34,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Storyblok Cache Invalidation
+
+This app uses tag-based cache invalidation for Storyblok content.
+
+1. Set `STORYBLOK_REVALIDATE_SECRET` in your environment.
+2. Configure a Storyblok webhook (published/unpublished/deleted) to call:
+   `POST /api/storyblok/revalidate?secret=YOUR_SECRET`
+3. The webhook route revalidates Storyblok tags and relevant paths, and flushes Storyblok memory cache when available.
