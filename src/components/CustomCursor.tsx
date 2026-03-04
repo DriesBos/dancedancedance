@@ -1,10 +1,12 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { gsap, useGSAP } from '@/lib/gsap';
 import styles from './CustomCursor.module.sass';
 
 export default function CustomCursor() {
+  const pathname = usePathname();
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -21,6 +23,25 @@ export default function CustomCursor() {
   const hintShowTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintHideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const previewContainer = previewRef.current;
+    const previewImage = previewImageRef.current;
+    if (!previewContainer || !previewImage) return;
+
+    // Route changes can skip hover-leave events, so force-reset preview state.
+    isPreviewVisible.current = false;
+    gsap.killTweensOf(previewContainer);
+    gsap.set(previewContainer, {
+      x: -1000,
+      y: -1000,
+      autoAlpha: 0,
+      scale: 0.96,
+      rotate: -1.5,
+    });
+    previewImage.setAttribute('src', '');
+    previewImage.setAttribute('alt', '');
+  }, [pathname]);
 
   useGSAP(() => {
     // Skip on touch devices - no hover support
@@ -389,6 +410,7 @@ export default function CustomCursor() {
       sizeAnimMagnetic.reverse();
       sizeAnimInteract.reverse();
       mouseInTarget.current = false;
+      hidePreview();
     };
 
     // Show navigation hint on project pages (first time only per session)
