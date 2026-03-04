@@ -12,7 +12,7 @@ import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
-import { gsap, useGSAP } from '@/lib/gsap';
+import { gsap } from '@/lib/gsap';
 import GrainyGradient from '@/components/GrainyGradient';
 import IconRocket from '@/components/Icons/IconRocket';
 import styles from './BlokHead.module.sass';
@@ -240,17 +240,30 @@ const BlokHead = ({}: Props) => {
   );
 
   useEffect(() => {
-    if (!isThreeDSpace) {
-      setIsTopPanelForcedClosed(false);
-      isHoveringTopPanelZoneRef.current = false;
-      return;
-    }
-
+    const mediaQuery =
+      typeof window.matchMedia === 'function'
+        ? window.matchMedia('(orientation: landscape)')
+        : null;
+    let isLandscape = mediaQuery ? mediaQuery.matches : true;
     let rafId: number | null = null;
     let isForcedClosed = false;
     let lastScrollY = window.scrollY;
     let scrollStartY = window.scrollY;
     let isScrollingDown = false;
+
+    const updateScrollBorder = () => {
+      const scrollY = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const threshold = viewportHeight * 0.2;
+      const hasBorder = scrollY > threshold;
+      setHasScrollBorder((prev) => (prev === hasBorder ? prev : hasBorder));
+    };
+
+    const resetScrollDirection = () => {
+      lastScrollY = window.scrollY;
+      scrollStartY = window.scrollY;
+      isScrollingDown = false;
+    };
 
     const syncTopPanelWithScroll = () => {
       const shouldForceClosed = isPagePastTop();
@@ -267,9 +280,7 @@ const BlokHead = ({}: Props) => {
           setIsTopPanelForcedClosed(false);
         }
         isForcedClosed = false;
-        lastScrollY = window.scrollY;
-        scrollStartY = window.scrollY;
-        isScrollingDown = false;
+        resetScrollDirection();
         return;
       }
 
@@ -310,19 +321,89 @@ const BlokHead = ({}: Props) => {
       lastScrollY = currentScrollY;
     };
 
-    const onScroll = () => {
+    const syncDesktopHeadOnScroll = () => {
+      if (!isLandscape) {
+        gsap.set(headRef.current, { y: 0 });
+        resetScrollDirection();
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const scrollThreshold = windowHeight * 0.1;
+
+      if (currentScrollY < scrollThreshold) {
+        animateHead({ y: 0 });
+        scrollStartY = currentScrollY;
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      const scrollingDown = currentScrollY > lastScrollY;
+      if (scrollingDown !== isScrollingDown) {
+        scrollStartY = lastScrollY;
+        isScrollingDown = scrollingDown;
+      }
+
+      const scrollDistance = Math.abs(currentScrollY - scrollStartY);
+      if (isScrollingDown && scrollDistance > scrollThreshold) {
+        animateHead({ y: -100, ease: 'power1.out' });
+      } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
+        animateHead({ y: 0, ease: 'power1.out' });
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    const syncHeadOnScroll = () => {
+      updateScrollBorder();
+      if (isThreeDSpace) {
+        syncTopPanelWithScroll();
+        return;
+      }
+      syncDesktopHeadOnScroll();
+    };
+
+    const handleScroll = () => {
       if (rafId !== null) return;
       rafId = window.requestAnimationFrame(() => {
         rafId = null;
-        syncTopPanelWithScroll();
+        syncHeadOnScroll();
       });
     };
 
-    syncTopPanelWithScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    const handleOrientationChange = (e: MediaQueryListEvent) => {
+      isLandscape = e.matches;
+      syncHeadOnScroll();
+    };
+
+    if (isThreeDSpace) {
+      gsap.set(headRef.current, { y: 0, yPercent: 0 });
+    } else {
+      setIsTopPanelForcedClosed(false);
+      isHoveringTopPanelZoneRef.current = false;
+    }
+
+    syncHeadOnScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    if (mediaQuery) {
+      if (typeof mediaQuery.addEventListener === 'function') {
+        mediaQuery.addEventListener('change', handleOrientationChange);
+      } else {
+        mediaQuery.addListener(handleOrientationChange);
+      }
+    }
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', handleScroll);
+      if (mediaQuery) {
+        if (typeof mediaQuery.removeEventListener === 'function') {
+          mediaQuery.removeEventListener('change', handleOrientationChange);
+        } else {
+          mediaQuery.removeListener(handleOrientationChange);
+        }
+      }
       if (rafId !== null) {
         window.cancelAnimationFrame(rafId);
       }
@@ -413,126 +494,6 @@ const BlokHead = ({}: Props) => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [router, pathName, projectSlugs, currentProjectIndex]);
-
-  // Reveal on scroll up header pattern
-  useGSAP(
-    (_, contextSafe) => {
-      if (typeof window.matchMedia !== 'function' || !headRef.current) return;
-
-      // In 3D mode, header is controlled by handleTopPanel.
-      if (isThreeDSpace) {
-        gsap.set(headRef.current, { y: 0, yPercent: 0 });
-        return;
-      }
-
-      const mediaQuery = window.matchMedia('(orientation: landscape)');
-      let isEnabled = mediaQuery.matches;
-      let rafId: number | null = null;
-
-      let lastScrollY = window.scrollY;
-      let scrollStartY = window.scrollY;
-      let isScrollingDown = false;
-
-      const updateHeaderVisibility = contextSafe(() => {
-        if (!isEnabled) return; // Skip if not in landscape
-
-        const currentScrollY = window.scrollY;
-        const windowHeight = window.innerHeight;
-        const scrollThreshold = windowHeight * 0.1; // 10% of window height
-
-        // Always show header at the top
-        if (currentScrollY < scrollThreshold) {
-          animateHead({ y: 0 });
-          scrollStartY = currentScrollY;
-          lastScrollY = currentScrollY;
-          return;
-        }
-
-        // Detect direction change
-        const scrollingDown = currentScrollY > lastScrollY;
-
-        if (scrollingDown !== isScrollingDown) {
-          // Direction changed, reset start point
-          scrollStartY = lastScrollY;
-          isScrollingDown = scrollingDown;
-        }
-
-        const scrollDistance = Math.abs(currentScrollY - scrollStartY);
-
-        // Check if we've scrolled enough in the current direction
-        if (isScrollingDown && scrollDistance > scrollThreshold) {
-          // Hide header - move up
-          animateHead({ y: -100, ease: 'power1.out' });
-        } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
-          // Show header - move to normal position
-          animateHead({ y: 0, ease: 'power1.out' });
-        }
-
-        lastScrollY = currentScrollY;
-      });
-
-      const handleScroll = () => {
-        if (rafId !== null) return;
-        rafId = window.requestAnimationFrame(() => {
-          rafId = null;
-          updateHeaderVisibility();
-        });
-      };
-
-      const handleOrientationChange = contextSafe((e: MediaQueryListEvent) => {
-        isEnabled = e.matches;
-
-        // Reset header position when switching to portrait
-        if (!isEnabled) {
-          gsap.set(headRef.current, { y: 0 });
-        }
-      });
-
-      // Listen for orientation changes (Safari fallback)
-      if (typeof mediaQuery.addEventListener === 'function') {
-        mediaQuery.addEventListener('change', handleOrientationChange);
-      } else {
-        mediaQuery.addListener(handleOrientationChange);
-      }
-      window.addEventListener('scroll', handleScroll, { passive: true });
-
-      return () => {
-        if (typeof mediaQuery.removeEventListener === 'function') {
-          mediaQuery.removeEventListener('change', handleOrientationChange);
-        } else {
-          mediaQuery.removeListener(handleOrientationChange);
-        }
-        if (rafId !== null) {
-          window.cancelAnimationFrame(rafId);
-        }
-        window.removeEventListener('scroll', handleScroll);
-      };
-    },
-    { scope: headRef, dependencies: [isThreeDSpace, animateHead], revertOnUpdate: true },
-  );
-
-  // Scroll border state
-  useEffect(() => {
-    const handleScrollBorder = () => {
-      const scrollY = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const threshold = viewportHeight * 0.2; // 20% of viewport height
-
-      if (scrollY > threshold) {
-        setHasScrollBorder(true);
-      } else {
-        setHasScrollBorder(false);
-      }
-    };
-
-    // Check initial state
-    handleScrollBorder();
-
-    window.addEventListener('scroll', handleScrollBorder, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScrollBorder);
-    };
-  }, []);
 
   return (
     <div
