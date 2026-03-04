@@ -4,12 +4,7 @@ import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { THEME_ORDER, useStore } from '@/store/store';
 
-type Props = {
-  children: React.ReactNode;
-  className: string;
-};
-
-const AppInitializer = ({ children, className }: Props) => {
+const AppInitializer = () => {
   const hasRunHomeIntroRef = useRef(false);
   const hasSetInitialThemeRef = useRef(false);
   const setTwoD = useStore((state) => state.setTwoD);
@@ -21,6 +16,16 @@ const AppInitializer = ({ children, className }: Props) => {
   const path = usePathname();
   const slug = (path || '/').split('/')[1] || 'home';
   const pathname = path || '/';
+
+  useEffect(() => {
+    const body = document.body;
+    if (!body) return;
+
+    body.setAttribute('data-theme', theme);
+    body.setAttribute('data-space', space);
+    body.setAttribute('data-page', slug);
+    body.setAttribute('data-border', 'minimal');
+  }, [theme, space, slug]);
 
   useEffect(() => {
     if (hasSetInitialThemeRef.current) return;
@@ -117,17 +122,7 @@ const AppInitializer = ({ children, className }: Props) => {
     };
   }, [pathname, setThreeD, setTwoD]);
 
-  return (
-    <body
-      className={`${className}`}
-      data-theme={theme}
-      data-space={space}
-      data-border="minimal"
-      data-page={slug}
-    >
-      {children}
-    </body>
-  );
+  return null;
 };
 
 export default AppInitializer;

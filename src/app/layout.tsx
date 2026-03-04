@@ -83,7 +83,8 @@ export default async function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
       </head>
-      <AppInitializer className={`body ${myFont.className}`}>
+      <body className={`body ${myFont.className}`} data-border="minimal" data-page="home">
+        <AppInitializer />
         <GrainyGradient variant="page" />
         <IconStylesLoader />
         <ProjectsProvider projects={projects}>
@@ -113,7 +114,7 @@ export default async function RootLayout({
             </main>
           </StoryblokProvider>
         </ProjectsProvider>
-      </AppInitializer>
+      </body>
     </html>
   );
 }
