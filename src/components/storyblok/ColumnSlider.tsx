@@ -52,10 +52,8 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   const activeImages =
     isMobile && blok.images_mobile?.length ? blok.images_mobile : blok.images;
 
-  // Get current and next items for conditional rendering
+  // Get current item for rendering
   const currentImage = activeImages?.[activeIndex];
-  const nextIndex = activeImages ? (activeIndex + 1) % activeImages.length : 0;
-  const nextImage = activeImages?.[nextIndex];
 
   // Fade in animation on slide change
   useGSAP(
@@ -102,7 +100,8 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
             height={0}
             sizes="100vw"
             quality={80}
-            priority
+            priority={activeIndex === 0}
+            loading={activeIndex === 0 ? 'eager' : 'lazy'}
             style={{ width: '100%', height: 'auto' }}
           />
           <SliderIndicators
@@ -116,22 +115,6 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
         )}
         {blok.caption && <div className="column-Caption">{blok.caption}</div>}
       </div>
-
-      {/* Preload next image (hidden, but loads in background) */}
-      {nextImage && (
-        <div style={{ display: 'none' }}>
-          <Image
-            src={nextImage.filename}
-            alt={nextImage.alt}
-            width={0}
-            height={0}
-            sizes="100vw"
-            quality={80}
-            priority
-            style={{ width: '100%', height: 'auto' }}
-          />
-        </div>
-      )}
     </div>
   );
 };
