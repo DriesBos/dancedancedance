@@ -254,6 +254,8 @@ mux-player, .muxPlayer
           width: 100%
           padding-left: var(--spacing-side) !important
           padding-right: var(--spacing-side) !important
+        & > div:first-child
+          border-bottom: var( --border-width) solid var(--border-color)
     .column
       text-align: left
       padding: var(--blok-padding) var(--spacing-side)
@@ -640,9 +642,6 @@ body
         border-top-width: 0
       &-Head
         background: var(--theme-blok-solid)
-      &-Footer
-        margin-top: 3.5rem
-        padding-top: 3.5rem
   &[data-space="3D"]
     // 124px panel height + blok height + desired margin
     padding-top: calc(124px + var(--blok-height) + 10vh)
