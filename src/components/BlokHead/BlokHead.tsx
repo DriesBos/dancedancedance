@@ -1,11 +1,10 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '@/store/store';
 import { useProjects } from '@/providers/projects-provider';
 import Link from 'next/link';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
@@ -14,19 +13,19 @@ import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import { gsap, useGSAP } from '@/lib/gsap';
-import IconCloud from '@/components/Icons/IconCloud';
-import IconThoughts from '@/components/Icons/IconThoughts';
 import GrainyGradient from '@/components/GrainyGradient';
 import IconRocket from '@/components/Icons/IconRocket';
 import styles from './BlokHead.module.sass';
 
 interface Props {
-  blok?: any;
+  blok?: unknown;
   float?: boolean;
-  params?: any;
+  params?: unknown;
 }
 
-const BlokHead = ({ blok, float, params }: Props) => {
+type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
+
+const BlokHead = ({}: Props) => {
   const headRef = useRef<HTMLDivElement>(null);
   const path = usePathname();
   const currentPath = path || '/';
@@ -34,16 +33,13 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const { projectSlugs, projects } = useProjects();
   const theme = useStore((state) => state.theme);
   const cycleTheme = useStore((state) => state.cycleTheme);
-  const space = useStore((state: any) => state.space);
+  const space = useStore((state) => state.space);
   const isThreeDSpace = space === '3D';
   const setTwoD = useStore((state) => state.setTwoD);
   const setThreeD = useStore((state) => state.setThreeD);
   const topPanel = useStore((state) => state.topPanel);
   const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
   const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
-  const [hasPrev, setHasPrev] = useState(false);
-  const [hasNext, setHasNext] = useState(false);
-  const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
@@ -52,11 +48,42 @@ const BlokHead = ({ blok, float, params }: Props) => {
   const spaceToggleTimeoutRef = useRef<number | null>(null);
   const isHoveringTopPanelZoneRef = useRef(false);
 
-  const [pathName, setPathName] = useState('');
-  const [projectName, setProjectName] = useState('');
-  const [externalLink, setExternalLink] = useState<
-    { cached_url: string } | undefined
-  >(undefined);
+  const currentSlug = useMemo(() => currentPath.split('/')[2] || '', [currentPath]);
+
+  const pathName = useMemo(() => {
+    const route = currentPath.split('/')[1];
+    if (route === 'about' || route === 'projects' || route === 'blurbs') {
+      return route;
+    }
+    return 'home';
+  }, [currentPath]);
+
+  const currentProjectIndex = useMemo(() => {
+    if (!projectSlugs || projectSlugs.length === 0 || !currentSlug) return -1;
+    return projectSlugs.indexOf(currentSlug);
+  }, [projectSlugs, currentSlug]);
+
+  const hasPrev = currentProjectIndex > 0;
+  const hasNext =
+    currentProjectIndex !== -1 &&
+    !!projectSlugs &&
+    currentProjectIndex < projectSlugs.length - 1;
+
+  const projectName = useMemo(() => {
+    if (!currentSlug) return '';
+    return currentSlug
+      .replace(/-/g, ' ')
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }, [currentSlug]);
+
+  const externalLink = useMemo(() => {
+    if (pathName !== 'projects' || !projects || projects.length === 0 || !currentSlug) {
+      return undefined;
+    }
+    return projects.find((project) => project.slug === currentSlug)?.external_link;
+  }, [pathName, projects, currentSlug]);
 
   const toggleSpace = useCallback(() => {
     const applyNextSpace = () => {
@@ -114,7 +141,6 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   const handleCycleTheme = useCallback(() => {
     cycleTheme();
-    console.log('Theme cycled to:', useStore.getState().theme);
 
     if (themeSpinTimeoutRef.current !== null) {
       window.clearTimeout(themeSpinTimeoutRef.current);
@@ -133,83 +159,19 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
   const clickNext = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) return;
-    const nextPath = currentPath;
-    const currentSlug = nextPath.split('/')[2];
-    const currentIndex = projectSlugs.indexOf(currentSlug);
-    if (currentIndex !== -1 && currentIndex < projectSlugs.length - 1) {
-      const nextSlug = `/projects/${projectSlugs[currentIndex + 1]}`;
+    if (currentProjectIndex !== -1 && currentProjectIndex < projectSlugs.length - 1) {
+      const nextSlug = `/projects/${projectSlugs[currentProjectIndex + 1]}`;
       router.push(nextSlug);
     }
-  }, [currentPath, router, projectSlugs]);
-
-  const checkNext = useCallback(() => {
-    if (!projectSlugs || projectSlugs.length === 0) {
-      setHasNext(false);
-      return;
-    }
-    const checkNextPath = currentPath;
-    const currentSlug = checkNextPath.split('/')[2];
-    const currentIndex = projectSlugs.indexOf(currentSlug);
-    setCurrentProjectIndex(currentIndex);
-    if (currentIndex === -1 || currentIndex >= projectSlugs.length - 1) {
-      setHasNext(false);
-    } else {
-      setHasNext(true);
-    }
-  }, [currentPath, projectSlugs]);
+  }, [router, projectSlugs, currentProjectIndex]);
 
   const clickPrev = useCallback(() => {
     if (!projectSlugs || projectSlugs.length === 0) return;
-    const prevPath = currentPath;
-    const currentSlug = prevPath.split('/')[2];
-    const currentIndex = projectSlugs.indexOf(currentSlug);
-    if (currentIndex > 0) {
-      const prevSlug = `/projects/${projectSlugs[currentIndex - 1]}`;
+    if (currentProjectIndex > 0) {
+      const prevSlug = `/projects/${projectSlugs[currentProjectIndex - 1]}`;
       router.push(prevSlug);
     }
-  }, [currentPath, router, projectSlugs]);
-
-  const checkPrev = useCallback(() => {
-    if (!projectSlugs || projectSlugs.length === 0) {
-      setHasPrev(false);
-      return;
-    }
-    const checkPrevPath = currentPath;
-    const currentSlug = checkPrevPath.split('/')[2];
-    const currentIndex = projectSlugs.indexOf(currentSlug);
-    if (currentIndex <= 0) {
-      setHasPrev(false);
-    } else {
-      setHasPrev(true);
-    }
-  }, [currentPath, projectSlugs]);
-
-  useEffect(() => {
-    if (!projectSlugs || projectSlugs.length === 0) {
-      setHasNext(false);
-      setHasPrev(false);
-      return;
-    }
-
-    const currentSlug = currentPath.split('/')[2];
-    const currentIndex = projectSlugs.indexOf(currentSlug);
-
-    setCurrentProjectIndex(currentIndex);
-
-    // Check next
-    if (currentIndex === -1 || currentIndex >= projectSlugs.length - 1) {
-      setHasNext(false);
-    } else {
-      setHasNext(true);
-    }
-
-    // Check prev
-    if (currentIndex <= 0) {
-      setHasPrev(false);
-    } else {
-      setHasPrev(true);
-    }
-  }, [currentPath, projectSlugs]);
+  }, [router, projectSlugs, currentProjectIndex]);
 
   const isPagePastTop = useCallback(() => {
     const page = document.querySelector('.page');
@@ -218,6 +180,36 @@ const BlokHead = ({ blok, float, params }: Props) => {
     }
     return window.scrollY > 0;
   }, []);
+
+  const animateHead = useCallback((vars: gsap.TweenVars) => {
+    if (!headRef.current) return;
+    gsap.to(headRef.current, {
+      duration: 0.33,
+      ease: 'power1.inOut',
+      overwrite: 'auto',
+      ...vars,
+    });
+  }, []);
+
+  const setTopPanelMode = useCallback(
+    (mode: TopPanelMode) => {
+      if (mode === 'open') {
+        setIsTopPanelForcedClosed(false);
+        setTopPanelTrue();
+        return;
+      }
+
+      if (mode === 'forcedClosed') {
+        setIsTopPanelForcedClosed(true);
+        setTopPanelFalse();
+        return;
+      }
+
+      setIsTopPanelForcedClosed(false);
+      setTopPanelFalse();
+    },
+    [setTopPanelTrue, setTopPanelFalse],
+  );
 
   const handleTopPanel = useCallback(
     (e: MouseEvent) => {
@@ -232,34 +224,19 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
       if (e.type === 'mouseenter') {
         if (pagePastTop) {
-          setIsTopPanelForcedClosed(true);
-          gsap.to(headRef.current, {
-            yPercent: 0,
-            ease: 'power1.inOut',
-            duration: 0.33,
-          });
-          setTopPanelFalse();
+          setTopPanelMode('forcedClosed');
+          animateHead({ yPercent: 0 });
           return;
         }
 
-        setIsTopPanelForcedClosed(false);
-        gsap.to(headRef.current, {
-          yPercent: -100,
-          ease: 'power1.inOut',
-          duration: 0.33,
-        });
-        setTopPanelTrue();
+        setTopPanelMode('open');
+        animateHead({ yPercent: -100 });
       } else {
-        setIsTopPanelForcedClosed(pagePastTop);
-        gsap.to(headRef.current, {
-          yPercent: 0,
-          ease: 'power1.inOut',
-          duration: 0.33,
-        });
-        setTopPanelFalse();
+        setTopPanelMode(pagePastTop ? 'forcedClosed' : 'closed');
+        animateHead({ yPercent: 0 });
       }
     },
-    [isThreeDSpace, isPagePastTop, setTopPanelTrue, setTopPanelFalse],
+    [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode],
   );
 
   useEffect(() => {
@@ -271,32 +248,66 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
     let rafId: number | null = null;
     let isForcedClosed = false;
+    let lastScrollY = window.scrollY;
+    let scrollStartY = window.scrollY;
+    let isScrollingDown = false;
 
     const syncTopPanelWithScroll = () => {
       const shouldForceClosed = isPagePastTop();
-      setIsTopPanelForcedClosed(shouldForceClosed);
       if (!shouldForceClosed) {
-        if (isForcedClosed && isHoveringTopPanelZoneRef.current && headRef.current) {
-          gsap.to(headRef.current, {
-            yPercent: -100,
-            ease: 'power1.inOut',
-            duration: 0.33,
-          });
-          setTopPanelTrue();
+        if (isForcedClosed) {
+          if (isHoveringTopPanelZoneRef.current) {
+            setTopPanelMode('open');
+            animateHead({ y: 0, yPercent: -100 });
+          } else {
+            setTopPanelMode('closed');
+            animateHead({ y: 0 });
+          }
+        } else {
+          setIsTopPanelForcedClosed(false);
         }
         isForcedClosed = false;
+        lastScrollY = window.scrollY;
+        scrollStartY = window.scrollY;
+        isScrollingDown = false;
         return;
       }
 
-      if (isForcedClosed) return;
+      const currentScrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const scrollThreshold = windowHeight * 0.1;
 
-      gsap.to(headRef.current, {
-        yPercent: 0,
-        ease: 'power1.inOut',
-        duration: 0.33,
-      });
-      setTopPanelFalse();
-      isForcedClosed = true;
+      if (!isForcedClosed) {
+        setTopPanelMode('forcedClosed');
+        animateHead({ y: 0, yPercent: 0 });
+        isForcedClosed = true;
+        lastScrollY = currentScrollY;
+        scrollStartY = currentScrollY;
+        isScrollingDown = false;
+        return;
+      }
+
+      if (currentScrollY < scrollThreshold) {
+        animateHead({ y: 0 });
+        scrollStartY = currentScrollY;
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      const scrollingDown = currentScrollY > lastScrollY;
+      if (scrollingDown !== isScrollingDown) {
+        scrollStartY = lastScrollY;
+        isScrollingDown = scrollingDown;
+      }
+
+      const scrollDistance = Math.abs(currentScrollY - scrollStartY);
+      if (isScrollingDown && scrollDistance > scrollThreshold) {
+        animateHead({ y: -100, ease: 'power1.out' });
+      } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
+        animateHead({ y: 0, ease: 'power1.out' });
+      }
+
+      lastScrollY = currentScrollY;
     };
 
     const onScroll = () => {
@@ -316,7 +327,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [isThreeDSpace, isPagePastTop, setTopPanelFalse, setTopPanelTrue]);
+  }, [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode]);
 
   useEffect(() => {
     const main = document.querySelector('main');
@@ -352,14 +363,13 @@ const BlokHead = ({ blok, float, params }: Props) => {
       };
     }
 
-    gsap.to(headRef.current, {
+    setTopPanelMode('closed');
+    animateHead({
       y: 0,
       yPercent: 0,
-      ease: 'power1.inOut',
       duration: 0.165,
     });
-    setTopPanelFalse();
-  }, [handleTopPanel, isThreeDSpace, setTopPanelFalse]);
+  }, [handleTopPanel, isThreeDSpace, animateHead, setTopPanelMode]);
 
   useEffect(() => {
     return () => {
@@ -375,68 +385,24 @@ const BlokHead = ({ blok, float, params }: Props) => {
     };
   }, []);
 
-  // Set Header Blok Title and External Link
-  useEffect(() => {
-    let tempPathName = currentPath.split('/')[1];
-    switch (tempPathName) {
-      case '':
-        setPathName('home');
-        setExternalLink(undefined);
-        break;
-      case 'about':
-        setPathName('about');
-        setExternalLink(undefined);
-        break;
-      case 'projects':
-        setPathName('projects');
-        let tempProjectName = currentPath.split('/')[2];
-        if (tempProjectName) {
-          tempProjectName = tempProjectName
-            .replace(/-/g, ' ')
-            .split(' ')
-            .map(
-              (word) =>
-                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-            )
-            .join(' ');
-          setProjectName(tempProjectName);
-
-          // Fetch external link for current project
-          if (projects && projects.length > 0) {
-            const currentSlug = currentPath.split('/')[2];
-            const currentProject = projects.find((p) => p.slug === currentSlug);
-            if (currentProject && currentProject.external_link) {
-              setExternalLink(currentProject.external_link);
-            } else {
-              setExternalLink(undefined);
-            }
-          }
-        }
-        break;
-    }
-  }, [currentPath, projects]);
-
   // Set Escape Key and Arrow Keys
   useEffect(() => {
-    const handleKeyDown = (e: any) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         router.push('/');
         return;
       }
 
       if (pathName === 'projects' && projectSlugs && projectSlugs.length > 0) {
-        const currentSlug = currentPath.split('/')[2];
-        const currentIndex = projectSlugs.indexOf(currentSlug);
-
-        if (e.key === 'ArrowLeft' && currentIndex > 0) {
-          const prevSlug = `/projects/${projectSlugs[currentIndex - 1]}`;
+        if (e.key === 'ArrowLeft' && currentProjectIndex > 0) {
+          const prevSlug = `/projects/${projectSlugs[currentProjectIndex - 1]}`;
           router.push(prevSlug);
         } else if (
           e.key === 'ArrowRight' &&
-          currentIndex !== -1 &&
-          currentIndex < projectSlugs.length - 1
+          currentProjectIndex !== -1 &&
+          currentProjectIndex < projectSlugs.length - 1
         ) {
-          const nextSlug = `/projects/${projectSlugs[currentIndex + 1]}`;
+          const nextSlug = `/projects/${projectSlugs[currentProjectIndex + 1]}`;
           router.push(nextSlug);
         }
       }
@@ -446,7 +412,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [router, pathName, currentPath, projectSlugs]);
+  }, [router, pathName, projectSlugs, currentProjectIndex]);
 
   // Reveal on scroll up header pattern
   useGSAP(
@@ -455,12 +421,13 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
       // In 3D mode, header is controlled by handleTopPanel.
       if (isThreeDSpace) {
-        gsap.set(headRef.current, { y: 0 });
+        gsap.set(headRef.current, { y: 0, yPercent: 0 });
         return;
       }
 
       const mediaQuery = window.matchMedia('(orientation: landscape)');
       let isEnabled = mediaQuery.matches;
+      let rafId: number | null = null;
 
       let lastScrollY = window.scrollY;
       let scrollStartY = window.scrollY;
@@ -475,11 +442,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
 
         // Always show header at the top
         if (currentScrollY < scrollThreshold) {
-          gsap.to(headRef.current, {
-            y: 0,
-            duration: 0.33,
-            ease: 'power1.inOut',
-          });
+          animateHead({ y: 0 });
           scrollStartY = currentScrollY;
           lastScrollY = currentScrollY;
           return;
@@ -499,25 +462,21 @@ const BlokHead = ({ blok, float, params }: Props) => {
         // Check if we've scrolled enough in the current direction
         if (isScrollingDown && scrollDistance > scrollThreshold) {
           // Hide header - move up
-          gsap.to(headRef.current, {
-            y: -100,
-            duration: 0.33,
-            ease: 'power1.out',
-          });
+          animateHead({ y: -100, ease: 'power1.out' });
         } else if (!isScrollingDown && scrollDistance > scrollThreshold) {
           // Show header - move to normal position
-          gsap.to(headRef.current, {
-            y: 0,
-            duration: 0.33,
-            ease: 'power1.out',
-          });
+          animateHead({ y: 0, ease: 'power1.out' });
         }
 
         lastScrollY = currentScrollY;
       });
 
       const handleScroll = () => {
-        window.requestAnimationFrame(updateHeaderVisibility);
+        if (rafId !== null) return;
+        rafId = window.requestAnimationFrame(() => {
+          rafId = null;
+          updateHeaderVisibility();
+        });
       };
 
       const handleOrientationChange = contextSafe((e: MediaQueryListEvent) => {
@@ -543,10 +502,13 @@ const BlokHead = ({ blok, float, params }: Props) => {
         } else {
           mediaQuery.removeListener(handleOrientationChange);
         }
+        if (rafId !== null) {
+          window.cancelAnimationFrame(rafId);
+        }
         window.removeEventListener('scroll', handleScroll);
       };
     },
-    { scope: headRef, dependencies: [isThreeDSpace], revertOnUpdate: true },
+    { scope: headRef, dependencies: [isThreeDSpace, animateHead], revertOnUpdate: true },
   );
 
   // Scroll border state
@@ -680,7 +642,7 @@ const BlokHead = ({ blok, float, params }: Props) => {
                   <IconArrow />
                 </div>
                 <div className="projectNumber headerDesktop">
-                  {currentProjectIndex + 1}/{projectSlugs.length}
+                  {currentProjectIndex + 1}/{projectSlugs?.length ?? 0}
                 </div>
                 <div
                   onClick={clickNext}
