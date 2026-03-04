@@ -640,7 +640,8 @@ body
         margin-top: 3.5rem
         padding-top: 3.5rem
   &[data-space="3D"]
-    padding-top: calc(191px + 68px + 20vh)
+    // 124px panel height + blok height + desired margin
+    padding-top: calc(124px + var(--blok-height) + 10vh)
     padding-bottom: 6rem
     // .laserBlok
     //   opacity: 1
