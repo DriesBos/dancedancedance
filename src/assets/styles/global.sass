@@ -34,7 +34,7 @@ main
   max-height: calc-size(auto)
   // border: var(--main-border-width) solid var(--border-color)
   border-radius: var(--main-border-radius)
-  transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), perspective-origin var(--transition-theme), perspective var(--transition-theme)
+  transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space)
   // Safe envs
   padding-top: env(safe-area-inset-top)
   padding-right: env(safe-area-inset-right)
@@ -582,12 +582,12 @@ body
   main
     & > .blok
       &:first-child
-        background: transparent
+        // background: transparent
         .side_Top
           opacity: 1
-          background: var(--theme-blok-showlines) !important
-        .side_Top, .side_Back
-          background: transparent
+          // background: var(--theme-blok-showlines) !important
+        // .side_Top, .side_Back
+          // background: transparent
         .side_Bottom
           z-index: -1
       &:nth-child(2)
@@ -626,6 +626,13 @@ body
     main
       width: 88vw
       max-width: 1150px
+    .blok
+      &-Head
+        background: var(--theme-blok-showlines)
+        &[data-forced-closed='true']
+          background: var(--theme-blok-solid)
+        .side_Top
+          background: var(--theme-blok-showlines)
 
 .clickable
   cursor: pointer

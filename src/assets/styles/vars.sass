@@ -142,10 +142,24 @@ body[data-border='organic']
   --border-gap: 0
 
 // THEMES
+body[data-theme='LIGHT']
+  --theme-bg: #E8E7E3
+  --theme-blok: #E8E7E3
+  --theme-blok-showlines: transparent
+  --theme-blok-solid: #E8E7E3
+  --theme-type: black
+  --theme-type-inactive: hsla(0, 0%, 0%, 0.33)
+  --theme-type-contrast: #E8E7E3
+  --cursor-color-bg: black
+  --cursor-color-blok: black
+  --border-color: black
+  --slider-indicator: #E8E7E3
+  --slider-indicator-active: black
+
 body[data-theme='DARK']
   --theme-bg: var(--color-dark-bg)
   --theme-blok: var(--color-dark-bg)
-  --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-showlines: transparent
   --theme-blok-solid: var(--theme-blok)
   --theme-type: var(--color-dark-type)
   --theme-type-inactive: var(--color-dark-type-secondary)
@@ -170,20 +184,6 @@ body[data-theme='STEDELIJK']
   --cursor-color-blok: black
   --border-color: black
   --slider-indicator: #62C853
-  --slider-indicator-active: black
-
-body[data-theme='LIGHT']
-  --theme-bg: #E8E7E3
-  --theme-blok: #E8E7E3
-  --theme-blok-showlines: var(--theme-blok)
-  --theme-blok-solid: #E8E7E3
-  --theme-type: black
-  --theme-type-inactive: hsla(0, 0%, 0%, 0.33)
-  --theme-type-contrast: #E8E7E3
-  --cursor-color-bg: black
-  --cursor-color-blok: black
-  --border-color: black
-  --slider-indicator: #E8E7E3
   --slider-indicator-active: black
 
 body[data-theme='TRON']
@@ -224,7 +224,7 @@ body[data-theme='BLACK']
 body[data-theme='DONJUDD']
   --theme-bg: #DAD9E0
   --theme-blok: #DAD9E0
-  --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-showlines: transparent
   --theme-blok-solid: var(--theme-blok)
   --theme-blok-subpanel: hsla(7, 95%, 62%, 0.4)
   --theme-type: #FA5942
