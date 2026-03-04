@@ -242,6 +242,14 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
         className={styles.indicators}
       />
 
+      {!hasCursor && currentItem?.link?.cached_url && (
+        <Link
+          href={currentItem.link.cached_url}
+          className={styles.tapTarget}
+          aria-label={`Open project ${String(currentItem.name || '')}`.trim()}
+        />
+      )}
+
       {/* Invisible hover zones - only rendered on devices with cursor */}
       {hasCursor && blok.body.length > 1 && (
         <div className={styles.hoverZones} onMouseLeave={handleZoneLeave}>

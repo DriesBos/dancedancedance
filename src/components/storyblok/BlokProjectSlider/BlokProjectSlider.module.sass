@@ -52,6 +52,14 @@
   bottom: calc(var(--spacing-base) + 0.33rem + 0.454545rem + 1.45em) !important
   right: calc(var(--spacing-side) + 0.5rem) !important
 
+.tapTarget
+  position: absolute
+  inset: 0
+  z-index: 11
+  pointer-events: auto
+  @media (hover: hover) and (pointer: fine)
+    display: none
+
 .caption
   display: flex
   justify-content: space-between
@@ -87,12 +95,16 @@
   flex-direction: row
   pointer-events: auto
   z-index: 10
+  @media (hover: none)
+    pointer-events: none
 
 .hoverZone
   position: relative
   height: 100%
   flex: 1
   pointer-events: auto
+  @media (hover: none)
+    pointer-events: none
 
 .captionYear
   text-align: right
