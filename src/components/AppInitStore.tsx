@@ -1,18 +1,48 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { THEME_ORDER, useStore } from '@/store/store';
+import { Space, THEME_ORDER, Theme, useStore } from '@/store/store';
 import { useShallow } from 'zustand/react/shallow';
+
+type InitialUIState = {
+  theme: Theme;
+  space: Space;
+};
+
+const getInitialTheme = (): Theme => {
+  const hour = new Date().getHours();
+  if (hour >= 0 && hour < 5) {
+    return 'NIGHTMODE';
+  }
+
+  const daytimeThemes = THEME_ORDER.filter((themeName) => themeName !== 'NIGHTMODE');
+  return daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)] ?? 'LIGHT';
+};
+
+const getInitialUIState = (): InitialUIState => {
+  const win = window as Window & { __DDD_INITIAL_STATE__?: InitialUIState };
+  return win.__DDD_INITIAL_STATE__ ?? { theme: getInitialTheme(), space: '3D' };
+};
+
+const applyBodyState = (theme: Theme, space: Space, slug: string) => {
+  const body = document.body;
+  if (!body) return;
+
+  body.setAttribute('data-theme', theme);
+  body.setAttribute('data-space', space);
+  body.setAttribute('data-page', slug);
+  body.setAttribute('data-border', 'minimal');
+};
 
 const AppInitializer = () => {
   const hasRunHomeIntroRef = useRef(false);
-  const hasSetInitialThemeRef = useRef(false);
-  const { setTwoD, setThreeD, setNightmode, setTheme, theme, space } = useStore(
+  const hasInitializedUIRef = useRef(false);
+  const readyFrameRef = useRef<number | null>(null);
+  const { setTwoD, setThreeD, setTheme, theme, space } = useStore(
     useShallow((state) => ({
       setTwoD: state.setTwoD,
       setThreeD: state.setThreeD,
-      setNightmode: state.setNightmode,
       setTheme: state.setTheme,
       theme: state.theme,
       space: state.space,
@@ -22,32 +52,45 @@ const AppInitializer = () => {
   const slug = (path || '/').split('/')[1] || 'home';
   const pathname = path || '/';
 
-  useEffect(() => {
-    const body = document.body;
-    if (!body) return;
+  useLayoutEffect(() => {
+    if (!hasInitializedUIRef.current) {
+      hasInitializedUIRef.current = true;
 
-    body.setAttribute('data-theme', theme);
-    body.setAttribute('data-space', space);
-    body.setAttribute('data-page', slug);
-    body.setAttribute('data-border', 'minimal');
-  }, [theme, space, slug]);
+      const initialState = getInitialUIState();
+      applyBodyState(initialState.theme, initialState.space, slug);
 
-  useEffect(() => {
-    if (hasSetInitialThemeRef.current) return;
-    hasSetInitialThemeRef.current = true;
+      if (theme !== initialState.theme) {
+        setTheme(initialState.theme);
+      }
 
-    const hour = new Date().getHours();
-    if (hour >= 0 && hour < 5) {
-      setNightmode();
+      if (space !== initialState.space) {
+        if (initialState.space === 'DESKTOP') {
+          setTwoD();
+        } else {
+          setThreeD();
+        }
+      }
+
+      if (readyFrameRef.current === null) {
+        readyFrameRef.current = window.requestAnimationFrame(() => {
+          document.body?.removeAttribute('data-initializing');
+          readyFrameRef.current = null;
+        });
+      }
+
       return;
     }
 
-    const daytimeThemes = THEME_ORDER.filter((themeName) => themeName !== 'NIGHTMODE');
-    if (daytimeThemes.length === 0) return;
-    const randomTheme =
-      daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
-    setTheme(randomTheme);
-  }, [setNightmode, setTheme]);
+    applyBodyState(theme, space, slug);
+  }, [setTheme, setThreeD, setTwoD, slug, space, theme]);
+
+  useEffect(() => {
+    return () => {
+      if (readyFrameRef.current !== null) {
+        window.cancelAnimationFrame(readyFrameRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (pathname !== '/' || hasRunHomeIntroRef.current) return;

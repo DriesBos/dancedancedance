@@ -22,6 +22,12 @@ body
   min-height: 100dvh
   transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
 
+body[data-initializing='true'],
+body[data-initializing='true'] *,
+body[data-initializing='true'] *::before,
+body[data-initializing='true'] *::after
+  transition: none !important
+
 main
   position: relative
   display: flex
@@ -617,7 +623,9 @@ body
   &[data-space="3D"]
     // 124px panel height + blok height + desired margin
     padding-top: calc(124px + var(--blok-height) + 10vh)
-    padding-bottom: 6rem
+    @media (orientation: portrait)
+      padding-top: calc(124px + var(--blok-height) + 7.5vh)
+      padding-bottom: 6rem
     // .laserBlok
     //   opacity: 1
     main

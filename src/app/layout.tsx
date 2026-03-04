@@ -22,6 +22,25 @@ import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
 import GrainyGradient from '@/components/GrainyGradient';
 
+const INITIAL_UI_STATE_SCRIPT = `
+  (function () {
+    var daytimeThemes = ['TRON', 'DONJUDD', 'STEDELIJK', 'LIGHT', 'DARK'];
+    var hour = new Date().getHours();
+    var theme =
+      hour >= 0 && hour < 5
+        ? 'NIGHTMODE'
+        : daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
+    var space = '3D';
+
+    window.__DDD_INITIAL_STATE__ = { theme: theme, space: space };
+
+    if (document.body) {
+      document.body.setAttribute('data-theme', theme);
+      document.body.setAttribute('data-space', space);
+    }
+  })();
+`;
+
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
   display: 'swap',
@@ -83,7 +102,14 @@ export default async function RootLayout({
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
       </head>
-      <body className={`body ${myFont.className}`} data-border="minimal" data-page="home">
+      <body
+        className={`body ${myFont.className}`}
+        data-border="minimal"
+        data-page="home"
+        data-initializing="true"
+        suppressHydrationWarning
+      >
+        <script dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }} />
         <AppInitializer />
         <GrainyGradient variant="page" />
         <ProjectsProvider projects={projects}>
