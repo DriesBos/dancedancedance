@@ -13,6 +13,7 @@ interface Props {
   title?: string;
   category?: string[];
   external_link?: { cached_url: string };
+  thumbnail?: { filename: string; alt?: string };
   stackIndex?: number;
 }
 
@@ -22,6 +23,7 @@ const BlokProject = ({
   title,
   category,
   external_link,
+  thumbnail,
   stackIndex,
 }: Props) => {
   const router = useRouter();
@@ -35,8 +37,12 @@ const BlokProject = ({
 
   return (
     <div
-      className="blok blok-Project blok-Animate cursorInteract"
+      className={`blok blok-Project blok-Animate cursorInteract ${
+        thumbnail?.filename ? 'cursorPreview' : ''
+      }`}
       onClick={handleClick}
+      data-cursor-preview={thumbnail?.filename || undefined}
+      data-cursor-preview-alt={thumbnail?.alt || title || ''}
       style={{ cursor: 'pointer', zIndex: stackIndex }}
     >
       <BlokSidePanels />

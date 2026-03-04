@@ -8,12 +8,15 @@ export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const previewImageRef = useRef<HTMLImageElement>(null);
   const isVisible = useRef(false);
+  const isPreviewVisible = useRef(false);
   const cursorSurface = useRef<'bg' | 'blok'>('bg');
   const mouseInTarget = useRef(false);
   const prevMousePos = useRef({ x: 0, y: 0 });
   const rotationResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(
-    null
+    null,
   );
   const hintShowTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hintHideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -26,12 +29,29 @@ export default function CustomCursor() {
     const cursor = cursorRef.current;
     const follower = followerRef.current;
     const messageContainer = messageRef.current;
-    if (!cursor || !follower || !messageContainer) return;
+    const previewContainer = previewRef.current;
+    const previewImage = previewImageRef.current;
+    if (
+      !cursor ||
+      !follower ||
+      !messageContainer ||
+      !previewContainer ||
+      !previewImage
+    ) {
+      return;
+    }
     document.body.setAttribute('data-cursor-surface', 'bg');
 
     // Initial state - both cursors and message hidden and centered on cursor point
     gsap.set([cursor, follower], { opacity: 0, xPercent: -50, yPercent: -50 });
     gsap.set(messageContainer, { opacity: 0, xPercent: 0, yPercent: 0 });
+    gsap.set(previewContainer, {
+      x: -1000,
+      y: -1000,
+      autoAlpha: 0,
+      scale: 0.96,
+      rotate: -1.5,
+    });
 
     // QuickTo for smooth follower movement
     const xFollowerTo = gsap.quickTo(follower, 'x', {
@@ -50,6 +70,14 @@ export default function CustomCursor() {
     });
     const yMessageTo = gsap.quickTo(messageContainer, 'y', {
       duration: 0.6,
+      ease: 'power3',
+    });
+    const xPreviewTo = gsap.quickTo(previewContainer, 'x', {
+      duration: 0.36,
+      ease: 'power3',
+    });
+    const yPreviewTo = gsap.quickTo(previewContainer, 'y', {
+      duration: 0.36,
       ease: 'power3',
     });
 
@@ -82,10 +110,64 @@ export default function CustomCursor() {
       ease: 'power2.out',
     });
 
+    const clampPreviewPosition = (clientX: number, clientY: number) => {
+      const previewWidth = previewContainer.offsetWidth || 360;
+      const previewHeight = previewContainer.offsetHeight || 270;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const padding = 16;
+      let x = clientX - previewWidth / 2;
+      let y = clientY - previewHeight / 2;
+
+      x = Math.max(
+        padding,
+        Math.min(viewportWidth - previewWidth - padding, x),
+      );
+      y = Math.max(
+        padding,
+        Math.min(viewportHeight - previewHeight - padding, y),
+      );
+
+      return { x, y };
+    };
+
+    const movePreviewToPointer = (clientX: number, clientY: number) => {
+      const { x, y } = clampPreviewPosition(clientX, clientY);
+      xPreviewTo(x);
+      yPreviewTo(y);
+    };
+
+    const showPreview = () => {
+      if (isPreviewVisible.current) return;
+      isPreviewVisible.current = true;
+      gsap.to(previewContainer, {
+        autoAlpha: 1,
+        scale: 1,
+        rotate: 0,
+        duration: 0.18,
+        ease: 'power3.out',
+        overwrite: 'auto',
+      });
+    };
+
+    const hidePreview = () => {
+      if (!isPreviewVisible.current) return;
+      isPreviewVisible.current = false;
+      gsap.to(previewContainer, {
+        autoAlpha: 0,
+        scale: 0.96,
+        rotate: -1.5,
+        duration: 0.42,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      });
+    };
+
     let magneticTargets: HTMLElement[] = [];
     const boundMagneticTargets = new WeakSet<EventTarget>();
     const boundInteractTargets = new WeakSet<EventTarget>();
     const boundMessageTargets = new WeakSet<EventTarget>();
+    const boundPreviewTargets = new WeakSet<EventTarget>();
 
     const handleMouseMove = (e: MouseEvent) => {
       // Show cursor on first move
@@ -101,7 +183,7 @@ export default function CustomCursor() {
 
       const hoveredElement = document.elementFromPoint(
         cursorPosition.x,
-        cursorPosition.y
+        cursorPosition.y,
       );
       const nextSurface: 'bg' | 'blok' = hoveredElement?.closest('.blok')
         ? 'blok'
@@ -130,7 +212,7 @@ export default function CustomCursor() {
         };
 
         const hypotenuse = Math.sqrt(
-          distance.adj * distance.adj + distance.opp * distance.opp
+          distance.adj * distance.adj + distance.opp * distance.opp,
         );
 
         // Get angle from adj and opp
@@ -185,12 +267,15 @@ export default function CustomCursor() {
 
       // Message container follows cursor with delay and slight offset
       const remInPixels = parseFloat(
-        getComputedStyle(document.documentElement).fontSize
+        getComputedStyle(document.documentElement).fontSize,
       );
       const xOffset = 0.4545454545 + 0.909090909 * remInPixels;
       const yOffset = 0.4545454545 * remInPixels;
       xMessageTo(cursorPosition.x + xOffset);
       yMessageTo(cursorPosition.y + 0); // Offset below cursor
+      if (isPreviewVisible.current) {
+        movePreviewToPointer(cursorPosition.x, cursorPosition.y);
+      }
 
       // Calculate velocity for tilt effect
       const deltaY = cursorPosition.y - prevMousePos.current.y;
@@ -248,6 +333,33 @@ export default function CustomCursor() {
       messageFadeAnim.reverse();
     };
 
+    const handlePreviewEnter = (e: Event) => {
+      const target = e.currentTarget as HTMLElement;
+      const src = target.getAttribute('data-cursor-preview');
+      if (!src) return;
+
+      const alt = target.getAttribute('data-cursor-preview-alt') || '';
+      if (previewImage.getAttribute('src') !== src) {
+        previewImage.setAttribute('src', src);
+      }
+      previewImage.setAttribute('alt', alt);
+
+      movePreviewToPointer(prevMousePos.current.x, prevMousePos.current.y);
+      showPreview();
+    };
+
+    const handlePreviewLeave = (e: Event) => {
+      const mouseEvent = e as MouseEvent;
+      const nextTarget = mouseEvent.relatedTarget;
+      if (
+        nextTarget instanceof Element &&
+        nextTarget.closest('.cursorPreview')
+      ) {
+        return;
+      }
+      hidePreview();
+    };
+
     // Hide cursors when mouse leaves window
     const handleMouseLeaveWindow = () => {
       gsap.set([cursor, follower], { opacity: 0 });
@@ -260,6 +372,7 @@ export default function CustomCursor() {
         clearTimeout(rotationResetTimeout.current);
       }
       rotateMessageTo(0); // Reset rotation when leaving window
+      hidePreview();
     };
 
     // Reset size animations on click (for route changes where leave isn't triggered)
@@ -307,7 +420,7 @@ export default function CustomCursor() {
 
     const addTargetListeners = () => {
       magneticTargets = Array.from(
-        document.querySelectorAll<HTMLElement>('.cursorMagnetic')
+        document.querySelectorAll<HTMLElement>('.cursorMagnetic'),
       );
       magneticTargets.forEach((target) => {
         if (boundMagneticTargets.has(target)) return;
@@ -317,7 +430,7 @@ export default function CustomCursor() {
       });
 
       const interactTargets = document.querySelectorAll(
-        '.cursorInteract, .markdown a'
+        '.cursorInteract, .markdown a',
       );
       interactTargets.forEach((target) => {
         if (boundInteractTargets.has(target)) return;
@@ -332,6 +445,14 @@ export default function CustomCursor() {
         target.addEventListener('mouseenter', handleMessageEnter);
         target.addEventListener('mouseleave', handleMessageLeave);
         boundMessageTargets.add(target);
+      });
+
+      const previewTargets = document.querySelectorAll('.cursorPreview');
+      previewTargets.forEach((target) => {
+        if (boundPreviewTargets.has(target)) return;
+        target.addEventListener('mouseenter', handlePreviewEnter);
+        target.addEventListener('mouseleave', handlePreviewLeave);
+        boundPreviewTargets.add(target);
       });
     };
 
@@ -354,7 +475,7 @@ export default function CustomCursor() {
         target.removeEventListener('mouseleave', handleMagneticLeave);
       });
       const interactTargets = document.querySelectorAll(
-        '.cursorInteract, .markdown a'
+        '.cursorInteract, .markdown a',
       );
       interactTargets.forEach((target) => {
         target.removeEventListener('mouseenter', handleInteractEnter);
@@ -364,6 +485,11 @@ export default function CustomCursor() {
       messageTargets.forEach((target) => {
         target.removeEventListener('mouseenter', handleMessageEnter);
         target.removeEventListener('mouseleave', handleMessageLeave);
+      });
+      const previewTargets = document.querySelectorAll('.cursorPreview');
+      previewTargets.forEach((target) => {
+        target.removeEventListener('mouseenter', handlePreviewEnter);
+        target.removeEventListener('mouseleave', handlePreviewLeave);
       });
 
       // Clear rotation reset timeout
@@ -376,6 +502,7 @@ export default function CustomCursor() {
       if (hintHideTimeout.current) {
         clearTimeout(hintHideTimeout.current);
       }
+      hidePreview();
 
       document.body.removeAttribute('data-cursor-surface');
       observer.disconnect();
@@ -387,7 +514,13 @@ export default function CustomCursor() {
       <div ref={messageRef} className={`${styles.cursor} ${styles.message}`}>
         {message}
       </div>
-      <div ref={followerRef} className={`${styles.cursor} ${styles.follower}`} />
+      <div ref={previewRef} className={styles.preview} aria-hidden="true">
+        <img ref={previewImageRef} src="" alt="" />
+      </div>
+      <div
+        ref={followerRef}
+        className={`${styles.cursor} ${styles.follower}`}
+      />
       <div ref={cursorRef} className={`${styles.cursor} ${styles.main}`} />
     </>
   );

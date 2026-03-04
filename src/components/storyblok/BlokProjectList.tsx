@@ -23,6 +23,7 @@ export default async function BlokProjectList({ blok }: BlokProjectListProps) {
           title={item.title}
           category={item.category}
           external_link={item.external_link}
+          thumbnail={item.thumbnail}
           stackIndex={index + 1}
         />
       ))}
