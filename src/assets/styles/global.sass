@@ -418,13 +418,13 @@ mux-player, .muxPlayer
     padding-top: var(--top-padding-filter)
     justify-content: flex-end
     @media (max-width: 770px)
-      .column:nth-child(n+3):not(.column-Icons)
+      .column:nth-child(n+4):not(.column-Icons)
         display: none
   &-ProjectList
     position: relative
     border-top: 0 !important
     border-bottom: 0 !important
-    padding-top: calc(3.95rem * 0.5)
+    padding-top: var(--spacing-base)
     @media (hover: hover)
       .blok-Project:hover
         transition-duration: 0.1s
@@ -450,7 +450,7 @@ mux-player, .muxPlayer
         position: relative
         z-index: 1
     @media (max-width: 770px)
-      .column:nth-child(n+3):not(.column-Icons)
+      .column:nth-child(n+4):not(.column-Icons)
         display: none
   &-Highlights
     display: grid
