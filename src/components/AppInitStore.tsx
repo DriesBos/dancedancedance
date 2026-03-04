@@ -3,16 +3,21 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { THEME_ORDER, useStore } from '@/store/store';
+import { useShallow } from 'zustand/react/shallow';
 
 const AppInitializer = () => {
   const hasRunHomeIntroRef = useRef(false);
   const hasSetInitialThemeRef = useRef(false);
-  const setTwoD = useStore((state) => state.setTwoD);
-  const setThreeD = useStore((state) => state.setThreeD);
-  const setNightmode = useStore((state) => state.setNightmode);
-  const setTheme = useStore((state) => state.setTheme);
-  const theme = useStore((state: any) => state.theme);
-  const space = useStore((state: any) => state.space);
+  const { setTwoD, setThreeD, setNightmode, setTheme, theme, space } = useStore(
+    useShallow((state) => ({
+      setTwoD: state.setTwoD,
+      setThreeD: state.setThreeD,
+      setNightmode: state.setNightmode,
+      setTheme: state.setTheme,
+      theme: state.theme,
+      space: state.space,
+    })),
+  );
   const path = usePathname();
   const slug = (path || '/').split('/')[1] || 'home';
   const pathname = path || '/';

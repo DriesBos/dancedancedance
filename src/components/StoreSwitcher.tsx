@@ -2,15 +2,16 @@
 
 import React, { useEffect } from 'react';
 import { useStore } from '@/store/store';
+import { useShallow } from 'zustand/react/shallow';
 
 const StoreSwitcher = () => {
-  const setNightmode = useStore((state: any) => state.setNightmode);
-  const setDefault = useStore((state: any) => state.setDefault);
-  const setTwoD = useStore((state: any) => state.setTwoD);
-  const setThreeD = useStore((state: any) => state.setThreeD);
-  const cycleTheme = useStore((state: any) => state.cycleTheme);
-  const theme = useStore((state: any) => state.theme);
-  const space = useStore((state: any) => state.space);
+  const { cycleTheme, theme, space } = useStore(
+    useShallow((state) => ({
+      cycleTheme: state.cycleTheme,
+      theme: state.theme,
+      space: state.space,
+    })),
+  );
 
   // Update theme-color meta tag when theme changes
   useEffect(() => {
@@ -27,9 +28,9 @@ const StoreSwitcher = () => {
 
   function handlePickSpace() {
     if (space === 'DESKTOP') {
-      setThreeD();
+      useStore.getState().setThreeD();
     } else {
-      setTwoD();
+      useStore.getState().setTwoD();
     }
   }
 

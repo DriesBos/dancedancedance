@@ -15,6 +15,7 @@ import BlokSidePanels from '@/components/BlokSidePanels';
 import { gsap } from '@/lib/gsap';
 import GrainyGradient from '@/components/GrainyGradient';
 import IconRocket from '@/components/Icons/IconRocket';
+import { useShallow } from 'zustand/react/shallow';
 import styles from './BlokHead.module.sass';
 
 interface Props {
@@ -31,15 +32,28 @@ const BlokHead = ({}: Props) => {
   const currentPath = path || '/';
   const router = useRouter();
   const { projectSlugs, projects } = useProjects();
-  const theme = useStore((state) => state.theme);
-  const cycleTheme = useStore((state) => state.cycleTheme);
-  const space = useStore((state) => state.space);
+  const {
+    theme,
+    cycleTheme,
+    space,
+    setTwoD,
+    setThreeD,
+    topPanel,
+    setTopPanelTrue,
+    setTopPanelFalse,
+  } = useStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      cycleTheme: state.cycleTheme,
+      space: state.space,
+      setTwoD: state.setTwoD,
+      setThreeD: state.setThreeD,
+      topPanel: state.topPanel,
+      setTopPanelTrue: state.setTopPanelTrue,
+      setTopPanelFalse: state.setTopPanelFalse,
+    })),
+  );
   const isThreeDSpace = space === '3D';
-  const setTwoD = useStore((state) => state.setTwoD);
-  const setThreeD = useStore((state) => state.setThreeD);
-  const topPanel = useStore((state) => state.topPanel);
-  const setTopPanelTrue = useStore((state) => state.setTopPanelTrue);
-  const setTopPanelFalse = useStore((state) => state.setTopPanelFalse);
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
