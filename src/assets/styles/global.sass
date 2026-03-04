@@ -35,8 +35,8 @@ main
   max-height: calc-size(auto)
   // border: var(--main-border-width) solid var(--border-color)
   border-radius: var(--main-border-radius)
-  transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), background-color var(--transition-theme), perspective-origin var(--transition-theme), perspective var(--transition-theme)
-  will-change: border, border-radius, width, max-width, height, max-height, transform, background-color, perspective, perspective-origin
+  transition: border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space), perspective-origin var(--transition-theme), perspective var(--transition-theme)
+  will-change: border, border-radius, width, max-width, height, max-height, transform, perspective, perspective-origin
   // Safe envs
   padding-top: env(safe-area-inset-top)
   padding-right: env(safe-area-inset-right)
@@ -46,6 +46,8 @@ main
     margin-top: calc(0px - (#{var(--border-width)}))
 
 .page
+  transition: background var(--transition-theme)
+  will-change: background
   & > .blok
     margin-top: calc(0px - (#{var(--border-width)}))
   &-Thumbnail
@@ -53,6 +55,8 @@ main
   &-Blurbs
     position: relative
     background: var(--theme-bg)
+    will-change: background
+    transition: background var(--transition-theme)
     width: 100vw
     height: 100dvh
     overflow: hidden
@@ -228,11 +232,11 @@ mux-player, .muxPlayer
   display: flex
   flex-direction: column
   border: var(--border-width) solid var(--border-color)
-  background-color: var(--theme-blok)
+  background: var(--theme-blok)
   perspective: 1500px
   perspective-origin: var(--panel-perspective-origin)
-  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background-color var(--transition-theme), perspective var(--transition-theme), perspective-origin var(--transition-theme)
-  will-change: border, border-left, border-right, border-top, border-bottom, background-color, opacity, perspective, perspective-origin
+  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme), perspective var(--transition-theme), perspective-origin var(--transition-theme)
+  will-change: border, border-left, border-right, border-top, border-bottom, background, opacity, perspective, perspective-origin
   &.inactive
     display: none
   .row
@@ -635,7 +639,7 @@ body
       &-Filter
         border-top-width: 0
       &-Head
-        background: var(--theme-blok-solid) !important
+        background: var(--theme-blok-solid)
       &-Footer
         margin-top: 3.5rem
         padding-top: 3.5rem
