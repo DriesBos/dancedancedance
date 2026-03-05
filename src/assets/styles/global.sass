@@ -59,7 +59,7 @@ main
     margin-top: calc(0px - (#{var(--border-width)}))
 
 .page
-  transition: background var(--transition-theme), margin-top var(--transition-space)
+  transition: margin-top var(--transition-space)
   & > .blok
     margin-top: calc(0px - (#{var(--border-width)}))
   &-Thumbnail
@@ -247,7 +247,7 @@ mux-player, .muxPlayer
   background: var(--theme-blok)
   perspective: 1500px
   perspective-origin: var(--panel-perspective-origin)
-  transition: border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme), perspective var(--transition-space), perspective-origin var(--transition-space)
+  transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme), perspective var(--transition-space), perspective-origin var(--transition-space)
   &.inactive
     display: none
   .row
@@ -494,6 +494,7 @@ mux-player, .muxPlayer
     .column-Icons
       & > .icon-Footer
         height: calc(100% - (var(--spacing-base) * 2))
+  &-ProjectSlider
   &-Filter
     justify-content: flex-end
     border-width: 0
@@ -685,15 +686,11 @@ body
     main
       max-width: 100%
       min-height: 100dvh
-    .page
-      background: var(--theme-blok)
-      &-General
-        padding-top: 20vh
-      &-Project
-        padding-top: 20vh
     .blok
       border-left-width: 0
       border-right-width: 0
+      &-ProjectSlider
+        padding-top: calc(2 * var(--blok-height))
       &-Project
         overflow: hidden
       &-Head

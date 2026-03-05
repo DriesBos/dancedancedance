@@ -221,8 +221,8 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
   const swipeToPrevSlide = () => {
     if (!blok.body || blok.body.length <= 1) return;
-    setActiveIndex((prevIndex) =>
-      (prevIndex - 1 + blok.body.length) % blok.body.length,
+    setActiveIndex(
+      (prevIndex) => (prevIndex - 1 + blok.body.length) % blok.body.length,
     );
   };
 
@@ -256,7 +256,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
   return (
     <div
-      className={`blok blok-Animate ${styles.root}`}
+      className={`blok blok-Animate blok-ProjectSlider ${styles.root}`}
       {...storyblokEditable(blok)}
       {...swipeHandlers}
     >
