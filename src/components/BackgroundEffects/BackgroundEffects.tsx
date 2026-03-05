@@ -13,6 +13,7 @@ const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
+const DEFAULT_ROTATION_DURATION_MS = 72000;
 
 type BackgroundEffectsProps = {
   version: 'radiating' | 'segments' | 'kusama';
@@ -20,6 +21,7 @@ type BackgroundEffectsProps = {
 
 function RadiatingBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const linesRef = useRef<SVGGElement>(null);
   const [lineCount, setLineCount] = useState(220);
 
   useEffect(() => {
@@ -29,13 +31,15 @@ function RadiatingBackground() {
     const computedStyles = getComputedStyle(root);
     const rawGap = computedStyles.getPropertyValue('--rb-line-gap').trim();
     const parsedGap = Number.parseFloat(rawGap);
-    const gap = Number.isFinite(parsedGap) && parsedGap > 0 ? parsedGap : DEFAULT_LINE_GAP;
+    const gap =
+      Number.isFinite(parsedGap) && parsedGap > 0
+        ? parsedGap
+        : DEFAULT_LINE_GAP;
     const circumference = 2 * Math.PI * EDGE_DISTANCE;
     const computedCount = Math.round(circumference / gap);
     const clampedCount = Math.min(720, Math.max(48, computedCount));
 
     setLineCount(clampedCount);
-
   }, []);
 
   const radialLines = useMemo(
@@ -57,6 +61,49 @@ function RadiatingBackground() {
     [lineCount],
   );
 
+  useEffect(() => {
+    const root = rootRef.current;
+    const lines = linesRef.current;
+    if (!root || !lines) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (prefersReducedMotion) return;
+
+    const rawDuration = getComputedStyle(root)
+      .getPropertyValue('--rb-rotation-duration')
+      .trim();
+    const parsedDuration = Number.parseFloat(rawDuration);
+    const isMs = rawDuration.endsWith('ms');
+    const durationMs = Number.isFinite(parsedDuration)
+      ? isMs
+        ? parsedDuration
+        : parsedDuration * 1000
+      : DEFAULT_ROTATION_DURATION_MS;
+    const safeDurationMs = Math.max(1, durationMs);
+
+    let frameId = 0;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = (elapsed % safeDurationMs) / safeDurationMs;
+      const degrees = progress * 360;
+
+      // SVG transform attribute is more reliable than CSS keyframes on iOS Safari.
+      lines.setAttribute('transform', `rotate(${degrees} ${CENTER} ${CENTER})`);
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    frameId = window.requestAnimationFrame(animate);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      lines.removeAttribute('transform');
+    };
+  }, []);
+
   return (
     <div
       ref={rootRef}
@@ -75,7 +122,7 @@ function RadiatingBackground() {
           width={VIEWBOX_SIZE}
           height={VIEWBOX_SIZE}
         />
-        <g className={styles.lines}>
+        <g ref={linesRef} className={styles.lines}>
           {radialLines.map((line, index) => (
             <line
               key={index}
