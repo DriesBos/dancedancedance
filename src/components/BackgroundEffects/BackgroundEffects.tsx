@@ -7,6 +7,7 @@ import {
   createSegmentsSketch,
   SEGMENTS_DEFAULT_PARAMS,
 } from './segmentsSketch';
+import { createKusamaSketch, KUSAMA_DEFAULT_PARAMS } from './kusamaSketch';
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
@@ -15,7 +16,7 @@ const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 36000;
 
 type BackgroundEffectsProps = {
-  version: 'radiating' | 'segments';
+  version: 'radiating' | 'segments' | 'kusama';
 };
 
 function RadiatingBackground() {
@@ -171,7 +172,53 @@ function SegmentsBackground() {
   );
 }
 
+function KusamaBackground() {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let instance: p5 | null = null;
+    let isDisposed = false;
+
+    const init = async () => {
+      const host = rootRef.current;
+      if (!host) return;
+
+      const { default: P5 } = await import('p5');
+      if (isDisposed || !rootRef.current) return;
+
+      instance = new P5(
+        createKusamaSketch({
+          host,
+          canvasClassName: styles.kusamaCanvas,
+          params: KUSAMA_DEFAULT_PARAMS,
+        }),
+      );
+    };
+
+    init();
+
+    return () => {
+      isDisposed = true;
+      instance?.remove();
+      instance = null;
+    };
+  }, []);
+
+  return (
+    <div
+      ref={rootRef}
+      className={`${styles.root} ${styles.kusamaRoot}`}
+      data-version="kusama"
+      aria-hidden="true"
+    />
+  );
+}
+
 export default function BackgroundEffects({ version }: BackgroundEffectsProps) {
+  if (version === 'kusama') {
+    return <KusamaBackground />;
+  }
+
   if (version === 'segments') {
     return <SegmentsBackground />;
   }

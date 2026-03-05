@@ -8,6 +8,10 @@
   --be-segments-line-color: var(--theme-type)
   --be-segments-line-width: var(--border-width)
   --be-segments-opacity: 1
+  --be-kusama-bg-color: #C61E1E
+  --be-kusama-line-color: #FFFFFF
+  --be-kusama-line-width: 10
+  --be-kusama-opacity: 1
   position: fixed
   inset: 0
   pointer-events: none
@@ -33,6 +37,14 @@
   opacity: var(--be-segments-opacity)
 
 .segmentsCanvas
+  width: 100% !important
+  height: 100% !important
+  display: block
+
+.kusamaRoot
+  opacity: var(--be-kusama-opacity)
+
+.kusamaCanvas
   width: 100% !important
   height: 100% !important
   display: block

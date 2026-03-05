@@ -25,7 +25,7 @@ import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundE
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
-    var daytimeThemes = ['TRON', 'DONJUDD', 'STEDELIJK', 'LIGHT', 'DARK'];
+    var daytimeThemes = ['TRON', 'DONJUDD', 'STEDELIJK', 'LIGHT', 'DARK', 'KUSAMA'];
     var hour = new Date().getHours();
     var theme =
       hour >= 0 && hour < 5

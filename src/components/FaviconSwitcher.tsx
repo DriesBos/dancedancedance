@@ -53,6 +53,8 @@ export default function FaviconSwitcher() {
           return defaultColor;
         case 'DARK':
           return defaultColor;
+        case 'KUSAMA':
+          return '#BA3A52';
         default:
           return defaultColor;
       }

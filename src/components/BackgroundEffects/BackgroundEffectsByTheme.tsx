@@ -14,5 +14,9 @@ export default function BackgroundEffectsByTheme() {
     return <BackgroundEffects version="segments" />;
   }
 
+  if (theme === 'KUSAMA') {
+    return <BackgroundEffects version="kusama" />;
+  }
+
   return null;
 }
