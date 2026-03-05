@@ -211,11 +211,11 @@ const BlokHead = ({}: Props) => {
     preventScrollOnSwipe: false,
     onSwipedLeft: () => {
       if (pathName !== 'projects') return;
-      clickPrev();
+      clickNext();
     },
     onSwipedRight: () => {
       if (pathName !== 'projects') return;
-      clickNext();
+      clickPrev();
     },
   });
 
