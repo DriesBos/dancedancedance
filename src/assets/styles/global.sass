@@ -270,6 +270,7 @@ mux-player, .muxPlayer
     .column
       text-align: left
       padding: var(--blok-padding) var(--spacing-side)
+      // For showing unpublished stories
       &[data-inactive='true']
         color: var(--theme-type-inactive)
         will-change: color
@@ -279,6 +280,7 @@ mux-player, .muxPlayer
       &-Project, &-Title, &-Category, &-Agency, &-Empty, &-Text, &-FooterColumn
         flex: 1 1 0
         width: 0
+        user-select: none
       &-Title, &-Category, &-Agency, &-FooterColumn, &-Copyright
         user-select: none
       &-Slider
@@ -398,6 +400,61 @@ mux-player, .muxPlayer
         align-items: center
         padding: 0 !important
         margin: 0 !important
+        .searchInput
+          position: relative
+          display: inline-flex
+          align-items: center
+          flex: 0 0 auto
+          min-width: auto
+          max-width: none
+          overflow: visible
+          color: var(--theme-type-inactive)
+          transition: color var(--transition-button)
+          @media (max-width: 770px)
+            display: none
+          .icon
+            opacity: 1 !important
+          &[data-active="true"]
+            color: var(--theme-type)
+          &:hover
+            @media (hover: hover)
+              color: var(--theme-type)
+          &-Trigger
+            background: none
+            border: 0
+            color: inherit
+            margin: 0
+            font: inherit
+            line-height: inherit
+            display: inline-flex
+            align-items: center
+            justify-content: center
+            flex: 0 0 auto
+            position: relative
+            z-index: 1
+          &-Field
+            position: absolute
+            right: 100%
+            top: 50%
+            transform: translateY(-50%)
+            width: 0
+            min-width: 0
+            border: 0
+            background: transparent
+            color: var(--theme-type)
+            font: inherit
+            line-height: inherit
+            outline: none
+            padding: 0
+            opacity: 0
+            pointer-events: none
+            transition: width var(--transition-button), padding var(--transition-button), opacity var(--transition-button)
+            &::placeholder
+              color: var(--theme-type-inactive)
+          &[data-active="true"] .searchInput-Field
+            width: clamp(7rem, 14vw, 12rem)
+            opacity: 1
+            pointer-events: auto
         &_NextPrev
           position: relative
           display: inline-flex
@@ -420,6 +477,17 @@ mux-player, .muxPlayer
             pointer-events: none
             opacity: 0
 
+  button.column
+    appearance: none
+    border: 0
+    background: none
+    color: inherit
+    font: inherit
+    line-height: inherit
+    margin: 0
+    text-align: left
+    cursor: pointer
+
   // Specific Bloks
   &-Animate
     opacity: 0
@@ -428,10 +496,13 @@ mux-player, .muxPlayer
         height: calc(100% - (var(--spacing-base) * 2))
   &-Filter
     transition: padding-top var(--transition-space)
-    padding-top: var(--top-padding-filter)
+    // padding-top: var(--top-padding-filter)
     justify-content: flex-end
+    .column-Icons
+      & > div:first-child
+        opacity: 0
     @media (max-width: 770px)
-      .column:nth-child(n+4):not(.column-Icons)
+      .column:nth-child(n+3):not(.column-Icons)
         display: none
   &-ProjectList
     position: relative
@@ -444,6 +515,7 @@ mux-player, .muxPlayer
         transform: translateY(-1.75rem) !important
   &-Project
     position: relative
+    opacity: 1
     border: 0
     border-top: var(--border-width) solid var(--border-color)
     padding-bottom: calc(3.95rem * 0.5)

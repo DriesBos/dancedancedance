@@ -1,40 +1,72 @@
 'use client';
 
-import IconSearch from '@/components/Icons/IconSearch';
-import { usePathname } from 'next/navigation';
 import Row from './Row';
 import BlokSidePanels from './BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient';
+import SearchInput from './SearchInput';
+import IconArrow from './Icons/IconArrow';
 
-export default function BlokFilter() {
-  const path = usePathname();
+export type ProjectSortField = 'year' | 'title' | 'category';
+export type ProjectSortDirection = 'asc' | 'desc';
+
+interface BlokFilterProps {
+  sortField: ProjectSortField;
+  sortDirection: ProjectSortDirection;
+  onSortChange: (field: ProjectSortField) => void;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+}
+
+export default function BlokFilter({
+  sortField,
+  sortDirection,
+  onSortChange,
+  searchValue,
+  onSearchChange,
+}: BlokFilterProps) {
+  const isSortActive = (field: ProjectSortField) => sortField === field;
+  const sortIndicator = (field: ProjectSortField) =>
+    isSortActive(field) ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
+
   return (
-    <>
-      {path === '/' && (
-        <div className="blok blok-Filter blok-Animate">
-          <GrainyGradient variant="blok" />
-          <BlokSidePanels />
-          <Row>
-            <div className="column column-Year" data-inactive={true}>
-              Date
-            </div>
-            <div className="column column-Project" data-inactive={true}>
-              Selected Projects
-            </div>
-            <div className="column column-Category" data-inactive={true}>
-              Category
-            </div>
-            <div className="column column-Agency" data-inactive={true}>
-              Agency
-            </div>
-            <div className="column column-Icons" data-inactive={true}>
-              <div className="icon">
-                <IconSearch />
-              </div>
-            </div>
-          </Row>
+    <div className="blok blok-Filter blok-Animate">
+      <GrainyGradient variant="blok" />
+      <BlokSidePanels />
+      <Row>
+        <button
+          type="button"
+          className="column column-Year"
+          data-active={isSortActive('year')}
+          data-inactive={!isSortActive('year')}
+          onClick={() => onSortChange('year')}
+        >
+          Date
+        </button>
+        <button
+          type="button"
+          className="column column-Project"
+          data-active={isSortActive('title')}
+          data-inactive={!isSortActive('title')}
+          onClick={() => onSortChange('title')}
+        >
+          Selected projects
+        </button>
+        <button
+          type="button"
+          className="column column-Category"
+          data-active={isSortActive('category')}
+          data-inactive={!isSortActive('category')}
+          onClick={() => onSortChange('category')}
+        >
+          Category
+        </button>
+        <div className="column column-Icons">
+          <div className="icon">
+            <IconArrow />
+          </div>
+          <SearchInput value={searchValue} onChange={onSearchChange} />
         </div>
-      )}
-    </>
+      </Row>
+    </div>
   );
 }
