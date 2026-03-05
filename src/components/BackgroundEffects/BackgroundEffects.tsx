@@ -13,7 +13,6 @@ const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
-const DEFAULT_ROTATION_DURATION_MS = 36000;
 
 type BackgroundEffectsProps = {
   version: 'radiating' | 'segments' | 'kusama';
@@ -22,10 +21,6 @@ type BackgroundEffectsProps = {
 function RadiatingBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(220);
-  const [rotationDurationMs, setRotationDurationMs] = useState(
-    DEFAULT_ROTATION_DURATION_MS,
-  );
-  const [angleOffset, setAngleOffset] = useState(0);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -41,23 +36,12 @@ function RadiatingBackground() {
 
     setLineCount(clampedCount);
 
-    const rawDuration = computedStyles
-      .getPropertyValue('--rb-rotation-duration')
-      .trim();
-    const parsedDuration = Number.parseFloat(rawDuration);
-    const isMs = rawDuration.endsWith('ms');
-    const resolvedDuration = Number.isFinite(parsedDuration)
-      ? isMs
-        ? parsedDuration
-        : parsedDuration * 1000
-      : DEFAULT_ROTATION_DURATION_MS;
-    setRotationDurationMs(Math.max(1, resolvedDuration));
   }, []);
 
   const radialLines = useMemo(
     () =>
       Array.from({ length: lineCount }, (_, index) => {
-        const angle = (index / lineCount) * Math.PI * 2 + angleOffset;
+        const angle = (index / lineCount) * Math.PI * 2;
         const dx = Math.cos(angle);
         const dy = Math.sin(angle);
         const fromScale = 0;
@@ -70,31 +54,8 @@ function RadiatingBackground() {
           y2: CENTER + dy * toScale,
         };
       }),
-    [angleOffset, lineCount],
+    [lineCount],
   );
-
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    if (prefersReducedMotion) return;
-
-    let frameId = 0;
-    const start = performance.now();
-
-    const animate = (now: number) => {
-      const elapsed = now - start;
-      const progress = (elapsed % rotationDurationMs) / rotationDurationMs;
-      setAngleOffset(progress * Math.PI * 2);
-      frameId = window.requestAnimationFrame(animate);
-    };
-
-    frameId = window.requestAnimationFrame(animate);
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-    };
-  }, [rotationDurationMs]);
 
   return (
     <div

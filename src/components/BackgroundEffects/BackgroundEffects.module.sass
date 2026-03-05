@@ -29,6 +29,19 @@
   stroke-width: var(--rb-line-width)
   fill: none
   shape-rendering: geometricPrecision
+  transform-origin: 50% 50%
+  transform-box: fill-box
+  animation: rb-rotate var(--rb-rotation-duration) linear infinite
+
+@media (prefers-reduced-motion: reduce)
+  .lines
+    animation: none
+
+@keyframes rb-rotate
+  from
+    transform: rotate(0deg)
+  to
+    transform: rotate(360deg)
 
 .background
   fill: var(--rb-bg-color)

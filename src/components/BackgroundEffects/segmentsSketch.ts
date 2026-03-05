@@ -14,6 +14,8 @@ const NEAR_SQUARE_THRESHOLD = 0.75;
 const ANCHOR_MARGIN_RATIO = 0.05;
 const ANCHOR_BAND_START = 0.1;
 const ANCHOR_BAND_SPAN = 0.8;
+const MOBILE_HEIGHT_DELTA_IGNORE_PX = 120;
+const RESIZE_WIDTH_EPSILON_PX = 2;
 
 type Point = {
   x: number;
@@ -71,7 +73,7 @@ export const SEGMENTS_DEFAULT_PARAMS: SegmentsParams = {
   uniformity: 0.5,
   lineThickness: 1,
   opacity: 1,
-  speed: 0.1,
+  speed: 0.5,
   hue: 0,
   saturation: 0,
   lightness: 0,
@@ -961,6 +963,16 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     let ink = resolveInkStyle(options.host, settings);
     let noProgressFrameCount = 0;
     let stepBudget = 0;
+    let lastViewportWidth = 0;
+    let lastViewportHeight = 0;
+    let lastOrientation: 'portrait' | 'landscape' = 'landscape';
+
+    const getOrientation = (width: number, height: number) =>
+      width >= height ? 'landscape' : 'portrait';
+
+    const isCoarsePointerDevice = () =>
+      window.matchMedia('(pointer: coarse)').matches ||
+      (navigator.maxTouchPoints ?? 0) > 0;
 
     const reset = () => {
       state.regionPool = createRegionPool();
@@ -986,6 +998,9 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
 
       instance.pixelDensity(1);
       instance.noFill();
+      lastViewportWidth = instance.windowWidth;
+      lastViewportHeight = instance.windowHeight;
+      lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
       reset();
     };
 
@@ -1031,9 +1046,29 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     };
 
     instance.windowResized = () => {
-      instance.resizeCanvas(instance.windowWidth, instance.windowHeight);
+      const nextWidth = instance.windowWidth;
+      const nextHeight = instance.windowHeight;
+      const nextOrientation = getOrientation(nextWidth, nextHeight);
+      const widthDelta = Math.abs(nextWidth - lastViewportWidth);
+      const heightDelta = Math.abs(nextHeight - lastViewportHeight);
+      const orientationChanged = nextOrientation !== lastOrientation;
+      const isLikelyMobileAddressBarResize =
+        isCoarsePointerDevice() &&
+        !orientationChanged &&
+        widthDelta < RESIZE_WIDTH_EPSILON_PX &&
+        heightDelta > 0 &&
+        heightDelta < MOBILE_HEIGHT_DELTA_IGNORE_PX;
+
+      if (isLikelyMobileAddressBarResize) {
+        return;
+      }
+
+      instance.resizeCanvas(nextWidth, nextHeight);
       ink = resolveInkStyle(options.host, settings);
       reset();
+      lastViewportWidth = nextWidth;
+      lastViewportHeight = nextHeight;
+      lastOrientation = nextOrientation;
     };
   };
 }

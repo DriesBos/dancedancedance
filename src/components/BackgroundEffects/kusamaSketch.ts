@@ -18,6 +18,8 @@ export const KUSAMA_DEFAULT_PARAMS: KusamaParams = {
   lineThickness: 1,
   opacity: 0.9,
 };
+const MOBILE_KUSAMA_CELL_SIZE = 25;
+const KUSAMA_MOBILE_BREAKPOINT_PX = 770;
 
 type KusamaSketchOptions = {
   host: HTMLDivElement;
@@ -271,8 +273,13 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     };
     const teardownFns: Array<() => void> = [];
 
+    const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
+
     const setupSeeds = () => {
-      seeds = createSeeds(instance.width, instance.height, settings);
+      const resolvedSettings = isNarrowViewport()
+        ? { ...settings, cellSize: MOBILE_KUSAMA_CELL_SIZE }
+        : settings;
+      seeds = createSeeds(instance.width, instance.height, resolvedSettings);
     };
 
     const updatePointer = (x: number, y: number, boost: number) => {
