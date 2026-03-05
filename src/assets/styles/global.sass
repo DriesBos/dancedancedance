@@ -495,9 +495,8 @@ mux-player, .muxPlayer
       & > .icon-Footer
         height: calc(100% - (var(--spacing-base) * 2))
   &-Filter
-    transition: padding-top var(--transition-space)
-    // padding-top: var(--top-padding-filter)
     justify-content: flex-end
+    border-top-width: 0
     .column-Icons
       & > div:first-child
         opacity: 0
@@ -697,8 +696,6 @@ body
       border-right-width: 0
       &-Project
         overflow: hidden
-      &-Filter
-        border-top-width: 0
       &-Head
         background: var(--theme-blok-solid)
   &[data-space="3D"]
