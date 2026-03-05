@@ -265,6 +265,20 @@ const BlokHead = ({}: Props) => {
     [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode],
   );
 
+  const openTopPanelFromTouch = useCallback(() => {
+    if (!headRef.current || !isThreeDSpace) return;
+
+    if (isPagePastTop()) {
+      setTopPanelMode('forcedClosed');
+      animateHead({ yPercent: 0 });
+      return;
+    }
+
+    isHoveringTopPanelZoneRef.current = true;
+    setTopPanelMode('open');
+    animateHead({ yPercent: -100 });
+  }, [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode]);
+
   useEffect(() => {
     const mediaQuery =
       typeof window.matchMedia === 'function'
@@ -479,6 +493,36 @@ const BlokHead = ({}: Props) => {
       duration: 0.165,
     });
   }, [handleTopPanel, isThreeDSpace, animateHead, setTopPanelMode]);
+
+  useEffect(() => {
+    if (!isThreeDSpace) return;
+
+    const listenerOptions: AddEventListenerOptions = {
+      passive: true,
+      capture: true,
+    };
+
+    if (typeof window.PointerEvent === 'function') {
+      const onPointerDown = (e: PointerEvent) => {
+        if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return;
+        openTopPanelFromTouch();
+      };
+
+      window.addEventListener('pointerdown', onPointerDown, listenerOptions);
+      return () => {
+        window.removeEventListener('pointerdown', onPointerDown, listenerOptions);
+      };
+    }
+
+    const onTouchStart = () => {
+      openTopPanelFromTouch();
+    };
+
+    window.addEventListener('touchstart', onTouchStart, listenerOptions);
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart, listenerOptions);
+    };
+  }, [isThreeDSpace, openTopPanelFromTouch]);
 
   useEffect(() => {
     return () => {
