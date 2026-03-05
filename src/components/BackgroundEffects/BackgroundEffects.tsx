@@ -21,7 +21,7 @@ type BackgroundEffectsProps = {
 
 function RadiatingBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const linesRef = useRef<SVGGElement>(null);
+  const spinLayerRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(220);
 
   useEffect(() => {
@@ -66,8 +66,8 @@ function RadiatingBackground() {
 
   useEffect(() => {
     const root = rootRef.current;
-    const lines = linesRef.current;
-    if (!root || !lines) return;
+    const spinLayer = spinLayerRef.current;
+    if (!root || !spinLayer) return;
 
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
@@ -94,8 +94,7 @@ function RadiatingBackground() {
       const progress = (elapsed % safeDurationMs) / safeDurationMs;
       const degrees = progress * 360;
 
-      // SVG transform attribute is more reliable than CSS keyframes on iOS Safari.
-      lines.setAttribute('transform', `rotate(${degrees} ${CENTER} ${CENTER})`);
+      spinLayer.style.transform = `translate3d(-50%, -50%, 0) rotate(${degrees}deg)`;
       frameId = window.requestAnimationFrame(animate);
     };
 
@@ -103,7 +102,7 @@ function RadiatingBackground() {
 
     return () => {
       window.cancelAnimationFrame(frameId);
-      lines.removeAttribute('transform');
+      spinLayer.style.transform = 'translate3d(-50%, -50%, 0) rotate(0deg)';
     };
   }, []);
 
@@ -114,30 +113,32 @@ function RadiatingBackground() {
       data-version="radiating"
       aria-hidden="true"
     >
-      <svg
-        className={styles.svg}
-        viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
-        preserveAspectRatio="xMidYMid slice"
-        role="presentation"
-      >
-        <rect
-          className={styles.background}
-          width={VIEWBOX_SIZE}
-          height={VIEWBOX_SIZE}
-        />
-        <g ref={linesRef} className={styles.lines}>
-          {radialLines.map((line, index) => (
-            <line
-              key={index}
-              x1={line.x1}
-              y1={line.y1}
-              x2={line.x2}
-              y2={line.y2}
-              opacity={line.opacity}
-            />
-          ))}
-        </g>
-      </svg>
+      <div ref={spinLayerRef} className={styles.radiatingSpinLayer}>
+        <svg
+          className={styles.svg}
+          viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
+          preserveAspectRatio="xMidYMid slice"
+          role="presentation"
+        >
+          <rect
+            className={styles.background}
+            width={VIEWBOX_SIZE}
+            height={VIEWBOX_SIZE}
+          />
+          <g className={styles.lines}>
+            {radialLines.map((line, index) => (
+              <line
+                key={index}
+                x1={line.x1}
+                y1={line.y1}
+                x2={line.x2}
+                y2={line.y2}
+                opacity={line.opacity}
+              />
+            ))}
+          </g>
+        </svg>
+      </div>
     </div>
   );
 }
