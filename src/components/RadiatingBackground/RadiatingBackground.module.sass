@@ -1,0 +1,26 @@
+.root
+  --rb-bg-color: var(--theme-bg)
+  --rb-line-color: var(--theme-type)
+  --rb-line-gap: 50rem
+  --rb-line-width: var(--border-width)
+  --rb-rotation-duration: 60s
+  position: fixed
+  inset: 0
+  pointer-events: none
+  z-index: -1
+  overflow: hidden
+  opacity: var(--theme-rotatingLines-bg)
+
+.svg
+  width: 100%
+  height: 100%
+  display: block
+
+.lines
+  stroke: var(--rb-line-color)
+  stroke-width: var(--rb-line-width)
+  fill: none
+  shape-rendering: geometricPrecision
+
+.background
+  fill: var(--rb-bg-color)

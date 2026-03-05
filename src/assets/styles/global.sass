@@ -1,5 +1,7 @@
+:root
+  overscroll-behavior: none
+
 *
-  // overscroll-behavior: none
   cursor: none !important
   @media (hover: none)
     cursor: auto !important
@@ -17,6 +19,7 @@ body
   color: var(--theme-type)
   background: var(--theme-bg)
   display: flex
+  isolation: isolate
   justify-content: center
   align-items: flex-start
   padding: 0
@@ -700,7 +703,7 @@ body
         background: var(--theme-blok-solid)
   &[data-space="3D"]
     // 124px panel height + blok height + desired margin
-    padding-top: calc(124px + var(--blok-height) + 10vh)
+    padding-top: calc(124px + var(--blok-height) + 15vh)
     padding-bottom: 6rem
     @media (orientation: portrait)
       padding-top: calc(124px + var(--blok-height) + 10vh)
