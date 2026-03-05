@@ -194,6 +194,8 @@ export default function CustomCursor() {
     const boundInteractTargets = new WeakSet<EventTarget>();
     const boundMessageTargets = new WeakSet<EventTarget>();
     const boundPreviewTargets = new WeakSet<EventTarget>();
+    const preloadedPreviewUrls = new Set<string>();
+    const preloadedPreviewImages: HTMLImageElement[] = [];
 
     const handleMouseMove = (e: MouseEvent) => {
       // Show cursor on first move
@@ -390,6 +392,28 @@ export default function CustomCursor() {
       hidePreview();
     };
 
+    const preloadPreviewImages = () => {
+      const previewTargets = document.querySelectorAll<HTMLElement>(
+        '.cursorPreview[data-cursor-preview]',
+      );
+
+      previewTargets.forEach((target) => {
+        const src = target.getAttribute('data-cursor-preview');
+        if (!src || preloadedPreviewUrls.has(src)) return;
+
+        preloadedPreviewUrls.add(src);
+        const image = new Image();
+        image.decoding = 'async';
+        image.loading = 'eager';
+        image.src = src;
+        preloadedPreviewImages.push(image);
+
+        if (typeof image.decode === 'function') {
+          image.decode().catch(() => {});
+        }
+      });
+    };
+
     // Hide cursors when mouse leaves window
     const handleMouseLeaveWindow = () => {
       gsap.set([cursor, follower], { opacity: 0 });
@@ -488,10 +512,12 @@ export default function CustomCursor() {
     };
 
     addTargetListeners();
+    preloadPreviewImages();
 
     // MutationObserver for dynamic elements and route changes
     const observer = new MutationObserver(() => {
       addTargetListeners();
+      preloadPreviewImages();
       showProjectNavigationHint(); // Check for project page on route change
     });
     observer.observe(document.body, { childList: true, subtree: true });
@@ -533,6 +559,8 @@ export default function CustomCursor() {
       if (hintHideTimeout.current) {
         clearTimeout(hintHideTimeout.current);
       }
+      preloadedPreviewImages.length = 0;
+      preloadedPreviewUrls.clear();
       hidePreview();
 
       document.body.removeAttribute('data-cursor-surface');

@@ -27,6 +27,20 @@ const BlokProject = ({
   stackIndex,
 }: Props) => {
   const router = useRouter();
+  const cursorPreviewImage = (() => {
+    const base = thumbnail?.filename;
+    if (!base) return undefined;
+
+    const shouldTransform =
+      base.includes('a.storyblok.com') || base.includes('img2.storyblok.com');
+    if (!shouldTransform || base.includes('/m/')) return base;
+
+    const [path, query] = base.split('?');
+    const transformed =
+      `${path}/m/640x480/smart/filters:format(webp):quality(70)`;
+
+    return query ? `${transformed}?${query}` : transformed;
+  })();
 
   const handleClick = () => {
     router.push(`/projects/${slug}`);
@@ -38,10 +52,10 @@ const BlokProject = ({
   return (
     <div
       className={`blok blok-Project blok-Animate cursorInteract ${
-        thumbnail?.filename ? 'cursorPreview' : ''
+        cursorPreviewImage ? 'cursorPreview' : ''
       }`}
       onClick={handleClick}
-      data-cursor-preview={thumbnail?.filename || undefined}
+      data-cursor-preview={cursorPreviewImage || undefined}
       data-cursor-preview-alt={thumbnail?.alt || title || ''}
       style={{ cursor: 'pointer', zIndex: stackIndex }}
     >
