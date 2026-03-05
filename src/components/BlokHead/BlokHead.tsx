@@ -497,6 +497,10 @@ const BlokHead = ({}: Props) => {
   useEffect(() => {
     if (!isThreeDSpace) return;
 
+    const main = document.querySelector('main');
+    if (!main) return;
+    const topPanel = headRef.current?.querySelector('.side_Top') || null;
+
     const listenerOptions: AddEventListenerOptions = {
       passive: true,
       capture: true,
@@ -508,9 +512,15 @@ const BlokHead = ({}: Props) => {
         openTopPanelFromTouch();
       };
 
-      window.addEventListener('pointerdown', onPointerDown, listenerOptions);
+      main.addEventListener('pointerdown', onPointerDown, listenerOptions);
+      topPanel?.addEventListener('pointerdown', onPointerDown, listenerOptions);
       return () => {
-        window.removeEventListener('pointerdown', onPointerDown, listenerOptions);
+        main.removeEventListener('pointerdown', onPointerDown, listenerOptions);
+        topPanel?.removeEventListener(
+          'pointerdown',
+          onPointerDown,
+          listenerOptions,
+        );
       };
     }
 
@@ -518,11 +528,73 @@ const BlokHead = ({}: Props) => {
       openTopPanelFromTouch();
     };
 
-    window.addEventListener('touchstart', onTouchStart, listenerOptions);
+    main.addEventListener('touchstart', onTouchStart, listenerOptions);
+    topPanel?.addEventListener('touchstart', onTouchStart, listenerOptions);
     return () => {
-      window.removeEventListener('touchstart', onTouchStart, listenerOptions);
+      main.removeEventListener('touchstart', onTouchStart, listenerOptions);
+      topPanel?.removeEventListener('touchstart', onTouchStart, listenerOptions);
     };
   }, [isThreeDSpace, openTopPanelFromTouch]);
+
+  useEffect(() => {
+    if (!isThreeDSpace) return;
+
+    const main = document.querySelector('main');
+    if (!main) return;
+    const topPanel = headRef.current?.querySelector('.side_Top') || null;
+
+    const isWithinInteractiveZone = (node: EventTarget | null) => {
+      if (!(node instanceof Node)) return false;
+      return (
+        main.contains(node) || (topPanel ? topPanel.contains(node) : false)
+      );
+    };
+
+    const closeTopPanelFromOutsideClick = () => {
+      isHoveringTopPanelZoneRef.current = false;
+      const pagePastTop = isPagePastTop();
+      setTopPanelMode(pagePastTop ? 'forcedClosed' : 'closed');
+      animateHead({ yPercent: 0 });
+    };
+
+    const listenerOptions: AddEventListenerOptions = {
+      passive: true,
+      capture: true,
+    };
+
+    if (typeof window.PointerEvent === 'function') {
+      const onPointerDown = (e: PointerEvent) => {
+        if (isWithinInteractiveZone(e.target)) return;
+        closeTopPanelFromOutsideClick();
+      };
+
+      document.addEventListener('pointerdown', onPointerDown, listenerOptions);
+      return () => {
+        document.removeEventListener(
+          'pointerdown',
+          onPointerDown,
+          listenerOptions,
+        );
+      };
+    }
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (isWithinInteractiveZone(e.target)) return;
+      closeTopPanelFromOutsideClick();
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (isWithinInteractiveZone(e.target)) return;
+      closeTopPanelFromOutsideClick();
+    };
+
+    document.addEventListener('mousedown', onMouseDown, listenerOptions);
+    document.addEventListener('touchstart', onTouchStart, listenerOptions);
+    return () => {
+      document.removeEventListener('mousedown', onMouseDown, listenerOptions);
+      document.removeEventListener('touchstart', onTouchStart, listenerOptions);
+    };
+  }, [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode]);
 
   useEffect(() => {
     return () => {
