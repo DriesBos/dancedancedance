@@ -4,6 +4,10 @@
   --rb-line-gap: 50rem
   --rb-line-width: var(--border-width)
   --rb-rotation-duration: 60s
+  --be-segments-bg-color: var(--theme-bg)
+  --be-segments-line-color: var(--theme-type)
+  --be-segments-line-width: var(--border-width)
+  --be-segments-opacity: 1
   position: fixed
   inset: 0
   pointer-events: none
@@ -24,3 +28,11 @@
 
 .background
   fill: var(--rb-bg-color)
+
+.segmentsRoot
+  opacity: var(--be-segments-opacity)
+
+.segmentsCanvas
+  width: 100% !important
+  height: 100% !important
+  display: block

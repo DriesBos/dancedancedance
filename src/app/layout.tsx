@@ -21,7 +21,7 @@ import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
 import GrainyGradient from '@/components/GrainyGradient';
-import RadiatingBackground from '@/components/RadiatingBackground/RadiatingBackground';
+import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -111,7 +111,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <script dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }} />
-        <RadiatingBackground />
+        <BackgroundEffectsByTheme />
         <AppInitializer />
         <GrainyGradient variant="page" />
         <ProjectsProvider projects={projects}>

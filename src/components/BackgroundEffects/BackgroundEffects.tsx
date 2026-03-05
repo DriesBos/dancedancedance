@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import styles from './RadiatingBackground.module.sass';
+import type p5 from 'p5';
+import styles from './BackgroundEffects.module.sass';
+import {
+  createSegmentsSketch,
+  SEGMENTS_DEFAULT_PARAMS,
+} from './segmentsSketch';
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
@@ -9,7 +14,11 @@ const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 36000;
 
-export default function RadiatingBackground() {
+type BackgroundEffectsProps = {
+  version: 'radiating' | 'segments';
+};
+
+function RadiatingBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(220);
   const [rotationDurationMs, setRotationDurationMs] = useState(
@@ -87,7 +96,12 @@ export default function RadiatingBackground() {
   }, [rotationDurationMs]);
 
   return (
-    <div ref={rootRef} className={styles.root} aria-hidden="true">
+    <div
+      ref={rootRef}
+      className={styles.root}
+      data-version="radiating"
+      aria-hidden="true"
+    >
       <svg
         className={styles.svg}
         viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
@@ -113,4 +127,54 @@ export default function RadiatingBackground() {
       </svg>
     </div>
   );
+}
+
+function SegmentsBackground() {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let instance: p5 | null = null;
+    let isDisposed = false;
+
+    const init = async () => {
+      const host = rootRef.current;
+      if (!host) return;
+
+      const { default: P5 } = await import('p5');
+      if (isDisposed || !rootRef.current) return;
+
+      instance = new P5(
+        createSegmentsSketch({
+          host,
+          canvasClassName: styles.segmentsCanvas,
+          params: SEGMENTS_DEFAULT_PARAMS,
+        }),
+      );
+    };
+
+    init();
+
+    return () => {
+      isDisposed = true;
+      instance?.remove();
+      instance = null;
+    };
+  }, []);
+
+  return (
+    <div
+      ref={rootRef}
+      className={`${styles.root} ${styles.segmentsRoot}`}
+      data-version="segments"
+      aria-hidden="true"
+    />
+  );
+}
+
+export default function BackgroundEffects({ version }: BackgroundEffectsProps) {
+  if (version === 'segments') {
+    return <SegmentsBackground />;
+  }
+
+  return <RadiatingBackground />;
 }
