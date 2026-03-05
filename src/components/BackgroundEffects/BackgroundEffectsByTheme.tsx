@@ -18,5 +18,9 @@ export default function BackgroundEffectsByTheme() {
     return <BackgroundEffects version="kusama" />;
   }
 
+  if (theme === 'DOTS' || theme === 'DOTSLIGHT') {
+    return <BackgroundEffects version="dots" />;
+  }
+
   return null;
 }

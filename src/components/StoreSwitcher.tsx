@@ -17,7 +17,12 @@ const StoreSwitcher = () => {
   useEffect(() => {
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      const color = theme === 'DARK' ? '#1A1A1A' : '#FFFFFF';
+      const color =
+        theme === 'DARK' || theme === 'DOTS'
+          ? '#050709'
+          : theme === 'DOTSLIGHT'
+            ? '#F3EEE3'
+            : '#FFFFFF';
       metaThemeColor.setAttribute('content', color);
     }
   }, [theme]);

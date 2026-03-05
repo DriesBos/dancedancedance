@@ -7,7 +7,9 @@ export type Theme =
   | 'STEDELIJK'
   | 'LIGHT'
   | 'DARK'
-  | 'KUSAMA';
+  | 'KUSAMA'
+  | 'DOTS'
+  | 'DOTSLIGHT';
 
 export type Space = 'DESKTOP' | '3D';
 
@@ -36,6 +38,8 @@ export const THEME_ORDER: Theme[] = [
   'LIGHT',
   'DARK',
   'KUSAMA',
+  'DOTS',
+  'DOTSLIGHT',
 ];
 
 export const useStore = create<Props & Actions>()((set) => ({

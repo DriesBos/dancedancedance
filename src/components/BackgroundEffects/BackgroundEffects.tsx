@@ -8,6 +8,7 @@ import {
   SEGMENTS_DEFAULT_PARAMS,
 } from './segmentsSketch';
 import { createKusamaSketch, KUSAMA_DEFAULT_PARAMS } from './kusamaSketch';
+import DotsScene from './dotsScene';
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
@@ -16,8 +17,22 @@ const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
 
 type BackgroundEffectsProps = {
-  version: 'radiating' | 'segments' | 'kusama';
+  version: 'radiating' | 'segments' | 'kusama' | 'dots';
 };
+
+const DOTS_LIGHT_COLOR_VAR_NAMES = [
+  '--be-dots-light-dot-color-1',
+  '--be-dots-light-dot-color-2',
+  '--be-dots-light-dot-color-3',
+  '--be-dots-light-dot-color-4',
+  '--be-dots-light-dot-color-5',
+  '--be-dots-light-dot-color-6',
+  '--be-dots-light-dot-color-7',
+  '--be-dots-light-dot-color-8',
+  '--be-dots-light-dot-color-9',
+  '--be-dots-light-dot-color-10',
+  '--be-dots-light-dot-color-11',
+] as const;
 
 function RadiatingBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -68,11 +83,6 @@ function RadiatingBackground() {
     const root = rootRef.current;
     const spinLayer = spinLayerRef.current;
     if (!root || !spinLayer) return;
-
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    if (prefersReducedMotion) return;
 
     const rawDuration = getComputedStyle(root)
       .getPropertyValue('--rb-rotation-duration')
@@ -227,7 +237,106 @@ function KusamaBackground() {
   );
 }
 
+function DotsBackground() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const scrollProgressRef = useRef(0);
+  const [sceneColors, setSceneColors] = useState({
+    background: '#050709',
+    dotColors: ['#ffffff'],
+    dotSize: 0.5,
+  });
+
+  useEffect(() => {
+    const host = rootRef.current;
+    if (!host) return;
+
+    const updateColors = () => {
+      const styles = getComputedStyle(host);
+      const themeName = document.body?.getAttribute('data-theme') || '';
+      const useLightDotsPalette = themeName === 'DOTSLIGHT';
+      const bgVarName = useLightDotsPalette
+        ? '--be-dots-light-bg-color'
+        : '--be-dots-bg-color';
+      const dotVarName = useLightDotsPalette
+        ? '--be-dots-light-dot-color'
+        : '--be-dots-dot-color';
+      const background =
+        styles.getPropertyValue(bgVarName).trim() ||
+        styles.getPropertyValue('--theme-bg').trim() ||
+        '#050709';
+      const dot =
+        styles.getPropertyValue(dotVarName).trim() ||
+        styles.getPropertyValue('--theme-type').trim() ||
+        '#ffffff';
+      const dotColors = useLightDotsPalette
+        ? DOTS_LIGHT_COLOR_VAR_NAMES.map((varName) =>
+            styles.getPropertyValue(varName).trim(),
+          ).filter(Boolean)
+        : [dot];
+      setSceneColors({
+        background,
+        dotColors: dotColors.length > 0 ? dotColors : [dot],
+        dotSize: useLightDotsPalette ? 1 : 0.5,
+      });
+    };
+
+    updateColors();
+    window.addEventListener('resize', updateColors, { passive: true });
+
+    const observer = new MutationObserver(updateColors);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateColors);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateScrollProgress = () => {
+      const root = document.documentElement;
+      const maxScroll = Math.max(1, root.scrollHeight - window.innerHeight);
+      const progress = window.scrollY / maxScroll;
+      scrollProgressRef.current = Math.max(0, Math.min(1, progress));
+    };
+
+    updateScrollProgress();
+
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    window.addEventListener('resize', updateScrollProgress, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', updateScrollProgress);
+      window.removeEventListener('resize', updateScrollProgress);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={rootRef}
+      className={`${styles.root} ${styles.dotsRoot}`}
+      data-version="dots"
+      aria-hidden="true"
+    >
+      <DotsScene
+        className={styles.dotsCanvas}
+        backgroundColor={sceneColors.background}
+        dotColors={sceneColors.dotColors}
+        dotSize={sceneColors.dotSize}
+        scrollProgressRef={scrollProgressRef}
+      />
+    </div>
+  );
+}
+
 export default function BackgroundEffects({ version }: BackgroundEffectsProps) {
+  if (version === 'dots') {
+    return <DotsBackground />;
+  }
+
   if (version === 'kusama') {
     return <KusamaBackground />;
   }
