@@ -10,6 +10,7 @@ import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
+import IconMail from '../Icons/IconMail';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
@@ -818,11 +819,11 @@ const BlokHead = ({}: Props) => {
           )}
           {pathName === 'about' && (
             <>
-              {/* <div className="icon">
-                <Link href="/about">
+              <div className="icon">
+                <Link href="mailto:info@driesbos.com?subject=Let's Make Internet">
                   <IconMail />
                 </Link>
-              </div> */}
+              </div>
               <Link href="/" className="icon cursorMagnetic">
                 <IconClose />
               </Link>

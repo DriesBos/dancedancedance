@@ -41,7 +41,7 @@ const BlokFooter = () => {
         </div>
         <div className="column column-FooterColumn">
           <a
-            href="mailto:info@driesbos.com"
+            href="mailto:info@driesbos.com?subject=Let's Make Internet"
             target="_blank"
             className="linkAnimation cursorMessage"
             data-cursor-message="Let's talk"

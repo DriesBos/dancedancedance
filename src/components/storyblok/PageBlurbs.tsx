@@ -123,11 +123,11 @@ function generateItemPositions(itemCount: number): Position[] {
     // Clamp to ensure items stay within canvas bounds
     const clampedX = Math.max(
       edgePadding,
-      Math.min(canvasWidth - edgePadding - itemSize.width, x)
+      Math.min(canvasWidth - edgePadding - itemSize.width, x),
     );
     const clampedY = Math.max(
       edgePadding,
-      Math.min(canvasHeight - edgePadding - itemSize.height, y)
+      Math.min(canvasHeight - edgePadding - itemSize.height, y),
     );
 
     positions.push({ x: clampedX, y: clampedY });
@@ -152,7 +152,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
   const [canvasOffset, setCanvasOffset] = useState<Position>({ x: 0, y: 0 });
   const [introComplete, setIntroComplete] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<'standard' | 'overview'>(
-    'standard'
+    'standard',
   );
 
   // Generate positions for all items
@@ -511,7 +511,7 @@ const PageBlurbs = ({ blok }: PageBlurbsProps) => {
           <div className="page-Blurbs-Header-Bottom-Right">
             <div className="page-Blurbs-Header-Bottom-Icons-Email">
               <a
-                href="mailto:info@driesbos.com"
+                href="mailto:info@driesbos.com?subject=Let's Make Internet"
                 target="_blank"
                 className="linkAnimation cursorMessage"
                 data-cursor-message="Let's talk"
