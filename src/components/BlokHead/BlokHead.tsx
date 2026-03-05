@@ -5,6 +5,7 @@ import { useStore } from '@/store/store';
 import { useProjects } from '@/providers/projects-provider';
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useSwipeable } from 'react-swipeable';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
@@ -65,8 +66,6 @@ const BlokHead = ({}: Props) => {
   const spaceToggleTimeoutRef = useRef<number | null>(null);
   const isHoveringTopPanelZoneRef = useRef(false);
   const TITLE_MARQUEE_PX_PER_SECOND = 10;
-  const SWIPE_MIN_X = 56;
-  const SWIPE_MAX_Y = 80;
 
   const currentSlug = useMemo(
     () => currentPath.split('/')[2] || '',
@@ -204,6 +203,21 @@ const BlokHead = ({}: Props) => {
       router.push(prevSlug);
     }
   }, [router, projectSlugs, currentProjectIndex]);
+
+  const projectPageSwipeHandlers = useSwipeable({
+    trackTouch: true,
+    trackMouse: false,
+    delta: { left: 56, right: 56 },
+    preventScrollOnSwipe: false,
+    onSwipedLeft: () => {
+      if (pathName !== 'projects') return;
+      clickPrev();
+    },
+    onSwipedRight: () => {
+      if (pathName !== 'projects') return;
+      clickNext();
+    },
+  });
 
   const isPagePastTop = useCallback(() => {
     const page = document.querySelector('.page');
@@ -690,117 +704,19 @@ const BlokHead = ({}: Props) => {
   }, []);
 
   useEffect(() => {
-    if (pathName !== 'projects') return;
-    if (!projectSlugs || projectSlugs.length === 0) return;
-
     const main = document.querySelector('main');
-    if (!main) return;
+    if (!(main instanceof HTMLElement)) return;
 
-    let startX: number | null = null;
-    let startY: number | null = null;
-    let activePointerId: number | null = null;
-    let activeTouchId: number | null = null;
-
-    const resetGesture = () => {
-      startX = null;
-      startY = null;
-      activePointerId = null;
-      activeTouchId = null;
-    };
-
-    const handleSwipeEnd = (endX: number, endY: number) => {
-      if (startX === null || startY === null) return;
-
-      const deltaX = endX - startX;
-      const deltaY = endY - startY;
-      resetGesture();
-
-      if (Math.abs(deltaX) < SWIPE_MIN_X) return;
-      if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
-      if (Math.abs(deltaY) > SWIPE_MAX_Y) return;
-
-      if (deltaX < 0) {
-        clickPrev();
-        return;
-      }
-      clickNext();
-    };
-
-    const listenerOptions: AddEventListenerOptions = { passive: true };
-
-    if (typeof window.PointerEvent === 'function') {
-      const onPointerDown = (e: PointerEvent) => {
-        if (e.pointerType !== 'touch') return;
-        activePointerId = e.pointerId;
-        startX = e.clientX;
-        startY = e.clientY;
-      };
-
-      const onPointerUp = (e: PointerEvent) => {
-        if (e.pointerType !== 'touch') return;
-        if (activePointerId === null || e.pointerId !== activePointerId) return;
-        handleSwipeEnd(e.clientX, e.clientY);
-      };
-
-      const onPointerCancel = (e: PointerEvent) => {
-        if (e.pointerType !== 'touch') return;
-        if (activePointerId === null || e.pointerId !== activePointerId) return;
-        resetGesture();
-      };
-
-      main.addEventListener('pointerdown', onPointerDown, listenerOptions);
-      window.addEventListener('pointerup', onPointerUp, listenerOptions);
-      window.addEventListener('pointercancel', onPointerCancel, listenerOptions);
-
-      return () => {
-        main.removeEventListener('pointerdown', onPointerDown, listenerOptions);
-        window.removeEventListener('pointerup', onPointerUp, listenerOptions);
-        window.removeEventListener(
-          'pointercancel',
-          onPointerCancel,
-          listenerOptions,
-        );
-      };
+    if (pathName !== 'projects') {
+      projectPageSwipeHandlers.ref(null);
+      return;
     }
 
-    const onTouchStart = (e: TouchEvent) => {
-      const firstTouch = e.changedTouches[0];
-      if (!firstTouch) return;
-      activeTouchId = firstTouch.identifier;
-      startX = firstTouch.clientX;
-      startY = firstTouch.clientY;
-    };
-
-    const onTouchEnd = (e: TouchEvent) => {
-      if (activeTouchId === null) return;
-      const touch = Array.from(e.changedTouches).find(
-        (item) => item.identifier === activeTouchId,
-      );
-      if (!touch) return;
-      handleSwipeEnd(touch.clientX, touch.clientY);
-    };
-
-    const onTouchCancel = () => {
-      resetGesture();
-    };
-
-    main.addEventListener('touchstart', onTouchStart, listenerOptions);
-    window.addEventListener('touchend', onTouchEnd, listenerOptions);
-    window.addEventListener('touchcancel', onTouchCancel, listenerOptions);
-
+    projectPageSwipeHandlers.ref(main);
     return () => {
-      main.removeEventListener('touchstart', onTouchStart, listenerOptions);
-      window.removeEventListener('touchend', onTouchEnd, listenerOptions);
-      window.removeEventListener('touchcancel', onTouchCancel, listenerOptions);
+      projectPageSwipeHandlers.ref(null);
     };
-  }, [
-    pathName,
-    projectSlugs,
-    clickPrev,
-    clickNext,
-    SWIPE_MIN_X,
-    SWIPE_MAX_Y,
-  ]);
+  }, [pathName, projectPageSwipeHandlers]);
 
   // Set Escape Key and Arrow Keys
   useEffect(() => {

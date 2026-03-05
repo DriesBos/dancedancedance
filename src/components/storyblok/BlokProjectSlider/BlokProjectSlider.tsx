@@ -4,6 +4,7 @@ import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { useSwipeable } from 'react-swipeable';
 import { gsap, useGSAP } from '@/lib/gsap';
 import MuxPlayer from '@/components/MuxPlayer';
 import SliderIndicators from '@/components/SliderIndicators';
@@ -157,6 +158,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [isHovering, setIsHovering] = useState(false);
   const [hasCursor, setHasCursor] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
+  const suppressTapUntilRef = useRef(0);
 
   const currentItem = blok.body?.[activeIndex];
   const currentDuration = currentItem?.duration || 800;
@@ -217,12 +219,46 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     setIsHovering(false);
   };
 
+  const swipeToPrevSlide = () => {
+    if (!blok.body || blok.body.length <= 1) return;
+    setActiveIndex((prevIndex) =>
+      (prevIndex - 1 + blok.body.length) % blok.body.length,
+    );
+  };
+
+  const swipeToNextSlide = () => {
+    if (!blok.body || blok.body.length <= 1) return;
+    setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
+  };
+
+  const swipeHandlers = useSwipeable({
+    trackTouch: true,
+    trackMouse: false,
+    delta: { left: 48, right: 48 },
+    preventScrollOnSwipe: false,
+    onSwipedLeft: () => {
+      suppressTapUntilRef.current = Date.now() + 400;
+      swipeToNextSlide();
+    },
+    onSwipedRight: () => {
+      suppressTapUntilRef.current = Date.now() + 400;
+      swipeToPrevSlide();
+    },
+  });
+
+  const handleTapTargetClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (Date.now() >= suppressTapUntilRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   if (!blok.body || blok.body.length === 0) return null;
 
   return (
     <div
       className={`blok blok-Animate ${styles.root}`}
       {...storyblokEditable(blok)}
+      {...swipeHandlers}
     >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
@@ -247,6 +283,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           href={currentItem.link.cached_url}
           className={styles.tapTarget}
           aria-label={`Open project ${String(currentItem.name || '')}`.trim()}
+          onClick={handleTapTargetClick}
         />
       )}
 
