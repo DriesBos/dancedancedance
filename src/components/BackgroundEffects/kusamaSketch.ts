@@ -4,8 +4,6 @@ import { Delaunay } from 'd3-delaunay';
 export type KusamaParams = {
   cellSize: number;
   jitter: number;
-  driftAmplitude: number;
-  driftSpeed: number;
   rippleRadius: number;
   rippleStrength: number;
   lineThickness: number;
@@ -13,14 +11,12 @@ export type KusamaParams = {
 };
 
 export const KUSAMA_DEFAULT_PARAMS: KusamaParams = {
-  cellSize: 74,
-  jitter: 0.32,
-  driftAmplitude: 1.1,
-  driftSpeed: 0.001,
-  rippleRadius: 180,
-  rippleStrength: 2.4,
+  cellSize: 50,
+  jitter: 1,
+  rippleRadius: 250,
+  rippleStrength: 50,
   lineThickness: 1,
-  opacity: 0.95,
+  opacity: 0.9,
 };
 
 type KusamaSketchOptions = {
@@ -51,6 +47,15 @@ type PointerState = {
   x: number;
   y: number;
   intensity: number;
+  velocity: number;
+};
+
+type Edge = {
+  ax: number;
+  ay: number;
+  bx: number;
+  by: number;
+  key: string;
 };
 
 function clamp(value: number, min: number, max: number): number {
@@ -61,8 +66,28 @@ function clamp01(value: number): number {
   return clamp(value, 0, 1);
 }
 
-function createSeeds(width: number, height: number, params: KusamaParams): KusamaSeed[] {
-  const spacing = Math.max(32, params.cellSize);
+function quantize(value: number, step = 0.5): number {
+  return Math.round(value / step) * step;
+}
+
+function edgeKey(ax: number, ay: number, bx: number, by: number): string {
+  const aX = quantize(ax);
+  const aY = quantize(ay);
+  const bX = quantize(bx);
+  const bY = quantize(by);
+
+  if (aX < bX || (aX === bX && aY <= bY)) {
+    return `${aX},${aY}|${bX},${bY}`;
+  }
+  return `${bX},${bY}|${aX},${aY}`;
+}
+
+function createSeeds(
+  width: number,
+  height: number,
+  params: KusamaParams,
+): KusamaSeed[] {
+  const spacing = Math.max(28, params.cellSize);
   const cols = Math.ceil(width / spacing) + 3;
   const rows = Math.ceil(height / spacing) + 3;
   const seeds: KusamaSeed[] = [];
@@ -80,8 +105,8 @@ function createSeeds(width: number, height: number, params: KusamaParams): Kusam
         anchorY: y + Math.sin(jitterAngle) * jitterScale,
         phaseX: Math.random() * Math.PI * 2,
         phaseY: Math.random() * Math.PI * 2,
-        freqX: 0.85 + Math.random() * 0.5,
-        freqY: 0.85 + Math.random() * 0.5,
+        freqX: 0.8 + Math.random() * 0.6,
+        freqY: 0.8 + Math.random() * 0.6,
         ampScale: 0.7 + Math.random() * 0.6,
       });
     }
@@ -90,23 +115,31 @@ function createSeeds(width: number, height: number, params: KusamaParams): Kusam
   return seeds;
 }
 
-function resolveStyles(host: HTMLElement, params: KusamaParams): ResolvedStyles {
+function resolveStyles(
+  host: HTMLElement,
+  params: KusamaParams,
+): ResolvedStyles {
   const computedStyles = getComputedStyle(host);
   const backgroundColor =
     computedStyles.getPropertyValue('--be-kusama-bg-color').trim() || '#f4eee2';
   const lineColor =
-    computedStyles.getPropertyValue('--be-kusama-line-color').trim() || '#ba3a52';
-  const rawWidth = computedStyles.getPropertyValue('--be-kusama-line-width').trim();
+    computedStyles.getPropertyValue('--be-kusama-line-color').trim() ||
+    '#ba3a52';
+  const rawWidth = computedStyles
+    .getPropertyValue('--be-kusama-line-width')
+    .trim();
   const parsedWidth = Number.parseFloat(rawWidth);
-  const cssWidth = Number.isFinite(parsedWidth) && parsedWidth > 0 ? parsedWidth : 1;
+  const cssWidth =
+    Number.isFinite(parsedWidth) && parsedWidth > 0 ? parsedWidth : 1;
+  const thicknessScale =
+    Number.isFinite(params.lineThickness) && params.lineThickness > 0
+      ? params.lineThickness
+      : 1;
 
   return {
     backgroundColor,
     lineColor,
-    lineWidth:
-      Number.isFinite(params.lineThickness) && params.lineThickness > 0
-        ? params.lineThickness
-        : cssWidth,
+    lineWidth: Math.max(0.25, cssWidth * thicknessScale),
     opacity: clamp01(params.opacity),
   };
 }
@@ -117,25 +150,14 @@ function buildAnimatedPoints(
   pointer: PointerState,
   width: number,
   height: number,
-  elapsedSeconds: number,
-  prefersReducedMotion: boolean,
 ): [number, number][] {
   const points: [number, number][] = [];
   const radius = Math.max(24, params.rippleRadius);
   const radiusSq = radius * radius;
-  const baseDrift = prefersReducedMotion ? 0 : params.driftAmplitude;
 
   for (const seed of seeds) {
-    let x =
-      seed.anchorX
-      + Math.sin(elapsedSeconds * params.driftSpeed * seed.freqX + seed.phaseX)
-        * baseDrift
-        * seed.ampScale;
-    let y =
-      seed.anchorY
-      + Math.cos(elapsedSeconds * params.driftSpeed * seed.freqY + seed.phaseY)
-        * baseDrift
-        * seed.ampScale;
+    let x = seed.anchorX;
+    let y = seed.anchorY;
 
     if (pointer.intensity > 0) {
       const dx = x - pointer.x;
@@ -143,19 +165,92 @@ function buildAnimatedPoints(
       const distSq = dx * dx + dy * dy;
       if (distSq < radiusSq) {
         const dist = Math.max(0.0001, Math.sqrt(distSq));
-        const normalizedDx = dx / dist;
-        const normalizedDy = dy / dist;
-        const falloff = Math.exp(-distSq / (radiusSq * 0.65));
-        const push = params.rippleStrength * pointer.intensity * falloff;
-        x += normalizedDx * push;
-        y += normalizedDy * push;
+        const ndx = dx / dist;
+        const ndy = dy / dist;
+        const influence = 1 - dist / radius;
+        const falloff = influence * influence;
+        const velocityBoost = 1 + pointer.velocity * 0.4;
+        const push =
+          params.rippleStrength * pointer.intensity * falloff * velocityBoost;
+
+        // Repel interaction.
+        x += ndx * push;
+        y += ndy * push;
       }
     }
 
-    points.push([clamp(x, -8, width + 8), clamp(y, -8, height + 8)]);
+    points.push([clamp(x, -12, width + 12), clamp(y, -12, height + 12)]);
   }
 
   return points;
+}
+
+function getVoronoiEdges(voronoi: any, width: number, height: number): Edge[] {
+  const map = new Map<string, Edge>();
+  const epsilon = 0.75;
+
+  for (const polygon of voronoi.cellPolygons()) {
+    const points = Array.from(polygon as Iterable<[number, number]>);
+    if (points.length < 2) {
+      continue;
+    }
+
+    for (let i = 0; i < points.length - 1; i += 1) {
+      const [ax, ay] = points[i];
+      const [bx, by] = points[i + 1];
+      if (
+        !Number.isFinite(ax) ||
+        !Number.isFinite(ay) ||
+        !Number.isFinite(bx) ||
+        !Number.isFinite(by)
+      ) {
+        continue;
+      }
+
+      if (Math.hypot(bx - ax, by - ay) < 1) {
+        continue;
+      }
+
+      const onLeft = Math.abs(ax) <= epsilon && Math.abs(bx) <= epsilon;
+      const onRight =
+        Math.abs(ax - width) <= epsilon && Math.abs(bx - width) <= epsilon;
+      const onTop = Math.abs(ay) <= epsilon && Math.abs(by) <= epsilon;
+      const onBottom =
+        Math.abs(ay - height) <= epsilon && Math.abs(by - height) <= epsilon;
+      if (onLeft || onRight || onTop || onBottom) {
+        continue;
+      }
+
+      const key = edgeKey(ax, ay, bx, by);
+      if (!map.has(key)) {
+        map.set(key, { ax, ay, bx, by, key });
+      }
+    }
+  }
+
+  return [...map.values()];
+}
+
+function renderStraightEdges(
+  context: CanvasRenderingContext2D,
+  edges: Edge[],
+  styles: ResolvedStyles,
+) {
+  context.save();
+  context.globalAlpha = styles.opacity;
+  context.beginPath();
+
+  for (const edge of edges) {
+    context.moveTo(edge.ax, edge.ay);
+    context.lineTo(edge.bx, edge.by);
+  }
+
+  context.lineWidth = styles.lineWidth;
+  context.lineCap = 'butt';
+  context.lineJoin = 'miter';
+  context.strokeStyle = styles.lineColor;
+  context.stroke();
+  context.restore();
 }
 
 export function createKusamaSketch(options: KusamaSketchOptions) {
@@ -172,22 +267,39 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       x: 0,
       y: 0,
       intensity: 0,
+      velocity: 0,
     };
-    let prefersReducedMotion = false;
+    const teardownFns: Array<() => void> = [];
 
     const setupSeeds = () => {
       seeds = createSeeds(instance.width, instance.height, settings);
     };
 
     const updatePointer = (x: number, y: number, boost: number) => {
+      const dx = x - pointer.x;
+      const dy = y - pointer.y;
+      pointer.velocity = clamp(Math.hypot(dx, dy) / 28, 0, 3);
       pointer.active = true;
       pointer.x = x;
       pointer.y = y;
       pointer.intensity = Math.max(pointer.intensity, clamp01(boost));
     };
 
+    const fadePointer = () => {
+      pointer.intensity *= 0.93;
+      pointer.velocity *= 0.85;
+      if (pointer.intensity < 0.01) {
+        pointer.intensity = 0;
+        pointer.velocity = 0;
+        pointer.active = false;
+      }
+    };
+
     instance.setup = () => {
-      const canvas = instance.createCanvas(instance.windowWidth, instance.windowHeight);
+      const canvas = instance.createCanvas(
+        instance.windowWidth,
+        instance.windowHeight,
+      );
       canvas.parent(options.host);
       if (options.canvasClassName) {
         canvas.elt.className = options.canvasClassName;
@@ -195,10 +307,38 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
 
       instance.pixelDensity(1);
       instance.frameRate(30);
-      prefersReducedMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
       setupSeeds();
+
+      const onPointerMove = (event: PointerEvent) => {
+        updatePointer(event.clientX, event.clientY, 0.72);
+      };
+      const onPointerDown = (event: PointerEvent) => {
+        updatePointer(event.clientX, event.clientY, 1);
+      };
+      const onPointerLeave = () => {
+        pointer.active = false;
+      };
+
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerdown', onPointerDown, { passive: true });
+      window.addEventListener('pointerleave', onPointerLeave, {
+        passive: true,
+      });
+
+      teardownFns.push(() => {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointerleave', onPointerLeave);
+      });
+
+      const originalRemove = instance.remove.bind(instance);
+      instance.remove = (() => {
+        for (const teardown of teardownFns) {
+          teardown();
+        }
+        teardownFns.length = 0;
+        originalRemove();
+      }) as typeof instance.remove;
     };
 
     instance.draw = () => {
@@ -211,64 +351,24 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         pointer,
         instance.width,
         instance.height,
-        instance.millis() * 0.06,
-        prefersReducedMotion,
       );
 
       if (points.length >= 3) {
         const delaunay = Delaunay.from(points);
-        const voronoi = delaunay.voronoi([0, 0, instance.width, instance.height]);
+        const voronoi = delaunay.voronoi([
+          0,
+          0,
+          instance.width,
+          instance.height,
+        ]);
+        const edges = getVoronoiEdges(voronoi, instance.width, instance.height);
         const context = instance.drawingContext as CanvasRenderingContext2D;
-        context.save();
-        context.globalAlpha = styles.opacity;
-        context.beginPath();
-        voronoi.render(context);
-        context.lineWidth = styles.lineWidth;
-        context.lineCap = 'round';
-        context.lineJoin = 'round';
-        context.strokeStyle = styles.lineColor;
-        context.stroke();
-        context.restore();
+        renderStraightEdges(context, edges, styles);
       }
 
       if (pointer.active) {
-        pointer.intensity *= 0.92;
-        if (pointer.intensity < 0.01) {
-          pointer.intensity = 0;
-          pointer.active = false;
-        }
+        fadePointer();
       }
-    };
-
-    instance.mouseMoved = () => {
-      updatePointer(instance.mouseX, instance.mouseY, 0.3);
-      return false;
-    };
-
-    instance.mouseDragged = () => {
-      updatePointer(instance.mouseX, instance.mouseY, 0.45);
-      return false;
-    };
-
-    (instance as any).mouseOut = () => {
-      pointer.active = false;
-    };
-
-    (instance as any).touchMoved = () => {
-      const touches = ((instance as any).touches ?? []) as Array<{
-        x: number;
-        y: number;
-      }>;
-      if (touches.length > 0) {
-        const point = touches[0];
-        updatePointer(point.x, point.y, 0.35);
-      }
-      return false;
-    };
-
-    (instance as any).touchEnded = () => {
-      pointer.active = false;
-      return false;
     };
 
     instance.windowResized = () => {
