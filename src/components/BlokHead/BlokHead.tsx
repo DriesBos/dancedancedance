@@ -28,6 +28,9 @@ type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
 
 const BlokHead = ({}: Props) => {
   const headRef = useRef<HTMLDivElement>(null);
+  const titleViewportRef = useRef<HTMLDivElement>(null);
+  const titleTrackRef = useRef<HTMLDivElement>(null);
+  const titleMarqueeRef = useRef<gsap.core.Timeline | null>(null);
   const path = usePathname();
   const currentPath = path || '/';
   const router = useRouter();
@@ -61,6 +64,7 @@ const BlokHead = ({}: Props) => {
   const spaceToggleRafRef = useRef<number | null>(null);
   const spaceToggleTimeoutRef = useRef<number | null>(null);
   const isHoveringTopPanelZoneRef = useRef(false);
+  const TITLE_MARQUEE_PX_PER_SECOND = 10;
 
   const currentSlug = useMemo(
     () => currentPath.split('/')[2] || '',
@@ -532,7 +536,11 @@ const BlokHead = ({}: Props) => {
     topPanel?.addEventListener('touchstart', onTouchStart, listenerOptions);
     return () => {
       main.removeEventListener('touchstart', onTouchStart, listenerOptions);
-      topPanel?.removeEventListener('touchstart', onTouchStart, listenerOptions);
+      topPanel?.removeEventListener(
+        'touchstart',
+        onTouchStart,
+        listenerOptions,
+      );
     };
   }, [isThreeDSpace, openTopPanelFromTouch]);
 
@@ -597,6 +605,75 @@ const BlokHead = ({}: Props) => {
   }, [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode]);
 
   useEffect(() => {
+    const viewport = titleViewportRef.current;
+    const track = titleTrackRef.current;
+    if (!viewport || !track) return;
+
+    let resizeObserver: ResizeObserver | null = null;
+    let rafId: number | null = null;
+
+    const clearTitleMarquee = () => {
+      if (titleMarqueeRef.current) {
+        titleMarqueeRef.current.kill();
+        titleMarqueeRef.current = null;
+      }
+      gsap.set(track, { x: 0 });
+    };
+
+    const buildTitleMarquee = () => {
+      clearTitleMarquee();
+
+      const overflow = track.scrollWidth - viewport.clientWidth;
+      if (overflow <= 1) return;
+
+      const duration = overflow / TITLE_MARQUEE_PX_PER_SECOND;
+      const marquee = gsap.timeline({ repeat: -1 });
+
+      marquee
+        .to({}, { duration: 2 })
+        .to(track, {
+          x: -overflow,
+          duration,
+          ease: 'none',
+        })
+        .to({}, { duration: 2 })
+        .set(track, { x: 0 });
+
+      titleMarqueeRef.current = marquee;
+    };
+
+    const scheduleBuild = () => {
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        buildTitleMarquee();
+      });
+    };
+
+    scheduleBuild();
+    document.fonts?.ready.then(scheduleBuild).catch(() => {});
+
+    if (typeof window.ResizeObserver === 'function') {
+      resizeObserver = new ResizeObserver(scheduleBuild);
+      resizeObserver.observe(viewport);
+      resizeObserver.observe(track);
+    }
+
+    window.addEventListener('resize', scheduleBuild);
+
+    return () => {
+      window.removeEventListener('resize', scheduleBuild);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+      resizeObserver?.disconnect();
+      clearTitleMarquee();
+    };
+  }, [pathName, projectName, TITLE_MARQUEE_PX_PER_SECOND]);
+
+  useEffect(() => {
     return () => {
       if (themeSpinTimeoutRef.current !== null) {
         window.clearTimeout(themeSpinTimeoutRef.current);
@@ -650,24 +727,28 @@ const BlokHead = ({}: Props) => {
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row>
-        <div className="column column-Title ellipsis">
-          {(pathName === 'home' ||
-            pathName === 'about' ||
-            pathName === 'projects') && (
-            <Link href="/" className="cursorInteract">
-              Dries Bos&nbsp;
-            </Link>
-          )}
-          <Link href="/" className="cursorInteract">
-            {(pathName === 'home' || pathName === 'about') && (
-              <span className="cursorInteract">— Creative Developer</span>
-            )}
-          </Link>
-          <Link href="/">
-            {pathName === 'projects' && (
-              <span className="cursorInteract ">& {projectName}</span>
-            )}
-          </Link>
+        <div className="column column-Title">
+          <div ref={titleViewportRef} className={styles.titleMarqueeViewport}>
+            <div ref={titleTrackRef} className={styles.titleMarqueeTrack}>
+              {(pathName === 'home' ||
+                pathName === 'about' ||
+                pathName === 'projects') && (
+                <Link href="/" className="cursorInteract">
+                  Dries Bos&nbsp;
+                </Link>
+              )}
+              <Link href="/" className="cursorInteract">
+                {(pathName === 'home' || pathName === 'about') && (
+                  <span className="cursorInteract">— Creative Developer</span>
+                )}
+              </Link>
+              <Link href="/">
+                {pathName === 'projects' && (
+                  <span className="cursorInteract ">& {projectName}</span>
+                )}
+              </Link>
+            </div>
+          </div>
         </div>
 
         <div className="column column-Icons">

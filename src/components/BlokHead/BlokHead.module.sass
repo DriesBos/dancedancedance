@@ -16,8 +16,22 @@
   :global(.column-Title)
     padding-right: 0
     user-select: none
+    min-width: 0
   :global(.side_Top)
     pointer-events: auto
+
+.titleMarqueeViewport
+  width: 100%
+  min-width: 0
+  overflow: hidden
+
+.titleMarqueeTrack
+  display: inline-flex
+  width: max-content
+  min-width: 100%
+  align-items: center
+  white-space: nowrap
+  will-change: transform
 
 .themeCycle
   width: var(--icon-size)
