@@ -959,6 +959,7 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     const state: SegmentsState = {
       regionPool: createRegionPool(),
     };
+    const teardownFns: Array<() => void> = [];
 
     let ink = resolveInkStyle(options.host, settings);
     let noProgressFrameCount = 0;
@@ -997,11 +998,37 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
       }
 
       instance.pixelDensity(1);
+      instance.frameRate(30);
       instance.noFill();
       lastViewportWidth = instance.windowWidth;
       lastViewportHeight = instance.windowHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
       reset();
+
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          instance.noLoop();
+        } else {
+          instance.loop();
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      teardownFns.push(() => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      });
+
+      if (document.hidden) {
+        instance.noLoop();
+      }
+
+      const originalRemove = instance.remove.bind(instance);
+      instance.remove = (() => {
+        for (const teardown of teardownFns) {
+          teardown();
+        }
+        teardownFns.length = 0;
+        originalRemove();
+      }) as typeof instance.remove;
     };
 
     instance.draw = () => {

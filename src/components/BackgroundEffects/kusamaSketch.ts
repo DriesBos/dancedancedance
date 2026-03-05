@@ -331,12 +331,25 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       window.addEventListener('pointerleave', onPointerLeave, {
         passive: true,
       });
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          instance.noLoop();
+        } else {
+          instance.loop();
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
 
       teardownFns.push(() => {
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerdown', onPointerDown);
         window.removeEventListener('pointerleave', onPointerLeave);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
       });
+
+      if (document.hidden) {
+        instance.noLoop();
+      }
 
       const originalRemove = instance.remove.bind(instance);
       instance.remove = (() => {

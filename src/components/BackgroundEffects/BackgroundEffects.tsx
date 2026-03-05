@@ -96,10 +96,31 @@ function RadiatingBackground() {
       frameId = window.requestAnimationFrame(animate);
     };
 
-    frameId = window.requestAnimationFrame(animate);
+    const startAnimation = () => {
+      if (frameId !== 0 || document.hidden) return;
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    const stopAnimation = () => {
+      if (frameId === 0) return;
+      window.cancelAnimationFrame(frameId);
+      frameId = 0;
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    startAnimation();
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopAnimation();
       lines.removeAttribute('transform');
     };
   }, []);
