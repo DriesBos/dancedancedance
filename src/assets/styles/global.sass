@@ -23,6 +23,15 @@ body
   min-height: 100dvh
   transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
 
+@media (hover: none)
+  body[data-page='projects']
+    touch-action: pan-y
+    overscroll-behavior-x: none
+    overflow-x: clip
+    main, .page, .page-Project
+      touch-action: pan-y
+      overscroll-behavior-x: none
+
 body[data-initializing='true'],
 body[data-initializing='true'] *,
 body[data-initializing='true'] *::before,
