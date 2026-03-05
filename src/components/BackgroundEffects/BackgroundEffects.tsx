@@ -49,13 +49,16 @@ function RadiatingBackground() {
         const dx = Math.cos(angle);
         const dy = Math.sin(angle);
         const fromScale = 0;
-        const toScale = EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy));
+        const baseToScale = EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy));
+        // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
+        const toScale = baseToScale * (1 + 0.025 * Math.sin(index * 0.39));
 
         return {
           x1: CENTER + dx * fromScale,
           y1: CENTER + dy * fromScale,
           x2: CENTER + dx * toScale,
           y2: CENTER + dy * toScale,
+          opacity: 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(index * 0.61)),
         };
       }),
     [lineCount],
@@ -96,31 +99,10 @@ function RadiatingBackground() {
       frameId = window.requestAnimationFrame(animate);
     };
 
-    const startAnimation = () => {
-      if (frameId !== 0 || document.hidden) return;
-      frameId = window.requestAnimationFrame(animate);
-    };
-
-    const stopAnimation = () => {
-      if (frameId === 0) return;
-      window.cancelAnimationFrame(frameId);
-      frameId = 0;
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        stopAnimation();
-      } else {
-        startAnimation();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    startAnimation();
+    frameId = window.requestAnimationFrame(animate);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      stopAnimation();
+      window.cancelAnimationFrame(frameId);
       lines.removeAttribute('transform');
     };
   }, []);
@@ -151,6 +133,7 @@ function RadiatingBackground() {
               y1={line.y1}
               x2={line.x2}
               y2={line.y2}
+              opacity={line.opacity}
             />
           ))}
         </g>

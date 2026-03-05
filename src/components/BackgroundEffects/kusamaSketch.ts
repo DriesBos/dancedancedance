@@ -20,6 +20,7 @@ export const KUSAMA_DEFAULT_PARAMS: KusamaParams = {
 };
 const MOBILE_KUSAMA_CELL_SIZE = 25;
 const KUSAMA_MOBILE_BREAKPOINT_PX = 770;
+const KUSAMA_MOBILE_WIDTH_DELTA_IGNORE_PX = 64;
 
 type KusamaSketchOptions = {
   host: HTMLDivElement;
@@ -264,6 +265,9 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
   return (instance: p5) => {
     let seeds: KusamaSeed[] = [];
     let styles = resolveStyles(options.host, settings);
+    let lastViewportWidth = 0;
+    let lastViewportHeight = 0;
+    let lastOrientation: 'portrait' | 'landscape' = 'landscape';
     const pointer: PointerState = {
       active: false,
       x: 0,
@@ -274,6 +278,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     const teardownFns: Array<() => void> = [];
 
     const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
+    const getOrientation = (width: number, height: number) =>
+      width >= height ? 'landscape' : 'portrait';
+    const isCoarsePointerDevice = () =>
+      window.matchMedia('(pointer: coarse)').matches ||
+      (navigator.maxTouchPoints ?? 0) > 0;
 
     const setupSeeds = () => {
       const resolvedSettings = isNarrowViewport()
@@ -315,6 +324,9 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       instance.pixelDensity(1);
       instance.frameRate(30);
       setupSeeds();
+      lastViewportWidth = instance.windowWidth;
+      lastViewportHeight = instance.windowHeight;
+      lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
 
       const onPointerMove = (event: PointerEvent) => {
         updatePointer(event.clientX, event.clientY, 0.72);
@@ -392,8 +404,25 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     };
 
     instance.windowResized = () => {
-      instance.resizeCanvas(instance.windowWidth, instance.windowHeight);
+      const nextWidth = instance.windowWidth;
+      const nextHeight = instance.windowHeight;
+      const nextOrientation = getOrientation(nextWidth, nextHeight);
+      const widthDelta = Math.abs(nextWidth - lastViewportWidth);
+      const orientationChanged = nextOrientation !== lastOrientation;
+      const isLikelyMobileViewportChurn =
+        isCoarsePointerDevice() &&
+        !orientationChanged &&
+        widthDelta < KUSAMA_MOBILE_WIDTH_DELTA_IGNORE_PX;
+
+      if (isLikelyMobileViewportChurn) {
+        return;
+      }
+
+      instance.resizeCanvas(nextWidth, nextHeight);
       setupSeeds();
+      lastViewportWidth = nextWidth;
+      lastViewportHeight = nextHeight;
+      lastOrientation = nextOrientation;
     };
   };
 }
