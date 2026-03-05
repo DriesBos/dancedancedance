@@ -819,7 +819,7 @@ const BlokHead = ({}: Props) => {
           )}
           {pathName === 'about' && (
             <>
-              <div className="icon">
+              <div className="icon cursorMagnetic">
                 <Link href="mailto:info@driesbos.com?subject=Let's Make Internet">
                   <IconMail />
                 </Link>
