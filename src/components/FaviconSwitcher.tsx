@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useStore } from '@/store/store';
 
 export default function FaviconSwitcher() {
+  const theme = useStore((state) => state.theme);
   const [browserTheme, setBrowserTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
@@ -11,15 +13,11 @@ export default function FaviconSwitcher() {
       return;
     }
 
-    // Check browser's color scheme preference
     const darkModeMediaQuery = window.matchMedia(
-      '(prefers-color-scheme: dark)'
+      '(prefers-color-scheme: dark)',
     );
-
-    // Set initial theme
     setBrowserTheme(darkModeMediaQuery.matches ? 'dark' : 'light');
 
-    // Listen for changes to browser theme
     const handleThemeChange = (e: MediaQueryListEvent) => {
       setBrowserTheme(e.matches ? 'dark' : 'light');
     };
@@ -40,12 +38,33 @@ export default function FaviconSwitcher() {
   }, []);
 
   useEffect(() => {
-    // Find all favicon links
+    const defaultColor = browserTheme === 'dark' ? '#FFFFFF' : '#000000';
+    const themeColor = (() => {
+      switch (theme) {
+        case 'NIGHTMODE':
+          return '#FF0000';
+        case 'TRON':
+          return '#80FFE9';
+        case 'DONJUDD':
+          return '#FA5942';
+        case 'STEDELIJK':
+          return '#62C853';
+        case 'LIGHT':
+          return defaultColor;
+        case 'DARK':
+          return defaultColor;
+        default:
+          return defaultColor;
+      }
+    })();
+
+    const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25"><path d="M12.25,0 C13.625,0 14.75,1.125 14.75,2.5 C14.75,3.875 13.625,5 12.25,5 C10.875,5 9.75,3.875 9.75,2.5 C9.75,1.125 10.875,0 12.25,0 Z M23.5,8.75 L16,8.75 L16,25 L13.5,25 L13.5,17.5 L11,17.5 L11,25 L8.5,25 L8.5,8.75 L1,8.75 L1,6.25 L23.5,6.25 L23.5,8.75 Z" fill="${themeColor}" fill-rule="nonzero"/></svg>`;
+    const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+
     const existingFavicons = document.querySelectorAll(
-      "link[rel='icon'], link[rel='shortcut icon'], link[rel='apple-touch-icon']"
+      "link[rel='icon'], link[rel='shortcut icon']",
     );
 
-    // Remove all existing favicons
     for (let i = 0; i < existingFavicons.length; i += 1) {
       const link = existingFavicons[i];
       if (typeof link.remove === 'function') {
@@ -55,37 +74,18 @@ export default function FaviconSwitcher() {
       }
     }
 
-    const prefix = browserTheme === 'dark' ? 'favicon-dark' : 'favicon-light';
-
-    // Create SVG favicon (best for modern browsers)
     const svgFavicon = document.createElement('link');
     svgFavicon.rel = 'icon';
     svgFavicon.type = 'image/svg+xml';
-    svgFavicon.href = `/${prefix}.svg`;
+    svgFavicon.href = faviconHref;
     document.head.appendChild(svgFavicon);
 
-    // Create PNG favicon 96x96 (for Chrome and most browsers)
-    const pngFavicon = document.createElement('link');
-    pngFavicon.rel = 'icon';
-    pngFavicon.type = 'image/png';
-    pngFavicon.sizes = '96x96';
-    pngFavicon.href = `/${prefix}-96x96.png`;
-    document.head.appendChild(pngFavicon);
-
-    // Create ICO fallback (for older browsers)
-    const icoFavicon = document.createElement('link');
-    icoFavicon.rel = 'icon';
-    icoFavicon.type = 'image/x-icon';
-    icoFavicon.href = `/${prefix}.ico`;
-    document.head.appendChild(icoFavicon);
-
-    // Apple touch icon
-    const appleTouchIcon = document.createElement('link');
-    appleTouchIcon.rel = 'apple-touch-icon';
-    appleTouchIcon.sizes = '180x180';
-    appleTouchIcon.href = `/${prefix}-96x96.png`;
-    document.head.appendChild(appleTouchIcon);
-  }, [browserTheme]);
+    const shortcutIcon = document.createElement('link');
+    shortcutIcon.rel = 'shortcut icon';
+    shortcutIcon.type = 'image/svg+xml';
+    shortcutIcon.href = faviconHref;
+    document.head.appendChild(shortcutIcon);
+  }, [theme, browserTheme]);
 
   return null;
 }
