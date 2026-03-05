@@ -7,6 +7,8 @@ type DotsSceneProps = {
   backgroundColor: string;
   dotColors: string[];
   dotSize: number;
+  densityScale?: number;
+  drawBackground?: boolean;
   className?: string;
   scrollProgressRef: MutableRefObject<number>;
 };
@@ -29,9 +31,11 @@ function clamp(value: number, min: number, max: number): number {
 function DotsField({
   dotColors,
   dotSize,
+  densityScale = 1,
 }: {
   dotColors: string[];
   dotSize: number;
+  densityScale?: number;
 }) {
   const pointsRef = useRef<THREE.Points>(null);
   const geometryRef = useRef<THREE.BufferGeometry>(null);
@@ -56,8 +60,16 @@ function DotsField({
   }, []);
   const { viewport } = useThree();
   const dotCount = useMemo(
-    () => clamp(Math.round(viewport.width * viewport.height * 4.2), 90, 270),
-    [viewport.height, viewport.width],
+    () => {
+      const clampedDensityScale = clamp(densityScale, 0.05, 1.5);
+      const minCount = Math.max(6, Math.round(90 * clampedDensityScale));
+      const maxCount = Math.max(minCount, Math.round(270 * clampedDensityScale));
+      const count = Math.round(
+        viewport.width * viewport.height * 4.2 * clampedDensityScale,
+      );
+      return clamp(count, minCount, maxCount);
+    },
+    [densityScale, viewport.height, viewport.width],
   );
   const positions = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
   const colors = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
@@ -182,6 +194,8 @@ export default function DotsScene({
   backgroundColor,
   dotColors,
   dotSize,
+  densityScale = 1,
+  drawBackground = true,
   className,
   scrollProgressRef,
 }: DotsSceneProps) {
@@ -196,10 +210,14 @@ export default function DotsScene({
         powerPreference: 'high-performance',
       }}
     >
-      <color attach="background" args={[backgroundColor]} />
-      <fog attach="fog" args={[backgroundColor, 20, 64]} />
+      {drawBackground && <color attach="background" args={[backgroundColor]} />}
+      {drawBackground && <fog attach="fog" args={[backgroundColor, 20, 64]} />}
       <CameraRig scrollProgressRef={scrollProgressRef} />
-      <DotsField dotColors={dotColors} dotSize={dotSize} />
+      <DotsField
+        dotColors={dotColors}
+        dotSize={dotSize}
+        densityScale={densityScale}
+      />
     </Canvas>
   );
 }

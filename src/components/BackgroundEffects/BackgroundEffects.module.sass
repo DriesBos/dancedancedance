@@ -15,6 +15,7 @@
   --be-dots-bg-color: black
   --be-dots-dot-color: white
   --be-dots-opacity: 1
+  --be-dots-overlay-opacity: 1
   --be-dots-light-bg-color: #F4F4F4
   --be-dots-light-dot-color: #111111
   --be-dots-light-opacity: 1
@@ -84,6 +85,20 @@
 
 .dotsRoot
   opacity: var(--be-dots-opacity)
+
+.overlayRoot
+  z-index: 4000
+  opacity: 0
+  visibility: hidden
+  pointer-events: none !important
+  transition: opacity var(--transition-theme-quick), visibility 0s linear var(--transition-theme-quick)
+  .dotsCanvas
+    pointer-events: none !important
+
+.overlayVisible
+  opacity: var(--be-dots-overlay-opacity)
+  visibility: visible
+  transition-delay: 0s
 
 .dotsCanvas
   width: 100% !important

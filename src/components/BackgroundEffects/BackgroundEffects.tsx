@@ -18,6 +18,9 @@ const DEFAULT_ROTATION_DURATION_MS = 72000;
 
 type BackgroundEffectsProps = {
   version: 'radiating' | 'segments' | 'kusama' | 'dots';
+  densityScale?: number;
+  layer?: 'background' | 'overlay';
+  active?: boolean;
 };
 
 const DOTS_LIGHT_COLOR_VAR_NAMES = [
@@ -237,7 +240,15 @@ function KusamaBackground() {
   );
 }
 
-function DotsBackground() {
+function DotsBackground({
+  densityScale = 1,
+  layer = 'background',
+  active = true,
+}: {
+  densityScale?: number;
+  layer?: 'background' | 'overlay';
+  active?: boolean;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollProgressRef = useRef(0);
   const [sceneColors, setSceneColors] = useState({
@@ -317,7 +328,11 @@ function DotsBackground() {
   return (
     <div
       ref={rootRef}
-      className={`${styles.root} ${styles.dotsRoot}`}
+      className={`${styles.root} ${styles.dotsRoot} ${
+        layer === 'overlay' ? styles.overlayRoot : ''
+      } ${
+        layer === 'overlay' && active ? styles.overlayVisible : ''
+      }`}
       data-version="dots"
       aria-hidden="true"
     >
@@ -326,15 +341,24 @@ function DotsBackground() {
         backgroundColor={sceneColors.background}
         dotColors={sceneColors.dotColors}
         dotSize={sceneColors.dotSize}
+        densityScale={densityScale}
+        drawBackground={layer !== 'overlay'}
         scrollProgressRef={scrollProgressRef}
       />
     </div>
   );
 }
 
-export default function BackgroundEffects({ version }: BackgroundEffectsProps) {
+export default function BackgroundEffects({
+  version,
+  densityScale,
+  layer,
+  active,
+}: BackgroundEffectsProps) {
   if (version === 'dots') {
-    return <DotsBackground />;
+    return (
+      <DotsBackground densityScale={densityScale} layer={layer} active={active} />
+    );
   }
 
   if (version === 'kusama') {

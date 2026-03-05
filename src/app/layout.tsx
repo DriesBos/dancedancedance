@@ -22,6 +22,7 @@ import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
 import GrainyGradient from '@/components/GrainyGradient';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
+import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverlayEffectsByTheme';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -141,6 +142,7 @@ export default async function RootLayout({
             </main>
           </StoryblokProvider>
         </ProjectsProvider>
+        <DotsOverlayEffectsByTheme />
       </body>
     </html>
   );
