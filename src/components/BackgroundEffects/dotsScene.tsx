@@ -34,11 +34,13 @@ function DotsField({
   dotSize,
   densityScale = 1,
   lockToInitialViewport = false,
+  countScale = 1,
 }: {
   dotColors: string[];
   dotSize: number;
   densityScale?: number;
   lockToInitialViewport?: boolean;
+  countScale?: number;
 }) {
   const pointsRef = useRef<THREE.Points>(null);
   const geometryRef = useRef<THREE.BufferGeometry>(null);
@@ -90,14 +92,23 @@ function DotsField({
   const dotCount = useMemo(
     () => {
       const clampedDensityScale = clamp(densityScale, 0.05, 1.5);
+      const clampedCountScale = clamp(countScale, 0.2, 1);
       const minCount = Math.max(6, Math.round(90 * clampedDensityScale));
       const maxCount = Math.max(minCount, Math.round(270 * clampedDensityScale));
       const count = Math.round(
         viewportWidth * viewportHeight * 4.2 * clampedDensityScale,
       );
-      return clamp(count, minCount, maxCount);
+      const baseCount = clamp(count, minCount, maxCount);
+      const scaledMinCount = Math.max(3, Math.round(minCount * clampedCountScale));
+      const scaledMaxCount = Math.max(
+        scaledMinCount,
+        Math.round(maxCount * clampedCountScale),
+      );
+      const scaledCount = Math.round(baseCount * clampedCountScale);
+
+      return clamp(scaledCount, scaledMinCount, scaledMaxCount);
     },
-    [densityScale, viewportHeight, viewportWidth],
+    [countScale, densityScale, viewportHeight, viewportWidth],
   );
   const positions = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
   const colors = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
@@ -242,6 +253,8 @@ export default function DotsScene({
   scrollProgressRef,
   disableInputs = false,
 }: DotsSceneProps) {
+  const countScale = disableInputs ? 0.5 : 1;
+
   return (
     <Canvas
       className={className}
@@ -265,6 +278,7 @@ export default function DotsScene({
         dotSize={dotSize}
         densityScale={densityScale}
         lockToInitialViewport={disableInputs}
+        countScale={countScale}
       />
     </Canvas>
   );
