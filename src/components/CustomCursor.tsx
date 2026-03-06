@@ -234,11 +234,15 @@ export default function CustomCursor() {
       (target.hasAttribute('data-cursor-message') ||
         target.hasAttribute('data-cursor-preview'));
 
-    const resolveFollowerMode = (hoveredElement: Element | null): FollowerMode => {
+    const resolveFollowerMode = (
+      hoveredElement: Element | null,
+    ): FollowerMode => {
       const magneticTarget = hoveredElement?.closest('.cursorMagnetic');
       if (magneticTarget) return 'magnetic';
 
-      const interactTarget = hoveredElement?.closest('.cursorInteract, .markdown a');
+      const interactTarget = hoveredElement?.closest(
+        '.cursorInteract, .markdown a',
+      );
       if (interactTarget && !shouldSkipInteractSize(interactTarget)) {
         return 'interact';
       }
