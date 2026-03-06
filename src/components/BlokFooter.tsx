@@ -13,6 +13,7 @@ import { useStore } from '@/store/store';
 const BlokFooter = () => {
   const theme = useStore((state) => state.theme);
   const cycleTheme = useStore((state) => state.cycleTheme);
+  const themeLabel = `${theme.charAt(0)}${theme.slice(1).toLowerCase()}`;
 
   const handleCycleTheme = () => {
     cycleTheme();
@@ -76,10 +77,10 @@ const BlokFooter = () => {
             type="button"
             onClick={handleCycleTheme}
             className="cursorInteract linkAnimation"
-            aria-label={`Cycle theme. Current theme: ${theme.toLowerCase()}`}
-            title={`Theme: ${theme.toLowerCase()}`}
+            aria-label={`Cycle theme. Current theme: ${themeLabel}`}
+            title={`Theme: ${themeLabel}`}
           >
-            Theme: {theme.toLowerCase()}
+            Theme: {themeLabel}
           </button>
         </div>
         <div className="column column-Icons">
