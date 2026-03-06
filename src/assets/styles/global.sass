@@ -737,7 +737,7 @@ body
       &-ProjectSlider
         padding-top: var(--spacing-base)
         border-bottom: var(--border-width) solid var(--border-color)
-      &-Project
+      &-Project, &-Filter
         border-radius: 0
       &-Head
         transform: translateY(0) !important
@@ -754,6 +754,12 @@ body
         width: 96vw
         @media (max-width: 770px)
           width: calc(100% - var(--spacing-side))
+      .blok
+        border-left-width: var(--border-width)
+        border-right-width: var(--border-width)
+        &-Filter
+          border-left-width: 0
+          border-right-width: 0
     &[data-space="3D"]
       padding-top: 4vh
       padding-bottom: calc(var(--border-gap) * 2)
