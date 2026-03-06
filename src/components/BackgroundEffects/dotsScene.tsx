@@ -178,12 +178,18 @@ function CameraRig({
 }) {
   const { camera } = useThree();
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const progress = clamp(scrollProgressRef.current, 0, 1);
     const travelY = 3;
     const targetY = -progress * travelY;
+    const smoothing = 9;
 
-    camera.position.y = targetY;
+    camera.position.y = THREE.MathUtils.damp(
+      camera.position.y,
+      targetY,
+      smoothing,
+      delta,
+    );
     camera.position.z = 28;
   });
 

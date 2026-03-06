@@ -257,10 +257,20 @@ function DotsBackground({
         styles.getPropertyValue('--be-dots-dot-color').trim() ||
         styles.getPropertyValue('--theme-type').trim() ||
         '#ffffff';
-      setSceneColors({
-        background,
-        dotColors: [dot],
-        dotSize: 0.5,
+      setSceneColors((previous) => {
+        if (
+          previous.background === background &&
+          previous.dotColors[0] === dot &&
+          previous.dotSize === 0.5
+        ) {
+          return previous;
+        }
+
+        return {
+          background,
+          dotColors: [dot],
+          dotSize: 0.5,
+        };
       });
     };
 
@@ -282,7 +292,8 @@ function DotsBackground({
   useEffect(() => {
     const updateScrollProgress = () => {
       const root = document.documentElement;
-      const maxScroll = Math.max(1, root.scrollHeight - window.innerHeight);
+      const viewportHeight = root.clientHeight;
+      const maxScroll = Math.max(1, root.scrollHeight - viewportHeight);
       const progress = window.scrollY / maxScroll;
       scrollProgressRef.current = Math.max(0, Math.min(1, progress));
     };
@@ -290,11 +301,13 @@ function DotsBackground({
     updateScrollProgress();
 
     window.addEventListener('scroll', updateScrollProgress, { passive: true });
-    window.addEventListener('resize', updateScrollProgress, { passive: true });
+    window.addEventListener('orientationchange', updateScrollProgress, {
+      passive: true,
+    });
 
     return () => {
       window.removeEventListener('scroll', updateScrollProgress);
-      window.removeEventListener('resize', updateScrollProgress);
+      window.removeEventListener('orientationchange', updateScrollProgress);
     };
   }, []);
 
