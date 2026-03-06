@@ -290,6 +290,15 @@ function DotsBackground({
   }, []);
 
   useEffect(() => {
+    const isTouchDevice = () =>
+      window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+      (navigator.maxTouchPoints ?? 0) > 0;
+
+    if (isTouchDevice()) {
+      scrollProgressRef.current = 0;
+      return;
+    }
+
     const updateScrollProgress = () => {
       const root = document.documentElement;
       const viewportHeight = root.clientHeight;

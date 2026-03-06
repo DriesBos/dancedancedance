@@ -177,8 +177,21 @@ function CameraRig({
   scrollProgressRef: MutableRefObject<number>;
 }) {
   const { camera } = useThree();
+  const isTouchDeviceRef = useRef(false);
+
+  useEffect(() => {
+    isTouchDeviceRef.current =
+      window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+      (navigator.maxTouchPoints ?? 0) > 0;
+  }, []);
 
   useFrame((_, delta) => {
+    if (isTouchDeviceRef.current) {
+      camera.position.y = THREE.MathUtils.damp(camera.position.y, 0, 12, delta);
+      camera.position.z = 28;
+      return;
+    }
+
     const progress = clamp(scrollProgressRef.current, 0, 1);
     const travelY = 3;
     const targetY = -progress * travelY;
