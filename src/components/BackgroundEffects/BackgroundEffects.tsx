@@ -237,11 +237,19 @@ function DotsBackground({
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollProgressRef = useRef(0);
+  const [disableInputEffects, setDisableInputEffects] = useState(false);
   const [sceneColors, setSceneColors] = useState({
     background: '#050709',
     dotColors: ['#ffffff'],
     dotSize: 0.5,
   });
+
+  useEffect(() => {
+    const isTouchDevice =
+      window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+      (navigator.maxTouchPoints ?? 0) > 0;
+    setDisableInputEffects(isTouchDevice);
+  }, []);
 
   useEffect(() => {
     const host = rootRef.current;
@@ -290,11 +298,7 @@ function DotsBackground({
   }, []);
 
   useEffect(() => {
-    const isTouchDevice = () =>
-      window.matchMedia('(hover: none), (pointer: coarse)').matches ||
-      (navigator.maxTouchPoints ?? 0) > 0;
-
-    if (isTouchDevice()) {
+    if (disableInputEffects) {
       scrollProgressRef.current = 0;
       return;
     }
@@ -318,7 +322,7 @@ function DotsBackground({
       window.removeEventListener('scroll', updateScrollProgress);
       window.removeEventListener('orientationchange', updateScrollProgress);
     };
-  }, []);
+  }, [disableInputEffects]);
 
   return (
     <div
@@ -339,6 +343,7 @@ function DotsBackground({
         densityScale={densityScale}
         drawBackground={layer !== 'overlay'}
         scrollProgressRef={scrollProgressRef}
+        disableInputs={disableInputEffects}
       />
     </div>
   );

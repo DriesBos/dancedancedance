@@ -11,6 +11,7 @@ type DotsSceneProps = {
   drawBackground?: boolean;
   className?: string;
   scrollProgressRef: MutableRefObject<number>;
+  disableInputs?: boolean;
 };
 
 type DotParticle = {
@@ -32,13 +33,18 @@ function DotsField({
   dotColors,
   dotSize,
   densityScale = 1,
+  lockToInitialViewport = false,
 }: {
   dotColors: string[];
   dotSize: number;
   densityScale?: number;
+  lockToInitialViewport?: boolean;
 }) {
   const pointsRef = useRef<THREE.Points>(null);
   const geometryRef = useRef<THREE.BufferGeometry>(null);
+  const initialViewportRef = useRef<{ width: number; height: number } | null>(
+    null,
+  );
   const dotTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 64;
@@ -59,24 +65,46 @@ function DotsField({
     return texture;
   }, []);
   const { viewport } = useThree();
+  const liveViewportWidth = viewport.width;
+  const liveViewportHeight = viewport.height;
+
+  if (
+    lockToInitialViewport &&
+    !initialViewportRef.current &&
+    liveViewportWidth > 0 &&
+    liveViewportHeight > 0
+  ) {
+    initialViewportRef.current = {
+      width: liveViewportWidth,
+      height: liveViewportHeight,
+    };
+  }
+
+  const viewportWidth = lockToInitialViewport
+    ? (initialViewportRef.current?.width ?? liveViewportWidth)
+    : liveViewportWidth;
+  const viewportHeight = lockToInitialViewport
+    ? (initialViewportRef.current?.height ?? liveViewportHeight)
+    : liveViewportHeight;
+
   const dotCount = useMemo(
     () => {
       const clampedDensityScale = clamp(densityScale, 0.05, 1.5);
       const minCount = Math.max(6, Math.round(90 * clampedDensityScale));
       const maxCount = Math.max(minCount, Math.round(270 * clampedDensityScale));
       const count = Math.round(
-        viewport.width * viewport.height * 4.2 * clampedDensityScale,
+        viewportWidth * viewportHeight * 4.2 * clampedDensityScale,
       );
       return clamp(count, minCount, maxCount);
     },
-    [densityScale, viewport.height, viewport.width],
+    [densityScale, viewportHeight, viewportWidth],
   );
   const positions = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
   const colors = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
 
   const particles = useMemo<DotParticle[]>(() => {
-    const spreadX = viewport.width * 0.56;
-    const spreadY = viewport.height * 0.56;
+    const spreadX = viewportWidth * 0.56;
+    const spreadY = viewportHeight * 0.56;
 
     return Array.from({ length: dotCount }, () => ({
       baseX: THREE.MathUtils.randFloatSpread(spreadX * 2),
@@ -88,7 +116,7 @@ function DotsField({
       speed: THREE.MathUtils.randFloat(0.28, 0.92),
       phase: Math.random() * Math.PI * 2,
     }));
-  }, [dotCount, viewport.height, viewport.width]);
+  }, [dotCount, viewportHeight, viewportWidth]);
 
   useEffect(() => {
     const geometry = geometryRef.current;
@@ -173,20 +201,15 @@ function DotsField({
 
 function CameraRig({
   scrollProgressRef,
+  enableParallax = true,
 }: {
   scrollProgressRef: MutableRefObject<number>;
+  enableParallax?: boolean;
 }) {
   const { camera } = useThree();
-  const isTouchDeviceRef = useRef(false);
-
-  useEffect(() => {
-    isTouchDeviceRef.current =
-      window.matchMedia('(hover: none), (pointer: coarse)').matches ||
-      (navigator.maxTouchPoints ?? 0) > 0;
-  }, []);
 
   useFrame((_, delta) => {
-    if (isTouchDeviceRef.current) {
+    if (!enableParallax) {
       camera.position.y = THREE.MathUtils.damp(camera.position.y, 0, 12, delta);
       camera.position.z = 28;
       return;
@@ -217,6 +240,7 @@ export default function DotsScene({
   drawBackground = true,
   className,
   scrollProgressRef,
+  disableInputs = false,
 }: DotsSceneProps) {
   return (
     <Canvas
@@ -232,11 +256,15 @@ export default function DotsScene({
     >
       {drawBackground && <color attach="background" args={[backgroundColor]} />}
       {drawBackground && <fog attach="fog" args={[backgroundColor, 20, 64]} />}
-      <CameraRig scrollProgressRef={scrollProgressRef} />
+      <CameraRig
+        scrollProgressRef={scrollProgressRef}
+        enableParallax={!disableInputs}
+      />
       <DotsField
         dotColors={dotColors}
         dotSize={dotSize}
         densityScale={densityScale}
+        lockToInitialViewport={disableInputs}
       />
     </Canvas>
   );
