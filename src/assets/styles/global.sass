@@ -750,6 +750,12 @@ body
         width: 96vw
         @media (max-width: 770px)
           width: calc(100% - 2 * var(--spacing-side))
+    &[data-space="3D"]
+      padding-top: 4vh
+      padding-bottom: calc(var(--border-gap) * 2)
+      main
+        @media (max-width: 770px)
+          width: calc(100% - 2 * var(--spacing-side))
 
 .clickable
   cursor: pointer
