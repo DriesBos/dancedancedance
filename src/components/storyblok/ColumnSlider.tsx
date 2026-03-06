@@ -67,10 +67,10 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           opacity: 1,
           duration: 0,
           ease: 'linear',
-        }
+        },
       );
     },
-    { dependencies: [activeIndex], revertOnUpdate: true }
+    { dependencies: [activeIndex], revertOnUpdate: true },
   );
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
       () => {
         setActiveIndex((prevIndex) => (prevIndex + 1) % activeImages.length);
       },
-      blok.speed ? blok.speed : 800
+      blok.speed ? blok.speed : 800,
     );
 
     return () => clearInterval(interval);
@@ -100,6 +100,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
             height={0}
             sizes="100vw"
             quality={80}
+            className="imageItem"
             priority={activeIndex === 0}
             loading={activeIndex === 0 ? 'eager' : 'lazy'}
             style={{ width: '100%', height: 'auto' }}

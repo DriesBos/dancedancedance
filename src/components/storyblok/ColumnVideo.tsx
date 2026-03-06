@@ -36,7 +36,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
           playbackId={blok.mux_playback_id!}
           poster={blok.placeholder?.filename}
           loop={blok.loop}
-          className="muxPlayer"
+          className="muxPlayer imageItem"
           pause={blok.pause}
           aspectRatio={blok.aspect_ratio || '16 / 9'}
           dynamicAspectRatio={!blok.aspect_ratio} // Auto-detect if not manually set
@@ -55,6 +55,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
           autoPlay
           playsInline
           preload="auto"
+          className="imageItem"
           poster={blok.placeholder?.filename}
           style={{ width: '100%', height: 'auto' }}
         />

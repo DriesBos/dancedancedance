@@ -174,7 +174,6 @@ body[data-theme='DOTS']
 
 body[data-theme='STEDELIJK']
   --theme-bg: black
-  --theme-bg-gradient: 0
   --theme-blok: #62C853
   --theme-blok-showlines: #62C853
   --theme-blok-solid: #62C853
@@ -184,11 +183,15 @@ body[data-theme='STEDELIJK']
   --theme-type-contrast: white
   --cursor-color-bg: white
   --cursor-color-blok: black
-  --border-color: black
   --slider-indicator: #62C853
   --slider-indicator-active: black
+  --border-color: black
+  --border-radius: 1.25rem
   --border-width: 2px
   --border-fatwidth: 2px
+  --border-gap: 0.5rem
+  &[data-space='3D']
+    --panel-perspective-origin: 50% 0vh
 
 body[data-theme='TRON']
   --theme-bg: var(--color-black)

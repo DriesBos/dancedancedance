@@ -90,7 +90,7 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
           ref={muxPlayerRef}
           playbackId={item.mux_playback_id}
           poster={item.media?.filename}
-          className="muxPlayer"
+          className="muxPlayer imageItem"
           aspectRatio={item.aspect_ratio || '16 / 9'}
           dynamicAspectRatio={!item.aspect_ratio}
           noControls={true}
@@ -107,6 +107,7 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
           muted
           playsInline
           preload="auto"
+          className="imageItem"
           poster={item.media?.filename}
           style={{ width: '100%', height: 'auto' }}
         />
@@ -124,6 +125,7 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
           height={0}
           sizes="100vw"
           quality={80}
+          className="imageItem"
           priority={index === 0} // Only prioritize first image
           style={{ width: '100%', height: 'auto' }}
         />
