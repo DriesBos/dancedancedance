@@ -15,7 +15,6 @@ export default function CustomCursor() {
   const isVisible = useRef(false);
   const isPreviewVisible = useRef(false);
   const cursorSurface = useRef<'bg' | 'blok'>('bg');
-  const mouseInTarget = useRef(false);
   const prevMousePos = useRef({ x: 0, y: 0 });
   const rotationResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -108,19 +107,33 @@ export default function CustomCursor() {
       ease: 'power3',
     });
 
-    // Size animation timeline (width/height instead of scale)
-    const sizeAnimInteract = gsap.timeline({ paused: true });
-    sizeAnimInteract.to(follower, {
-      width: '1.8181818182rem',
-      height: '1.8181818182rem',
-      duration: 0.165,
-    });
+    const followerDefaultSize = '0.9090909091rem';
+    const followerInteractSize = '1.8181818182rem';
+    const followerMagneticSize = '2.7272727273rem';
+    type FollowerMode = 'default' | 'interact' | 'magnetic';
+    let currentFollowerMode: FollowerMode = 'default';
 
-    const sizeAnimMagnetic = gsap.timeline({ paused: true });
-    sizeAnimMagnetic.to(follower, {
-      width: '2.7272727273rem',
-      height: '2.7272727273rem',
-      duration: 0.165,
+    const setFollowerMode = (mode: FollowerMode) => {
+      if (currentFollowerMode === mode) return;
+      currentFollowerMode = mode;
+
+      const size =
+        mode === 'magnetic'
+          ? followerMagneticSize
+          : mode === 'interact'
+            ? followerInteractSize
+            : followerDefaultSize;
+
+      gsap.to(follower, {
+        width: size,
+        height: size,
+        duration: 0.165,
+        overwrite: 'auto',
+      });
+    };
+    gsap.set(follower, {
+      width: followerDefaultSize,
+      height: followerDefaultSize,
     });
 
     // Message fade animation
@@ -211,12 +224,27 @@ export default function CustomCursor() {
     };
 
     let magneticTargets: HTMLElement[] = [];
-    const boundMagneticTargets = new WeakSet<EventTarget>();
-    const boundInteractTargets = new WeakSet<EventTarget>();
     const boundMessageTargets = new WeakSet<EventTarget>();
     const boundPreviewTargets = new WeakSet<EventTarget>();
     const preloadedPreviewUrls = new Set<string>();
     const preloadedPreviewImages: HTMLImageElement[] = [];
+
+    const shouldSkipInteractSize = (target: Element | null) =>
+      target instanceof Element &&
+      (target.hasAttribute('data-cursor-message') ||
+        target.hasAttribute('data-cursor-preview'));
+
+    const resolveFollowerMode = (hoveredElement: Element | null): FollowerMode => {
+      const magneticTarget = hoveredElement?.closest('.cursorMagnetic');
+      if (magneticTarget) return 'magnetic';
+
+      const interactTarget = hoveredElement?.closest('.cursorInteract, .markdown a');
+      if (interactTarget && !shouldSkipInteractSize(interactTarget)) {
+        return 'interact';
+      }
+
+      return 'default';
+    };
 
     const handleMouseMove = (e: MouseEvent) => {
       // Show cursor on first move
@@ -241,6 +269,7 @@ export default function CustomCursor() {
         cursorSurface.current = nextSurface;
         document.body.setAttribute('data-cursor-surface', nextSurface);
       }
+      setFollowerMode(resolveFollowerMode(hoveredElement));
 
       let foundTarget = false;
 
@@ -351,36 +380,6 @@ export default function CustomCursor() {
       prevMousePos.current = { x: cursorPosition.x, y: cursorPosition.y };
     };
 
-    // Hover handlers for magnetic targets (magnetic + size)
-    const handleMagneticEnter = () => {
-      mouseInTarget.current = true;
-      sizeAnimMagnetic.play();
-    };
-
-    const handleMagneticLeave = () => {
-      mouseInTarget.current = false;
-      sizeAnimMagnetic.reverse();
-    };
-
-    const shouldSkipInteractSize = (target: EventTarget | null) =>
-      target instanceof Element &&
-      (target.hasAttribute('data-cursor-message') ||
-        target.hasAttribute('data-cursor-preview'));
-
-    // Hover handlers for interact targets (size only, no magnetic)
-    const handleInteractEnter = (e: Event) => {
-      if (shouldSkipInteractSize(e.currentTarget)) {
-        sizeAnimInteract.reverse();
-        return;
-      }
-      sizeAnimInteract.play();
-    };
-
-    const handleInteractLeave = (e: Event) => {
-      if (shouldSkipInteractSize(e.currentTarget)) return;
-      sizeAnimInteract.reverse();
-    };
-
     // Hover handlers for message targets
     const handleMessageEnter = (e: Event) => {
       const target = e.currentTarget as HTMLElement;
@@ -455,6 +454,7 @@ export default function CustomCursor() {
       isVisible.current = false;
       cursorSurface.current = 'bg';
       document.body.setAttribute('data-cursor-surface', 'bg');
+      setFollowerMode('default');
 
       // Clear rotation reset timeout and reset rotation
       if (rotationResetTimeout.current) {
@@ -466,9 +466,7 @@ export default function CustomCursor() {
 
     // Reset size animations on click (for route changes where leave isn't triggered)
     const handleClick = () => {
-      sizeAnimMagnetic.reverse();
-      sizeAnimInteract.reverse();
-      mouseInTarget.current = false;
+      setFollowerMode('default');
       hidePreview();
     };
 
@@ -512,22 +510,6 @@ export default function CustomCursor() {
       magneticTargets = Array.from(
         document.querySelectorAll<HTMLElement>('.cursorMagnetic'),
       );
-      magneticTargets.forEach((target) => {
-        if (boundMagneticTargets.has(target)) return;
-        target.addEventListener('mouseenter', handleMagneticEnter);
-        target.addEventListener('mouseleave', handleMagneticLeave);
-        boundMagneticTargets.add(target);
-      });
-
-      const interactTargets = document.querySelectorAll(
-        '.cursorInteract, .markdown a',
-      );
-      interactTargets.forEach((target) => {
-        if (boundInteractTargets.has(target)) return;
-        target.addEventListener('mouseenter', handleInteractEnter);
-        target.addEventListener('mouseleave', handleInteractLeave);
-        boundInteractTargets.add(target);
-      });
 
       const messageTargets = document.querySelectorAll('.cursorMessage');
       messageTargets.forEach((target) => {
@@ -561,18 +543,6 @@ export default function CustomCursor() {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeaveWindow);
       document.removeEventListener('click', handleClick);
-      const magneticTargets = document.querySelectorAll('.cursorMagnetic');
-      magneticTargets.forEach((target) => {
-        target.removeEventListener('mouseenter', handleMagneticEnter);
-        target.removeEventListener('mouseleave', handleMagneticLeave);
-      });
-      const interactTargets = document.querySelectorAll(
-        '.cursorInteract, .markdown a',
-      );
-      interactTargets.forEach((target) => {
-        target.removeEventListener('mouseenter', handleInteractEnter);
-        target.removeEventListener('mouseleave', handleInteractLeave);
-      });
       const messageTargets = document.querySelectorAll('.cursorMessage');
       messageTargets.forEach((target) => {
         target.removeEventListener('mouseenter', handleMessageEnter);

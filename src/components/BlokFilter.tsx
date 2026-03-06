@@ -35,7 +35,7 @@ export default function BlokFilter({
       <Row>
         <button
           type="button"
-          className="column column-Year"
+          className="column column-Year cursorInteract"
           data-active={isSortActive('year')}
           data-inactive={!isSortActive('year')}
           onClick={() => onSortChange('year')}
@@ -44,7 +44,7 @@ export default function BlokFilter({
         </button>
         <button
           type="button"
-          className="column column-Project"
+          className="column column-Project cursorInteract"
           data-active={isSortActive('title')}
           data-inactive={!isSortActive('title')}
           onClick={() => onSortChange('title')}
@@ -53,7 +53,7 @@ export default function BlokFilter({
         </button>
         <button
           type="button"
-          className="column column-Category"
+          className="column column-Category cursorInteract"
           data-active={isSortActive('category')}
           data-inactive={!isSortActive('category')}
           onClick={() => onSortChange('category')}
