@@ -204,6 +204,7 @@ export default function DotsScene({
       className={className}
       camera={{ fov: 48, near: 0.1, far: 120, position: [0, 0, 28] }}
       dpr={[1, 1.2]}
+      resize={{ scroll: false, debounce: { scroll: 0, resize: 200 } }}
       gl={{
         antialias: false,
         alpha: true,

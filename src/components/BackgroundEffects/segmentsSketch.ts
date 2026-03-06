@@ -14,7 +14,7 @@ const NEAR_SQUARE_THRESHOLD = 0.75;
 const ANCHOR_MARGIN_RATIO = 0.05;
 const ANCHOR_BAND_START = 0.1;
 const ANCHOR_BAND_SPAN = 0.8;
-const MOBILE_WIDTH_DELTA_IGNORE_PX = 64;
+const MOBILE_VIEWPORT_DELTA_IGNORE_PX = 200;
 
 type Point = {
   x: number;
@@ -1076,11 +1076,13 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
       const nextHeight = instance.windowHeight;
       const nextOrientation = getOrientation(nextWidth, nextHeight);
       const widthDelta = Math.abs(nextWidth - lastViewportWidth);
+      const heightDelta = Math.abs(nextHeight - lastViewportHeight);
+      const viewportDelta = Math.max(widthDelta, heightDelta);
       const orientationChanged = nextOrientation !== lastOrientation;
       const isLikelyMobileViewportChurn =
         isCoarsePointerDevice() &&
         !orientationChanged &&
-        widthDelta < MOBILE_WIDTH_DELTA_IGNORE_PX;
+        viewportDelta < MOBILE_VIEWPORT_DELTA_IGNORE_PX;
 
       if (isLikelyMobileViewportChurn) {
         return;

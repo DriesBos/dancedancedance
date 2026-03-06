@@ -20,7 +20,7 @@ export const KUSAMA_DEFAULT_PARAMS: KusamaParams = {
 };
 const MOBILE_KUSAMA_CELL_SIZE = 25;
 const KUSAMA_MOBILE_BREAKPOINT_PX = 770;
-const KUSAMA_MOBILE_WIDTH_DELTA_IGNORE_PX = 64;
+const KUSAMA_MOBILE_VIEWPORT_DELTA_IGNORE_PX = 200;
 
 type KusamaSketchOptions = {
   host: HTMLDivElement;
@@ -408,11 +408,13 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       const nextHeight = instance.windowHeight;
       const nextOrientation = getOrientation(nextWidth, nextHeight);
       const widthDelta = Math.abs(nextWidth - lastViewportWidth);
+      const heightDelta = Math.abs(nextHeight - lastViewportHeight);
+      const viewportDelta = Math.max(widthDelta, heightDelta);
       const orientationChanged = nextOrientation !== lastOrientation;
       const isLikelyMobileViewportChurn =
         isCoarsePointerDevice() &&
         !orientationChanged &&
-        widthDelta < KUSAMA_MOBILE_WIDTH_DELTA_IGNORE_PX;
+        viewportDelta < KUSAMA_MOBILE_VIEWPORT_DELTA_IGNORE_PX;
 
       if (isLikelyMobileViewportChurn) {
         return;
