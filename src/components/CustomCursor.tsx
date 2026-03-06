@@ -163,6 +163,27 @@ export default function CustomCursor() {
       gsap.set(previewContainer, { x, y });
     };
 
+    const clampMessagePosition = (clientX: number, clientY: number) => {
+      const messageWidth = messageContainer.offsetWidth || 220;
+      const messageHeight = messageContainer.offsetHeight || 44;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const padding = 16;
+      let x = clientX;
+      let y = clientY;
+
+      x = Math.max(
+        padding,
+        Math.min(viewportWidth - messageWidth - padding, x),
+      );
+      y = Math.max(
+        padding,
+        Math.min(viewportHeight - messageHeight - padding, y),
+      );
+
+      return { x, y };
+    };
+
     const showPreview = () => {
       if (isPreviewVisible.current) return;
       isPreviewVisible.current = true;
@@ -299,8 +320,12 @@ export default function CustomCursor() {
       );
       const xOffset = 0.4545454545 + 0.909090909 * remInPixels;
       const yOffset = 0.4545454545 * remInPixels;
-      xMessageTo(cursorPosition.x + xOffset);
-      yMessageTo(cursorPosition.y + 0); // Offset below cursor
+      const { x: clampedMessageX, y: clampedMessageY } = clampMessagePosition(
+        cursorPosition.x + xOffset,
+        cursorPosition.y + yOffset,
+      );
+      xMessageTo(clampedMessageX);
+      yMessageTo(clampedMessageY);
       if (isPreviewVisible.current) {
         movePreviewToPointer(cursorPosition.x, cursorPosition.y);
       }
@@ -337,12 +362,22 @@ export default function CustomCursor() {
       sizeAnimMagnetic.reverse();
     };
 
+    const shouldSkipInteractSize = (target: EventTarget | null) =>
+      target instanceof Element &&
+      (target.hasAttribute('data-cursor-message') ||
+        target.hasAttribute('data-cursor-preview'));
+
     // Hover handlers for interact targets (size only, no magnetic)
-    const handleInteractEnter = () => {
+    const handleInteractEnter = (e: Event) => {
+      if (shouldSkipInteractSize(e.currentTarget)) {
+        sizeAnimInteract.reverse();
+        return;
+      }
       sizeAnimInteract.play();
     };
 
-    const handleInteractLeave = () => {
+    const handleInteractLeave = (e: Event) => {
+      if (shouldSkipInteractSize(e.currentTarget)) return;
       sizeAnimInteract.reverse();
     };
 

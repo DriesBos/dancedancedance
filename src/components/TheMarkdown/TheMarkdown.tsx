@@ -37,7 +37,28 @@ const Markdown: React.FunctionComponent<MarkdownProps> = ({
 
   return (
     <div ref={markdownRef} className={`${className} ${styles.markdown} markdown`}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        skipHtml
+        components={{
+          a: ({ node: _node, href, className, ...props }) => {
+            const isMailto =
+              typeof href === 'string' && href.toLowerCase().startsWith('mailto:');
+            const linkClassName = [className, isMailto ? 'cursorMessage' : null]
+              .filter(Boolean)
+              .join(' ');
+
+            return (
+              <a
+                href={href}
+                className={linkClassName || undefined}
+                data-cursor-message={isMailto ? "Let's talk" : undefined}
+                {...props}
+              />
+            );
+          },
+        }}
+      >
         {content}
       </ReactMarkdown>
     </div>
