@@ -8,8 +8,16 @@ import IconExternal from './Icons/IconExternal';
 import Newsletter from './Newsletter/Newsletter';
 import IconArrowHead from './Icons/IconArrowHead';
 import GrainyGradient from '@/components/GrainyGradient';
+import { useStore } from '@/store/store';
 
 const BlokFooter = () => {
+  const theme = useStore((state) => state.theme);
+  const cycleTheme = useStore((state) => state.cycleTheme);
+
+  const handleCycleTheme = () => {
+    cycleTheme();
+  };
+
   const ScrollToTop = () => {
     try {
       window.scrollTo({
@@ -63,6 +71,16 @@ const BlokFooter = () => {
           <div className="column-Subscribe">
             <Newsletter className="cursorInteract" />
           </div>
+          <br />
+          <button
+            type="button"
+            onClick={handleCycleTheme}
+            className="cursorInteract linkAnimation"
+            aria-label={`Cycle theme. Current theme: ${theme.toLowerCase()}`}
+            title={`Theme: ${theme.toLowerCase()}`}
+          >
+            Theme: {theme.toLowerCase()}
+          </button>
         </div>
         <div className="column column-Icons">
           <div className="icon icon-ExternalLink">

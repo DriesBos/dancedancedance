@@ -59,6 +59,7 @@ const BlokHead = ({}: Props) => {
     })),
   );
   const isThreeDSpace = space === '3D';
+  const themeLabel = theme.toLowerCase();
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
@@ -791,8 +792,8 @@ const BlokHead = ({}: Props) => {
                 type="button"
                 className={`icon cursorMagnetic ${styles.themeButton}`}
                 onClick={handleCycleTheme}
-                aria-label={`Cycle theme. Current theme: ${theme}`}
-                title={`Theme: ${theme}`}
+                aria-label={`Cycle theme. Current theme: ${themeLabel}`}
+                title={`Theme: ${themeLabel}`}
               >
                 <span
                   className={`${styles.themeCycle} ${
