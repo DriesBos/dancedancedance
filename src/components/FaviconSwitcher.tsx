@@ -57,8 +57,6 @@ export default function FaviconSwitcher() {
           return '#BA3A52';
         case 'DOTS':
           return '#FFFFFF';
-        case 'DOTSLIGHT':
-          return '#111111';
         default:
           return defaultColor;
       }

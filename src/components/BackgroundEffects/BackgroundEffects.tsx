@@ -23,20 +23,6 @@ type BackgroundEffectsProps = {
   active?: boolean;
 };
 
-const DOTS_LIGHT_COLOR_VAR_NAMES = [
-  '--be-dots-light-dot-color-1',
-  '--be-dots-light-dot-color-2',
-  '--be-dots-light-dot-color-3',
-  '--be-dots-light-dot-color-4',
-  '--be-dots-light-dot-color-5',
-  '--be-dots-light-dot-color-6',
-  '--be-dots-light-dot-color-7',
-  '--be-dots-light-dot-color-8',
-  '--be-dots-light-dot-color-9',
-  '--be-dots-light-dot-color-10',
-  '--be-dots-light-dot-color-11',
-] as const;
-
 function RadiatingBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
   const spinLayerRef = useRef<HTMLDivElement>(null);
@@ -263,31 +249,18 @@ function DotsBackground({
 
     const updateColors = () => {
       const styles = getComputedStyle(host);
-      const themeName = document.body?.getAttribute('data-theme') || '';
-      const useLightDotsPalette = themeName === 'DOTSLIGHT';
-      const bgVarName = useLightDotsPalette
-        ? '--be-dots-light-bg-color'
-        : '--be-dots-bg-color';
-      const dotVarName = useLightDotsPalette
-        ? '--be-dots-light-dot-color'
-        : '--be-dots-dot-color';
       const background =
-        styles.getPropertyValue(bgVarName).trim() ||
+        styles.getPropertyValue('--be-dots-bg-color').trim() ||
         styles.getPropertyValue('--theme-bg').trim() ||
         '#050709';
       const dot =
-        styles.getPropertyValue(dotVarName).trim() ||
+        styles.getPropertyValue('--be-dots-dot-color').trim() ||
         styles.getPropertyValue('--theme-type').trim() ||
         '#ffffff';
-      const dotColors = useLightDotsPalette
-        ? DOTS_LIGHT_COLOR_VAR_NAMES.map((varName) =>
-            styles.getPropertyValue(varName).trim(),
-          ).filter(Boolean)
-        : [dot];
       setSceneColors({
         background,
-        dotColors: dotColors.length > 0 ? dotColors : [dot],
-        dotSize: useLightDotsPalette ? 1 : 0.5,
+        dotColors: [dot],
+        dotSize: 0.5,
       });
     };
 

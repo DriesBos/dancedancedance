@@ -20,9 +20,7 @@ const StoreSwitcher = () => {
       const color =
         theme === 'DARK' || theme === 'DOTS'
           ? '#050709'
-          : theme === 'DOTSLIGHT'
-            ? '#F3EEE3'
-            : '#FFFFFF';
+          : '#FFFFFF';
       metaThemeColor.setAttribute('content', color);
     }
   }, [theme]);
