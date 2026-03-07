@@ -44,6 +44,24 @@ export const THEME_ORDER: Theme[] = [
   'DOTS',
 ];
 
+export const THEME_BUTTON_ORDER: Theme[] = THEME_ORDER.filter(
+  (theme) => theme !== 'RADIANT DARK',
+);
+
+const getNextThemeForButtonCycle = (currentTheme: Theme): Theme => {
+  const currentIndex = THEME_ORDER.indexOf(currentTheme);
+  const safeCurrentIndex = currentIndex >= 0 ? currentIndex : 0;
+
+  for (let step = 1; step <= THEME_ORDER.length; step += 1) {
+    const candidate = THEME_ORDER[(safeCurrentIndex + step) % THEME_ORDER.length];
+    if (THEME_BUTTON_ORDER.includes(candidate)) {
+      return candidate;
+    }
+  }
+
+  return THEME_BUTTON_ORDER[0];
+};
+
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
   theme: 'LIGHT',
@@ -54,9 +72,7 @@ export const useStore = create<Props & Actions>()((set) => ({
   setTheme: (theme: Theme) => set({ theme }),
   cycleTheme: () =>
     set((state) => {
-      const currentIndex = THEME_ORDER.indexOf(state.theme);
-      const nextIndex = (currentIndex + 1) % THEME_ORDER.length;
-      return { theme: THEME_ORDER[nextIndex] };
+      return { theme: getNextThemeForButtonCycle(state.theme) };
     }),
   setTwoD: () => set({ space: 'DESKTOP' }),
   setThreeD: () => set({ space: '3D' }),

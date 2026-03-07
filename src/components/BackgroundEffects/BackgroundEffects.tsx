@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type p5 from 'p5';
 import styles from './BackgroundEffects.module.sass';
 import {
@@ -15,14 +15,15 @@ const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
+const DEFAULT_LINE_GAP_RADIANT_DARK = 9;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
 const BIRDS_SKY_VARIATIONS = [
   'dawn',
-  'sunrise',
-  'day',
+  'noon',
   'sunset',
   'dusk',
-  'night',
+  'evening',
+  'predawn',
 ] as const;
 
 type BackgroundEffectsProps = {
@@ -36,23 +37,50 @@ function RadiatingBackground() {
   const rootRef = useRef<HTMLDivElement>(null);
   const spinLayerRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(220);
+  const [isRadiantDark, setIsRadiantDark] = useState(false);
+  const idSeed = useId().replace(/:/g, '');
+  const lineGradientId = `rb-line-gradient-${idSeed}`;
+  const centerHaloGradientId = `rb-center-halo-${idSeed}`;
+  const paintFilterId = `rb-line-paint-${idSeed}`;
+  const glowFilterId = `rb-line-glow-${idSeed}`;
+  const paperNoiseFilterId = `rb-paper-noise-${idSeed}`;
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
 
-    const computedStyles = getComputedStyle(root);
-    const rawGap = computedStyles.getPropertyValue('--rb-line-gap').trim();
-    const parsedGap = Number.parseFloat(rawGap);
-    const gap =
-      Number.isFinite(parsedGap) && parsedGap > 0
-        ? parsedGap
-        : DEFAULT_LINE_GAP;
-    const circumference = 2 * Math.PI * EDGE_DISTANCE;
-    const computedCount = Math.round(circumference / gap);
-    const clampedCount = Math.min(720, Math.max(48, computedCount));
+    const updateLineCount = () => {
+      const computedStyles = getComputedStyle(root);
+      const rawGap = computedStyles.getPropertyValue('--rb-line-gap').trim();
+      const parsedGap = Number.parseFloat(rawGap);
+      const fallbackGap =
+        document.body.dataset.theme === 'RADIANT DARK'
+          ? DEFAULT_LINE_GAP_RADIANT_DARK
+          : DEFAULT_LINE_GAP;
+      const gap =
+        Number.isFinite(parsedGap) && parsedGap > 0
+          ? parsedGap
+          : fallbackGap;
+      const circumference = 2 * Math.PI * EDGE_DISTANCE;
+      const computedCount = Math.round(circumference / gap);
+      const clampedCount = Math.min(720, Math.max(48, computedCount));
 
-    setLineCount(clampedCount);
+      setLineCount(clampedCount);
+    };
+
+    updateLineCount();
+    window.addEventListener('resize', updateLineCount, { passive: true });
+
+    const observer = new MutationObserver(updateLineCount);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateLineCount);
+      observer.disconnect();
+    };
   }, []);
 
   const radialLines = useMemo(
@@ -61,22 +89,71 @@ function RadiatingBackground() {
         const angle = (index / lineCount) * Math.PI * 2;
         const dx = Math.cos(angle);
         const dy = Math.sin(angle);
-        const fromScale = 0;
         const baseToScale =
-          EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy));
-        // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
-        const toScale = baseToScale * (1 + 0.025 * Math.sin(index * 0.39));
+          EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy), 0.0001);
+
+        if (!isRadiantDark) {
+          const fromScale = 0;
+          // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
+          const toScale = baseToScale * (1 + 0.025 * Math.sin(index * 0.39));
+
+          return {
+            x1: CENTER + dx * fromScale,
+            y1: CENTER + dy * fromScale,
+            x2: CENTER + dx * toScale,
+            y2: CENTER + dy * toScale,
+            opacity: 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(index * 0.61)),
+            glowOpacity: 0,
+            widthScale: 1,
+          };
+        }
+
+        // The dark radiant variant uses slight endpoint jitter and width variance
+        // to mimic hand-painted metallic lines.
+        const fromScale = 18 + 14 * (0.5 + 0.5 * Math.sin(index * 1.37));
+        const lengthScale =
+          0.84 + 0.2 * (0.5 + 0.5 * Math.sin(index * 0.29 + index * 0.013));
+        const toScale = baseToScale * lengthScale;
+        const px = -dy;
+        const py = dx;
+        const tangentialJitter = 1.6 * Math.sin(index * 0.91);
+        const perpendicularJitter = 2.4 * Math.cos(index * 0.63);
+        const widthScale =
+          0.78 + 0.48 * (0.5 + 0.5 * Math.cos(index * 0.73 + 0.8));
 
         return {
-          x1: CENTER + dx * fromScale,
-          y1: CENTER + dy * fromScale,
-          x2: CENTER + dx * toScale,
-          y2: CENTER + dy * toScale,
-          opacity: 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(index * 0.61)),
+          x1: CENTER + dx * fromScale + px * tangentialJitter * 0.35,
+          y1: CENTER + dy * fromScale + py * tangentialJitter * 0.35,
+          x2: CENTER + dx * toScale + px * perpendicularJitter,
+          y2: CENTER + dy * toScale + py * perpendicularJitter,
+          opacity:
+            0.58 +
+            0.37 *
+              (0.5 +
+                0.5 * Math.sin(index * 0.61 + Math.sin(index * 0.17))),
+          glowOpacity: 0.2 + 0.4 * (0.5 + 0.5 * Math.sin(index * 0.43 + 0.7)),
+          widthScale,
         };
       }),
-    [lineCount],
+    [isRadiantDark, lineCount],
   );
+
+  useEffect(() => {
+    const updateThemeMode = () => {
+      setIsRadiantDark(document.body.dataset.theme === 'RADIANT DARK');
+    };
+
+    updateThemeMode();
+    const observer = new MutationObserver(updateThemeMode);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -129,23 +206,159 @@ function RadiatingBackground() {
           preserveAspectRatio="xMidYMid slice"
           role="presentation"
         >
+          {isRadiantDark && (
+            <defs>
+              <radialGradient
+                id={lineGradientId}
+                cx="50%"
+                cy="50%"
+                r="72%"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop
+                  offset="0%"
+                  stopColor="var(--rb-line-gradient-start, var(--rb-line-color))"
+                />
+                <stop
+                  offset="18%"
+                  stopColor="var(--rb-line-gradient-mid, var(--rb-line-color))"
+                />
+                <stop
+                  offset="64%"
+                  stopColor="var(--rb-line-gradient-end, var(--rb-line-color))"
+                />
+                <stop
+                  offset="100%"
+                  stopColor="var(--rb-line-gradient-tail, var(--rb-line-color))"
+                />
+              </radialGradient>
+              <radialGradient id={centerHaloGradientId} cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(0, 0, 0, 0)" />
+                <stop
+                  offset="62%"
+                  stopColor="var(--rb-center-halo-color, var(--rb-line-color))"
+                />
+                <stop offset="100%" stopColor="rgba(0, 0, 0, 0)" />
+              </radialGradient>
+              <filter
+                id={paintFilterId}
+                x="-28%"
+                y="-28%"
+                width="156%"
+                height="156%"
+                colorInterpolationFilters="sRGB"
+              >
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.95"
+                  numOctaves="2"
+                  seed="14"
+                  result="paintNoise"
+                />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="paintNoise"
+                  scale="0.85"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+              <filter
+                id={glowFilterId}
+                x="-36%"
+                y="-36%"
+                width="172%"
+                height="172%"
+                colorInterpolationFilters="sRGB"
+              >
+                <feGaussianBlur stdDeviation="1.25" />
+              </filter>
+              <filter id={paperNoiseFilterId} x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.82"
+                  numOctaves="2"
+                  seed="11"
+                  stitchTiles="stitch"
+                />
+              </filter>
+            </defs>
+          )}
           <rect
             className={styles.background}
             width={VIEWBOX_SIZE}
             height={VIEWBOX_SIZE}
           />
-          <g className={styles.lines}>
-            {radialLines.map((line, index) => (
-              <line
-                key={index}
-                x1={line.x1}
-                y1={line.y1}
-                x2={line.x2}
-                y2={line.y2}
-                opacity={line.opacity}
+          {isRadiantDark && (
+            <>
+              <rect
+                className={styles.paperNoise}
+                width={VIEWBOX_SIZE}
+                height={VIEWBOX_SIZE}
+                filter={`url(#${paperNoiseFilterId})`}
               />
-            ))}
-          </g>
+              <circle
+                className={styles.centerHalo}
+                cx={CENTER}
+                cy={CENTER}
+                r={40}
+                fill={`url(#${centerHaloGradientId})`}
+              />
+              <circle
+                className={styles.centerVoid}
+                cx={CENTER}
+                cy={CENTER}
+                r={14}
+              />
+              <g className={styles.linesGlow} filter={`url(#${glowFilterId})`}>
+                {radialLines.map((line, index) => (
+                  <line
+                    key={`glow-${index}`}
+                    className={styles.line}
+                    x1={line.x1}
+                    y1={line.y1}
+                    x2={line.x2}
+                    y2={line.y2}
+                    strokeWidth={line.widthScale * 1.95}
+                    opacity={line.glowOpacity}
+                  />
+                ))}
+              </g>
+              <g
+                className={styles.linesDark}
+                stroke={`url(#${lineGradientId})`}
+                filter={`url(#${paintFilterId})`}
+              >
+                {radialLines.map((line, index) => (
+                  <line
+                    key={index}
+                    className={styles.line}
+                    x1={line.x1}
+                    y1={line.y1}
+                    x2={line.x2}
+                    y2={line.y2}
+                    strokeWidth={line.widthScale}
+                    opacity={line.opacity}
+                  />
+                ))}
+              </g>
+            </>
+          )}
+          {!isRadiantDark && (
+            <g className={styles.lines}>
+              {radialLines.map((line, index) => (
+                <line
+                  key={index}
+                  className={styles.line}
+                  x1={line.x1}
+                  y1={line.y1}
+                  x2={line.x2}
+                  y2={line.y2}
+                  opacity={line.opacity}
+                />
+              ))}
+            </g>
+          )}
         </svg>
       </div>
     </div>
@@ -364,9 +577,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     bird: '#000000',
     skyVariation: 'auto',
   });
-  const [testingSkyVariation, setTestingSkyVariation] = useState<string | null>(
-    null,
-  );
+  const [testingSkyVariation, setTestingSkyVariation] = useState<string>('dawn');
 
   useEffect(() => {
     const host = rootRef.current;
@@ -417,7 +628,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     };
   }, []);
 
-  const activeSkyVariation = testingSkyVariation ?? sceneColors.skyVariation;
+  const activeSkyVariation = testingSkyVariation;
 
   const handleToggleSkyVariation = () => {
     const currentIndex = BIRDS_SKY_VARIATIONS.indexOf(

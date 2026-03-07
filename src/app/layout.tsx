@@ -25,10 +25,13 @@ import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverla
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
+    var isHome = window.location.pathname === '/';
     var daytimeThemes = ['TRON', 'RADIANT', 'RADIANT DARK', 'AUGURIES', 'KERMIT', 'LIGHT', 'DARK', 'KUSAMA', 'DOTS'];
     var hour = new Date().getHours();
     var theme =
-      hour >= 0 && hour < 5
+      isHome
+        ? 'RADIANT'
+        : hour >= 0 && hour < 5
         ? 'NIGHT MODE'
         : daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
     var space = '3D';

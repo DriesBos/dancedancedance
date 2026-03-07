@@ -4,6 +4,17 @@
   --rb-line-gap: 50rem
   --rb-line-width: var(--border-width)
   --rb-rotation-duration: 60s
+  --rb-line-gradient-start: var(--rb-line-color)
+  --rb-line-gradient-mid: var(--rb-line-color)
+  --rb-line-gradient-end: var(--rb-line-color)
+  --rb-line-gradient-tail: var(--rb-line-color)
+  --rb-line-glow-color: var(--rb-line-color)
+  --rb-line-glow-opacity: 0
+  --rb-paper-noise-color: #fff
+  --rb-paper-noise-opacity: 0
+  --rb-center-halo-color: var(--rb-line-color)
+  --rb-center-halo-opacity: 0
+  --rb-center-void-opacity: 0
   --be-segments-bg-color: var(--theme-bg)
   --be-segments-line-color: var(--theme-type)
   --be-segments-line-width: var(--border-width)
@@ -16,8 +27,8 @@
   --be-dots-dot-color: white
   --be-dots-opacity: 1
   --be-dots-overlay-opacity: 1
-  --be-birds-bg-color: var(--theme-bg)
-  --be-birds-color: var(--theme-type)
+  --be-birds-bg-color: #FFFFFF
+  --be-birds-color: #000000
   --be-birds-opacity: 1
   --be-birds-sky-variation: auto
   position: fixed
@@ -51,8 +62,38 @@
   fill: none
   shape-rendering: geometricPrecision
 
-.lines line
+.line
   vector-effect: non-scaling-stroke
+
+.linesDark
+  stroke-width: var(--rb-line-width)
+  fill: none
+  shape-rendering: geometricPrecision
+  .line
+    stroke-linecap: round
+    stroke-linejoin: round
+
+.linesGlow
+  stroke: var(--rb-line-glow-color)
+  stroke-width: var(--rb-line-width)
+  fill: none
+  opacity: var(--rb-line-glow-opacity)
+  mix-blend-mode: screen
+  .line
+    stroke-linecap: round
+    stroke-linejoin: round
+
+.paperNoise
+  fill: var(--rb-paper-noise-color)
+  opacity: var(--rb-paper-noise-opacity)
+  mix-blend-mode: soft-light
+
+.centerHalo
+  opacity: var(--rb-center-halo-opacity)
+
+.centerVoid
+  fill: var(--rb-bg-color)
+  opacity: var(--rb-center-void-opacity)
 
 .background
   fill: var(--rb-bg-color)
@@ -107,17 +148,18 @@
 
 .birdsVariationToggle
   position: fixed
-  right: 1rem
-  bottom: 1rem
+  right: var(--spacing-side)
+  bottom: var(--spacing-base)
   z-index: 6000
   pointer-events: auto
-  border: 1px solid var(--theme-type)
-  background: var(--theme-blok-solid)
+  user-select: none
+  border: var(--border-width) solid var(--theme-type)
+  background: var(--theme-blok)
   color: var(--theme-type)
   font: inherit
-  font-size: 0.75rem
+  font-size: 14px
   line-height: 1
-  padding: 0.55rem 0.7rem
+  padding: 0.5rem calc(var(--spacing-base) / 2)
   cursor: pointer
   text-transform: uppercase
   letter-spacing: 0.04em

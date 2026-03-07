@@ -10,11 +10,11 @@ type BirdsSceneProps = {
 
 const SKY_VARIATION_NAMES = [
   'dawn',
-  'sunrise',
-  'day',
+  'noon',
   'sunset',
   'dusk',
-  'night',
+  'evening',
+  'predawn',
 ] as const;
 
 type SkyVariationName = (typeof SKY_VARIATION_NAMES)[number];
@@ -26,20 +26,33 @@ type SkyPalette = {
   fog: string;
 };
 
+type RuntimeState = {
+  THREE: any;
+  scene: any;
+  birdMaterial: any;
+  skyTopUniform: any;
+  skyHorizonUniform: any;
+  skyBottomUniform: any;
+  skyTopTarget: any;
+  skyHorizonTarget: any;
+  skyBottomTarget: any;
+  fogTarget: any;
+};
+
+type AppearanceState = {
+  backgroundColor: string;
+  birdColor: string;
+  skyVariation: string;
+};
+
 const SKY_PALETTES: Record<SkyVariationName, SkyPalette> = {
   dawn: {
     top: '#6A88C6',
     horizon: '#F5B38B',
-    bottom: '#FFE0C7',
+    bottom: '#FFF1E5',
     fog: '#F6D9C1',
   },
-  sunrise: {
-    top: '#79A5E0',
-    horizon: '#FFB16A',
-    bottom: '#FFD4A8',
-    fog: '#FFD0A1',
-  },
-  day: {
+  noon: {
     top: '#6EA6FF',
     horizon: '#B7D5FF',
     bottom: '#E6F2FF',
@@ -57,17 +70,21 @@ const SKY_PALETTES: Record<SkyVariationName, SkyPalette> = {
     bottom: '#F39D88',
     fog: '#9A7AA9',
   },
-  night: {
-    top: '#040913',
-    horizon: '#111A34',
-    bottom: '#263158',
-    fog: '#0D1530',
+  evening: {
+    top: '#101C43',
+    horizon: '#2B3D74',
+    bottom: '#6F6EA1',
+    fog: '#3A477A',
+  },
+  predawn: {
+    top: '#375189',
+    horizon: '#6D79AF',
+    bottom: '#BFC4DE',
+    fog: '#6C79A8',
   },
 };
 
-const resolveSkyVariation = (
-  skyVariation?: string,
-): SkyVariationName => {
+const resolveSkyVariation = (skyVariation?: string): SkyVariationName => {
   const normalized = (skyVariation ?? 'auto')
     .trim()
     .toLowerCase()
@@ -75,8 +92,12 @@ const resolveSkyVariation = (
 
   if (normalized === 'random') {
     const randomIndex = Math.floor(Math.random() * SKY_VARIATION_NAMES.length);
-    return SKY_VARIATION_NAMES[randomIndex] ?? 'day';
+    return SKY_VARIATION_NAMES[randomIndex] ?? 'noon';
   }
+
+  if (normalized === 'day') return 'noon';
+  if (normalized === 'sunrise') return 'dawn';
+  if (normalized === 'night') return 'evening';
 
   if (normalized !== 'auto') {
     const explicit = SKY_VARIATION_NAMES.find((name) => name === normalized);
@@ -84,18 +105,58 @@ const resolveSkyVariation = (
   }
 
   const hour = new Date().getHours();
+  if (hour >= 4 && hour < 5) return 'predawn';
   if (hour >= 5 && hour < 7) return 'dawn';
-  if (hour >= 7 && hour < 10) return 'sunrise';
-  if (hour >= 10 && hour < 17) return 'day';
+  if (hour >= 7 && hour < 10) return 'dawn';
+  if (hour >= 10 && hour < 17) return 'noon';
   if (hour >= 17 && hour < 19) return 'sunset';
   if (hour >= 19 && hour < 21) return 'dusk';
-  return 'night';
+  return 'evening';
+};
+
+const resolveSkyPalette = (
+  skyVariation: string | undefined,
+  fallbackColor: string,
+): SkyPalette => {
+  const selected = resolveSkyVariation(skyVariation);
+  const palette = SKY_PALETTES[selected];
+  return (
+    palette ?? {
+      top: fallbackColor,
+      horizon: fallbackColor,
+      bottom: fallbackColor,
+      fog: fallbackColor,
+    }
+  );
+};
+
+const applyRuntimeAppearance = (
+  runtime: RuntimeState,
+  appearance: AppearanceState,
+) => {
+  const palette = resolveSkyPalette(
+    appearance.skyVariation,
+    appearance.backgroundColor,
+  );
+  const top = new runtime.THREE.Color(palette.top);
+  const horizon = new runtime.THREE.Color(palette.horizon);
+  const bottom = new runtime.THREE.Color(palette.bottom);
+
+  runtime.skyTopTarget.set(top.r, top.g, top.b);
+  runtime.skyHorizonTarget.set(horizon.r, horizon.g, horizon.b);
+  runtime.skyBottomTarget.set(bottom.r, bottom.g, bottom.b);
+  runtime.fogTarget.set(palette.fog);
+
+  if (runtime.birdMaterial?.color?.set) {
+    runtime.birdMaterial.color.set(appearance.birdColor);
+  }
 };
 
 const BIRDS = 5000; // Max '8192'
 const SPEED_LIMIT = 9.0;
 const BOUNDS = 800;
 const BOUNDS_HALF = BOUNDS / 2;
+const SKY_PALETTE_FADE_SPEED = 2.4;
 
 // Inspired by https://threejs.org/examples/webgpu_compute_birds.html
 export default function BirdsScene({
@@ -105,6 +166,17 @@ export default function BirdsScene({
   skyVariation = 'auto',
 }: BirdsSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const runtimeRef = useRef<RuntimeState | null>(null);
+  const latestPropsRef = useRef({
+    backgroundColor,
+    birdColor,
+    skyVariation,
+  });
+  latestPropsRef.current = {
+    backgroundColor,
+    birdColor,
+    skyVariation,
+  };
 
   useEffect(() => {
     let isDisposed = false;
@@ -193,19 +265,30 @@ export default function BirdsScene({
       );
       camera.position.z = 1000;
 
-      const selectedSky = resolveSkyVariation(skyVariation);
-      const palette = SKY_PALETTES[selectedSky];
+      const initialPalette = resolveSkyPalette(
+        latestPropsRef.current.skyVariation,
+        latestPropsRef.current.backgroundColor,
+      );
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(palette?.fog ?? backgroundColor, 700, 3000);
+      scene.fog = new THREE.Fog(initialPalette.fog, 700, 3000);
 
       const pointer = new THREE.Vector2();
       pointer.set(20, 20);
       const raycaster = new THREE.Raycaster();
 
-      const topColor = new THREE.Color(palette?.top ?? '#6EA6FF');
-      const horizonColor = new THREE.Color(palette?.horizon ?? '#B7D5FF');
-      const bottomColor = new THREE.Color(palette?.bottom ?? '#E6F2FF');
+      const toVec3 = (hex: string) => {
+        const parsed = new THREE.Color(hex);
+        return new THREE.Vector3(parsed.r, parsed.g, parsed.b);
+      };
+
+      const skyTopUniform = uniform(toVec3(initialPalette.top));
+      const skyHorizonUniform = uniform(toVec3(initialPalette.horizon));
+      const skyBottomUniform = uniform(toVec3(initialPalette.bottom));
+      const skyTopTarget = toVec3(initialPalette.top);
+      const skyHorizonTarget = toVec3(initialPalette.horizon);
+      const skyBottomTarget = toVec3(initialPalette.bottom);
+      const fogTarget = new THREE.Color(initialPalette.fog);
 
       const skyGeometry = new THREE.IcosahedronGeometry(1, 6);
       const skyMaterial = new THREE.MeshBasicNodeMaterial({
@@ -214,11 +297,11 @@ export default function BirdsScene({
           vec4(
             mix(
               mix(
-                vec3(bottomColor.r, bottomColor.g, bottomColor.b),
-                vec3(horizonColor.r, horizonColor.g, horizonColor.b),
+                skyBottomUniform,
+                skyHorizonUniform,
                 clamp(positionLocal.y.mul(0.95).add(0.45), 0.0, 1.0),
               ),
-              vec3(topColor.r, topColor.g, topColor.b),
+              skyTopUniform,
               clamp(positionLocal.y.mul(1.2).sub(0.1), 0.0, 1.0),
             ),
             1.0,
@@ -295,7 +378,7 @@ export default function BirdsScene({
 
       const birdGeometry = new BirdGeometry();
       const birdMaterial: any = new THREE.NodeMaterial();
-      birdMaterial.color = new THREE.Color(birdColor);
+      birdMaterial.color = new THREE.Color(latestPropsRef.current.birdColor);
 
       const birdVertexTSL = Fn(() => {
         const position = positionLocal.toVar();
@@ -524,6 +607,12 @@ export default function BirdsScene({
 
         if (deltaTime > 1) deltaTime = 1;
         last = now;
+        const fadeAlpha = Math.min(1, deltaTime * SKY_PALETTE_FADE_SPEED);
+
+        skyTopUniform.value.lerp(skyTopTarget, fadeAlpha);
+        skyHorizonUniform.value.lerp(skyHorizonTarget, fadeAlpha);
+        skyBottomUniform.value.lerp(skyBottomTarget, fadeAlpha);
+        scene.fog.color.lerp(fogTarget, fadeAlpha);
 
         raycaster.setFromCamera(pointer, camera);
 
@@ -541,16 +630,26 @@ export default function BirdsScene({
 
       renderer.setAnimationLoop(render);
 
+      runtimeRef.current = {
+        THREE,
+        scene,
+        birdMaterial,
+        skyTopUniform,
+        skyHorizonUniform,
+        skyBottomUniform,
+        skyTopTarget,
+        skyHorizonTarget,
+        skyBottomTarget,
+        fogTarget,
+      };
+      applyRuntimeAppearance(runtimeRef.current, latestPropsRef.current);
+
       cleanup = () => {
+        runtimeRef.current = null;
         window.removeEventListener('resize', onWindowResize);
         window.removeEventListener('pointermove', onPointerMove);
         renderer.setAnimationLoop(null);
         renderer.dispose();
-
-        birdGeometry.dispose();
-        birdMaterial.dispose();
-        skyGeometry.dispose();
-        skyMaterial.dispose();
 
         if (host.contains(renderer.domElement)) {
           host.removeChild(renderer.domElement);
@@ -564,6 +663,17 @@ export default function BirdsScene({
       isDisposed = true;
       cleanup();
     };
+  }, []);
+
+  useEffect(() => {
+    const runtime = runtimeRef.current;
+    if (!runtime) return;
+
+    applyRuntimeAppearance(runtime, {
+      backgroundColor,
+      birdColor,
+      skyVariation,
+    });
   }, [backgroundColor, birdColor, skyVariation]);
 
   return <div ref={rootRef} className={className} aria-hidden="true" />;

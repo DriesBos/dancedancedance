@@ -584,7 +584,7 @@ export default function CustomCursor() {
         {message}
       </div>
       <div ref={previewRef} className={styles.preview} aria-hidden="true">
-        <img ref={previewImageRef} src="" alt="" />
+        <img ref={previewImageRef} src={undefined} alt="" />
       </div>
       <div
         ref={followerRef}
