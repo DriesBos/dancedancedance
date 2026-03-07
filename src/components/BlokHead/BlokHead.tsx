@@ -63,6 +63,9 @@ const BlokHead = ({}: Props) => {
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
+  const [isAboutLegsHovered, setIsAboutLegsHovered] = useState(false);
+  const [isAboutCrossHovered, setIsAboutCrossHovered] = useState(false);
+  const [isAboutMixedHovered, setIsAboutMixedHovered] = useState(false);
   const themeSpinTimeoutRef = useRef<number | null>(null);
   const spaceToggleRafRef = useRef<number | null>(null);
   const spaceToggleTimeoutRef = useRef<number | null>(null);
@@ -810,8 +813,16 @@ const BlokHead = ({}: Props) => {
                   <IconRocket />
                 </span>
               </button>
-              <Link href="/about" className="icon cursorMagnetic">
-                <IconAbout />
+              <Link
+                href="/about"
+                className="icon cursorMagnetic"
+                aria-label="About (mixed animation test)"
+                onMouseEnter={() => setIsAboutMixedHovered(true)}
+                onMouseLeave={() => setIsAboutMixedHovered(false)}
+                onFocus={() => setIsAboutMixedHovered(true)}
+                onBlur={() => setIsAboutMixedHovered(false)}
+              >
+                <IconAbout variant="mixed" animate={isAboutMixedHovered} />
               </Link>
               {/* <Link href="/blurbs" className="icon cursorMagnetic">
                 <IconThoughts />
