@@ -197,6 +197,8 @@ body[data-theme='KERMIT']
   --border-width: 2px
   --border-fatwidth: 2px
   --border-gap: 1rem
+  &[data-space='3D']
+    --panel-perspective-origin: 50% 0vh
   @media (max-width: 770px)
     --border-gap: 0.5rem
     --theme-bg: black
@@ -204,9 +206,6 @@ body[data-theme='KERMIT']
   @media (orientation: portrait)
     --theme-bg-gradient: 0
     --theme-bg: black
-
-  &[data-space='3D']
-    --panel-perspective-origin: 50% 0vh
 
 body[data-theme='TRON']
   --theme-bg: var(--color-black)
@@ -301,10 +300,12 @@ body[data-theme='AUGURIES']
   --theme-rotatingLines-bg: 1
   --border-color: white
   --border-width: 2px
-  --border-fatwidth: 2.5px
+  --border-fatwidth: 3px
   --cursor-color-bg: black
   --cursor-color-blok: black
   --slider-indicator: white
   --slider-indicator-active: black
   &[data-space='3D']
-    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 30vh)
+    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 40vh)
+  @media (max-width: 770px)
+    --border-color: black
