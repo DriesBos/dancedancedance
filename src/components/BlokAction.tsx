@@ -10,10 +10,12 @@ const MARQUEE_REPEATS_PER_GROUP = 50;
 
 export default function BlokAction() {
   return (
-    <div
+    <a
+      href="https://www.instagram.com/dries_bos"
+      target="_blank"
+      rel="noopener noreferrer"
       className="blok blok-Action blok-Animate cursorMessage"
       data-cursor-message="Start your project"
-      style={{ zIndex: 9999 }}
     >
       <GrainyGradient variant="blok" />
       <Row>
@@ -49,6 +51,6 @@ export default function BlokAction() {
           </div>
         </div>
       </Row>
-    </div>
+    </a>
   );
 }

@@ -12,9 +12,8 @@ import StoryblokProvider from '@/providers/storyblok-provider';
 import { ProjectsProvider } from '@/providers/projects-provider';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import AppInitializer from '@/components/AppInitStore';
-import ThemeBackground from '@/components/ThemeBackground';
 import BlokHeadWrapper from '@/components/BlokHeadWrapper';
-import BlokFilter from '@/components/BlokFilter';
+import BlokAction from '@/components/BlokAction';
 import BlokFooterWrapper from '@/components/BlokFooterWrapper';
 import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
@@ -181,6 +180,7 @@ export default async function RootLayout({
               <BlokHeadWrapper />
               {/* <BlokFilter /> */}
               {children}
+              <BlokAction />
               <BlokFooterWrapper />
             </main>
           </StoryblokProvider>
