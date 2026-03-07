@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 
 export type Theme =
-  | 'NIGHTMODE'
+  | 'NIGHT MODE'
   | 'TRON'
-  | 'DONJUDD'
+  | 'RADIANT'
+  | 'RADIANT DARK'
   | 'AUGURIES'
-  | 'STEDELIJK'
+  | 'KERMIT'
   | 'LIGHT'
   | 'DARK'
   | 'KUSAMA'
@@ -31,11 +32,12 @@ export type Actions = {
 };
 
 export const THEME_ORDER: Theme[] = [
-  'NIGHTMODE',
+  'NIGHT MODE',
   'TRON',
-  'DONJUDD',
+  'RADIANT',
+  'RADIANT DARK',
   'AUGURIES',
-  'STEDELIJK',
+  'KERMIT',
   'LIGHT',
   'DARK',
   'KUSAMA',
@@ -47,7 +49,7 @@ export const useStore = create<Props & Actions>()((set) => ({
   theme: 'LIGHT',
   space: '3D',
   topPanel: true,
-  setNightmode: () => set({ theme: 'NIGHTMODE' }),
+  setNightmode: () => set({ theme: 'NIGHT MODE' }),
   setDefault: () => set({ theme: 'LIGHT' }),
   setTheme: (theme: Theme) => set({ theme }),
   cycleTheme: () =>

@@ -59,7 +59,11 @@ const BlokHead = ({}: Props) => {
     })),
   );
   const isThreeDSpace = space === '3D';
-  const themeLabel = `${theme.charAt(0)}${theme.slice(1).toLowerCase()}`;
+  const themeLabel = theme
+    .toLowerCase()
+    .split(' ')
+    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+    .join(' ');
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);

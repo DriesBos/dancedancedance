@@ -20,17 +20,16 @@ import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
-import GrainyGradient from '@/components/GrainyGradient';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
 import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverlayEffectsByTheme';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
-    var daytimeThemes = ['TRON', 'DONJUDD', 'AUGURIES', 'STEDELIJK', 'LIGHT', 'DARK', 'KUSAMA', 'DOTS'];
+    var daytimeThemes = ['TRON', 'RADIANT', 'RADIANT DARK', 'AUGURIES', 'KERMIT', 'LIGHT', 'DARK', 'KUSAMA', 'DOTS'];
     var hour = new Date().getHours();
     var theme =
       hour >= 0 && hour < 5
-        ? 'NIGHTMODE'
+        ? 'NIGHT MODE'
         : daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
     var space = '3D';
 
@@ -114,7 +113,6 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }} />
         <BackgroundEffectsByTheme />
         <AppInitializer />
-        <GrainyGradient variant="page" />
         <ProjectsProvider projects={projects}>
           <CursorLoader />
           <TitleSwitcher />

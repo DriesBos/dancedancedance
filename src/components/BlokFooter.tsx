@@ -13,7 +13,11 @@ import { useStore } from '@/store/store';
 const BlokFooter = () => {
   const theme = useStore((state) => state.theme);
   const cycleTheme = useStore((state) => state.cycleTheme);
-  const themeLabel = `${theme.charAt(0)}${theme.slice(1).toLowerCase()}`;
+  const themeLabel = theme
+    .toLowerCase()
+    .split(' ')
+    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+    .join(' ');
 
   const handleCycleTheme = () => {
     cycleTheme();

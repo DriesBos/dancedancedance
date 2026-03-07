@@ -14,10 +14,12 @@ type InitialUIState = {
 const getInitialTheme = (): Theme => {
   const hour = new Date().getHours();
   if (hour >= 0 && hour < 5) {
-    return 'NIGHTMODE';
+    return 'NIGHT MODE';
   }
 
-  const daytimeThemes = THEME_ORDER.filter((themeName) => themeName !== 'NIGHTMODE');
+  const daytimeThemes = THEME_ORDER.filter(
+    (themeName) => themeName !== 'NIGHT MODE',
+  );
   return daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)] ?? 'LIGHT';
 };
 
