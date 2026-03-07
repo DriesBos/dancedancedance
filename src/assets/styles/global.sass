@@ -518,12 +518,11 @@ mux-player, .muxPlayer
     padding-top: calc(2 * var(--blok-height))
     overflow: hidden
     & > .blok
-      background: transparent
       border: 0
     @media (hover: hover)
       .blok-Project:hover
         transition-duration: 0.1s
-        transform: translateY(-1.35rem) !important
+        transform: translateY(-1.8rem) !important
   &-Filter
     justify-content: flex-end
   &-Project
@@ -534,10 +533,12 @@ mux-player, .muxPlayer
     transform: translateY(0)
     transition: transform 0.5s
     border-top: var(--border-width) solid var(--border-color) !important
+    background: var(--theme-blok)
     .row
       position: relative
       overflow: hidden
       border: 0 !important
+      background: var(--theme-blok)
       .grainyInRow
         z-index: 0
       & > .column
@@ -766,6 +767,22 @@ body
       main
         @media (max-width: 770px)
           width: calc(100% - var(--spacing-side))
+  &[data-theme='AUGURIES']
+    // WHEN theme-blok is semi-transparent THEN we remove overlapping layers and prevent overlap
+    .blok
+      &-Filter
+        .grainyGradient
+          opacity: 0
+      &-Project
+        background: transparent
+        .grainyGradient
+          opacity: 0
+        &:hover
+          @media (hover: hover)
+            transform: translateY(-1.35rem) !important
+        .row
+          background: transparent
+
 .clickable
   cursor: pointer
   user-select: none

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
+import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from './BlokSidePanels';
 
 interface Props {
@@ -58,7 +59,9 @@ const BlokProject = ({
       style={{ cursor: 'pointer', zIndex: stackIndex }}
     >
       <BlokSidePanels />
+      <GrainyGradient variant="blok" />
       <Row>
+        <GrainyGradient variant="blok" className="grainyInRow" />
         {displayYear && <div className="column column-Year">{displayYear}</div>}
         {title && <div className="column column-Project">{title}</div>}
         {category && (

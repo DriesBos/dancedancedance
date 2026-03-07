@@ -14,7 +14,7 @@ export default function GrainyGradient({
   return (
     <div
       aria-hidden="true"
-      className={`${styles.layer} ${isPage ? styles.page : styles.blok} ${className}`.trim()}
+      className={`grainyGradient ${styles.layer} ${isPage ? styles.page : styles.blok} ${className}`.trim()}
     />
   );
 }
