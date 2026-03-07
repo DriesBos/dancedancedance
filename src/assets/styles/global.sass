@@ -23,6 +23,7 @@ body
   justify-content: center
   align-items: flex-start
   padding: 0
+  padding-top: var(--spacing-containerTopDistance)
   min-height: 100vh
   min-height: 100lvh
   transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
@@ -710,8 +711,6 @@ body
       &-Head
         background: var(--theme-blok-solid)
   &[data-space="3D"]
-    // 124px panel height + blok height + desired margin
-    padding-top: calc(124px + var(--blok-height) + 20vh)
     padding-bottom: 6rem
     @media (orientation: portrait)
       padding-top: calc(124px + var(--blok-height) + 15vh)

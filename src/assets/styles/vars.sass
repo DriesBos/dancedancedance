@@ -83,6 +83,8 @@ $break-desktop: 1370px
   --spacing-between-images: 1.25rem
   --spacing-base: 1.25rem
   --spacing-half: 0.625rem
+  // 124px panel height + blok height + desired margin
+  --spacing-containerTopDistance: 0
   @media (max-width: 770px)
     --border-fatwidth: 2px
     --spacing-side: 1rem
@@ -106,6 +108,7 @@ body[data-space='DESKTOP']
 
 body[data-space='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
+  --spacing-containerTopDistance: calc(124px + var(--blok-height) + 20vh)
   --panel-perspective-origin: 50% -100vh
   @media (orientation: portrait)
     --panel-perspective-origin: 50% -75vh
@@ -292,3 +295,5 @@ body[data-theme='AUGURIES']
   --slider-indicator-active: black
   --theme-bg-gradient: 0
   --theme-blok-gradient: 0
+  &[data-space='3D']
+    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 30vh)
