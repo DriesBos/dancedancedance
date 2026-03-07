@@ -45,11 +45,11 @@ export default function BlokAction() {
             )}
           </div>
         </div>
-        <div className="column column-Icons">
+        {/* <div className="column column-Icons">
           <div className="icon">
             <IconArrow />
           </div>
-        </div>
+        </div> */}
       </Row>
     </a>
   );
