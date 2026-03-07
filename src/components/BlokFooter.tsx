@@ -65,7 +65,7 @@ const BlokFooter = () => {
             Thoughts
           </Link> */}
         </div>
-        <div className="column column-FooterColumn">
+        <div className="column column-FooterColumn desktop">
           <a
             href="mailto:info@driesbos.com?subject=Let's Make Internet"
             target="_blank"
