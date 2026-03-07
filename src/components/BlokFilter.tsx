@@ -30,7 +30,6 @@ export default function BlokFilter({
 
   return (
     <div className="blok blok-Filter blok-Animate">
-      <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row>
         <button
