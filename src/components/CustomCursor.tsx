@@ -116,6 +116,7 @@ export default function CustomCursor() {
     const setFollowerMode = (mode: FollowerMode) => {
       if (currentFollowerMode === mode) return;
       currentFollowerMode = mode;
+      follower.classList.toggle(styles.magnetic, mode === 'magnetic');
 
       const size =
         mode === 'magnetic'

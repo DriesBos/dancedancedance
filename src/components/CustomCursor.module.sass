@@ -3,11 +3,11 @@
   top: 0
   left: 0
   color: var(--cursor-color-bg)
-  border-radius: 50%
+  border-radius: var(--border-radius)
   pointer-events: none
   z-index: 9999
   will-change: transform
-  transition: color var(--transition-theme-quick)
+  transition: color var(--transition-cursor), border-radius var(--transition-cursor)
   @media (hover: none) or (pointer: coarse)
     display: none
 
@@ -23,7 +23,12 @@
   width: 0.9090909091rem
   height: 0.9090909091rem
   background-color: transparent
-  border: 1.5px solid currentColor
+  border: var(--border-width) solid currentColor
+  border-radius: var(--border-radius)
+  transition: border-radius var(--transition-cursor), border var(--transition-cursor)
+
+.magnetic
+  border-radius: var(--border-radius)
 
 .message
   opacity: 0
@@ -47,14 +52,14 @@
   aspect-ratio: 4 / 3
   pointer-events: none
   overflow: hidden
-  border: var(--border-width) solid var(--border-color)
+  border: var(--border-width) solid currentColor
   border-radius: var(--border-radius)
   background: var(--theme-blok-solid)
   z-index: 9998
   opacity: 0
   visibility: hidden
   will-change: transform, opacity
-  transition: border-color var(--transition-theme), background var(--transition-theme)
+  transition: border-color var(--transition-cursor), background var(--transition-cursor)
   img
     width: 100%
     height: 100%
