@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Space, THEME_ORDER, Theme, useStore } from '@/store/store';
+import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 type InitialUIState = {
@@ -91,6 +92,13 @@ const AppInitializer = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) return;
+
+    metaThemeColor.setAttribute('content', getThemeMetaColor(theme));
+  }, [theme]);
 
   useEffect(() => {
     if (pathname !== '/' || hasRunHomeIntroRef.current) return;

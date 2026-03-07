@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useStore } from '@/store/store';
+import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 const StoreSwitcher = () => {
@@ -17,10 +18,7 @@ const StoreSwitcher = () => {
   useEffect(() => {
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      const color =
-        theme === 'DARK' || theme === 'DOTS'
-          ? '#050709'
-          : '#FFFFFF';
+      const color = getThemeMetaColor(theme);
       metaThemeColor.setAttribute('content', color);
     }
   }, [theme]);

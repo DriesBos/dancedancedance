@@ -26,7 +26,7 @@ import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverla
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
-    var daytimeThemes = ['TRON', 'DONJUDD', 'STEDELIJK', 'LIGHT', 'DARK', 'KUSAMA', 'DOTS'];
+    var daytimeThemes = ['TRON', 'DONJUDD', 'AUGURIES', 'STEDELIJK', 'LIGHT', 'DARK', 'KUSAMA', 'DOTS'];
     var hour = new Date().getHours();
     var theme =
       hour >= 0 && hour < 5

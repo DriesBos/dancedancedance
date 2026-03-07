@@ -74,6 +74,8 @@ export default function FaviconSwitcher() {
         return '#80FFE9';
       case 'DONJUDD':
         return '#FA5942';
+      case 'AUGURIES':
+        return '#F3C96A';
       case 'STEDELIJK':
         return '#62C853';
       case 'LIGHT':

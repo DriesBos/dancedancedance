@@ -4,6 +4,7 @@ export type Theme =
   | 'NIGHTMODE'
   | 'TRON'
   | 'DONJUDD'
+  | 'AUGURIES'
   | 'STEDELIJK'
   | 'LIGHT'
   | 'DARK'
@@ -33,6 +34,7 @@ export const THEME_ORDER: Theme[] = [
   'NIGHTMODE',
   'TRON',
   'DONJUDD',
+  'AUGURIES',
   'STEDELIJK',
   'LIGHT',
   'DARK',
