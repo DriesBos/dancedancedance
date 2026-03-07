@@ -75,7 +75,7 @@ const INITIAL_UI_STATE_SCRIPT = `
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
-      document.body.setAttribute('data-space', layout);
+      document.body.setAttribute('data-layout', layout);
       document.body.setAttribute('data-sky-variation', skyVariation);
     }
 
