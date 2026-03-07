@@ -13,7 +13,7 @@ type InitialUIState = {
 };
 
 const getSkyVariationForHour = (hour: number): string => {
-  if (hour >= 4 && hour < 5) return 'predawn';
+  if (hour >= 4 && hour < 5) return 'morning';
   if (hour >= 5 && hour < 10) return 'dawn';
   if (hour >= 10 && hour < 17) return 'noon';
   if (hour >= 17 && hour < 19) return 'sunset';

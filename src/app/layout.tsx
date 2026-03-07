@@ -30,7 +30,7 @@ const INITIAL_UI_STATE_SCRIPT = `
     var hour = new Date().getHours();
     var skyVariation =
       hour >= 4 && hour < 5
-        ? 'predawn'
+        ? 'morning'
         : hour >= 5 && hour < 10
         ? 'dawn'
         : hour >= 10 && hour < 17

@@ -14,7 +14,7 @@ const SKY_VARIATION_NAMES = [
   'sunset',
   'dusk',
   'evening',
-  'predawn',
+  'morning',
 ] as const;
 
 type SkyVariationName = (typeof SKY_VARIATION_NAMES)[number];
@@ -76,7 +76,7 @@ const SKY_PALETTES: Record<SkyVariationName, SkyPalette> = {
     bottom: '#6F6EA1',
     fog: '#3A477A',
   },
-  predawn: {
+  morning: {
     top: '#375189',
     horizon: '#6D79AF',
     bottom: '#BFC4DE',
@@ -105,7 +105,7 @@ const resolveSkyVariation = (skyVariation?: string): SkyVariationName => {
   }
 
   const hour = new Date().getHours();
-  if (hour >= 4 && hour < 5) return 'predawn';
+  if (hour >= 4 && hour < 5) return 'morning';
   if (hour >= 5 && hour < 7) return 'dawn';
   if (hour >= 7 && hour < 10) return 'dawn';
   if (hour >= 10 && hour < 17) return 'noon';

@@ -23,7 +23,7 @@ const BIRDS_SKY_VARIATIONS = [
   'sunset',
   'dusk',
   'evening',
-  'predawn',
+  'morning',
 ] as const;
 
 const formatLocalTime = () =>
@@ -34,7 +34,7 @@ const formatLocalTime = () =>
   }).format(new Date());
 
 const getSkyVariationForHour = (hour: number) => {
-  if (hour >= 4 && hour < 5) return 'predawn';
+  if (hour >= 4 && hour < 5) return 'morning';
   if (hour >= 5 && hour < 10) return 'dawn';
   if (hour >= 10 && hour < 17) return 'noon';
   if (hour >= 17 && hour < 19) return 'sunset';
@@ -676,7 +676,9 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
 
   const activeSkyVariation = testingSkyVariation ?? sceneColors.skyVariation;
   const buttonLabel =
-    activeSkyVariation === localSkyVariation ? localTime : activeSkyVariation;
+    activeSkyVariation === localSkyVariation
+      ? localTime + ' ' + activeSkyVariation
+      : activeSkyVariation;
 
   const handleToggleSkyVariation = () => {
     const currentIndex = BIRDS_SKY_VARIATIONS.indexOf(
@@ -706,7 +708,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
       </div>
       <button
         type="button"
-        className={styles.birdsVariationToggle}
+        className={`${styles.birdsVariationToggle} cursorInteract`}
         onClick={handleToggleSkyVariation}
       >
         {buttonLabel}
