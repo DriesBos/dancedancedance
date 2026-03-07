@@ -197,13 +197,17 @@ body[data-theme='STEDELIJK']
     --border-gap: 0.5rem
     --theme-bg: black
     --theme-bg-gradient: 0
+  @media (orientation: portrait)
+    --theme-bg-gradient: 0
+    --theme-bg: black
+
   &[data-space='3D']
     --panel-perspective-origin: 50% 0vh
 
 body[data-theme='TRON']
   --theme-bg: var(--color-black)
   --theme-blok: var(--color-black)
-  --theme-blok-showlines: var(--theme-blok)
+  --theme-blok-showlines: transparent
   --theme-blok-solid: var(--color-black)
   --theme-type: hsla(172, 100%, 75%, 1)
   --theme-type-inactive: hsla(172, 100%, 75%, 0.4)
