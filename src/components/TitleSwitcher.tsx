@@ -12,7 +12,7 @@ export default function TitleSwitcher() {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // User left the tab
-        document.title = 'Hire this guy👨‍💻';
+        document.title = 'Hire this guy';
       } else {
         // User returned to the tab
         document.title = originalTitle;
