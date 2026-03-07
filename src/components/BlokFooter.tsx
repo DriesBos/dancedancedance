@@ -9,6 +9,7 @@ import Newsletter from './Newsletter/Newsletter';
 import IconArrowHead from './Icons/IconArrowHead';
 import GrainyGradient from '@/components/GrainyGradient';
 import { useStore } from '@/store/store';
+import BlokSidePanels from './BlokSidePanels';
 
 const BlokFooter = () => {
   const theme = useStore((state) => state.theme);
@@ -47,6 +48,7 @@ const BlokFooter = () => {
   return (
     <div className="blok blok-Footer blok-Animate">
       <GrainyGradient variant="blok" />
+      <BlokSidePanels />
       <Row>
         <div className="column column-Year column-Copyright">
           {new Date().getFullYear()}

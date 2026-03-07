@@ -528,6 +528,8 @@ mux-player, .muxPlayer
     cursor: pointer
 
   // Specific Bloks
+  &-Footer
+    transition: margin-top var(--transition-theme)
   &-Animate
     opacity: 0
     .column-Icons
@@ -605,8 +607,6 @@ mux-player, .muxPlayer
     flex-wrap: nowrap
     @media (max-width: 770px)
       flex-direction: column
-  &-Footer
-    padding-top: calc(2 * var(--blok-height))
 
 // .themeBackground
 //   position: fixed
@@ -741,12 +741,14 @@ body
     .blok
       border-left-width: 0
       border-right-width: 0
+      &-Head
+        background: var(--theme-blok-solid)
       &-ProjectSlider
         padding-top: calc(2 * var(--blok-height))
       &-Project
         overflow: hidden
-      &-Head
-        background: var(--theme-blok-solid)
+      &-Footer
+        padding-top: calc(2 * var(--blok-height))
   &[data-layout="3D"]
     padding-bottom: 6rem
     @media (orientation: portrait)
@@ -758,12 +760,19 @@ body
       @media (max-width: 770px)
         width: calc(100% - 2 * var(--spacing-side))
     .blok
+      &-Action
+        z-index: 2
       &-Head
         background: var(--theme-blok-showlines)
         &[data-forced-closed='true']
           background: var(--theme-blok-solid)
         .side_Top
           background: var(--theme-blok-showlines)
+      &-Footer
+        z-index: 1
+        margin-top: var(--blok-height)
+        .side_Top
+          opacity: 1
   &[data-theme='KERMIT']
     padding-bottom: 4vh
     .blok
@@ -783,6 +792,7 @@ body
     .page-Project
       & > div:nth-child(2)
         padding-top: 0
+    // KERMIT => desktop
     &[data-layout="DESKTOP"]
       padding-bottom: calc(var(--border-gap) * 2)
       main
@@ -795,6 +805,7 @@ body
         &-Filter
           border-left-width: 0
           border-right-width: 0
+    // Kermit => 3D
     &[data-layout="3D"]
       padding-bottom: calc(var(--border-gap) * 2)
       main
