@@ -58,9 +58,7 @@ function RadiatingBackground() {
           ? DEFAULT_LINE_GAP_RADIANT_DARK
           : DEFAULT_LINE_GAP;
       const gap =
-        Number.isFinite(parsedGap) && parsedGap > 0
-          ? parsedGap
-          : fallbackGap;
+        Number.isFinite(parsedGap) && parsedGap > 0 ? parsedGap : fallbackGap;
       const circumference = 2 * Math.PI * EDGE_DISTANCE;
       const computedCount = Math.round(circumference / gap);
       const clampedCount = Math.min(720, Math.max(48, computedCount));
@@ -129,8 +127,7 @@ function RadiatingBackground() {
           opacity:
             0.58 +
             0.37 *
-              (0.5 +
-                0.5 * Math.sin(index * 0.61 + Math.sin(index * 0.17))),
+              (0.5 + 0.5 * Math.sin(index * 0.61 + Math.sin(index * 0.17))),
           glowOpacity: 0.2 + 0.4 * (0.5 + 0.5 * Math.sin(index * 0.43 + 0.7)),
           widthScale,
         };
@@ -232,7 +229,12 @@ function RadiatingBackground() {
                   stopColor="var(--rb-line-gradient-tail, var(--rb-line-color))"
                 />
               </radialGradient>
-              <radialGradient id={centerHaloGradientId} cx="50%" cy="50%" r="50%">
+              <radialGradient
+                id={centerHaloGradientId}
+                cx="50%"
+                cy="50%"
+                r="50%"
+              >
                 <stop offset="0%" stopColor="rgba(0, 0, 0, 0)" />
                 <stop
                   offset="62%"
@@ -273,7 +275,13 @@ function RadiatingBackground() {
               >
                 <feGaussianBlur stdDeviation="1.25" />
               </filter>
-              <filter id={paperNoiseFilterId} x="0%" y="0%" width="100%" height="100%">
+              <filter
+                id={paperNoiseFilterId}
+                x="0%"
+                y="0%"
+                width="100%"
+                height="100%"
+              >
                 <feTurbulence
                   type="fractalNoise"
                   baseFrequency="0.82"
@@ -600,8 +608,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
       const cssSkyVariation = styles
         .getPropertyValue('--be-birds-sky-variation')
         .trim();
-      const skyVariation =
-        bodySkyVariation || cssSkyVariation || 'auto';
+      const skyVariation = bodySkyVariation || cssSkyVariation || 'auto';
 
       setSceneColors((previous) => {
         if (
