@@ -694,7 +694,9 @@ body
       & > :first-child + .blok .side_Top
         opacity: 1
   &[data-space="DESKTOP"]
-    padding: 0
+    padding-left: 0
+    padding-right: 0
+    padding-bottom: 0
     .page-Project
       & > div:nth-child(2)
         padding-top: calc(2 * var(--blok-height))
@@ -729,6 +731,7 @@ body
         .side_Top
           background: var(--theme-blok-showlines)
   &[data-theme='KERMIT']
+    padding-bottom: 4vh
     .blok
       overflow: hidden
       &-Footer, &-ProjectList
