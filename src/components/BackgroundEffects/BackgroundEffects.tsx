@@ -577,7 +577,9 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     bird: '#000000',
     skyVariation: 'auto',
   });
-  const [testingSkyVariation, setTestingSkyVariation] = useState<string>('dawn');
+  const [testingSkyVariation, setTestingSkyVariation] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const host = rootRef.current;
@@ -593,8 +595,13 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
         styles.getPropertyValue('--be-birds-color').trim() ||
         styles.getPropertyValue('--theme-type').trim() ||
         '#000000';
+      const bodySkyVariation =
+        document.body?.getAttribute('data-sky-variation')?.trim() ?? '';
+      const cssSkyVariation = styles
+        .getPropertyValue('--be-birds-sky-variation')
+        .trim();
       const skyVariation =
-        styles.getPropertyValue('--be-birds-sky-variation').trim() || 'auto';
+        bodySkyVariation || cssSkyVariation || 'auto';
 
       setSceneColors((previous) => {
         if (
@@ -619,7 +626,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     const observer = new MutationObserver(updateColors);
     observer.observe(document.body, {
       attributes: true,
-      attributeFilter: ['data-theme'],
+      attributeFilter: ['data-theme', 'data-sky-variation'],
     });
 
     return () => {
@@ -628,7 +635,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     };
   }, []);
 
-  const activeSkyVariation = testingSkyVariation;
+  const activeSkyVariation = testingSkyVariation ?? sceneColors.skyVariation;
 
   const handleToggleSkyVariation = () => {
     const currentIndex = BIRDS_SKY_VARIATIONS.indexOf(

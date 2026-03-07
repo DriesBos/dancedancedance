@@ -28,6 +28,18 @@ const INITIAL_UI_STATE_SCRIPT = `
     var isHome = window.location.pathname === '/';
     var daytimeThemes = ['TRON', 'RADIANT', 'RADIANT DARK', 'AUGURIES', 'KERMIT', 'LIGHT', 'DARK', 'KUSAMA', 'DOTS'];
     var hour = new Date().getHours();
+    var skyVariation =
+      hour >= 4 && hour < 5
+        ? 'predawn'
+        : hour >= 5 && hour < 10
+        ? 'dawn'
+        : hour >= 10 && hour < 17
+        ? 'noon'
+        : hour >= 17 && hour < 19
+        ? 'sunset'
+        : hour >= 19 && hour < 21
+        ? 'dusk'
+        : 'evening';
     var theme =
       isHome
         ? 'RADIANT'
@@ -36,11 +48,12 @@ const INITIAL_UI_STATE_SCRIPT = `
         : daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
     var space = '3D';
 
-    window.__DDD_INITIAL_STATE__ = { theme: theme, space: space };
+    window.__DDD_INITIAL_STATE__ = { theme: theme, space: space, skyVariation: skyVariation };
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
       document.body.setAttribute('data-space', space);
+      document.body.setAttribute('data-sky-variation', skyVariation);
     }
   })();
 `;
