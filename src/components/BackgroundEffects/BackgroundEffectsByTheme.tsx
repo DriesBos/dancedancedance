@@ -6,7 +6,11 @@ import { useStore } from '@/store/store';
 export default function BackgroundEffectsByTheme() {
   const theme = useStore((state) => state.theme);
 
-  if (theme === 'DONJUDD') {
+  if (theme === 'AUGURIES') {
+    return <BackgroundEffects version="birds" />;
+  }
+
+  if (theme === 'RADIANT' || theme === 'RADIANT DARK') {
     return <BackgroundEffects version="radiating" />;
   }
 

@@ -9,15 +9,24 @@ import {
 } from './segmentsSketch';
 import { createKusamaSketch, KUSAMA_DEFAULT_PARAMS } from './kusamaSketch';
 import DotsScene from './dotsScene';
+import BirdsScene from './birdsScene';
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
+const BIRDS_SKY_VARIATIONS = [
+  'dawn',
+  'sunrise',
+  'day',
+  'sunset',
+  'dusk',
+  'night',
+] as const;
 
 type BackgroundEffectsProps = {
-  version: 'radiating' | 'segments' | 'kusama' | 'dots';
+  version: 'radiating' | 'segments' | 'kusama' | 'dots' | 'birds';
   densityScale?: number;
   layer?: 'background' | 'overlay';
   active?: boolean;
@@ -53,7 +62,8 @@ function RadiatingBackground() {
         const dx = Math.cos(angle);
         const dy = Math.sin(angle);
         const fromScale = 0;
-        const baseToScale = EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy));
+        const baseToScale =
+          EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy));
         // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
         const toScale = baseToScale * (1 + 0.025 * Math.sin(index * 0.39));
 
@@ -329,9 +339,7 @@ function DotsBackground({
       ref={rootRef}
       className={`${styles.root} ${styles.dotsRoot} ${
         layer === 'overlay' ? styles.overlayRoot : ''
-      } ${
-        layer === 'overlay' && active ? styles.overlayVisible : ''
-      }`}
+      } ${layer === 'overlay' && active ? styles.overlayVisible : ''}`}
       data-version="dots"
       aria-hidden="true"
     >
@@ -349,15 +357,122 @@ function DotsBackground({
   );
 }
 
+function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [sceneColors, setSceneColors] = useState({
+    background: '#FFFFFF',
+    bird: '#000000',
+    skyVariation: 'auto',
+  });
+  const [testingSkyVariation, setTestingSkyVariation] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const host = rootRef.current;
+    if (!host) return;
+
+    const updateColors = () => {
+      const styles = getComputedStyle(host);
+      const background =
+        styles.getPropertyValue('--be-birds-bg-color').trim() ||
+        styles.getPropertyValue('--theme-bg').trim() ||
+        '#FFFFFF';
+      const bird =
+        styles.getPropertyValue('--be-birds-color').trim() ||
+        styles.getPropertyValue('--theme-type').trim() ||
+        '#000000';
+      const skyVariation =
+        styles.getPropertyValue('--be-birds-sky-variation').trim() || 'auto';
+
+      setSceneColors((previous) => {
+        if (
+          previous.background === background &&
+          previous.bird === bird &&
+          previous.skyVariation === skyVariation
+        ) {
+          return previous;
+        }
+
+        return {
+          background,
+          bird,
+          skyVariation,
+        };
+      });
+    };
+
+    updateColors();
+    window.addEventListener('resize', updateColors, { passive: true });
+
+    const observer = new MutationObserver(updateColors);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateColors);
+      observer.disconnect();
+    };
+  }, []);
+
+  const activeSkyVariation = testingSkyVariation ?? sceneColors.skyVariation;
+
+  const handleToggleSkyVariation = () => {
+    const currentIndex = BIRDS_SKY_VARIATIONS.indexOf(
+      activeSkyVariation as (typeof BIRDS_SKY_VARIATIONS)[number],
+    );
+    const safeCurrentIndex = currentIndex >= 0 ? currentIndex : -1;
+    const nextIndex = (safeCurrentIndex + 1) % BIRDS_SKY_VARIATIONS.length;
+    const nextVariation = BIRDS_SKY_VARIATIONS[nextIndex];
+    setTestingSkyVariation(nextVariation);
+  };
+
+  return (
+    <>
+      <div
+        ref={rootRef}
+        className={`${styles.root} ${styles.birdsRoot}`}
+        data-version="birds"
+        aria-hidden="true"
+      >
+        <BirdsScene
+          className={styles.birdsCanvas}
+          backgroundColor={sceneColors.background}
+          birdColor={sceneColors.bird}
+          skyVariation={activeSkyVariation}
+          densityScale={densityScale}
+        />
+      </div>
+      <button
+        type="button"
+        className={styles.birdsVariationToggle}
+        onClick={handleToggleSkyVariation}
+      >
+        Sky: {activeSkyVariation}
+      </button>
+    </>
+  );
+}
+
 export default function BackgroundEffects({
   version,
   densityScale,
   layer,
   active,
 }: BackgroundEffectsProps) {
+  if (version === 'birds') {
+    return <BirdsBackground densityScale={densityScale} />;
+  }
+
   if (version === 'dots') {
     return (
-      <DotsBackground densityScale={densityScale} layer={layer} active={active} />
+      <DotsBackground
+        densityScale={densityScale}
+        layer={layer}
+        active={active}
+      />
     );
   }
 
