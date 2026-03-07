@@ -41,7 +41,7 @@ const BlokHead = ({}: Props) => {
   const {
     theme,
     cycleTheme,
-    space,
+    layout,
     setTwoD,
     setThreeD,
     topPanel,
@@ -51,7 +51,7 @@ const BlokHead = ({}: Props) => {
     useShallow((state) => ({
       theme: state.theme,
       cycleTheme: state.cycleTheme,
-      space: state.space,
+      layout: state.layout,
       setTwoD: state.setTwoD,
       setThreeD: state.setThreeD,
       topPanel: state.topPanel,
@@ -59,12 +59,13 @@ const BlokHead = ({}: Props) => {
       setTopPanelFalse: state.setTopPanelFalse,
     })),
   );
-  const isThreeDSpace = space === '3D';
+  const isThreeDSpace = layout === '3D';
   const themeLabel = theme
     .toLowerCase()
     .split(' ')
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
+  const layoutLabel = layout === 'DESKTOP' ? 'Desktop' : '3D';
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
@@ -123,7 +124,7 @@ const BlokHead = ({}: Props) => {
 
   const toggleSpace = useCallback(() => {
     const applyNextSpace = () => {
-      if (space === '3D') {
+      if (layout === '3D') {
         setTwoD();
         return;
       }
@@ -173,7 +174,7 @@ const BlokHead = ({}: Props) => {
 
     spaceToggleRafRef.current = window.requestAnimationFrame(checkTop);
     spaceToggleTimeoutRef.current = window.setTimeout(settle, 1200);
-  }, [space, setTwoD, setThreeD]);
+  }, [layout, setTwoD, setThreeD]);
 
   const handleCycleTheme = useCallback(() => {
     cycleTheme();
@@ -811,6 +812,7 @@ const BlokHead = ({}: Props) => {
                 type="button"
                 className={`icon iconRocket cursorMagnetic ${styles.spaceButton}`}
                 onClick={toggleSpace}
+                title={`Layout: ${layoutLabel}`}
               >
                 <span className={styles.rocketWrap}>
                   <IconRocket />
@@ -824,6 +826,7 @@ const BlokHead = ({}: Props) => {
                 onMouseLeave={() => setIsAboutMixedHovered(false)}
                 onFocus={() => setIsAboutMixedHovered(true)}
                 onBlur={() => setIsAboutMixedHovered(false)}
+                title="About"
               >
                 <IconAbout variant="mixed" animate={isAboutMixedHovered} />
               </Link>

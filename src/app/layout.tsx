@@ -45,7 +45,7 @@ const INITIAL_UI_STATE_SCRIPT = `
         : hour >= 0 && hour < 5
         ? 'NIGHT MODE'
         : daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
-    var space = '3D';
+    var layout = '3D';
     var auguriesMetaColors = {
       morning: '#6D79AF',
       dawn: '#F5B38B',
@@ -71,11 +71,11 @@ const INITIAL_UI_STATE_SCRIPT = `
         ? (auguriesMetaColors[skyVariation] || themeMetaColors.AUGURIES)
         : (themeMetaColors[theme] || '#FFFFFF');
 
-    window.__DDD_INITIAL_STATE__ = { theme: theme, space: space, skyVariation: skyVariation };
+    window.__DDD_INITIAL_STATE__ = { theme: theme, layout: layout, skyVariation: skyVariation };
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
-      document.body.setAttribute('data-space', space);
+      document.body.setAttribute('data-space', layout);
       document.body.setAttribute('data-sky-variation', skyVariation);
     }
 

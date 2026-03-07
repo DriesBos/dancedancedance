@@ -2,13 +2,13 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { Space, THEME_ORDER, Theme, useStore } from '@/store/store';
+import { Layout, THEME_ORDER, Theme, useStore } from '@/store/store';
 import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 type InitialUIState = {
   theme: Theme;
-  space: Space;
+  layout: Layout;
   skyVariation: string;
 };
 
@@ -38,7 +38,7 @@ const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
   return {
     theme: getInitialTheme(hour),
-    space: '3D',
+    layout: '3D',
     skyVariation: getSkyVariationForHour(hour),
   };
 };
@@ -47,7 +47,7 @@ const getHomeInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
   return {
     theme: 'RADIANT',
-    space: '3D',
+    layout: '3D',
     skyVariation: getSkyVariationForHour(hour),
   };
 };
@@ -72,7 +72,7 @@ const getInitialUIState = (pathname: string): InitialUIState => {
 
 const applyBodyState = (
   theme: Theme,
-  space: Space,
+  layout: Layout,
   slug: string,
   skyVariation: string,
 ) => {
@@ -80,7 +80,7 @@ const applyBodyState = (
   if (!body) return;
 
   body.setAttribute('data-theme', theme);
-  body.setAttribute('data-space', space);
+  body.setAttribute('data-space', layout);
   body.setAttribute('data-page', slug);
   body.setAttribute('data-border', 'minimal');
   body.setAttribute('data-sky-variation', skyVariation);
@@ -90,13 +90,13 @@ const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const skyVariationRef = useRef('auto');
   const readyFrameRef = useRef<number | null>(null);
-  const { setTwoD, setThreeD, setTheme, theme, space } = useStore(
+  const { setTwoD, setThreeD, setTheme, theme, layout } = useStore(
     useShallow((state) => ({
       setTwoD: state.setTwoD,
       setThreeD: state.setThreeD,
       setTheme: state.setTheme,
       theme: state.theme,
-      space: state.space,
+      layout: state.layout,
     })),
   );
   const path = usePathname();
@@ -111,7 +111,7 @@ const AppInitializer = () => {
       skyVariationRef.current = initialState.skyVariation || 'auto';
       applyBodyState(
         initialState.theme,
-        initialState.space,
+        initialState.layout,
         slug,
         skyVariationRef.current,
       );
@@ -120,8 +120,8 @@ const AppInitializer = () => {
         setTheme(initialState.theme);
       }
 
-      if (space !== initialState.space) {
-        if (initialState.space === 'DESKTOP') {
+      if (layout !== initialState.layout) {
+        if (initialState.layout === 'DESKTOP') {
           setTwoD();
         } else {
           setThreeD();
@@ -138,8 +138,8 @@ const AppInitializer = () => {
       return;
     }
 
-    applyBodyState(theme, space, slug, skyVariationRef.current);
-  }, [pathname, setTheme, setThreeD, setTwoD, slug, space, theme]);
+    applyBodyState(theme, layout, slug, skyVariationRef.current);
+  }, [pathname, setTheme, setThreeD, setTwoD, slug, layout, theme]);
 
   useEffect(() => {
     return () => {

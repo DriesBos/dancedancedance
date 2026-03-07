@@ -12,15 +12,26 @@ import { useStore } from '@/store/store';
 
 const BlokFooter = () => {
   const theme = useStore((state) => state.theme);
+  const layout = useStore((state) => state.layout);
   const cycleTheme = useStore((state) => state.cycleTheme);
+  const setTwoD = useStore((state) => state.setTwoD);
+  const setThreeD = useStore((state) => state.setThreeD);
   const themeLabel = theme
     .toLowerCase()
     .split(' ')
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
+  const layoutLabel = layout === 'DESKTOP' ? 'Desktop' : '3D';
 
   const handleCycleTheme = () => {
     cycleTheme();
+  };
+  const handleCycleLayout = () => {
+    if (layout === 'DESKTOP') {
+      setThreeD();
+      return;
+    }
+    setTwoD();
   };
 
   const ScrollToTop = () => {
@@ -85,6 +96,16 @@ const BlokFooter = () => {
             title={`Theme: ${themeLabel}`}
           >
             Theme: {themeLabel}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleCycleLayout}
+            className="cursorInteract linkAnimation"
+            aria-label={`Cycle layout. Current layout: ${layoutLabel}`}
+            title={`Layout: ${layoutLabel}`}
+          >
+            Layout: {layoutLabel}
           </button>
         </div>
         <div className="column column-Icons">

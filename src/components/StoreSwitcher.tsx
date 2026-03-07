@@ -6,11 +6,11 @@ import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 const StoreSwitcher = () => {
-  const { cycleTheme, theme, space } = useStore(
+  const { cycleTheme, theme, layout } = useStore(
     useShallow((state) => ({
       cycleTheme: state.cycleTheme,
       theme: state.theme,
-      space: state.space,
+      layout: state.layout,
     })),
   );
 
@@ -28,7 +28,7 @@ const StoreSwitcher = () => {
   }
 
   function handlePickSpace() {
-    if (space === 'DESKTOP') {
+    if (layout === 'DESKTOP') {
       useStore.getState().setThreeD();
     } else {
       useStore.getState().setTwoD();

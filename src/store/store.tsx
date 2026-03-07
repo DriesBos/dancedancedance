@@ -12,11 +12,11 @@ export type Theme =
   | 'KUSAMA'
   | 'DOTS';
 
-export type Space = 'DESKTOP' | '3D';
+export type Layout = 'DESKTOP' | '3D';
 
 export type Props = {
   theme: Theme;
-  space: Space;
+  layout: Layout;
   topPanel: boolean;
 };
 
@@ -65,7 +65,7 @@ const getNextThemeForButtonCycle = (currentTheme: Theme): Theme => {
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
   theme: 'LIGHT',
-  space: '3D',
+  layout: '3D',
   topPanel: true,
   setNightmode: () => set({ theme: 'NIGHT MODE' }),
   setDefault: () => set({ theme: 'LIGHT' }),
@@ -74,8 +74,8 @@ export const useStore = create<Props & Actions>()((set) => ({
     set((state) => {
       return { theme: getNextThemeForButtonCycle(state.theme) };
     }),
-  setTwoD: () => set({ space: 'DESKTOP' }),
-  setThreeD: () => set({ space: '3D' }),
+  setTwoD: () => set({ layout: 'DESKTOP' }),
+  setThreeD: () => set({ layout: '3D' }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
 }));
