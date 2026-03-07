@@ -1,7 +1,35 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@/store/store';
+import { ICON_ABOUT_FRAME_PATHS } from '@/components/Icons/IconAbout';
+
+const MIXED_FAVICON_FRAMES: Array<keyof typeof ICON_ABOUT_FRAME_PATHS> = [
+  'default',
+  'leftArmRightLeg',
+  'default',
+  'rightArmLeftLeg',
+  'default',
+  'rightLeg',
+  'default',
+  'leftLeg',
+];
+
+const FAVICON_FRAME_DURATION_MS = 500;
+
+const getOrCreateFaviconLink = (rel: 'icon' | 'shortcut icon') => {
+  const existing = document.querySelector<HTMLLinkElement>(
+    `link[rel='${rel}'][data-favicon-switcher='true']`,
+  );
+  if (existing) return existing;
+
+  const link = document.createElement('link');
+  link.rel = rel;
+  link.type = 'image/svg+xml';
+  link.setAttribute('data-favicon-switcher', 'true');
+  document.head.appendChild(link);
+  return link;
+};
 
 export default function FaviconSwitcher() {
   const theme = useStore((state) => state.theme);
@@ -37,59 +65,63 @@ export default function FaviconSwitcher() {
     };
   }, []);
 
-  useEffect(() => {
+  const themeColor = useMemo(() => {
     const defaultColor = browserTheme === 'dark' ? '#FFFFFF' : '#000000';
-    const themeColor = (() => {
-      switch (theme) {
-        case 'NIGHTMODE':
-          return '#FF0000';
-        case 'TRON':
-          return '#80FFE9';
-        case 'DONJUDD':
-          return '#FA5942';
-        case 'STEDELIJK':
-          return '#62C853';
-        case 'LIGHT':
-          return defaultColor;
-        case 'DARK':
-          return defaultColor;
-        case 'KUSAMA':
-          return '#BA3A52';
-        case 'DOTS':
-          return '#FFFFFF';
-        default:
-          return defaultColor;
-      }
-    })();
+    switch (theme) {
+      case 'NIGHTMODE':
+        return '#FF0000';
+      case 'TRON':
+        return '#80FFE9';
+      case 'DONJUDD':
+        return '#FA5942';
+      case 'STEDELIJK':
+        return '#62C853';
+      case 'LIGHT':
+        return defaultColor;
+      case 'DARK':
+        return defaultColor;
+      case 'KUSAMA':
+        return '#BA3A52';
+      case 'DOTS':
+        return '#FFFFFF';
+      default:
+        return defaultColor;
+    }
+  }, [theme, browserTheme]);
 
-    const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25"><path d="M12.25,0 C13.625,0 14.75,1.125 14.75,2.5 C14.75,3.875 13.625,5 12.25,5 C10.875,5 9.75,3.875 9.75,2.5 C9.75,1.125 10.875,0 12.25,0 Z M23.5,8.75 L16,8.75 L16,25 L13.5,25 L13.5,17.5 L11,17.5 L11,25 L8.5,25 L8.5,8.75 L1,8.75 L1,6.25 L23.5,6.25 L23.5,8.75 Z" fill="${themeColor}" fill-rule="nonzero"/></svg>`;
-    const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+  useEffect(() => {
+    const unmanagedFavicons = document.querySelectorAll<HTMLLinkElement>(
+      "link[rel='icon']:not([data-favicon-switcher='true']), link[rel='shortcut icon']:not([data-favicon-switcher='true'])",
+    );
+    unmanagedFavicons.forEach((link) => link.remove());
 
-    const existingFavicons = document.querySelectorAll(
-      "link[rel='icon'], link[rel='shortcut icon']",
+    const iconLink = getOrCreateFaviconLink('icon');
+    const shortcutLink = getOrCreateFaviconLink('shortcut icon');
+
+    let frameIndex = 0;
+
+    const renderFrame = () => {
+      const framePath =
+        ICON_ABOUT_FRAME_PATHS[MIXED_FAVICON_FRAMES[frameIndex]];
+      const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25"><path d="${framePath}" fill="${themeColor}"/></svg>`;
+      const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
+
+      iconLink.href = faviconHref;
+      shortcutLink.href = faviconHref;
+
+      frameIndex = (frameIndex + 1) % MIXED_FAVICON_FRAMES.length;
+    };
+
+    renderFrame();
+    const intervalId = window.setInterval(
+      renderFrame,
+      FAVICON_FRAME_DURATION_MS,
     );
 
-    for (let i = 0; i < existingFavicons.length; i += 1) {
-      const link = existingFavicons[i];
-      if (typeof link.remove === 'function') {
-        link.remove();
-      } else if (link.parentNode) {
-        link.parentNode.removeChild(link);
-      }
-    }
-
-    const svgFavicon = document.createElement('link');
-    svgFavicon.rel = 'icon';
-    svgFavicon.type = 'image/svg+xml';
-    svgFavicon.href = faviconHref;
-    document.head.appendChild(svgFavicon);
-
-    const shortcutIcon = document.createElement('link');
-    shortcutIcon.rel = 'shortcut icon';
-    shortcutIcon.type = 'image/svg+xml';
-    shortcutIcon.href = faviconHref;
-    document.head.appendChild(shortcutIcon);
-  }, [theme, browserTheme]);
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [themeColor]);
 
   return null;
 }
