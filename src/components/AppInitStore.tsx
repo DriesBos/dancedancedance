@@ -80,7 +80,7 @@ const applyBodyState = (
   if (!body) return;
 
   body.setAttribute('data-theme', theme);
-  body.setAttribute('data-space', layout);
+  body.setAttribute('data-layout', layout);
   body.setAttribute('data-page', slug);
   body.setAttribute('data-border', 'minimal');
   body.setAttribute('data-sky-variation', skyVariation);

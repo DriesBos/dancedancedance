@@ -95,18 +95,18 @@ $break-desktop: 1370px
   // Transition
   --transition-button: .33s ease
   --transition-project-hover: .2s ease
-  --transition-space: 0.66s ease-in-out
-  --transition-space-quick: 0.33s ease
+  --transition-layout: 0.66s ease-in-out
+  --transition-layout-quick: 0.33s ease
   --transition-theme: 0.66s ease-in-out
   --transition-theme-quick: 0.33s ease
   --transition-cursor: 0.25s ease-in-out
 
-// SPACES
-body[data-space='DESKTOP']
+// LAYOUTS
+body[data-layout='DESKTOP']
   --top-padding-filter: calc(#{var(--blok-height)} * 3)
   --panel-perspective-origin: 50% 0vh
 
-body[data-space='3D']
+body[data-layout='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
   --spacing-containerTopDistance: calc(124px + var(--blok-height) + 20vh)
   --panel-perspective-origin: 50% -100vh
@@ -198,7 +198,7 @@ body[data-theme='KERMIT']
   --border-fatwidth: 2px
   --border-gap: 1rem
   --spacing-containerTopDistance: 4vh
-  &[data-space='3D']
+  &[data-layout='3D']
     --panel-perspective-origin: 50% 0vh
   @media (max-width: 770px)
     --border-gap: 0.5rem
@@ -330,9 +330,9 @@ body[data-theme='AUGURIES']
     --theme-bg: linear-gradient(180deg, #101C43 0%, #2B3D74 52%, #6F6EA1 100%)
     --theme-blok: hsla(0, 0%, 80%, 0.98)
     --theme-blok-solid: hsla(0, 0%, 80%, 0.98)
-  &[data-space='3D']
+  &[data-layout='3D']
     --spacing-containerTopDistance: calc(124px + var(--blok-height) + 40vh)
-  &[data-space='DESKTOP']
+  &[data-layout='DESKTOP']
     --theme-blok-showlines: hsla(0, 0%, 92%, 0.98)
   @media (orientation: portrait)
     --border-width: 3px

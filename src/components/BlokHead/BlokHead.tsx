@@ -59,7 +59,7 @@ const BlokHead = ({}: Props) => {
       setTopPanelFalse: state.setTopPanelFalse,
     })),
   );
-  const isThreeDSpace = layout === '3D';
+  const isThreeDLayout = layout === '3D';
   const themeLabel = theme
     .toLowerCase()
     .split(' ')
@@ -71,8 +71,8 @@ const BlokHead = ({}: Props) => {
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
   const [isAboutMixedHovered, setIsAboutMixedHovered] = useState(false);
   const themeSpinTimeoutRef = useRef<number | null>(null);
-  const spaceToggleRafRef = useRef<number | null>(null);
-  const spaceToggleTimeoutRef = useRef<number | null>(null);
+  const layoutToggleRafRef = useRef<number | null>(null);
+  const layoutToggleTimeoutRef = useRef<number | null>(null);
   const isHoveringTopPanelZoneRef = useRef(false);
   const TITLE_MARQUEE_PX_PER_SECOND = 10;
 
@@ -122,8 +122,8 @@ const BlokHead = ({}: Props) => {
       ?.external_link;
   }, [pathName, projects, currentSlug]);
 
-  const toggleSpace = useCallback(() => {
-    const applyNextSpace = () => {
+  const toggleLayout = useCallback(() => {
+    const applyNextLayout = () => {
       if (layout === '3D') {
         setTwoD();
         return;
@@ -131,17 +131,17 @@ const BlokHead = ({}: Props) => {
       setThreeD();
     };
 
-    if (spaceToggleRafRef.current !== null) {
-      window.cancelAnimationFrame(spaceToggleRafRef.current);
-      spaceToggleRafRef.current = null;
+    if (layoutToggleRafRef.current !== null) {
+      window.cancelAnimationFrame(layoutToggleRafRef.current);
+      layoutToggleRafRef.current = null;
     }
-    if (spaceToggleTimeoutRef.current !== null) {
-      window.clearTimeout(spaceToggleTimeoutRef.current);
-      spaceToggleTimeoutRef.current = null;
+    if (layoutToggleTimeoutRef.current !== null) {
+      window.clearTimeout(layoutToggleTimeoutRef.current);
+      layoutToggleTimeoutRef.current = null;
     }
 
     if (window.scrollY <= 1) {
-      applyNextSpace();
+      applyNextLayout();
       return;
     }
 
@@ -152,16 +152,16 @@ const BlokHead = ({}: Props) => {
       if (settled) return;
       settled = true;
 
-      if (spaceToggleRafRef.current !== null) {
-        window.cancelAnimationFrame(spaceToggleRafRef.current);
-        spaceToggleRafRef.current = null;
+      if (layoutToggleRafRef.current !== null) {
+        window.cancelAnimationFrame(layoutToggleRafRef.current);
+        layoutToggleRafRef.current = null;
       }
-      if (spaceToggleTimeoutRef.current !== null) {
-        window.clearTimeout(spaceToggleTimeoutRef.current);
-        spaceToggleTimeoutRef.current = null;
+      if (layoutToggleTimeoutRef.current !== null) {
+        window.clearTimeout(layoutToggleTimeoutRef.current);
+        layoutToggleTimeoutRef.current = null;
       }
 
-      applyNextSpace();
+      applyNextLayout();
     };
 
     const checkTop = () => {
@@ -169,11 +169,11 @@ const BlokHead = ({}: Props) => {
         settle();
         return;
       }
-      spaceToggleRafRef.current = window.requestAnimationFrame(checkTop);
+      layoutToggleRafRef.current = window.requestAnimationFrame(checkTop);
     };
 
-    spaceToggleRafRef.current = window.requestAnimationFrame(checkTop);
-    spaceToggleTimeoutRef.current = window.setTimeout(settle, 1200);
+    layoutToggleRafRef.current = window.requestAnimationFrame(checkTop);
+    layoutToggleTimeoutRef.current = window.setTimeout(settle, 1200);
   }, [layout, setTwoD, setThreeD]);
 
   const handleCycleTheme = useCallback(() => {
@@ -268,7 +268,7 @@ const BlokHead = ({}: Props) => {
 
   const handleTopPanel = useCallback(
     (e: MouseEvent) => {
-      if (!headRef.current || !isThreeDSpace) return;
+      if (!headRef.current || !isThreeDLayout) return;
       const pagePastTop = isPagePastTop();
 
       if (e.type === 'mouseenter') {
@@ -291,11 +291,11 @@ const BlokHead = ({}: Props) => {
         animateHead({ yPercent: 0 });
       }
     },
-    [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode],
+    [isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode],
   );
 
   const openTopPanelFromTouch = useCallback(() => {
-    if (!headRef.current || !isThreeDSpace) return;
+    if (!headRef.current || !isThreeDLayout) return;
 
     if (isPagePastTop()) {
       setTopPanelMode('forcedClosed');
@@ -306,7 +306,7 @@ const BlokHead = ({}: Props) => {
     isHoveringTopPanelZoneRef.current = true;
     setTopPanelMode('open');
     animateHead({ yPercent: -100 });
-  }, [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode]);
+  }, [isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode]);
 
   useEffect(() => {
     const mediaQuery =
@@ -426,7 +426,7 @@ const BlokHead = ({}: Props) => {
 
     const syncHeadOnScroll = () => {
       updateScrollBorder();
-      if (isThreeDSpace) {
+      if (isThreeDLayout) {
         syncTopPanelWithScroll();
         return;
       }
@@ -446,7 +446,7 @@ const BlokHead = ({}: Props) => {
       syncHeadOnScroll();
     };
 
-    if (isThreeDSpace) {
+    if (isThreeDLayout) {
       gsap.set(headRef.current, { y: 0, yPercent: 0 });
     } else {
       setIsTopPanelForcedClosed(false);
@@ -477,13 +477,13 @@ const BlokHead = ({}: Props) => {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode]);
+  }, [isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode]);
 
   useEffect(() => {
     const main = document.querySelector('main');
     if (!main) return;
 
-    if (isThreeDSpace) {
+    if (isThreeDLayout) {
       const topPanel = headRef.current?.querySelector('.side_Top') || null;
       const isWithinInteractiveZone = (node: EventTarget | null) => {
         if (!(node instanceof Node)) return false;
@@ -521,10 +521,10 @@ const BlokHead = ({}: Props) => {
       yPercent: 0,
       duration: 0.165,
     });
-  }, [handleTopPanel, isThreeDSpace, animateHead, setTopPanelMode]);
+  }, [handleTopPanel, isThreeDLayout, animateHead, setTopPanelMode]);
 
   useEffect(() => {
-    if (!isThreeDSpace) return;
+    if (!isThreeDLayout) return;
 
     const main = document.querySelector('main');
     if (!main) return;
@@ -567,10 +567,10 @@ const BlokHead = ({}: Props) => {
         listenerOptions,
       );
     };
-  }, [isThreeDSpace, openTopPanelFromTouch]);
+  }, [isThreeDLayout, openTopPanelFromTouch]);
 
   useEffect(() => {
-    if (!isThreeDSpace) return;
+    if (!isThreeDLayout) return;
 
     const main = document.querySelector('main');
     if (!main) return;
@@ -627,7 +627,7 @@ const BlokHead = ({}: Props) => {
       document.removeEventListener('mousedown', onMouseDown, listenerOptions);
       document.removeEventListener('touchstart', onTouchStart, listenerOptions);
     };
-  }, [isThreeDSpace, isPagePastTop, animateHead, setTopPanelMode]);
+  }, [isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode]);
 
   useEffect(() => {
     const viewport = titleViewportRef.current;
@@ -703,11 +703,11 @@ const BlokHead = ({}: Props) => {
       if (themeSpinTimeoutRef.current !== null) {
         window.clearTimeout(themeSpinTimeoutRef.current);
       }
-      if (spaceToggleRafRef.current !== null) {
-        window.cancelAnimationFrame(spaceToggleRafRef.current);
+      if (layoutToggleRafRef.current !== null) {
+        window.cancelAnimationFrame(layoutToggleRafRef.current);
       }
-      if (spaceToggleTimeoutRef.current !== null) {
-        window.clearTimeout(spaceToggleTimeoutRef.current);
+      if (layoutToggleTimeoutRef.current !== null) {
+        window.clearTimeout(layoutToggleTimeoutRef.current);
       }
     };
   }, []);
@@ -794,7 +794,6 @@ const BlokHead = ({}: Props) => {
         <div className="column column-Icons">
           {pathName === 'home' && (
             <>
-              {/* <StoreSwitcher /> */}
               <button
                 type="button"
                 className={`icon cursorMagnetic ${styles.themeButton}`}
@@ -810,8 +809,8 @@ const BlokHead = ({}: Props) => {
               </button>
               <button
                 type="button"
-                className={`icon iconRocket cursorMagnetic ${styles.spaceButton}`}
-                onClick={toggleSpace}
+                className={`icon iconRocket cursorMagnetic ${styles.layoutButton}`}
+                onClick={toggleLayout}
                 title={`Layout: ${layoutLabel}`}
               >
                 <span className={styles.rocketWrap}>

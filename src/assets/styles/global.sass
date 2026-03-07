@@ -26,7 +26,7 @@ body
   padding-top: var(--spacing-containerTopDistance)
   min-height: 100vh
   min-height: 100lvh
-  transition: padding-top var(--transition-space), padding-bottom var(--transition-space), color var(--transition-theme), background var(--transition-theme)
+  transition: padding-top var(--transition-layout), padding-bottom var(--transition-layout), color var(--transition-theme), background var(--transition-theme)
 
 @media (hover: none)
   body[data-page='projects']
@@ -55,7 +55,7 @@ main
   max-height: auto
   max-height: calc-size(auto)
   border-radius: var(--main-border-radius)
-  transition: gap var(--transition-theme), border var(--transition-theme), border-radius var(--transition-space-quick), width var(--transition-space), max-width var(--transition-space), height var(--transition-space), max-height var(--transition-space), transform var(--transition-space)
+  transition: gap var(--transition-theme), border var(--transition-theme), border-radius var(--transition-layout-quick), width var(--transition-layout), max-width var(--transition-layout), height var(--transition-layout), max-height var(--transition-layout), transform var(--transition-layout)
   // Safe envs
   padding-top: env(safe-area-inset-top)
   padding-right: env(safe-area-inset-right)
@@ -65,7 +65,7 @@ main
     margin-top: calc(0px - (#{var(--border-width)}))
 
 .page
-  transition: margin-top var(--transition-space)
+  transition: margin-top var(--transition-layout)
   display: flex
   flex-direction: column
   gap: var(--border-gap)
@@ -258,7 +258,7 @@ mux-player, .muxPlayer
   background: var(--theme-blok)
   perspective: 1500px
   perspective-origin: var(--panel-perspective-origin)
-  transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), border-radius var(--transition-theme), background var(--transition-theme), perspective var(--transition-space), perspective-origin var(--transition-space)
+  transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), border-radius var(--transition-theme), background var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
   &.inactive
     display: none
   .row
@@ -707,7 +707,7 @@ mux-player, .muxPlayer
   @media screen and ( max-width: 400px )
     display: none
 
-// SPACE
+// LAYOUT
 body
   main
     & > .blok
@@ -727,7 +727,7 @@ body
       & > .blok:first-child .side_Top,
       & > :first-child + .blok .side_Top
         opacity: 1
-  &[data-space="DESKTOP"]
+  &[data-layout="DESKTOP"]
     padding-left: 0
     padding-right: 0
     padding-bottom: 0
@@ -747,7 +747,7 @@ body
         overflow: hidden
       &-Head
         background: var(--theme-blok-solid)
-  &[data-space="3D"]
+  &[data-layout="3D"]
     padding-bottom: 6rem
     @media (orientation: portrait)
     // .laserBlok
@@ -779,11 +779,11 @@ body
         transform: translateY(0) !important
         &[data-scrollborder='true']
           border-radius: 0
-          transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), border-radius var(--transition-theme-quick), background var(--transition-theme), perspective var(--transition-space), perspective-origin var(--transition-space)
+          transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), border-radius var(--transition-theme-quick), background var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
     .page-Project
       & > div:nth-child(2)
         padding-top: 0
-    &[data-space="DESKTOP"]
+    &[data-layout="DESKTOP"]
       padding-bottom: calc(var(--border-gap) * 2)
       main
         width: 96vw
@@ -795,7 +795,7 @@ body
         &-Filter
           border-left-width: 0
           border-right-width: 0
-    &[data-space="3D"]
+    &[data-layout="3D"]
       padding-bottom: calc(var(--border-gap) * 2)
       main
         @media (max-width: 770px)
