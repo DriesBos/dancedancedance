@@ -294,6 +294,34 @@ mux-player, .muxPlayer
         flex: 1 1 0
         width: 0
         user-select: none
+      &-AnimateSlideLeft
+        flex: 1 1 0
+        width: 0
+        min-width: 0
+        overflow: hidden
+        padding-right: 0
+        .animateSlideLeftTrack
+          display: flex
+          align-items: center
+          width: max-content
+          min-width: 100%
+          animation: actionSlideLeft 300s linear infinite
+          will-change: transform
+        .animateSlideLeftGroup
+          display: inline-flex
+          align-items: center
+          gap: calc(var(--spacing-base) * 1.5)
+          padding-right: calc(var(--spacing-base) * 1.5)
+          white-space: nowrap
+        .animateSlideLeftUnit
+          display: inline-flex
+          align-items: center
+          gap: var(--spacing-base)
+          span
+            white-space: nowrap
+        @media (prefers-reduced-motion: reduce)
+          .animateSlideLeftTrack
+            animation: none
       &-Title, &-Category, &-Agency, &-FooterColumn, &-Copyright
         user-select: none
       &-Slider
@@ -547,6 +575,13 @@ mux-player, .muxPlayer
     @media (max-width: 770px)
       .column:nth-child(n+4):not(.column-Icons)
         display: none
+  &-Action
+    border-top: var(--border-width) solid var(--border-color) !important
+    color: inherit
+    text-decoration: none
+    .column-Icons
+      & > div:first-child
+        opacity: 1
   &-Highlights
     display: grid
     grid-template-columns: repeat(2, minmax(0, 1fr))
@@ -814,3 +849,9 @@ body
     left: 0
     right: auto
     width: 100%
+
+@keyframes actionSlideLeft
+  from
+    transform: translateX(0)
+  to
+    transform: translateX(-50%)

@@ -12,6 +12,7 @@ import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconMail from '../Icons/IconMail';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
+import IconLocation from '@/components/Icons/IconLocation';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import { gsap } from '@/lib/gsap';
@@ -67,8 +68,6 @@ const BlokHead = ({}: Props) => {
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
-  const [isAboutLegsHovered, setIsAboutLegsHovered] = useState(false);
-  const [isAboutCrossHovered, setIsAboutCrossHovered] = useState(false);
   const [isAboutMixedHovered, setIsAboutMixedHovered] = useState(false);
   const themeSpinTimeoutRef = useRef<number | null>(null);
   const spaceToggleRafRef = useRef<number | null>(null);
@@ -908,6 +907,9 @@ const BlokHead = ({}: Props) => {
               <IconClose />
             </Link>
           )}
+          {/* <div className="icon cursorMagnetic">
+            <IconLocation />
+          </div> */}
         </div>
       </Row>
     </div>

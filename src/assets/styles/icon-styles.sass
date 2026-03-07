@@ -131,3 +131,123 @@
 
 .IconTheme[data-theme='DARK'] .IconTheme-Circle
   left: calc(var(--spacing-base) / 2 + ((var(--icon-size) * 2)) - (var(--icon-size) / 5 * 4))
+
+.IconLocation
+  --icon-location-stroke: 1px
+  --icon-location-stroke-thin: calc(var(--icon-location-stroke) * 1)
+  --icon-location-stroke-thick: calc(var(--icon-location-stroke) * 1)
+  position: relative
+  width: 100%
+  height: 100%
+  border-radius: 50%
+  overflow: hidden
+  font-size: calc(var(--icon-size) / 3)
+
+.IconLocation-Overlay
+  opacity: 0
+  transition: opacity 1s ease-in-out
+  animation: iconLocationBallPulse 6s ease-in-out infinite
+
+.IconLocation-Globe
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 3em
+  height: 3em
+  transform: translate(-50%, -50%)
+  border-radius: 50%
+  overflow: hidden
+  will-change: transform
+
+.IconLocation-GlobeWrap
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 100%
+  height: 100%
+  display: block
+  border-radius: 50%
+  transform: translate(-50%, -50%) rotate(30deg)
+  animation: iconLocationGlobe 5.4s cubic-bezier(0.35, 0, 0.65, 1) infinite
+  overflow: hidden
+  box-shadow: inset 0 0 0 var(--icon-location-stroke) currentColor
+
+.IconLocation-Circle
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 100%
+  height: 100%
+  transform: translate(-50%, -50%)
+  border-radius: 50%
+  box-shadow: inset var(--icon-location-stroke-thick) 0 0 var(--icon-location-stroke-thin) currentColor
+  animation: iconLocationCircle1 2.7s linear infinite
+  font-size: .75em
+
+.IconLocation-Circle:nth-child(1)
+  animation-delay: -1.8s
+
+.IconLocation-Circle:nth-child(2)
+  animation-delay: -.9s
+
+.IconLocation-CircleHor
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 150%
+  height: 55%
+  transform: translate(-50%, -50%)
+  border-radius: 50%
+  box-shadow: inset 0 0 0 var(--icon-location-stroke-thick) currentColor
+  font-size: .75em
+
+.IconLocation-CircleHorMiddle
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 150%
+  height: var(--icon-location-stroke-thick)
+  transform: translate(-50%, -50%)
+  border-radius: 0
+  background: currentColor
+  font-size: .75em
+
+@keyframes iconLocationBallPulse
+  0%
+    opacity: 0
+  50%
+    opacity: .12
+  100%
+    opacity: 0
+
+@keyframes iconLocationGlobe
+  0%
+    transform: translate(-50%, -50%) rotate(15deg)
+  50%
+    transform: translate(-50%, -50%) rotate(-15deg)
+  100%
+    transform: translate(-50%, -50%) rotate(15deg)
+
+@keyframes iconLocationCircle1
+  0%
+    border-radius: 50%
+    box-shadow: inset var(--icon-location-stroke-thick) 0 0 var(--icon-location-stroke-thin) currentColor
+    width: 100%
+    background: transparent
+  49%
+    border-radius: 50%
+    box-shadow: inset var(--icon-location-stroke-thick) 0 0 var(--icon-location-stroke-thin) currentColor
+    background: transparent
+  50%
+    border-radius: 0
+    width: calc(var(--icon-location-stroke-thick) * 1.15)
+    background: currentColor
+  51%
+    border-radius: 50%
+    box-shadow: inset calc(var(--icon-location-stroke-thick) * -1) 0 0 var(--icon-location-stroke-thin) currentColor
+    background: transparent
+  100%
+    border-radius: 50%
+    box-shadow: inset calc(var(--icon-location-stroke-thick) * -1) 0 0 var(--icon-location-stroke-thin) currentColor
+    width: 100%
+    background: transparent
