@@ -26,6 +26,22 @@ const BIRDS_SKY_VARIATIONS = [
   'predawn',
 ] as const;
 
+const formatLocalTime = () =>
+  new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date());
+
+const getSkyVariationForHour = (hour: number) => {
+  if (hour >= 4 && hour < 5) return 'predawn';
+  if (hour >= 5 && hour < 10) return 'dawn';
+  if (hour >= 10 && hour < 17) return 'noon';
+  if (hour >= 17 && hour < 19) return 'sunset';
+  if (hour >= 19 && hour < 21) return 'dusk';
+  return 'evening';
+};
+
 type BackgroundEffectsProps = {
   version: 'radiating' | 'segments' | 'kusama' | 'dots' | 'birds';
   densityScale?: number;
@@ -588,6 +604,8 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
   const [testingSkyVariation, setTestingSkyVariation] = useState<string | null>(
     null,
   );
+  const [localTime, setLocalTime] = useState('--:--:--');
+  const [localSkyVariation, setLocalSkyVariation] = useState('noon');
 
   useEffect(() => {
     const host = rootRef.current;
@@ -642,7 +660,23 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     };
   }, []);
 
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setLocalTime(formatLocalTime());
+      setLocalSkyVariation(getSkyVariationForHour(now.getHours()));
+    };
+    updateTime();
+
+    const intervalId = window.setInterval(updateTime, 1000);
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
   const activeSkyVariation = testingSkyVariation ?? sceneColors.skyVariation;
+  const buttonLabel =
+    activeSkyVariation === localSkyVariation ? localTime : activeSkyVariation;
 
   const handleToggleSkyVariation = () => {
     const currentIndex = BIRDS_SKY_VARIATIONS.indexOf(
@@ -675,7 +709,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
         className={styles.birdsVariationToggle}
         onClick={handleToggleSkyVariation}
       >
-        Sky: {activeSkyVariation}
+        {buttonLabel}
       </button>
     </>
   );
