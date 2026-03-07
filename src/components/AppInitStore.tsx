@@ -152,8 +152,31 @@ const AppInitializer = () => {
   useEffect(() => {
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (!metaThemeColor) return;
+    const body = document.body;
 
-    metaThemeColor.setAttribute('content', getThemeMetaColor(theme));
+    const updateMetaThemeColor = () => {
+      const bodyTheme = body?.getAttribute('data-theme');
+      const resolvedTheme = (bodyTheme as Theme | null) ?? theme;
+      const skyVariation = body?.getAttribute('data-sky-variation') ?? undefined;
+      metaThemeColor.setAttribute(
+        'content',
+        getThemeMetaColor(resolvedTheme, skyVariation),
+      );
+    };
+
+    updateMetaThemeColor();
+
+    if (!body) return;
+
+    const observer = new MutationObserver(updateMetaThemeColor);
+    observer.observe(body, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'data-sky-variation'],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   }, [theme]);
 
   return null;

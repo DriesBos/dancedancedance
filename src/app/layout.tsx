@@ -47,6 +47,30 @@ const INITIAL_UI_STATE_SCRIPT = `
         ? 'NIGHT MODE'
         : daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
     var space = '3D';
+    var auguriesMetaColors = {
+      morning: '#6D79AF',
+      dawn: '#F5B38B',
+      noon: '#B7D5FF',
+      sunset: '#FF8A5B',
+      dusk: '#8E5CA5',
+      evening: '#2B3D74',
+    };
+    var themeMetaColors = {
+      'NIGHT MODE': '#000000',
+      TRON: '#000000',
+      RADIANT: '#DAD9E0',
+      'RADIANT DARK': '#000000',
+      AUGURIES: '#B7D5FF',
+      KERMIT: '#FFFFFF',
+      LIGHT: '#E8E7E3',
+      DARK: '#1A1A1A',
+      KUSAMA: '#000000',
+      DOTS: '#000000',
+    };
+    var themeColor =
+      theme === 'AUGURIES'
+        ? (auguriesMetaColors[skyVariation] || themeMetaColors.AUGURIES)
+        : (themeMetaColors[theme] || '#FFFFFF');
 
     window.__DDD_INITIAL_STATE__ = { theme: theme, space: space, skyVariation: skyVariation };
 
@@ -54,6 +78,11 @@ const INITIAL_UI_STATE_SCRIPT = `
       document.body.setAttribute('data-theme', theme);
       document.body.setAttribute('data-space', space);
       document.body.setAttribute('data-sky-variation', skyVariation);
+    }
+
+    var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', themeColor);
     }
   })();
 `;
@@ -91,7 +120,7 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   other: {
-    'theme-color': '#FFFFFF',
+    'theme-color': '#0D111A',
   },
 };
 

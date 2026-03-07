@@ -688,6 +688,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     const nextIndex = (safeCurrentIndex + 1) % BIRDS_SKY_VARIATIONS.length;
     const nextVariation = BIRDS_SKY_VARIATIONS[nextIndex];
     setTestingSkyVariation(nextVariation);
+    document.body?.setAttribute('data-sky-variation', nextVariation);
   };
 
   return (
