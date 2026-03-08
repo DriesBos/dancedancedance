@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { gsap, useGSAP } from '@/lib/gsap';
 
@@ -9,6 +9,9 @@ interface PageTransitionProps {
 }
 
 export default function PageTransition({ children }: PageTransitionProps) {
+  const BLOCK_DURATION = 0.33;
+  const BLOCK_STAGGER = 0.165;
+  const PROJECT_SPEED_MULTIPLIER = 2;
   const pathname = usePathname();
   const hasAnimatedHeader = useRef(false);
   const getHeaderTargets = () =>
@@ -16,8 +19,8 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const getBlockTargets = () =>
     Array.from(document.querySelectorAll<HTMLElement>('.blok-Animate'));
 
-  // Scroll to top on route change - instant, no smooth behavior
-  useEffect(() => {
+  // Force top on every client-side route change.
+  useLayoutEffect(() => {
     try {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     } catch {
@@ -59,14 +62,25 @@ export default function PageTransition({ children }: PageTransitionProps) {
         y: 20,
       });
 
-      // Animate in with stagger - faster duration for snappier feel
-      gsap.to(blockTargets, {
-        opacity: 1,
-        y: 0,
-        duration: 0.33,
-        stagger: 0.165,
-        ease: 'power1.inOut',
-        overwrite: 'auto',
+      // Keep DOM-order sequence, but animate .blok-Project entries at 2x speed.
+      const timeline = gsap.timeline({
+        defaults: {
+          opacity: 1,
+          y: 0,
+          ease: 'power1.inOut',
+          overwrite: 'auto',
+        },
+      });
+
+      let offset = 0;
+      blockTargets.forEach((target) => {
+        const isProject = target.classList.contains('blok-Project');
+        const speed = isProject ? PROJECT_SPEED_MULTIPLIER : 1;
+        const duration = BLOCK_DURATION / speed;
+        const gap = BLOCK_STAGGER / speed;
+
+        timeline.to(target, { duration }, offset);
+        offset += gap;
       });
     },
     { dependencies: [pathname], revertOnUpdate: true }

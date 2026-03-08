@@ -64,6 +64,32 @@ const INITIAL_UI_STATE_SCRIPT = `
   })();
 `;
 
+const FORCE_SCROLL_TOP_SCRIPT = `
+  (function () {
+    var scrollToTop = function () {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+      document.documentElement.scrollTop = 0;
+      if (document.body) {
+        document.body.scrollTop = 0;
+      }
+    };
+
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    scrollToTop();
+    window.addEventListener('load', scrollToTop);
+    window.addEventListener('pageshow', scrollToTop);
+    window.addEventListener('beforeunload', scrollToTop);
+    window.addEventListener('popstate', scrollToTop);
+  })();
+`;
+
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
   display: 'swap',
@@ -128,6 +154,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <script dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: FORCE_SCROLL_TOP_SCRIPT }} />
         <BackgroundEffectsByTheme />
         <GrainyGradient variant="page" />
         <AppInitializer />
