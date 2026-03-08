@@ -866,7 +866,7 @@ const BlokHead = ({}: Props) => {
                   href={externalLink.cached_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="icon cursorMagnetic"
+                  className="icon cursorMagnetic desktop"
                   data-external-link="true"
                 >
                   <IconLinkOutside />
