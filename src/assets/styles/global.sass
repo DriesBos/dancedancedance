@@ -759,30 +759,29 @@ body
       max-width: 1150px
       @media (max-width: 770px)
         width: calc(100% - 2 * var(--spacing-side))
-      & > .blok-Head
-        z-index: 3
-      & > .page
+      .page
         position: relative
         z-index: 2
-      & > .blok-Action
-        z-index: 2
-      & > .blok-Footer
-        z-index: 1
-    .blok
-      &-Action
-        background: var(--theme-blok-solid)
-      &-Project
-        background: var(--theme-blok-solid)
-      &-Head
-        background: var(--theme-blok-showlines)
-        &[data-forced-closed='true']
-          background: var(--theme-blok-solid)
-        .side_Top
+      .blok
+        &-Head
+          z-index: 3
           background: var(--theme-blok-showlines)
-      &-Footer
-        margin-top: var(--blok-height)
-        .side_Top
-          opacity: 1
+          &[data-forced-closed='true']
+            background: var(--theme-blok-solid)
+          .side_Top
+            background: var(--theme-blok-showlines)
+        &-ProjectList
+          border-top-width: 0
+        &-Project
+          background: var(--theme-blok-solid)
+        &-Action
+          z-index: 2
+          background: var(--theme-blok-solid)
+        &-Footer
+          z-index: 1
+          margin-top: var(--blok-height)
+          .side_Top
+            opacity: 1
   &[data-theme='KERMIT']
     padding-bottom: 4vh
     .blok
@@ -829,6 +828,9 @@ body
       main
         @media (max-width: 770px)
           width: calc(100% - var(--spacing-side))
+      .blok
+        &-ProjectList
+          border-top-width: var(--border-width)
   &[data-theme='AUGURIES']
     // WHEN theme-blok is semi-transparent THEN we remove overlapping layers and prevent overlap
     .blok
