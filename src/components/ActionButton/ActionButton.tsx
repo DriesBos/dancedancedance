@@ -1,6 +1,7 @@
 import styles from './ActionButton.module.sass';
 
 type ActionButtonLinkType = 'email' | 'url';
+type ActionButtonDropPage = 'home' | 'projects' | 'about' | 'blurbs';
 
 interface ActionButtonProps {
   copy: string;
@@ -11,6 +12,7 @@ interface ActionButtonProps {
   dropLeftPx?: number;
   dropCenterPercent?: number;
   dropDelayMs?: number;
+  dropOnPage?: ActionButtonDropPage;
 }
 
 const EMAIL_LIKE_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+(?:\?.*)?$/;
@@ -45,6 +47,7 @@ const ActionButton = ({
   dropLeftPx,
   dropCenterPercent,
   dropDelayMs,
+  dropOnPage,
 }: ActionButtonProps) => {
   const isEmail = isEmailLink(link, linkType);
   const href = isEmail ? getEmailHref(link) : getUrlHref(link);
@@ -59,6 +62,7 @@ const ActionButton = ({
       data-action-drop-left={dropLeftPx}
       data-action-drop-center-percent={dropCenterPercent}
       data-action-drop-delay-ms={dropDelayMs}
+      data-action-drop-page={dropOnPage}
     >
       <span className={styles.copy}>{copy}</span>
     </a>

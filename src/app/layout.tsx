@@ -156,6 +156,7 @@ export default async function RootLayout({
                 linkType="email"
                 className="cursorInteract"
                 dropLeftPx={40}
+                dropOnPage="projects"
               />
               <ActionButton
                 copy="Book a discovery call"
@@ -164,6 +165,7 @@ export default async function RootLayout({
                 className="cursorInteract"
                 dropLeftPx={130}
                 dropDelayMs={100}
+                dropOnPage="about"
               />
             </ActionButtonContainer>
           </StoryblokProvider>
