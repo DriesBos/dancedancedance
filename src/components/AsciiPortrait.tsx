@@ -39,8 +39,6 @@ const AsciiPortrait = ({
   const [asciiOutput, setAsciiOutput] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [didFail, setDidFail] = useState(false);
-  const [sourceAspectRatio, setSourceAspectRatio] = useState(4 / 3);
-  const [asciiFontSizePx, setAsciiFontSizePx] = useState(6);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -86,8 +84,6 @@ const AsciiPortrait = ({
           throw new Error('Image dimensions could not be resolved.');
         }
 
-        setSourceAspectRatio(sourceWidth / sourceHeight);
-
         const columns = clamp(
           Math.round((containerWidth / 7.5) * clamp(density, 0.5, 2.2)),
           MIN_COLUMNS,
@@ -120,9 +116,6 @@ const AsciiPortrait = ({
         const charsetLength = charsetToUse.length - 1;
         const contrastToUse = clamp(contrast, 0.6, 2.8);
         const lines: string[] = new Array(rows);
-        const charWidthFactor = 0.62;
-        const calculatedFontSize = containerWidth / (columns * charWidthFactor);
-        setAsciiFontSizePx(calculatedFontSize);
 
         for (let y = 0; y < rows; y += 1) {
           let line = '';
@@ -185,22 +178,13 @@ const AsciiPortrait = ({
     <div className="blok blok-Portrait blok-Animate">
       <GrainyGradient variant="blok" />
       <div className="row">
-        <div className="column column-Image" style={{ padding: 0 }}>
-          <div
-            ref={containerRef}
-            className={`${styles.frame} imageItem`}
-            style={{ aspectRatio: sourceAspectRatio }}
-          >
+        <div className="column column-Image">
+          <div ref={containerRef} className={`${styles.frame} imageItem`}>
             {isLoading && (
               <div className={styles.loading}>Rendering ASCII portrait</div>
             )}
             {!isLoading && !didFail && (
-              <pre
-                className={styles.asciiPre}
-                role="img"
-                aria-label={alt}
-                style={{ fontSize: `${asciiFontSizePx}px` }}
-              >
+              <pre className={styles.asciiPre} role="img" aria-label={alt}>
                 {asciiOutput}
               </pre>
             )}

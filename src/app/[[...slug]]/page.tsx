@@ -2,7 +2,7 @@ import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import { getStoryblokApi } from '@/lib/storyblok';
 import PageTransition from '@/components/PageTransition';
-import AsciiPortrait from '@/components/AsciiPortrait';
+import AsciiVideoPortrait from '@/components/AsciiVideoPortrait';
 import type { Metadata } from 'next';
 import { cache } from 'react';
 
@@ -148,9 +148,9 @@ export default async function Home({ params }: { params: Params }) {
         <>
           <StoryblokStory story={pageData.story} />
           {/* {showAsciiPortrait && (
-            <AsciiPortrait
-              src="/portraits/portrait1.png"
-              alt="Dries Bos Portrait"
+            <AsciiVideoPortrait
+              src="/portraits/portrait_movie.mp4"
+              alt="Dries Bos ASCII video portrait"
             />
           )} */}
         </>
