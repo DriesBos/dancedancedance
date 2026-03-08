@@ -748,14 +748,17 @@ body
         .grainyGradient
           opacity: 0
       &-Project
-        background: transparent
+        background: transparent !important
         .grainyGradient
           opacity: 0
         &:hover
           @media (hover: hover)
             transform: translateY(-1.35rem) !important
         .row
-          background: transparent
+          background: transparent !important
+      &[data-layout="3D"]
+        .blok-Action
+          background: transparent !important
 
 .clickable
   cursor: pointer
