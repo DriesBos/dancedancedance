@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type p5 from 'p5';
+import dynamic from 'next/dynamic';
 import styles from './BackgroundEffects.module.sass';
 import {
   createSegmentsSketch,
@@ -9,7 +10,8 @@ import {
 } from './segmentsSketch';
 import { createKusamaSketch, KUSAMA_DEFAULT_PARAMS } from './kusamaSketch';
 import DotsScene from './dotsScene';
-import BirdsScene from './birdsScene';
+
+const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;

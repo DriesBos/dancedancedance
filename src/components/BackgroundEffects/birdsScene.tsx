@@ -152,7 +152,15 @@ const applyRuntimeAppearance = (
   }
 };
 
-const BIRDS = 5000; // Max '8192'
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
+
+const BASE_BIRD_COUNT = 3333;
+const MIN_BIRD_COUNT = 1667;
+const MAX_BIRD_COUNT = 3333;
+const BIRD_DENSITY_MIN = 0.05;
+const BIRD_DENSITY_MAX = 1.5;
+const POINTER_ACTIVE_WINDOW_MS = 160;
 const SPEED_LIMIT = 9.0;
 const BOUNDS = 800;
 const BOUNDS_HALF = BOUNDS / 2;
@@ -163,10 +171,21 @@ export default function BirdsScene({
   backgroundColor,
   birdColor,
   className,
+  densityScale = 1,
   skyVariation = 'auto',
 }: BirdsSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<RuntimeState | null>(null);
+  const clampedDensityScale = clamp(
+    densityScale,
+    BIRD_DENSITY_MIN,
+    BIRD_DENSITY_MAX,
+  );
+  const birdCount = clamp(
+    Math.round(BASE_BIRD_COUNT * clampedDensityScale),
+    MIN_BIRD_COUNT,
+    MAX_BIRD_COUNT,
+  );
   const latestPropsRef = useRef({
     backgroundColor,
     birdColor,
@@ -274,8 +293,14 @@ export default function BirdsScene({
       scene.fog = new THREE.Fog(initialPalette.fog, 700, 3000);
 
       const pointer = new THREE.Vector2();
-      pointer.set(20, 20);
       const raycaster = new THREE.Raycaster();
+      const inactiveRayOrigin = new THREE.Vector3(
+        1_000_000,
+        1_000_000,
+        1_000_000,
+      );
+      const inactiveRayDirection = new THREE.Vector3(0, 1, 0);
+      let lastPointerMoveAt = -Infinity;
 
       const toVec3 = (hex: string) => {
         const parsed = new THREE.Color(hex);
@@ -327,11 +352,11 @@ export default function BirdsScene({
       renderer.toneMapping = THREE.NeutralToneMapping;
       host.appendChild(renderer.domElement);
 
-      const positionArray = new Float32Array(BIRDS * 3);
-      const velocityArray = new Float32Array(BIRDS * 3);
-      const phaseArray = new Float32Array(BIRDS);
+      const positionArray = new Float32Array(birdCount * 3);
+      const velocityArray = new Float32Array(birdCount * 3);
+      const phaseArray = new Float32Array(birdCount);
 
-      for (let index = 0; index < BIRDS; index += 1) {
+      for (let index = 0; index < birdCount; index += 1) {
         const posX = Math.random() * BOUNDS - BOUNDS_HALF;
         const posY = Math.random() * BOUNDS - BOUNDS_HALF;
         const posZ = Math.random() * BOUNDS - BOUNDS_HALF;
@@ -420,7 +445,7 @@ export default function BirdsScene({
       const birdMesh = new THREE.InstancedMesh(
         birdGeometry,
         birdMaterial,
-        BIRDS,
+        birdCount,
       );
       birdMesh.rotation.y = Math.PI / 2;
       birdMesh.matrixAutoUpdate = false;
@@ -488,7 +513,12 @@ export default function BirdsScene({
           velocity.subAssign(normalize(dirToCenter).mul(deltaTime).mul(5.0));
 
           Loop(
-            { start: uint(0), end: uint(BIRDS), type: 'uint', condition: '<' },
+            {
+              start: uint(0),
+              end: uint(birdCount),
+              type: 'uint',
+              condition: '<',
+            },
             ({ i }: { i: any }) => {
               If(i.equal(birdIndex), () => {
                 Continue();
@@ -557,7 +587,7 @@ export default function BirdsScene({
           velocityStorage.element(birdIndex).assign(velocity);
         })() as any
       )
-        .compute(BIRDS)
+        .compute(birdCount)
         .setName('Birds Velocity');
 
       const computePosition: any = (
@@ -580,7 +610,7 @@ export default function BirdsScene({
           phaseStorage.element(instanceIndex).assign(modValue.mod(62.83));
         })() as any
       )
-        .compute(BIRDS)
+        .compute(birdCount)
         .setName('Birds Position');
 
       const onWindowResize = () => {
@@ -594,10 +624,18 @@ export default function BirdsScene({
 
         pointer.x = (event.clientX / window.innerWidth) * 2.0 - 1.0;
         pointer.y = 1.0 - (event.clientY / window.innerHeight) * 2.0;
+        lastPointerMoveAt = performance.now();
+      };
+      const onPointerLeave = (event: PointerEvent) => {
+        if (!event.isPrimary) return;
+        lastPointerMoveAt = -Infinity;
       };
 
       window.addEventListener('resize', onWindowResize);
       window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerleave', onPointerLeave, {
+        passive: true,
+      });
 
       let last = performance.now();
 
@@ -614,18 +652,22 @@ export default function BirdsScene({
         skyBottomUniform.value.lerp(skyBottomTarget, fadeAlpha);
         scene.fog.color.lerp(fogTarget, fadeAlpha);
 
-        raycaster.setFromCamera(pointer, camera);
-
         effectController.now.value = now;
         effectController.deltaTime.value = deltaTime;
-        effectController.rayOrigin.value.copy(raycaster.ray.origin);
-        effectController.rayDirection.value.copy(raycaster.ray.direction);
+        const isPointerActive =
+          now - lastPointerMoveAt <= POINTER_ACTIVE_WINDOW_MS;
+        if (isPointerActive) {
+          raycaster.setFromCamera(pointer, camera);
+          effectController.rayOrigin.value.copy(raycaster.ray.origin);
+          effectController.rayDirection.value.copy(raycaster.ray.direction);
+        } else {
+          effectController.rayOrigin.value.copy(inactiveRayOrigin);
+          effectController.rayDirection.value.copy(inactiveRayDirection);
+        }
 
         renderer.compute(computeVelocity);
         renderer.compute(computePosition);
         renderer.render(scene, camera);
-
-        pointer.y = 10;
       };
 
       renderer.setAnimationLoop(render);
@@ -648,7 +690,20 @@ export default function BirdsScene({
         runtimeRef.current = null;
         window.removeEventListener('resize', onWindowResize);
         window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerleave', onPointerLeave);
         renderer.setAnimationLoop(null);
+
+        scene.remove(birdMesh);
+        scene.remove(skyMesh);
+
+        birdGeometry.dispose();
+        skyGeometry.dispose();
+        birdMaterial.dispose?.();
+        skyMaterial.dispose?.();
+        positionStorage.dispose?.();
+        velocityStorage.dispose?.();
+        phaseStorage.dispose?.();
+
         renderer.dispose();
 
         if (host.contains(renderer.domElement)) {
@@ -663,7 +718,7 @@ export default function BirdsScene({
       isDisposed = true;
       cleanup();
     };
-  }, []);
+  }, [birdCount]);
 
   useEffect(() => {
     const runtime = runtimeRef.current;
