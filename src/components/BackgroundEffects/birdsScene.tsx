@@ -85,7 +85,7 @@ const SKY_PALETTES: Record<SkyVariationName, SkyPalette> = {
 };
 
 const resolveSkyVariation = (skyVariation?: string): SkyVariationName => {
-  const normalized = (skyVariation ?? 'auto')
+  const normalized = (skyVariation ?? 'morning')
     .trim()
     .toLowerCase()
     .replace(/^['"]|['"]$/g, '');
@@ -104,14 +104,7 @@ const resolveSkyVariation = (skyVariation?: string): SkyVariationName => {
     if (explicit) return explicit;
   }
 
-  const hour = new Date().getHours();
-  if (hour >= 4 && hour < 5) return 'morning';
-  if (hour >= 5 && hour < 7) return 'dawn';
-  if (hour >= 7 && hour < 10) return 'dawn';
-  if (hour >= 10 && hour < 17) return 'noon';
-  if (hour >= 17 && hour < 19) return 'sunset';
-  if (hour >= 19 && hour < 21) return 'dusk';
-  return 'evening';
+  return 'morning';
 };
 
 const resolveSkyPalette = (
@@ -172,7 +165,7 @@ export default function BirdsScene({
   birdColor,
   className,
   densityScale = 1,
-  skyVariation = 'auto',
+  skyVariation = 'morning',
 }: BirdsSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<RuntimeState | null>(null);

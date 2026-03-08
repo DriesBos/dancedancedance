@@ -19,11 +19,6 @@ const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
 const BIRDS_SKY_VARIATIONS = [
-  'dawn',
-  'noon',
-  'sunset',
-  'dusk',
-  'evening',
   'morning',
 ] as const;
 
@@ -397,7 +392,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
   const [sceneColors, setSceneColors] = useState({
     background: '#FFFFFF',
     bird: '#000000',
-    skyVariation: 'auto',
+    skyVariation: 'morning',
   });
   const [testingSkyVariation, setTestingSkyVariation] = useState<string | null>(
     null,
@@ -419,12 +414,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
         styles.getPropertyValue('--be-birds-color').trim() ||
         styles.getPropertyValue('--theme-type').trim() ||
         '#000000';
-      const bodySkyVariation =
-        document.body?.getAttribute('data-sky-variation')?.trim() ?? '';
-      const cssSkyVariation = styles
-        .getPropertyValue('--be-birds-sky-variation')
-        .trim();
-      const skyVariation = bodySkyVariation || cssSkyVariation || 'auto';
+      const skyVariation = 'morning';
 
       setSceneColors((previous) => {
         if (
@@ -505,13 +495,13 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
           densityScale={densityScale}
         />
       </div>
-      <button
+      {/* <button
         type="button"
         className={`${styles.birdsVariationToggle} cursorInteract`}
         onClick={handleToggleSkyVariation}
       >
         {buttonLabel}
-      </button>
+      </button> */}
     </>
   );
 }
