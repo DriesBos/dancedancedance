@@ -12,7 +12,6 @@ import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconMail from '../Icons/IconMail';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
-import IconLocation from '@/components/Icons/IconLocation';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import { gsap } from '@/lib/gsap';
@@ -770,14 +769,14 @@ const BlokHead = ({}: Props) => {
   return (
     <div
       ref={headRef}
-      className={`${styles.root} blok blok-Head blok-AnimateHead`}
+      className={`${styles.blokHead} blok blok-Head blok-AnimateHead`}
       data-active={topPanel}
       data-forced-closed={isTopPanelForcedClosed}
       data-scrollborder={hasScrollBorder}
     >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
-      <Row>
+      <Row className={styles.row}>
         <div className={`column column-Title ${styles.title}`}>
           <div ref={titleViewportRef} className={styles.titleMarqueeViewport}>
             <div ref={titleTrackRef} className={styles.titleMarqueeTrack}>

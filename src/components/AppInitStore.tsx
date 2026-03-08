@@ -9,16 +9,6 @@ import { useShallow } from 'zustand/react/shallow';
 type InitialUIState = {
   theme: Theme;
   layout: Layout;
-  skyVariation: string;
-};
-
-const getSkyVariationForHour = (hour: number): string => {
-  if (hour >= 4 && hour < 5) return 'morning';
-  if (hour >= 5 && hour < 10) return 'dawn';
-  if (hour >= 10 && hour < 17) return 'noon';
-  if (hour >= 17 && hour < 19) return 'sunset';
-  if (hour >= 19 && hour < 21) return 'dusk';
-  return 'evening';
 };
 
 const getInitialTheme = (hour: number): Theme => {
@@ -34,30 +24,19 @@ const getFallbackInitialUIState = (): InitialUIState => {
   return {
     theme: getInitialTheme(hour),
     layout: '3D',
-    skyVariation: getSkyVariationForHour(hour),
   };
 };
 
 const getInitialUIState = (): InitialUIState => {
   const win = window as Window & { __DDD_INITIAL_STATE__?: InitialUIState };
   if (win.__DDD_INITIAL_STATE__) {
-    return {
-      ...win.__DDD_INITIAL_STATE__,
-      skyVariation:
-        win.__DDD_INITIAL_STATE__.skyVariation ??
-        getSkyVariationForHour(new Date().getHours()),
-    };
+    return win.__DDD_INITIAL_STATE__;
   }
 
   return getFallbackInitialUIState();
 };
 
-const applyBodyState = (
-  theme: Theme,
-  layout: Layout,
-  slug: string,
-  skyVariation: string,
-) => {
+const applyBodyState = (theme: Theme, layout: Layout, slug: string) => {
   const body = document.body;
   if (!body) return;
 
@@ -65,12 +44,10 @@ const applyBodyState = (
   body.setAttribute('data-layout', layout);
   body.setAttribute('data-page', slug);
   body.setAttribute('data-border', 'minimal');
-  body.setAttribute('data-sky-variation', skyVariation);
 };
 
 const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
-  const skyVariationRef = useRef('auto');
   const readyFrameRef = useRef<number | null>(null);
   const { setTwoD, setThreeD, setTheme, theme, layout } = useStore(
     useShallow((state) => ({
@@ -90,13 +67,7 @@ const AppInitializer = () => {
       hasInitializedUIRef.current = true;
 
       const initialState = getInitialUIState();
-      skyVariationRef.current = initialState.skyVariation || 'auto';
-      applyBodyState(
-        initialState.theme,
-        initialState.layout,
-        slug,
-        skyVariationRef.current,
-      );
+      applyBodyState(initialState.theme, initialState.layout, slug);
 
       if (theme !== initialState.theme) {
         setTheme(initialState.theme);
@@ -120,7 +91,7 @@ const AppInitializer = () => {
       return;
     }
 
-    applyBodyState(theme, layout, slug, skyVariationRef.current);
+    applyBodyState(theme, layout, slug);
   }, [pathname, setTheme, setThreeD, setTwoD, slug, layout, theme]);
 
   useEffect(() => {
@@ -139,11 +110,7 @@ const AppInitializer = () => {
     const updateMetaThemeColor = () => {
       const bodyTheme = body?.getAttribute('data-theme');
       const resolvedTheme = (bodyTheme as Theme | null) ?? theme;
-      const skyVariation = body?.getAttribute('data-sky-variation') ?? undefined;
-      metaThemeColor.setAttribute(
-        'content',
-        getThemeMetaColor(resolvedTheme, skyVariation),
-      );
+      metaThemeColor.setAttribute('content', getThemeMetaColor(resolvedTheme));
     };
 
     updateMetaThemeColor();
@@ -153,7 +120,7 @@ const AppInitializer = () => {
     const observer = new MutationObserver(updateMetaThemeColor);
     observer.observe(body, {
       attributes: true,
-      attributeFilter: ['data-theme', 'data-sky-variation'],
+      attributeFilter: ['data-theme'],
     });
 
     return () => {

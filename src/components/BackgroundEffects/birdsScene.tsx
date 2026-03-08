@@ -5,19 +5,7 @@ type BirdsSceneProps = {
   birdColor: string;
   className?: string;
   densityScale?: number;
-  skyVariation?: string;
 };
-
-const SKY_VARIATION_NAMES = [
-  'dawn',
-  'noon',
-  'sunset',
-  'dusk',
-  'evening',
-  'morning',
-] as const;
-
-type SkyVariationName = (typeof SKY_VARIATION_NAMES)[number];
 
 type SkyPalette = {
   top: string;
@@ -42,95 +30,29 @@ type RuntimeState = {
 type AppearanceState = {
   backgroundColor: string;
   birdColor: string;
-  skyVariation: string;
 };
 
-const SKY_PALETTES: Record<SkyVariationName, SkyPalette> = {
-  dawn: {
-    top: '#6A88C6',
-    horizon: '#F5B38B',
-    bottom: '#FFF1E5',
-    fog: '#F6D9C1',
-  },
-  noon: {
-    top: '#6EA6FF',
-    horizon: '#B7D5FF',
-    bottom: '#E6F2FF',
-    fog: '#DCEBFF',
-  },
-  sunset: {
-    top: '#3B4E8A',
-    horizon: '#FF8A5B',
-    bottom: '#FFC28B',
-    fog: '#F8B286',
-  },
-  dusk: {
-    top: '#1D2959',
-    horizon: '#8E5CA5',
-    bottom: '#F39D88',
-    fog: '#9A7AA9',
-  },
-  evening: {
-    top: '#101C43',
-    horizon: '#2B3D74',
-    bottom: '#6F6EA1',
-    fog: '#3A477A',
-  },
-  morning: {
-    top: '#375189',
-    horizon: '#6D79AF',
-    bottom: '#BFC4DE',
-    fog: '#6C79A8',
-  },
-};
-
-const resolveSkyVariation = (skyVariation?: string): SkyVariationName => {
-  const normalized = (skyVariation ?? 'morning')
-    .trim()
-    .toLowerCase()
-    .replace(/^['"]|['"]$/g, '');
-
-  if (normalized === 'random') {
-    const randomIndex = Math.floor(Math.random() * SKY_VARIATION_NAMES.length);
-    return SKY_VARIATION_NAMES[randomIndex] ?? 'noon';
-  }
-
-  if (normalized === 'day') return 'noon';
-  if (normalized === 'sunrise') return 'dawn';
-  if (normalized === 'night') return 'evening';
-
-  if (normalized !== 'auto') {
-    const explicit = SKY_VARIATION_NAMES.find((name) => name === normalized);
-    if (explicit) return explicit;
-  }
-
-  return 'morning';
+const SKY_PALETTE: SkyPalette = {
+  top: '#375189',
+  horizon: '#6D79AF',
+  bottom: '#BFC4DE',
+  fog: '#6C79A8',
 };
 
 const resolveSkyPalette = (
-  skyVariation: string | undefined,
   fallbackColor: string,
-): SkyPalette => {
-  const selected = resolveSkyVariation(skyVariation);
-  const palette = SKY_PALETTES[selected];
-  return (
-    palette ?? {
-      top: fallbackColor,
-      horizon: fallbackColor,
-      bottom: fallbackColor,
-      fog: fallbackColor,
-    }
-  );
-};
+): SkyPalette => ({
+  top: SKY_PALETTE.top || fallbackColor,
+  horizon: SKY_PALETTE.horizon || fallbackColor,
+  bottom: SKY_PALETTE.bottom || fallbackColor,
+  fog: SKY_PALETTE.fog || fallbackColor,
+});
 
 const applyRuntimeAppearance = (
   runtime: RuntimeState,
   appearance: AppearanceState,
 ) => {
-  const palette = resolveSkyPalette(
-    appearance.skyVariation,
-    appearance.backgroundColor,
-  );
+  const palette = resolveSkyPalette(appearance.backgroundColor);
   const top = new runtime.THREE.Color(palette.top);
   const horizon = new runtime.THREE.Color(palette.horizon);
   const bottom = new runtime.THREE.Color(palette.bottom);
@@ -165,7 +87,6 @@ export default function BirdsScene({
   birdColor,
   className,
   densityScale = 1,
-  skyVariation = 'morning',
 }: BirdsSceneProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<RuntimeState | null>(null);
@@ -182,12 +103,10 @@ export default function BirdsScene({
   const latestPropsRef = useRef({
     backgroundColor,
     birdColor,
-    skyVariation,
   });
   latestPropsRef.current = {
     backgroundColor,
     birdColor,
-    skyVariation,
   };
 
   useEffect(() => {
@@ -278,7 +197,6 @@ export default function BirdsScene({
       camera.position.z = 1000;
 
       const initialPalette = resolveSkyPalette(
-        latestPropsRef.current.skyVariation,
         latestPropsRef.current.backgroundColor,
       );
 
@@ -720,9 +638,8 @@ export default function BirdsScene({
     applyRuntimeAppearance(runtime, {
       backgroundColor,
       birdColor,
-      skyVariation,
     });
-  }, [backgroundColor, birdColor, skyVariation]);
+  }, [backgroundColor, birdColor]);
 
   return <div ref={rootRef} className={className} aria-hidden="true" />;
 }

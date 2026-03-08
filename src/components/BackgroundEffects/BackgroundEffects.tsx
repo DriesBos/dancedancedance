@@ -20,16 +20,8 @@ const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
 const SEGMENTS_SCALE_DURATION_MS = 90000;
 const SEGMENTS_SCALE_DURATION_PORTRAIT_MS = 45000;
-const BIRDS_SKY_VARIATIONS = ['morning'] as const;
 const IOS_IMMERSIVE_HEIGHT_VAR = '--be-ios-immersive-height';
 const IOS_IMMERSIVE_WIDTH_VAR = '--be-ios-immersive-width';
-
-const formatLocalTime = () =>
-  new Intl.DateTimeFormat(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date());
 
 const isIosSafari = () => {
   if (typeof navigator === 'undefined') return false;
@@ -44,15 +36,6 @@ const isIosSafari = () => {
   );
 
   return isIosDevice && isWebKit && !isNonSafariBrowser;
-};
-
-const getSkyVariationForHour = (hour: number) => {
-  if (hour >= 4 && hour < 5) return 'morning';
-  if (hour >= 5 && hour < 10) return 'dawn';
-  if (hour >= 10 && hour < 17) return 'noon';
-  if (hour >= 17 && hour < 19) return 'sunset';
-  if (hour >= 19 && hour < 21) return 'dusk';
-  return 'evening';
 };
 
 type BackgroundEffectsProps = {
@@ -455,13 +438,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
   const [sceneColors, setSceneColors] = useState({
     background: '#FFFFFF',
     bird: '#000000',
-    skyVariation: 'morning',
   });
-  const [testingSkyVariation, setTestingSkyVariation] = useState<string | null>(
-    null,
-  );
-  const [localTime, setLocalTime] = useState('--:--:--');
-  const [localSkyVariation, setLocalSkyVariation] = useState('noon');
 
   useEffect(() => {
     const host = rootRef.current;
@@ -477,21 +454,15 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
         styles.getPropertyValue('--be-birds-color').trim() ||
         styles.getPropertyValue('--theme-type').trim() ||
         '#000000';
-      const skyVariation = 'morning';
 
       setSceneColors((previous) => {
-        if (
-          previous.background === background &&
-          previous.bird === bird &&
-          previous.skyVariation === skyVariation
-        ) {
+        if (previous.background === background && previous.bird === bird) {
           return previous;
         }
 
         return {
           background,
           bird,
-          skyVariation,
         };
       });
     };
@@ -502,7 +473,7 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
     const observer = new MutationObserver(updateColors);
     observer.observe(document.body, {
       attributes: true,
-      attributeFilter: ['data-theme', 'data-sky-variation'],
+      attributeFilter: ['data-theme'],
     });
 
     return () => {
@@ -510,37 +481,6 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
       observer.disconnect();
     };
   }, []);
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setLocalTime(formatLocalTime());
-      setLocalSkyVariation(getSkyVariationForHour(now.getHours()));
-    };
-    updateTime();
-
-    const intervalId = window.setInterval(updateTime, 1000);
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, []);
-
-  const activeSkyVariation = testingSkyVariation ?? sceneColors.skyVariation;
-  const buttonLabel =
-    activeSkyVariation === localSkyVariation
-      ? localTime + ' ' + activeSkyVariation
-      : activeSkyVariation;
-
-  const handleToggleSkyVariation = () => {
-    const currentIndex = BIRDS_SKY_VARIATIONS.indexOf(
-      activeSkyVariation as (typeof BIRDS_SKY_VARIATIONS)[number],
-    );
-    const safeCurrentIndex = currentIndex >= 0 ? currentIndex : -1;
-    const nextIndex = (safeCurrentIndex + 1) % BIRDS_SKY_VARIATIONS.length;
-    const nextVariation = BIRDS_SKY_VARIATIONS[nextIndex];
-    setTestingSkyVariation(nextVariation);
-    document.body?.setAttribute('data-sky-variation', nextVariation);
-  };
 
   return (
     <>
@@ -554,17 +494,9 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
           className={styles.birdsCanvas}
           backgroundColor={sceneColors.background}
           birdColor={sceneColors.bird}
-          skyVariation={activeSkyVariation}
           densityScale={densityScale}
         />
       </div>
-      {/* <button
-        type="button"
-        className={`${styles.birdsVariationToggle} cursorInteract`}
-        onClick={handleToggleSkyVariation}
-      >
-        {buttonLabel}
-      </button> */}
     </>
   );
 }

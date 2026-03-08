@@ -27,33 +27,14 @@ import CurrentTheme from '@/components/CurrentTheme';
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
     var hour = new Date().getHours();
-    var skyVariation =
-      hour >= 4 && hour < 5
-        ? 'morning'
-        : hour >= 5 && hour < 10
-        ? 'dawn'
-        : hour >= 10 && hour < 17
-        ? 'noon'
-        : hour >= 17 && hour < 19
-        ? 'sunset'
-        : hour >= 19 && hour < 21
-        ? 'dusk'
-        : 'evening';
     var theme = hour >= 0 && hour < 5 ? 'NIGHT' : 'RADIANT';
     var layout = '3D';
-    var skyThemeMetaColors = {
-      morning: '#6D79AF',
-      dawn: '#F5B38B',
-      noon: '#B7D5FF',
-      sunset: '#FF8A5B',
-      dusk: '#8E5CA5',
-      evening: '#2B3D74',
-    };
+    var skyThemeMetaColor = '#BFC4DE';
     var themeMetaColors = {
       NIGHT: '#000000',
       TRON: '#000000',
       RADIANT: '#DAD9E0',
-      SKY: '#B7D5FF',
+      SKY: '#BFC4DE',
       KERMIT: '#FFFFFF',
       LIGHT: '#E8E7E3',
       SEGMENTS: '#1A1A1A',
@@ -62,15 +43,14 @@ const INITIAL_UI_STATE_SCRIPT = `
     };
     var themeColor =
       theme === 'SKY'
-        ? (skyThemeMetaColors[skyVariation] || themeMetaColors.SKY)
+        ? skyThemeMetaColor
         : (themeMetaColors[theme] || '#FFFFFF');
 
-    window.__DDD_INITIAL_STATE__ = { theme: theme, layout: layout, skyVariation: skyVariation };
+    window.__DDD_INITIAL_STATE__ = { theme: theme, layout: layout };
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
       document.body.setAttribute('data-layout', layout);
-      document.body.setAttribute('data-sky-variation', skyVariation);
     }
 
     var metaThemeColor = document.querySelector('meta[name="theme-color"]');
