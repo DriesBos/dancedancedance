@@ -18,9 +18,8 @@ const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
-const BIRDS_SKY_VARIATIONS = [
-  'morning',
-] as const;
+const SEGMENTS_SCALE_DURATION_MS = 90000;
+const BIRDS_SKY_VARIATIONS = ['morning'] as const;
 
 const formatLocalTime = () =>
   new Intl.DateTimeFormat(undefined, {
@@ -211,6 +210,46 @@ function SegmentsBackground() {
       isDisposed = true;
       instance?.remove();
       instance = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    const fromScale = 1;
+    const toScale = 0.5;
+    const durationMs = SEGMENTS_SCALE_DURATION_MS;
+    let frameId = 0;
+    let startTime = 0;
+
+    const applyScale = (scale: number) => {
+      host.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
+    };
+
+    applyScale(fromScale);
+
+    const animate = (timestamp: number) => {
+      if (!startTime) {
+        startTime = timestamp;
+      }
+
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(1, elapsed / durationMs);
+      const scale = fromScale + (toScale - fromScale) * progress;
+
+      applyScale(scale);
+
+      if (progress < 1) {
+        frameId = window.requestAnimationFrame(animate);
+      }
+    };
+
+    frameId = window.requestAnimationFrame(animate);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      host.style.transform = `translate3d(-50%, -50%, 0) scale(${fromScale})`;
     };
   }, []);
 
