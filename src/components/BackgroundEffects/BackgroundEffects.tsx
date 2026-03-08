@@ -183,18 +183,18 @@ function RadiatingBackground() {
 }
 
 function SegmentsBackground() {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let instance: p5 | null = null;
     let isDisposed = false;
 
     const init = async () => {
-      const host = rootRef.current;
+      const host = hostRef.current;
       if (!host) return;
 
       const { default: P5 } = await import('p5');
-      if (isDisposed || !rootRef.current) return;
+      if (isDisposed || !hostRef.current) return;
 
       instance = new P5(
         createSegmentsSketch({
@@ -216,11 +216,12 @@ function SegmentsBackground() {
 
   return (
     <div
-      ref={rootRef}
-      className={`${styles.root} ${styles.segmentsRoot}`}
+      className={`${styles.root} ${styles.segmentsViewport}`}
       data-version="segments"
       aria-hidden="true"
-    />
+    >
+      <div ref={hostRef} className={styles.segmentsRoot} />
+    </div>
   );
 }
 

@@ -970,6 +970,22 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     const getOrientation = (width: number, height: number) =>
       width >= height ? 'landscape' : 'portrait';
 
+    const getCanvasDimensions = () => {
+      const { width, height } = options.host.getBoundingClientRect();
+      return {
+        width: Math.max(1, Math.round(width || options.host.clientWidth || 0)),
+        height: Math.max(
+          1,
+          Math.round(height || options.host.clientHeight || 0),
+        ),
+      };
+    };
+
+    const getViewportDimensions = () => ({
+      width: window.innerWidth || instance.windowWidth,
+      height: window.innerHeight || instance.windowHeight,
+    });
+
     const isCoarsePointerDevice = () =>
       window.matchMedia('(pointer: coarse)').matches ||
       (navigator.maxTouchPoints ?? 0) > 0;
@@ -987,10 +1003,8 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     };
 
     instance.setup = () => {
-      const canvas = instance.createCanvas(
-        instance.windowWidth,
-        instance.windowHeight,
-      );
+      const { width, height } = getCanvasDimensions();
+      const canvas = instance.createCanvas(width, height);
       canvas.parent(options.host);
       if (options.canvasClassName) {
         canvas.elt.className = options.canvasClassName;
@@ -999,8 +1013,10 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
       instance.pixelDensity(1);
       instance.frameRate(30);
       instance.noFill();
-      lastViewportWidth = instance.windowWidth;
-      lastViewportHeight = instance.windowHeight;
+      const { width: viewportWidth, height: viewportHeight } =
+        getViewportDimensions();
+      lastViewportWidth = viewportWidth;
+      lastViewportHeight = viewportHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
       reset();
 
@@ -1075,11 +1091,11 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     };
 
     instance.windowResized = () => {
-      const nextWidth = instance.windowWidth;
-      const nextHeight = instance.windowHeight;
-      const nextOrientation = getOrientation(nextWidth, nextHeight);
-      const widthDelta = Math.abs(nextWidth - lastViewportWidth);
-      const heightDelta = Math.abs(nextHeight - lastViewportHeight);
+      const { width: nextViewportWidth, height: nextViewportHeight } =
+        getViewportDimensions();
+      const nextOrientation = getOrientation(nextViewportWidth, nextViewportHeight);
+      const widthDelta = Math.abs(nextViewportWidth - lastViewportWidth);
+      const heightDelta = Math.abs(nextViewportHeight - lastViewportHeight);
       const viewportDelta = Math.max(widthDelta, heightDelta);
       const orientationChanged = nextOrientation !== lastOrientation;
       const isLikelyMobileViewportChurn =
@@ -1091,11 +1107,13 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
         return;
       }
 
-      instance.resizeCanvas(nextWidth, nextHeight);
+      const { width: nextCanvasWidth, height: nextCanvasHeight } =
+        getCanvasDimensions();
+      instance.resizeCanvas(nextCanvasWidth, nextCanvasHeight);
       ink = resolveInkStyle(options.host, settings);
       reset();
-      lastViewportWidth = nextWidth;
-      lastViewportHeight = nextHeight;
+      lastViewportWidth = nextViewportWidth;
+      lastViewportHeight = nextViewportHeight;
       lastOrientation = nextOrientation;
     };
   };
