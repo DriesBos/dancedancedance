@@ -388,6 +388,10 @@ export default function CustomCursor() {
     // Hover handlers for message targets
     const handleMessageEnter = (e: Event) => {
       const target = e.currentTarget as HTMLElement;
+      if (!target.classList.contains('cursorMessage')) {
+        messageFadeAnim.reverse();
+        return;
+      }
       const messageText = target.getAttribute('data-cursor-message');
       if (messageText) {
         setMessage(messageText);

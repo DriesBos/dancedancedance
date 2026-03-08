@@ -55,7 +55,7 @@ export default function Newsletter({ className }: NewsletterProps) {
         return () => clearInterval(interval);
       }
     },
-    { dependencies: [buttonText] }
+    { dependencies: [buttonText] },
   );
 
   // Playful scramble animation for message text
@@ -94,7 +94,7 @@ export default function Newsletter({ className }: NewsletterProps) {
         return () => clearInterval(interval);
       }
     },
-    { dependencies: [message] }
+    { dependencies: [message] },
   );
 
   // Update button text based on state
@@ -186,9 +186,14 @@ export default function Newsletter({ className }: NewsletterProps) {
     }
   };
 
+  const showCursorMessage = !isActive && !inputValue;
+
   return (
     <div
-      className={`${styles.newsletter} ${className || ''}`}
+      className={`${styles.newsletter} ${className || ''} ${showCursorMessage ? 'cursorMessage' : ''}`}
+      data-cursor-message={
+        showCursorMessage ? 'infrequent but spirited mails' : undefined
+      }
       data-active={isActive}
     >
       <form
