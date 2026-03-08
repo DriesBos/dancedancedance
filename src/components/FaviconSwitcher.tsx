@@ -80,7 +80,7 @@ export default function FaviconSwitcher() {
         return '#62C853';
       case 'LIGHT':
         return defaultColor;
-      case 'DARK':
+      case 'SEGMENTS':
         return defaultColor;
       case 'KUSAMA':
         return '#BA3A52';

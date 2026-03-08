@@ -72,7 +72,7 @@ export const SEGMENTS_DEFAULT_PARAMS: SegmentsParams = {
   uniformity: 0.5,
   lineThickness: 1,
   opacity: 1,
-  speed: 0.5,
+  speed: 1,
   hue: 0,
   saturation: 0,
   lightness: 0,
@@ -1013,7 +1013,10 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
       };
       document.addEventListener('visibilitychange', handleVisibilityChange);
       teardownFns.push(() => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener(
+          'visibilitychange',
+          handleVisibilityChange,
+        );
       });
 
       if (document.hidden) {

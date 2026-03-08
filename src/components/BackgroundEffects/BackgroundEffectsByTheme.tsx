@@ -14,7 +14,7 @@ export default function BackgroundEffectsByTheme() {
     return <BackgroundEffects version="radiating" />;
   }
 
-  if (theme === 'DARK') {
+  if (theme === 'SEGMENTS') {
     return <BackgroundEffects version="segments" />;
   }
 

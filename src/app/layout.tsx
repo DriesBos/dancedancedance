@@ -56,7 +56,7 @@ const INITIAL_UI_STATE_SCRIPT = `
       SKY: '#B7D5FF',
       KERMIT: '#FFFFFF',
       LIGHT: '#E8E7E3',
-      DARK: '#1A1A1A',
+      SEGMENTS: '#1A1A1A',
       KUSAMA: '#000000',
       SPACE: '#000000',
     };

@@ -7,7 +7,7 @@ export type Theme =
   | 'SKY'
   | 'KERMIT'
   | 'LIGHT'
-  | 'DARK'
+  | 'SEGMENTS'
   | 'KUSAMA'
   | 'SPACE';
 
@@ -34,7 +34,7 @@ export const THEME_ORDER: Theme[] = [
   'RADIANT',
   'TRON',
   'SKY',
-  'DARK',
+  'SEGMENTS',
   'LIGHT',
   'KUSAMA',
   'SPACE',
