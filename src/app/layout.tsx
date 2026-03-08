@@ -29,12 +29,12 @@ const INITIAL_UI_STATE_SCRIPT = `
     var hour = new Date().getHours();
     var theme = hour >= 0 && hour < 5 ? 'NIGHT' : 'RADIANT';
     var layout = '3D';
-    var skyThemeMetaColor = '#BFC4DE';
+    var skyThemeMetaColor = 'transparent';
     var themeMetaColors = {
       NIGHT: '#000000',
       TRON: '#000000',
       RADIANT: '#DAD9E0',
-      SKY: '#BFC4DE',
+      SKY: 'transparent',
       KERMIT: '#FFFFFF',
       LIGHT: '#E8E7E3',
       SEGMENTS: '#1A1A1A',
