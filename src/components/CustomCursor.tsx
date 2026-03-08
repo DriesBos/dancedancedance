@@ -583,7 +583,11 @@ export default function CustomCursor() {
       <div ref={messageRef} className={`${styles.cursor} ${styles.message}`}>
         {message}
       </div>
-      <div ref={previewRef} className={styles.preview} aria-hidden="true">
+      <div
+        ref={previewRef}
+        className={`${styles.preview} imageItem`}
+        aria-hidden="true"
+      >
         <img ref={previewImageRef} src={undefined} alt="" />
       </div>
       <div

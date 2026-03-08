@@ -770,6 +770,9 @@ body
       &[data-layout="3D"]
         .blok-Action
           background: transparent !important
+  &[data-theme='NIGHT']
+    .imageItem
+      opacity: 0.75
 
 .clickable
   cursor: pointer
@@ -777,7 +780,7 @@ body
 
 .imageItem
   border-radius: calc(var(--border-radius) / 2)
-  transition: border-radius var(--transition-theme)
+  transition: border-radius var(--transition-theme), opacity var(--transition-theme)
 
 @keyframes hyperLink
   0%
