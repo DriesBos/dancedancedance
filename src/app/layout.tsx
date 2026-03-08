@@ -162,7 +162,7 @@ export default async function RootLayout({
                 link="https://calendly.com/info-b9c/30min"
                 linkType="url"
                 className="cursorInteract"
-                dropLeftPx={140}
+                dropLeftPx={130}
                 dropDelayMs={100}
               />
             </ActionButtonContainer>
