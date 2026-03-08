@@ -406,6 +406,7 @@ mux-player, .muxPlayer
           @media (min-width: 770px)
             display: none
       &-Image, &-Thumbnail, &-Video, &-Slider
+        width: 100%
         padding: var(--spacing-base) var(--spacing-side)
         flex: 1
         img, video
@@ -422,9 +423,19 @@ mux-player, .muxPlayer
             flex-direction: row
             align-items: flex-end
             gap: calc(var(--spacing-base) / 2)
+            min-width: 0
+            .imageItem, mux-player, video
+              flex: 1 1 0%
+              min-width: 0
+              width: auto !important
             .column-Caption
               padding: calc(var(--spacing-base) / 2) 0
+              flex: 0 1 9rem
               max-width: 9rem
+              min-width: 0
+              overflow-wrap: anywhere
+              // min-width: 8rem
+              // flex-shrink: 0
       &-Slider
         &-ImageWrapper
           position: relative
