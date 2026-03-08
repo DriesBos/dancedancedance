@@ -72,7 +72,7 @@ export const SEGMENTS_DEFAULT_PARAMS: SegmentsParams = {
   uniformity: 0.5,
   lineThickness: 1,
   opacity: 1,
-  speed: 1,
+  speed: 2,
   hue: 0,
   saturation: 0,
   lightness: 0,
@@ -1093,7 +1093,10 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     instance.windowResized = () => {
       const { width: nextViewportWidth, height: nextViewportHeight } =
         getViewportDimensions();
-      const nextOrientation = getOrientation(nextViewportWidth, nextViewportHeight);
+      const nextOrientation = getOrientation(
+        nextViewportWidth,
+        nextViewportHeight,
+      );
       const widthDelta = Math.abs(nextViewportWidth - lastViewportWidth);
       const heightDelta = Math.abs(nextViewportHeight - lastViewportHeight);
       const viewportDelta = Math.max(widthDelta, heightDelta);
