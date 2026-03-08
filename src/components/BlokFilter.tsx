@@ -49,7 +49,7 @@ export default function BlokFilter({
           data-inactive={!isSortActive('title')}
           onClick={() => onSortChange('title')}
         >
-          Selected projects
+          Selected work
         </button>
         <button
           type="button"

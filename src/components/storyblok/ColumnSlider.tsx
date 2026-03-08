@@ -108,7 +108,6 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           <SliderIndicators
             total={activeImages?.length || 0}
             activeIndex={activeIndex}
-            className="column-Slider-Indicators"
           />
         </div>
         {currentImage.name && (

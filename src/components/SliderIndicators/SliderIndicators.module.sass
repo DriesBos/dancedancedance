@@ -1,25 +1,21 @@
 .sliderIndicator
   position: absolute
-  // bottom: 0.33rem
-  // right: 0.5rem
+  bottom: calc(var(--spacing-base) / 2)
+  right: var(--spacing-side)
   display: inline-flex
   align-items: flex-end
-  gap: 4px
+  gap: 6px
   z-index: 1
-  height: 16px
   @media (max-width: 770px)
-    bottom: 0.165rem
-    gap: 3px
+    gap: 5px
   &_Item
-    background: currentColor
     width: 1.5px
-    height: 12px
+    height: 0.75rem
     background: var(--slider-indicator)
-    transition: background 0.165s ease, height 0.33s ease
+    transition: all 0.33s ease
     @media (max-width: 770px)
-      height: 9px
+      height: 12px
     &[data-active='true']
-      height: 16px
-      background: var(--slider-indicator-active)
+      height: 1.25rem
       @media (max-width: 770px)
-        height: 12px
+        height: 18px

@@ -43,7 +43,12 @@ interface SlideItemProps {
   progressRef?: React.RefObject<HTMLDivElement>;
 }
 
-const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
+const SlideItem = ({
+  item,
+  isActive,
+  index,
+  progressRef,
+}: SlideItemProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const muxPlayerRef = useRef<any>(null);
 
@@ -140,16 +145,17 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
         <div className={styles.imageWrapper}>{renderMedia()}</div>
       </div>
       <div className={styles.caption}>
+        {/* <div className={styles.captionYear}>{item.year}</div> */}
         <div className={styles.captionTitle}>
-          <span>Featured</span>
-          {isActive && progressRef && (
+          {/* {isActive && progressRef && (
             <div className={styles.progressWrapper}>
               <div className={styles.progress} ref={progressRef} />
             </div>
-          )}
-          {String(item.name)}
+          )} */}
+          <span>Featured work</span>
         </div>
-        <div className={styles.captionYear}>{item.year}</div>
+        <div>{String(item.name)}</div>
+        {/* <span>Featured</span> */}
       </div>
     </div>
   );
@@ -273,12 +279,9 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           progressRef={activeIndex === index ? progressRef : undefined}
         />
       ))}
-
-      <SliderIndicators
-        total={blok.body.length}
-        activeIndex={activeIndex}
-        className={styles.indicators}
-      />
+      <div className={styles.indicatorAnchor}>
+        <SliderIndicators total={blok.body.length} activeIndex={activeIndex} />
+      </div>
 
       {!hasCursor && currentItem?.link?.cached_url && (
         <Link

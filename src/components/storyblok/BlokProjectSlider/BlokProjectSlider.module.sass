@@ -48,9 +48,16 @@
   width: 100%
   height: 100%
 
-.indicators
-  bottom: calc(var(--spacing-base) + 0.33rem + 0.454545rem + 1.45em) !important
-  right: calc(var(--spacing-side) + 0.5rem) !important
+.indicatorAnchor
+  position: absolute
+  top: var(--spacing-base)
+  left: var(--spacing-side)
+  width: calc(100% - (var(--spacing-side) * 2))
+  aspect-ratio: 16 / 9
+  pointer-events: none
+  z-index: 2
+  @media (orientation: portrait)
+    aspect-ratio: 3 / 2
 
 .tapTarget
   position: absolute
@@ -62,13 +69,14 @@
 
 .caption
   display: flex
-  justify-content: space-between
   align-items: center
 
 .captionTitle
-  display: flex
-  align-items: center
-  gap: 0.25rem
+  flex-grow: 1
+  // padding-left: var(--spacing-side)
+  padding-right: var(--spacing-side)
+  // span
+  //   color: var(--theme-type-inactive)
 
 .progressWrapper
   position: relative
@@ -108,6 +116,3 @@
   pointer-events: auto
   @media (hover: none)
     pointer-events: none
-
-.captionYear
-  text-align: right
