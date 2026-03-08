@@ -10,12 +10,14 @@
   border-right: var(--border-width) solid var(--border-color)
   &[data-scrollborder='true']
     border-bottom-width: var(--border-width)
-  :global(.column-Title)
-    padding-right: 0
-    user-select: none
-    min-width: 0
   :global(.side_Top)
     pointer-events: auto
+
+.title
+  padding-right: 0 !important
+  padding-left: 0 !important
+  user-select: none
+  min-width: 0
 
 .titleMarqueeViewport
   width: 100%
@@ -23,6 +25,7 @@
   overflow: hidden
 
 .titleMarqueeTrack
+  padding-left: var(--spacing-side)
   display: inline-flex
   width: max-content
   min-width: 100%

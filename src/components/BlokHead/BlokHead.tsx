@@ -75,6 +75,7 @@ const BlokHead = ({}: Props) => {
   const layoutToggleTimeoutRef = useRef<number | null>(null);
   const isHoveringTopPanelZoneRef = useRef(false);
   const TITLE_MARQUEE_PX_PER_SECOND = 10;
+  const TITLE_MARQUEE_RETURN_SPEED_MULTIPLIER = 8;
 
   const currentSlug = useMemo(
     () => currentPath.split('/')[2] || '',
@@ -652,6 +653,7 @@ const BlokHead = ({}: Props) => {
       if (overflow <= 1) return;
 
       const duration = overflow / TITLE_MARQUEE_PX_PER_SECOND;
+      const returnDuration = duration / TITLE_MARQUEE_RETURN_SPEED_MULTIPLIER;
       const marquee = gsap.timeline({ repeat: -1 });
 
       marquee
@@ -662,7 +664,11 @@ const BlokHead = ({}: Props) => {
           ease: 'none',
         })
         .to({}, { duration: 2 })
-        .set(track, { x: 0 });
+        .to(track, {
+          x: 0,
+          duration: returnDuration,
+          ease: 'power3',
+        });
 
       titleMarqueeRef.current = marquee;
     };
@@ -696,7 +702,12 @@ const BlokHead = ({}: Props) => {
       resizeObserver?.disconnect();
       clearTitleMarquee();
     };
-  }, [pathName, projectName, TITLE_MARQUEE_PX_PER_SECOND]);
+  }, [
+    pathName,
+    projectName,
+    TITLE_MARQUEE_PX_PER_SECOND,
+    TITLE_MARQUEE_RETURN_SPEED_MULTIPLIER,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -767,7 +778,7 @@ const BlokHead = ({}: Props) => {
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row>
-        <div className="column column-Title">
+        <div className={`column column-Title ${styles.title}`}>
           <div ref={titleViewportRef} className={styles.titleMarqueeViewport}>
             <div ref={titleTrackRef} className={styles.titleMarqueeTrack}>
               {(pathName === 'home' ||
