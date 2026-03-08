@@ -6,10 +6,10 @@ import { useStore } from '@/store/store';
 export default function DotsOverlayEffectsByTheme() {
   const theme = useStore((state) => state.theme);
   const layout = useStore((state) => state.layout);
-  const isDotsTheme = theme === 'DOTS';
+  const isSpaceTheme = theme === 'SPACE';
   const isVisible = layout === '3D';
 
-  if (!isDotsTheme) {
+  if (!isSpaceTheme) {
     return null;
   }
 

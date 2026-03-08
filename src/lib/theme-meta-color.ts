@@ -1,19 +1,18 @@
 import { Theme } from '@/store/store';
 
 const THEME_META_COLORS: Record<Theme, string> = {
-  'NIGHT MODE': '#000000',
+  NIGHT: '#000000',
   TRON: '#000000',
   RADIANT: '#DAD9E0',
-  'RADIANT DARK': '#000000',
-  AUGURIES: '#B7D5FF',
+  SKY: '#B7D5FF',
   KERMIT: '#FFFFFF',
   LIGHT: '#E8E7E3',
   DARK: '#1A1A1A',
   KUSAMA: '#000000',
-  DOTS: '#000000',
+  SPACE: '#000000',
 };
 
-const AUGURIES_SKY_META_COLORS: Record<string, string> = {
+const SKY_VARIATION_META_COLORS: Record<string, string> = {
   morning: '#6D79AF',
   dawn: '#F5B38B',
   noon: '#B7D5FF',
@@ -32,11 +31,10 @@ export const getThemeMetaColor = (
   theme: Theme,
   skyVariation?: string,
 ): string => {
-  if (theme === 'AUGURIES') {
+  if (theme === 'SKY') {
     const normalizedVariation = normalizeSkyVariation(skyVariation);
     return (
-      AUGURIES_SKY_META_COLORS[normalizedVariation] ??
-      THEME_META_COLORS.AUGURIES
+      SKY_VARIATION_META_COLORS[normalizedVariation] ?? THEME_META_COLORS.SKY
     );
   }
 

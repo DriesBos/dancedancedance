@@ -61,7 +61,7 @@ const BlokHead = ({}: Props) => {
   );
   const isThreeDLayout = layout === '3D';
   const themeLabel = theme
-    .toLowerCase()
+    .toUpperCase()
     .split(' ')
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
@@ -810,7 +810,7 @@ const BlokHead = ({}: Props) => {
                 className={`icon cursorMagnetic ${styles.themeButton}`}
                 onClick={handleCycleTheme}
                 aria-label={`Cycle theme. Current theme: ${themeLabel}`}
-                title={`Theme: ${themeLabel}`}
+                title={`${themeLabel} mode`}
               >
                 <span
                   className={`${styles.themeCycle} ${

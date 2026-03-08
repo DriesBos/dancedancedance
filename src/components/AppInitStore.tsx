@@ -23,7 +23,7 @@ const getSkyVariationForHour = (hour: number): string => {
 
 const getInitialTheme = (hour: number): Theme => {
   if (hour >= 0 && hour < 5) {
-    return 'NIGHT MODE';
+    return 'NIGHT';
   }
 
   return 'RADIANT';

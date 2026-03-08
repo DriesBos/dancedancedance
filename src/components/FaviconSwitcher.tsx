@@ -68,15 +68,13 @@ export default function FaviconSwitcher() {
   const themeColor = useMemo(() => {
     const defaultColor = browserTheme === 'dark' ? '#FFFFFF' : '#000000';
     switch (theme) {
-      case 'NIGHT MODE':
+      case 'NIGHT':
         return '#FF0000';
       case 'TRON':
         return '#80FFE9';
       case 'RADIANT':
         return '#FA5942';
-      case 'RADIANT DARK':
-        return '#D4AF37';
-      case 'AUGURIES':
+      case 'SKY':
         return defaultColor;
       case 'KERMIT':
         return '#62C853';
@@ -86,7 +84,7 @@ export default function FaviconSwitcher() {
         return defaultColor;
       case 'KUSAMA':
         return '#BA3A52';
-      case 'DOTS':
+      case 'SPACE':
         return defaultColor;
       default:
         return defaultColor;

@@ -37,9 +37,9 @@ const INITIAL_UI_STATE_SCRIPT = `
         : hour >= 19 && hour < 21
         ? 'dusk'
         : 'evening';
-    var theme = hour >= 0 && hour < 5 ? 'NIGHT MODE' : 'RADIANT';
+    var theme = hour >= 0 && hour < 5 ? 'NIGHT' : 'RADIANT';
     var layout = '3D';
-    var auguriesMetaColors = {
+    var skyThemeMetaColors = {
       morning: '#6D79AF',
       dawn: '#F5B38B',
       noon: '#B7D5FF',
@@ -48,20 +48,19 @@ const INITIAL_UI_STATE_SCRIPT = `
       evening: '#2B3D74',
     };
     var themeMetaColors = {
-      'NIGHT MODE': '#000000',
+      NIGHT: '#000000',
       TRON: '#000000',
       RADIANT: '#DAD9E0',
-      'RADIANT DARK': '#000000',
-      AUGURIES: '#B7D5FF',
+      SKY: '#B7D5FF',
       KERMIT: '#FFFFFF',
       LIGHT: '#E8E7E3',
       DARK: '#1A1A1A',
       KUSAMA: '#000000',
-      DOTS: '#000000',
+      SPACE: '#000000',
     };
     var themeColor =
-      theme === 'AUGURIES'
-        ? (auguriesMetaColors[skyVariation] || themeMetaColors.AUGURIES)
+      theme === 'SKY'
+        ? (skyThemeMetaColors[skyVariation] || themeMetaColors.SKY)
         : (themeMetaColors[theme] || '#FFFFFF');
 
     window.__DDD_INITIAL_STATE__ = { theme: theme, layout: layout, skyVariation: skyVariation };

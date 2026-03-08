@@ -1,16 +1,15 @@
 import { create } from 'zustand';
 
 export type Theme =
-  | 'NIGHT MODE'
+  | 'NIGHT'
   | 'TRON'
   | 'RADIANT'
-  | 'RADIANT DARK'
-  | 'AUGURIES'
+  | 'SKY'
   | 'KERMIT'
   | 'LIGHT'
   | 'DARK'
   | 'KUSAMA'
-  | 'DOTS';
+  | 'SPACE';
 
 export type Layout = 'DESKTOP' | '3D';
 
@@ -32,28 +31,26 @@ export type Actions = {
 };
 
 export const THEME_ORDER: Theme[] = [
-  'NIGHT MODE',
-  'TRON',
   'RADIANT',
-  'RADIANT DARK',
-  'AUGURIES',
-  'KERMIT',
-  'LIGHT',
+  'TRON',
+  'SKY',
   'DARK',
+  'LIGHT',
   'KUSAMA',
-  'DOTS',
+  'SPACE',
+  'NIGHT',
+  'KERMIT',
 ];
 
-export const THEME_BUTTON_ORDER: Theme[] = THEME_ORDER.filter(
-  (theme) => theme !== 'RADIANT DARK',
-);
+export const THEME_BUTTON_ORDER: Theme[] = THEME_ORDER;
 
 const getNextThemeForButtonCycle = (currentTheme: Theme): Theme => {
   const currentIndex = THEME_ORDER.indexOf(currentTheme);
   const safeCurrentIndex = currentIndex >= 0 ? currentIndex : 0;
 
   for (let step = 1; step <= THEME_ORDER.length; step += 1) {
-    const candidate = THEME_ORDER[(safeCurrentIndex + step) % THEME_ORDER.length];
+    const candidate =
+      THEME_ORDER[(safeCurrentIndex + step) % THEME_ORDER.length];
     if (THEME_BUTTON_ORDER.includes(candidate)) {
       return candidate;
     }
@@ -67,7 +64,7 @@ export const useStore = create<Props & Actions>()((set) => ({
   theme: 'LIGHT',
   layout: '3D',
   topPanel: true,
-  setNightmode: () => set({ theme: 'NIGHT MODE' }),
+  setNightmode: () => set({ theme: 'NIGHT' }),
   setDefault: () => set({ theme: 'LIGHT' }),
   setTheme: (theme: Theme) => set({ theme }),
   cycleTheme: () =>
