@@ -164,7 +164,6 @@ export default async function RootLayout({
                 linkType="url"
                 className="cursorInteract"
                 dropLeftPx={130}
-                dropDelayMs={100}
                 dropOnPage="about"
               />
             </ActionButtonContainer>

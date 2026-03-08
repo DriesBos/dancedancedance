@@ -11,7 +11,6 @@ interface ActionButtonProps {
   cursorMessage?: string;
   dropLeftPx?: number;
   dropCenterPercent?: number;
-  dropDelayMs?: number;
   dropOnPage?: ActionButtonDropPage;
 }
 
@@ -46,7 +45,6 @@ const ActionButton = ({
   cursorMessage,
   dropLeftPx,
   dropCenterPercent,
-  dropDelayMs,
   dropOnPage,
 }: ActionButtonProps) => {
   const isEmail = isEmailLink(link, linkType);
@@ -61,7 +59,6 @@ const ActionButton = ({
       data-cursor-message={cursorMessage}
       data-action-drop-left={dropLeftPx}
       data-action-drop-center-percent={dropCenterPercent}
-      data-action-drop-delay-ms={dropDelayMs}
       data-action-drop-page={dropOnPage}
     >
       <span className={styles.copy}>{copy}</span>

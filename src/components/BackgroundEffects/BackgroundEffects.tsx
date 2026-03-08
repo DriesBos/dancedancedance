@@ -18,8 +18,8 @@ const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
-const SEGMENTS_SCALE_DURATION_MS = 90000;
-const SEGMENTS_SCALE_DURATION_PORTRAIT_MS = 45000;
+const SEGMENTS_SCALE_DURATION_MS = 60000;
+const SEGMENTS_SCALE_DURATION_PORTRAIT_MS = 30000;
 const IOS_IMMERSIVE_HEIGHT_VAR = '--be-ios-immersive-height';
 const IOS_IMMERSIVE_WIDTH_VAR = '--be-ios-immersive-width';
 
@@ -31,9 +31,8 @@ const isIosSafari = () => {
     /iP(hone|ad|od)/.test(ua) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isWebKit = /WebKit/i.test(ua);
-  const isNonSafariBrowser = /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|YaBrowser/i.test(
-    ua,
-  );
+  const isNonSafariBrowser =
+    /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|YaBrowser/i.test(ua);
 
   return isIosDevice && isWebKit && !isNonSafariBrowser;
 };

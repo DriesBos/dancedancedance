@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bodies, Body, Engine, Runner, Sleeping, World } from 'matter-js';
+import { Bodies, Body, Engine, Runner, World } from 'matter-js';
 import styles from './ActionButtonContainer.module.sass';
 
 interface ActionButtonContainerProps {
@@ -23,9 +23,6 @@ interface PhysicsEntry {
   element: HTMLDivElement;
   width: number;
   height: number;
-  dropDelayMs: number;
-  initialAngularVelocity: number;
-  activated: boolean;
 }
 
 interface PersistedItemState {
@@ -121,7 +118,7 @@ const ActionButtonContainer = ({
     const engine = Engine.create();
     engine.enableSleeping = true;
     engine.gravity.y = 1;
-    engine.gravity.scale = 0.0012;
+    engine.gravity.scale = 0.0016;
 
     const runner = Runner.create();
     const containerRect = container.getBoundingClientRect();
@@ -163,8 +160,13 @@ const ActionButtonContainer = ({
       .map((element, index): PhysicsEntry | null => {
         const persistedState = persistedTransformsRef.current.get(index);
         if (persistedState) {
-          const { x, y, angle, width: persistedWidth, height: persistedHeight } =
-            persistedState;
+          const {
+            x,
+            y,
+            angle,
+            width: persistedWidth,
+            height: persistedHeight,
+          } = persistedState;
           element.style.opacity = '1';
           element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad)`;
 
@@ -208,17 +210,12 @@ const ActionButtonContainer = ({
         const preferredCenterPercentValue = childRoot?.getAttribute(
           'data-action-drop-center-percent',
         );
-        const dropDelayValue = childRoot?.getAttribute(
-          'data-action-drop-delay-ms',
-        );
         const preferredLeftPx =
           preferredLeftValue === null ? Number.NaN : Number(preferredLeftValue);
         const preferredCenterPercent =
           preferredCenterPercentValue === null
             ? Number.NaN
             : Number(preferredCenterPercentValue);
-        const dropDelayMs =
-          dropDelayValue === null ? 0 : Math.max(0, Number(dropDelayValue) || 0);
         const hasPreferredLeft = Number.isFinite(preferredLeftPx);
         const hasPreferredCenterPercent = Number.isFinite(
           preferredCenterPercent,
@@ -241,9 +238,8 @@ const ActionButtonContainer = ({
           sleepThreshold: 40,
         });
 
-        const initialAngularVelocity = (Math.random() - 0.5) * 0.02;
         Body.setAngle(body, (Math.random() - 0.5) * 0.16);
-        Body.setStatic(body, true);
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.02);
         World.add(engine.world, body);
 
         return {
@@ -252,9 +248,6 @@ const ActionButtonContainer = ({
           element,
           width,
           height,
-          dropDelayMs,
-          initialAngularVelocity,
-          activated: false,
         };
       })
       .filter((entry): entry is PhysicsEntry => entry !== null);
@@ -272,38 +265,22 @@ const ActionButtonContainer = ({
 
     let settleFrames = 0;
     let rafId = 0;
-    const startTime = performance.now();
     const renderFrame = () => {
-      const elapsedMs = performance.now() - startTime;
-      let allBodiesActivated = true;
       let allBodiesSleeping = true;
 
       entries.forEach((entry) => {
         const { body, element, width, height } = entry;
 
-        if (!entry.activated && elapsedMs >= entry.dropDelayMs) {
-          Body.setStatic(body, false);
-          Sleeping.set(body, false);
-          Body.setVelocity(body, { x: 0, y: 0.01 });
-          Body.setAngularVelocity(body, entry.initialAngularVelocity);
-          entry.activated = true;
-        }
-
-        if (!entry.activated) {
-          allBodiesActivated = false;
-          allBodiesSleeping = false;
-        }
-
         const x = body.position.x - width / 2;
         const y = body.position.y - height / 2;
         element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${body.angle}rad)`;
 
-        if (entry.activated && !body.isSleeping) {
+        if (!body.isSleeping) {
           allBodiesSleeping = false;
         }
       });
 
-      if (allBodiesActivated && allBodiesSleeping) {
+      if (allBodiesSleeping) {
         settleFrames += 1;
       } else {
         settleFrames = 0;
