@@ -82,6 +82,7 @@ $break-desktop: 1370px
   --spacing-side: 1.25rem
   --spacing-between-images: 1.25rem
   --spacing-base: 1.25rem
+  --spacing-icons: 1.25rem
   --spacing-half: 0.625rem
   // 124px panel height + blok height + desired margin
   --spacing-containerTopDistance: 0
@@ -90,7 +91,10 @@ $break-desktop: 1370px
     --spacing-side: 1rem
     --spacing-between-images: 0.5rem
     --spacing-base: 1rem
+    --spacing-icons: 1rem
     --border-hyperlink: 1px
+  @media (max-width: 450px)
+    --spacing-icons: 0.75rem
 
   // Transition
   --transition-button: .33s ease
