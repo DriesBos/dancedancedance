@@ -2,6 +2,7 @@ import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import { getStoryblokApi } from '@/lib/storyblok';
 import PageTransition from '@/components/PageTransition';
+import AsciiPortrait from '@/components/AsciiPortrait';
 import type { Metadata } from 'next';
 import { cache } from 'react';
 
@@ -30,7 +31,9 @@ export async function generateStaticParams() {
     }>;
 
     const staticParams = stories
-      .filter((story) => !story.is_folder && !!story.slug && story.slug !== 'home')
+      .filter(
+        (story) => !story.is_folder && !!story.slug && story.slug !== 'home',
+      )
       .map((story) => ({
         slug: story.slug!.split('/'),
       }));
@@ -53,12 +56,15 @@ const getStoryVersion = (): 'draft' | 'published' => {
   return useDraftInDev ? 'draft' : 'published';
 };
 
-const getSlugPath = (slug?: string[]) => (slug && slug.length > 0 ? slug.join('/') : '');
+const getSlugPath = (slug?: string[]) =>
+  slug && slug.length > 0 ? slug.join('/') : '';
 
-const getPageData = cache(async (version: 'draft' | 'published', slugPath: string) => {
-  const slug = slugPath ? slugPath.split('/') : undefined;
-  return fetchStory(version, slug);
-});
+const getPageData = cache(
+  async (version: 'draft' | 'published', slugPath: string) => {
+    const slug = slugPath ? slugPath.split('/') : undefined;
+    return fetchStory(version, slug);
+  },
+);
 
 export async function generateMetadata({
   params,
@@ -124,6 +130,7 @@ export default async function Home({ params }: { params: Params }) {
     const version = getStoryVersion();
     const slugPath = getSlugPath(slug);
     const pageData = await getPageData(version, slugPath);
+    const showAsciiPortrait = slugPath === 'about';
 
     if (!pageData || !pageData.story) {
       return (
@@ -138,7 +145,15 @@ export default async function Home({ params }: { params: Params }) {
 
     return (
       <PageTransition>
-        <StoryblokStory story={pageData.story} />
+        <>
+          <StoryblokStory story={pageData.story} />
+          {/* {showAsciiPortrait && (
+            <AsciiPortrait
+              src="/portraits/portrait1.png"
+              alt="Dries Bos Portrait"
+            />
+          )} */}
+        </>
       </PageTransition>
     );
   } catch (error) {
