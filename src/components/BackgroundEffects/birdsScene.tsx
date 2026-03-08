@@ -155,9 +155,9 @@ const applyRuntimeAppearance = (
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
-const BASE_BIRD_COUNT = 3333;
-const MIN_BIRD_COUNT = 1667;
-const MAX_BIRD_COUNT = 3333;
+const BASE_BIRD_COUNT = 1500;
+const MIN_BIRD_COUNT = 1000;
+const MAX_BIRD_COUNT = 1500;
 const BIRD_DENSITY_MIN = 0.05;
 const BIRD_DENSITY_MAX = 1.5;
 const POINTER_ACTIVE_WINDOW_MS = 160;

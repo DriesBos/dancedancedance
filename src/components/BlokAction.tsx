@@ -15,7 +15,7 @@ export default function BlokAction() {
       target="_blank"
       rel="noopener noreferrer"
       className="blok blok-Action blok-Animate cursorMessage"
-      data-cursor-message="Start your project"
+      data-cursor-message="Let's talk"
     >
       <GrainyGradient variant="blok" />
       <Row>
@@ -32,7 +32,7 @@ export default function BlokAction() {
                     {Array.from({ length: MARQUEE_REPEATS_PER_GROUP }).map(
                       (_, unitIndex) => (
                         <div className="animateSlideLeftUnit" key={unitIndex}>
-                          <span>Start your project</span>
+                          <span>Hire this guy</span>
                           <div className="icon">
                             <IconAbout variant="mixed" animate />
                           </div>
