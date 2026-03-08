@@ -39,9 +39,7 @@ const SKY_PALETTE: SkyPalette = {
   fog: '#6C79A8',
 };
 
-const resolveSkyPalette = (
-  fallbackColor: string,
-): SkyPalette => ({
+const resolveSkyPalette = (fallbackColor: string): SkyPalette => ({
   top: SKY_PALETTE.top || fallbackColor,
   horizon: SKY_PALETTE.horizon || fallbackColor,
   bottom: SKY_PALETTE.bottom || fallbackColor,
@@ -72,14 +70,18 @@ const clamp = (value: number, min: number, max: number) =>
 
 const BASE_BIRD_COUNT = 1500;
 const MIN_BIRD_COUNT = 1000;
-const MAX_BIRD_COUNT = 1500;
+const MAX_BIRD_COUNT = 2000;
 const BIRD_DENSITY_MIN = 0.05;
 const BIRD_DENSITY_MAX = 1.5;
 const POINTER_ACTIVE_WINDOW_MS = 160;
 const SPEED_LIMIT = 9.0;
-const BOUNDS = 800;
-const BOUNDS_HALF = BOUNDS / 2;
 const SKY_PALETTE_FADE_SPEED = 2.4;
+const INITIAL_SPAWN_RADIUS = 180;
+const INITIAL_OUTWARD_SPEED_MIN = 4.0;
+const INITIAL_OUTWARD_SPEED_MAX = 10.0;
+const INITIAL_VELOCITY_JITTER = 1.5;
+const INITIAL_SPAWN_SCREEN_Y = 0.9;
+const INITIAL_SPAWN_SCREEN_X = 0.1;
 
 // Inspired by https://threejs.org/examples/webgpu_compute_birds.html
 export default function BirdsScene({
@@ -263,28 +265,57 @@ export default function BirdsScene({
       renderer.toneMapping = THREE.NeutralToneMapping;
       host.appendChild(renderer.domElement);
 
+      const spawnNdcX = INITIAL_SPAWN_SCREEN_X * 2 - 1;
+      const spawnNdcY = 1 - INITIAL_SPAWN_SCREEN_Y * 2;
+      const spawnDepth = camera.position.z;
+      const spawnHalfHeight =
+        Math.tan((camera.fov * Math.PI) / 360) * spawnDepth;
+      const spawnHalfWidth = spawnHalfHeight * camera.aspect;
+      const spawnCenterX = spawnNdcX * spawnHalfWidth;
+      const spawnCenterY = spawnNdcY * spawnHalfHeight;
+
       const positionArray = new Float32Array(birdCount * 3);
       const velocityArray = new Float32Array(birdCount * 3);
       const phaseArray = new Float32Array(birdCount);
 
       for (let index = 0; index < birdCount; index += 1) {
-        const posX = Math.random() * BOUNDS - BOUNDS_HALF;
-        const posY = Math.random() * BOUNDS - BOUNDS_HALF;
-        const posZ = Math.random() * BOUNDS - BOUNDS_HALF;
+        const spawnRadius = INITIAL_SPAWN_RADIUS * Math.cbrt(Math.random());
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const sinPhi = Math.sin(phi);
+
+        const localX = spawnRadius * sinPhi * Math.cos(theta);
+        const localY = spawnRadius * sinPhi * Math.sin(theta);
+        const localZ = spawnRadius * Math.cos(phi);
+        const posX = spawnCenterX + localX;
+        const posY = spawnCenterY + localY;
+        const posZ = localZ;
 
         positionArray[index * 3] = posX;
         positionArray[index * 3 + 1] = posY;
         positionArray[index * 3 + 2] = posZ;
 
-        const velX = Math.random() - 0.5;
-        const velY = Math.random() - 0.5;
-        const velZ = Math.random() - 0.5;
+        const localLength = Math.hypot(localX, localY, localZ) || 1;
+        const dirX = localX / localLength;
+        const dirY = localY / localLength;
+        const dirZ = localZ / localLength;
+        const outwardSpeed =
+          INITIAL_OUTWARD_SPEED_MIN +
+          Math.random() *
+            (INITIAL_OUTWARD_SPEED_MAX - INITIAL_OUTWARD_SPEED_MIN);
 
-        velocityArray[index * 3] = velX * 10;
-        velocityArray[index * 3 + 1] = velY * 10;
-        velocityArray[index * 3 + 2] = velZ * 10;
+        const velX =
+          dirX * outwardSpeed + (Math.random() - 0.5) * INITIAL_VELOCITY_JITTER;
+        const velY =
+          dirY * outwardSpeed + (Math.random() - 0.5) * INITIAL_VELOCITY_JITTER;
+        const velZ =
+          dirZ * outwardSpeed + (Math.random() - 0.5) * INITIAL_VELOCITY_JITTER;
 
-        phaseArray[index] = 1;
+        velocityArray[index * 3] = velX;
+        velocityArray[index * 3 + 1] = velY;
+        velocityArray[index * 3 + 2] = velZ;
+
+        phaseArray[index] = Math.random() * Math.PI * 2;
       }
 
       const positionStorage: any = (
