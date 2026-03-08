@@ -151,18 +151,18 @@ export default async function RootLayout({
               {/* <ActionBlock variant="square" />*/}
               {/* <ActionBlock variant="round" /> */}
               <ActionButton
-                copy="Let's Make Internet"
+                copy="Start your project"
                 link="info@driesbos.com?subject=Let's Make Internet"
                 linkType="email"
                 className="cursorInteract"
-                dropLeftPx={33}
+                dropLeftPx={40}
               />
               <ActionButton
                 copy="Book a discovery call"
                 link="https://calendly.com/info-b9c/30min"
                 linkType="url"
                 className="cursorInteract"
-                dropLeftPx={150}
+                dropLeftPx={140}
                 dropDelayMs={100}
               />
             </ActionButtonContainer>
