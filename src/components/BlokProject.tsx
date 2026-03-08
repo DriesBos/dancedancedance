@@ -56,7 +56,7 @@ const BlokProject = ({
       onClick={handleClick}
       data-cursor-preview={cursorPreviewImage || undefined}
       data-cursor-preview-alt={thumbnail?.alt || title || ''}
-      style={{ cursor: 'pointer', zIndex: stackIndex }}
+      style={{ cursor: 'pointer', zIndex: stackIndex ?? 0 }}
     >
       <BlokSidePanels />
       <GrainyGradient variant="blok" />

@@ -633,10 +633,15 @@ body
       &:nth-child(2)
         z-index: -1
   .page
-    &-General, &-Project, &-About
-      & > .blok:first-child .side_Top,
-      & > :first-child + .blok .side_Top
-        opacity: 1
+    &-Project, &-General
+      & > .blok
+        .side_Top
+          opacity: 0
+        &:first-child
+          .side_Top
+            opacity: 1
+      // & > :first-child + .blok .side_Top
+      //   opacity: 1
   &[data-layout="DESKTOP"]
     padding-left: 0
     padding-right: 0
@@ -739,6 +744,9 @@ body
         @media (max-width: 770px)
           width: calc(100% - var(--spacing-side))
       .blok
+        &-Footer
+          margin-top: 0
+          padding-top: 0
         &-ProjectList
           border-top-width: var(--border-width)
   &[data-theme='SKY']

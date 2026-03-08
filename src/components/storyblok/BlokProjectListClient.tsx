@@ -112,7 +112,7 @@ export default function BlokProjectListClient({
             category={item.category}
             external_link={item.external_link}
             thumbnail={item.thumbnail}
-            stackIndex={index + 1}
+            stackIndex={index}
           />
         ))
       )}

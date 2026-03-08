@@ -21,6 +21,8 @@ import FaviconSwitcher from '@/components/FaviconSwitcher';
 import CursorLoader from '@/components/CursorLoader';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
 import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverlayEffectsByTheme';
+import GrainyGradient from '@/components/GrainyGradient';
+import CurrentTheme from '@/components/CurrentTheme';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -148,6 +150,7 @@ export default async function RootLayout({
       >
         <script dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }} />
         <BackgroundEffectsByTheme />
+        <GrainyGradient variant="page" />
         <AppInitializer />
         <ProjectsProvider projects={projects}>
           <CursorLoader />
@@ -158,6 +161,7 @@ export default async function RootLayout({
           )}
           <StoryblokProvider>
             <ThemeFilter />
+            <CurrentTheme />
             <main className="main">
               <BlokHeadWrapper />
               {children}

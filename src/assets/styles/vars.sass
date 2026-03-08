@@ -108,9 +108,10 @@ body[data-layout='DESKTOP']
 
 body[data-layout='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
-  --spacing-containerTopDistance: calc(124px + var(--blok-height) + 25vh)
+  --spacing-containerTopDistance: calc(124px + var(--blok-height) + 27vh)
   --panel-perspective-origin: 50% -70rem
   @media (max-width: 770px)
+    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 37vh)
     --panel-perspective-origin: 50% -55rem
 
 // THEMES
