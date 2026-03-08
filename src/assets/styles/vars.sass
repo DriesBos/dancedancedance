@@ -111,7 +111,7 @@ body[data-layout='3D']
   --spacing-containerTopDistance: calc(124px + var(--blok-height) + 20vh)
   --panel-perspective-origin: 50% -100vh
   @media (max-width: 1150px)
-    --panel-perspective-origin: 50% -100vw
+    --panel-perspective-origin: 50% -175vw
 
 // THEMES
 body[data-theme='LIGHT']
@@ -143,11 +143,8 @@ body[data-theme='KUSAMA']
   --slider-indicator-active: #DA4B9A
   --theme-bg-gradient: 0.1
   --theme-blok-gradient: 0.1
-  --border-width: 3px
-  --border-fatwidth: 4px
-  @media (max-width: 770px)
-    --border-width: 1.5px
-    --border-fatwidth: 2px
+  --border-width: 1.5px
+  --border-fatwidth: 1.5px
 
 body[data-theme='DARK']
   --theme-bg: var(--color-dark-bg)
@@ -301,7 +298,7 @@ body[data-theme='AUGURIES']
   --theme-rotatingLines-bg: 1
   --border-color: white
   --border-width: 2px
-  --border-fatwidth: 3px
+  --border-fatwidth: 2px
   --cursor-color-bg: black
   --cursor-color-blok: black
   --slider-indicator: white
@@ -335,6 +332,6 @@ body[data-theme='AUGURIES']
   &[data-layout='DESKTOP']
     --theme-blok-showlines: hsla(0, 0%, 92%, 0.98)
   @media (orientation: portrait)
-    --border-width: 3px
-    --border-fatwidth: 4px
+    --border-width: 2px
+    --border-fatwidth: 2px
     --theme-blok: hsla(0, 0%, 92%, 0.96)

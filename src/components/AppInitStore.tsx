@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { Layout, THEME_ORDER, Theme, useStore } from '@/store/store';
+import { Layout, Theme, useStore } from '@/store/store';
 import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -26,12 +26,7 @@ const getInitialTheme = (hour: number): Theme => {
     return 'NIGHT MODE';
   }
 
-  const daytimeThemes = THEME_ORDER.filter(
-    (themeName) => themeName !== 'NIGHT MODE',
-  );
-  return (
-    daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)] ?? 'LIGHT'
-  );
+  return 'RADIANT';
 };
 
 const getFallbackInitialUIState = (): InitialUIState => {
@@ -43,16 +38,7 @@ const getFallbackInitialUIState = (): InitialUIState => {
   };
 };
 
-const getHomeInitialUIState = (): InitialUIState => {
-  const hour = new Date().getHours();
-  return {
-    theme: 'RADIANT',
-    layout: '3D',
-    skyVariation: getSkyVariationForHour(hour),
-  };
-};
-
-const getInitialUIState = (pathname: string): InitialUIState => {
+const getInitialUIState = (): InitialUIState => {
   const win = window as Window & { __DDD_INITIAL_STATE__?: InitialUIState };
   if (win.__DDD_INITIAL_STATE__) {
     return {
@@ -61,10 +47,6 @@ const getInitialUIState = (pathname: string): InitialUIState => {
         win.__DDD_INITIAL_STATE__.skyVariation ??
         getSkyVariationForHour(new Date().getHours()),
     };
-  }
-
-  if (pathname === '/') {
-    return getHomeInitialUIState();
   }
 
   return getFallbackInitialUIState();
@@ -107,7 +89,7 @@ const AppInitializer = () => {
     if (!hasInitializedUIRef.current) {
       hasInitializedUIRef.current = true;
 
-      const initialState = getInitialUIState(pathname);
+      const initialState = getInitialUIState();
       skyVariationRef.current = initialState.skyVariation || 'auto';
       applyBodyState(
         initialState.theme,

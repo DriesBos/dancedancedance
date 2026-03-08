@@ -24,8 +24,6 @@ import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverla
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
-    var isHome = window.location.pathname === '/';
-    var daytimeThemes = ['TRON', 'RADIANT', 'RADIANT DARK', 'AUGURIES', 'KERMIT', 'LIGHT', 'DARK', 'KUSAMA', 'DOTS'];
     var hour = new Date().getHours();
     var skyVariation =
       hour >= 4 && hour < 5
@@ -39,12 +37,7 @@ const INITIAL_UI_STATE_SCRIPT = `
         : hour >= 19 && hour < 21
         ? 'dusk'
         : 'evening';
-    var theme =
-      isHome
-        ? 'RADIANT'
-        : hour >= 0 && hour < 5
-        ? 'NIGHT MODE'
-        : daytimeThemes[Math.floor(Math.random() * daytimeThemes.length)];
+    var theme = hour >= 0 && hour < 5 ? 'NIGHT MODE' : 'RADIANT';
     var layout = '3D';
     var auguriesMetaColors = {
       morning: '#6D79AF',
