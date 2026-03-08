@@ -772,7 +772,7 @@ body
           background: transparent !important
   &[data-theme='NIGHT']
     .imageItem
-      opacity: 0.75
+      filter: brightness(.78) contrast(1.04) saturate(.9)
 
 .clickable
   cursor: pointer
@@ -780,7 +780,8 @@ body
 
 .imageItem
   border-radius: calc(var(--border-radius) / 2)
-  transition: border-radius var(--transition-theme), opacity var(--transition-theme)
+  filter: none
+  transition: border-radius var(--transition-theme), opacity var(--transition-theme), filter var(--transition-theme)
 
 @keyframes hyperLink
   0%
