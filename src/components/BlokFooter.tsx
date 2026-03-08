@@ -97,7 +97,7 @@ const BlokFooter = () => {
             aria-label={`Cycle theme. Current theme: ${themeLabel}`}
             title={`Theme: ${themeLabel}`}
           >
-            Theme: {themeLabel}
+            Mode: {themeLabel}
           </button>
 
           <button
