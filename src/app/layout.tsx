@@ -14,6 +14,10 @@ import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import AppInitializer from '@/components/AppInitStore';
 import BlokHeadWrapper from '@/components/BlokHeadWrapper';
 import BlokAction from '@/components/BlokAction';
+import ActionButton, {
+  ActionBlock,
+  ActionButtonContainer,
+} from '@/components/ActionButton';
 import BlokFooterWrapper from '@/components/BlokFooterWrapper';
 import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
@@ -143,6 +147,25 @@ export default async function RootLayout({
               <BlokAction />
               <BlokFooterWrapper />
             </main>
+            <ActionButtonContainer>
+              {/* <ActionBlock variant="square" />*/}
+              {/* <ActionBlock variant="round" /> */}
+              <ActionButton
+                copy="Let's Make Internet"
+                link="info@driesbos.com?subject=Let's Make Internet"
+                linkType="email"
+                className="cursorInteract"
+                dropLeftPx={33}
+              />
+              <ActionButton
+                copy="Book a discovery call"
+                link="https://calendly.com/info-b9c/30min"
+                linkType="url"
+                className="cursorInteract"
+                dropLeftPx={150}
+                dropDelayMs={100}
+              />
+            </ActionButtonContainer>
           </StoryblokProvider>
         </ProjectsProvider>
         <DotsOverlayEffectsByTheme />

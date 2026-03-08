@@ -1,0 +1,28 @@
+.actionButtonContainer
+  position: fixed
+  width: 100%
+  top: 0
+  left: 0
+  bottom: 0
+  pointer-events: none
+  overflow: hidden
+  z-index: 800
+
+  // @media (max-width: 770px)
+  //   width: 50%
+  // @media (max-width: 450px)
+  //   width: 100%
+
+.physicsItem
+  position: absolute
+  top: 0
+  left: 0
+  transform: translate3d(-200vw, -200vh, 0)
+  transform-origin: center
+  will-change: transform
+  pointer-events: none
+  user-select: none
+
+.actionButtonContainer[data-settled='true']
+  .physicsItem
+    pointer-events: auto
