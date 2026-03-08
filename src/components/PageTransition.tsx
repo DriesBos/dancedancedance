@@ -15,9 +15,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
     Array.from(document.querySelectorAll<HTMLElement>('.blok-AnimateHead'));
   const getBlockTargets = () =>
     Array.from(document.querySelectorAll<HTMLElement>('.blok-Animate'));
-  const prefersReducedMotion = () =>
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Scroll to top on route change - instant, no smooth behavior
   useEffect(() => {
@@ -34,12 +31,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
     const headerTargets = getHeaderTargets();
     if (headerTargets.length === 0) {
-      hasAnimatedHeader.current = true;
-      return;
-    }
-
-    if (prefersReducedMotion()) {
-      gsap.set(headerTargets, { opacity: 1, y: 0 });
       hasAnimatedHeader.current = true;
       return;
     }
@@ -62,11 +53,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
     () => {
       const blockTargets = getBlockTargets();
       if (blockTargets.length === 0) return;
-
-      if (prefersReducedMotion()) {
-        gsap.set(blockTargets, { opacity: 1, y: 0 });
-        return;
-      }
 
       gsap.set(blockTargets, {
         opacity: 0,
