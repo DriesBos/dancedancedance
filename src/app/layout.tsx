@@ -159,19 +159,8 @@ export default async function RootLayout({
           )}
           <StoryblokProvider>
             <ThemeFilter />
-            {/* <ThemeBackground /> */}
-            {/* <div className="laserBlok">
-              <div className="laserBlok-Line"></div>
-            </div> */}
-            {/* <div className="introText">
-              <h1>
-                Dries Bos, computational design, creative development & digital
-                partner
-              </h1>
-            </div> */}
             <main className="main">
               <BlokHeadWrapper />
-              {/* <BlokFilter /> */}
               {children}
               <BlokAction />
               <BlokFooterWrapper />

@@ -606,91 +606,6 @@ mux-player, .muxPlayer
     .column-Category
       display: none
 
-// .themeBackground
-//   position: fixed
-//   width: 100%
-//   height: 100vh
-//   top: 0
-//   left: 0
-  // &-Image
-  //   position: absolute
-  //   width: 100%
-  //   height: 100%
-  //   top: 0
-  //   left: 0
-  //   opacity: 0
-  //   object-fit: cover
-  //   object-position: center
-  //   transition: opacity var(--transition-theme-quick)
-  //   will-change: opacity
-  // &-Color
-  //   position: absolute
-  //   width: 100%
-  //   height: 100%
-  //   top: 0
-  //   left: 0
-  //   opacity: 1
-  //   background: var(--theme-bg)
-  //   transition: opacity var(--transition-theme-quick), background var(--transition-theme-quick)
-  //   will-change: opacity, background
-
-// .themeFilter
-//   position: fixed
-//   width: 100%
-//   height: 100vh
-//   top: 0
-//   left: 0
-//   background: linear-gradient(180deg, #371921, #533535 44%, #422328 94%)
-//   object-fit: cover
-//   opacity: 0
-//   transition: opacity var(--transition-theme-quick)
-//   will-change: opacity
-//   svg, img
-//     position: absolute
-//     top: 0
-//     left: 0
-//     width: 100%
-//     height: 100%
-//     opacity: 0.05
-//     object-fit: cover
-
-// .introText
-//   position: fixed
-//   top: 0
-//   left: 0
-//   margin-top: 5vh
-//   margin-left: 5vw
-//   margin-right: 10vw
-//   max-width: 58em
-//   opacity: 0
-//   transition: opacity var(--transition-theme-quick)
-//   will-change: opacity
-//   @media screen and ( max-width: 770px )
-//     margin-top: 10vh
-//   h1
-//     font-size: 3.3vmax
-//     line-height: 1.1
-
-// .laserBlok
-//   position: fixed
-//   left: 0
-//   top: 0
-//   right: 0
-//   bottom: 0
-//   opacity: 0
-//   will-change: opacity
-//   pointer-events: none
-//   &-Line
-//     position: absolute
-//     top: 50%
-//     left: 50%
-//     width: 0
-//     height: 0
-//     opacity: 0
-//     transform: translate(-50%, -50%)
-//     will-change: width, height, opacity
-//     border: var(--border-width) solid currentColor
-
 .mobile
   @media screen and ( min-width: 770px )
     display: none !important
@@ -710,12 +625,8 @@ body
   main
     & > .blok
       &:first-child
-        // background: transparent
         .side_Top
           opacity: 1
-          // background: var(--theme-blok-showlines) !important
-        // .side_Top, .side_Back
-          // background: transparent
         .side_Bottom
           z-index: -1
       &:nth-child(2)
@@ -752,8 +663,6 @@ body
   &[data-layout="3D"]
     padding-bottom: 6rem
     @media (orientation: portrait)
-    // .laserBlok
-    //   opacity: 1
     main
       width: 88vw
       max-width: 1150px

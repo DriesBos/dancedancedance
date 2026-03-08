@@ -35,12 +35,12 @@ export default function BlokFilter({
       <Row>
         <button
           type="button"
-          className="column column-Year cursorInteract"
+          className="column column-Year cursorInteract desktop"
           data-active={isSortActive('year')}
           data-inactive={!isSortActive('year')}
           onClick={() => onSortChange('year')}
         >
-          Date
+          Year
         </button>
         <button
           type="button"
