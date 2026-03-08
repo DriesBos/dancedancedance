@@ -15,7 +15,7 @@ const CurrentTheme = () => {
   return (
     <button
       type="button"
-      className={`${styles.currentTheme} cursorInteract`}
+      className={`${styles.currentTheme} currentTheme cursorInteract`}
       onClick={themeCycle}
       aria-label={`Cycle theme. Current theme: ${themeLabel}`}
       title={`${themeLabel} mode`}

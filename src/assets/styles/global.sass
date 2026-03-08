@@ -668,7 +668,10 @@ body
         padding-top: var(--blok-height)
   &[data-layout="3D"]
     padding-bottom: 6rem
-    @media (orientation: portrait)
+    .currentTheme
+      opacity: 1
+      @media (max-width: 770px)
+        opacity: 0
     main
       width: 88vw
       max-width: 1150px

@@ -2,7 +2,7 @@
   position: fixed
   top: var(--spacing-base)
   right: var(--spacing-side)
-  z-index: 30
+  z-index: 0
   // padding: 0.35rem 0.65rem
   // border: var(--border-width) solid var(--theme-type)
   // border-radius: 999px
@@ -13,6 +13,8 @@
   text-transform: uppercase
   letter-spacing: 0.02em
   user-select: none
+  opacity: 0
+  transition: opacity var(--transition-theme)
   span
     display: inline-block
     transform: rotate(-90deg) translate(1.15rem, 0)
