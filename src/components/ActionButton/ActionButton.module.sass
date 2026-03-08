@@ -1,6 +1,9 @@
 .actionButton
   display: flex
   align-items: center
+  position: relative
+  isolation: isolate
+  overflow: hidden
   padding: .5rem 1.5rem
   border: 1.5px solid var(--border-color)
   background: var(--theme-blok)
@@ -11,6 +14,8 @@
 
 .copy
   display: block
+  position: relative
+  z-index: 1
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis

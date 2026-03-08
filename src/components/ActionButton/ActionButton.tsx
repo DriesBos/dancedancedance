@@ -1,4 +1,5 @@
 import styles from './ActionButton.module.sass';
+import GrainyGradient from '../GrainyGradient';
 
 type ActionButtonLinkType = 'email' | 'url';
 type ActionButtonDropPage = 'home' | 'projects' | 'about' | 'blurbs';
@@ -61,6 +62,7 @@ const ActionButton = ({
       data-action-drop-center-percent={dropCenterPercent}
       data-action-drop-page={dropOnPage}
     >
+      <GrainyGradient variant="blok" />
       <span className={styles.copy}>{copy}</span>
     </a>
   );
