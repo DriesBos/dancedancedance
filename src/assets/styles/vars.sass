@@ -110,8 +110,8 @@ body[data-layout='3D']
   --top-padding-filter: calc(#{var(--blok-height)} * 2)
   --spacing-containerTopDistance: calc(124px + var(--blok-height) + 20vh)
   --panel-perspective-origin: 50% -100vh
-  @media (orientation: portrait)
-    --panel-perspective-origin: 50% -75vh
+  @media (max-width: 1150px)
+    --panel-perspective-origin: 50% -100vw
 
 // THEMES
 body[data-theme='LIGHT']
