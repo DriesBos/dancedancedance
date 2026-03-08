@@ -759,9 +759,17 @@ body
       max-width: 1150px
       @media (max-width: 770px)
         width: calc(100% - 2 * var(--spacing-side))
+      & > .blok-Head
+        z-index: 3
+      & > .page
+        position: relative
+        z-index: 2
+      & > .blok-Action
+        z-index: 2
+      & > .blok-Footer
+        z-index: 1
     .blok
       &-Action
-        z-index: 2
         background: var(--theme-blok-solid)
       &-Project
         background: var(--theme-blok-solid)
@@ -772,7 +780,6 @@ body
         .side_Top
           background: var(--theme-blok-showlines)
       &-Footer
-        z-index: 1
         margin-top: var(--blok-height)
         .side_Top
           opacity: 1
@@ -782,6 +789,7 @@ body
       overflow: hidden
       &-Footer, &-ProjectList
         padding-top: 0
+        margin-top: 0
       &-ProjectSlider
         padding-top: var(--spacing-base)
         border-bottom: var(--border-width) solid var(--border-color)
@@ -802,9 +810,16 @@ body
         width: 96vw
         @media (max-width: 770px)
           width: calc(100% - var(--spacing-side))
+      .page-Project, .page-General
+        & > div:nth-child(2)
+          padding-top: 0
       .blok
         border-left-width: var(--border-width)
         border-right-width: var(--border-width)
+        &-ProjectSlider
+          padding-top: var(--spacing-base) !important
+        &-ProjectList
+          border-top-width: var(--border-width)
         &-Filter
           border-left-width: 0
           border-right-width: 0
