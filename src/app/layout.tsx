@@ -122,6 +122,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: 'cover',
+  interactiveWidget: 'overlays-content',
 };
 
 export default async function RootLayout({
@@ -134,13 +136,6 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        {/* Viewport fit for notch displays */}
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-        />
-      </head>
       <body
         className={`body ${myFont.className}`}
         data-border="minimal"

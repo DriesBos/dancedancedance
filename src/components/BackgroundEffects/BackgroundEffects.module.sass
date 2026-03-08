@@ -32,7 +32,13 @@
   --be-birds-opacity: 1
   --be-birds-sky-variation: auto
   position: fixed
-  inset: 0
+  top: 50%
+  left: 50%
+  width: 100vw
+  height: 100vh
+  width: max(100lvw, var(--be-ios-immersive-width, 0px))
+  height: max(100lvh, var(--be-ios-immersive-height, 0px))
+  transform: translate3d(-50%, -50%, 0)
   pointer-events: none
   z-index: -1
   overflow: hidden
