@@ -3,6 +3,7 @@
 import {
   Children,
   ReactNode,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -23,6 +24,7 @@ interface PhysicsEntry {
   element: HTMLDivElement;
   width: number;
   height: number;
+  sleepFrames: number;
 }
 
 interface PersistedItemState {
@@ -35,6 +37,15 @@ interface PersistedItemState {
 
 const SETTLE_FRAME_COUNT = 20;
 
+const hideElement = (element: HTMLDivElement) => {
+  element.style.opacity = '0';
+  element.style.transform = 'translate3d(-200vw, -200vh, 0)';
+};
+
+const showElement = (element: HTMLDivElement) => {
+  element.style.opacity = '1';
+};
+
 const ActionButtonContainer = ({
   children,
   className = '',
@@ -43,9 +54,13 @@ const ActionButtonContainer = ({
   const [layoutVersion, setLayoutVersion] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const persistedTransformsRef = useRef<Map<number, PersistedItemState>>(
-    new Map(),
-  );
+  const engineRef = useRef<Engine | null>(null);
+  const runnerRef = useRef<Runner | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+  const activeEntriesRef = useRef<PhysicsEntry[]>([]);
+  const spawnedIndicesRef = useRef<Set<number>>(new Set());
+  const latestSettledRef = useRef(true);
+  const persistedStatesRef = useRef<Map<number, PersistedItemState>>(new Map());
   const lastKnownSizeRef = useRef<{ width: number; height: number } | null>(
     null,
   );
@@ -53,6 +68,146 @@ const ActionButtonContainer = ({
   const pageSlug = pathname.split('/')[1] || 'home';
   const childItems = useMemo(() => Children.toArray(children), [children]);
   const childCount = childItems.length;
+
+  const setSettledState = useCallback((nextValue: boolean) => {
+    if (latestSettledRef.current === nextValue) return;
+    latestSettledRef.current = nextValue;
+    setIsSettled(nextValue);
+  }, []);
+
+  const spawnEntry = useCallback(
+    (index: number, element: HTMLDivElement, containerWidth: number) => {
+      const engine = engineRef.current;
+      if (!engine) return;
+
+      const rect = element.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+      const spawnPadding = 4;
+      const minX = width / 2 + spawnPadding;
+      const maxX = containerWidth - width / 2 - spawnPadding;
+      const childRoot = element.firstElementChild as HTMLElement | null;
+      const preferredLeftValue = childRoot?.getAttribute('data-action-drop-left');
+      const preferredCenterPercentValue = childRoot?.getAttribute(
+        'data-action-drop-center-percent',
+      );
+      const preferredLeftPx =
+        preferredLeftValue === null ? Number.NaN : Number(preferredLeftValue);
+      const preferredCenterPercent =
+        preferredCenterPercentValue === null
+          ? Number.NaN
+          : Number(preferredCenterPercentValue);
+      const hasPreferredLeft = Number.isFinite(preferredLeftPx);
+      const hasPreferredCenterPercent = Number.isFinite(preferredCenterPercent);
+      const randomSpawnX = minX + Math.random() * Math.max(1, maxX - minX);
+      const preferredCenterX = hasPreferredCenterPercent
+        ? (containerWidth * preferredCenterPercent) / 100
+        : Number.NaN;
+      const spawnX = hasPreferredLeft
+        ? Math.min(maxX, Math.max(minX, preferredLeftPx + width / 2))
+        : hasPreferredCenterPercent
+          ? Math.min(maxX, Math.max(minX, preferredCenterX))
+          : randomSpawnX;
+      const spawnY = -height - index * (height + 16);
+
+      const body = Bodies.rectangle(spawnX, spawnY, width, height, {
+        restitution: 0.33,
+        friction: 0.5,
+        frictionAir: 0.01,
+        sleepThreshold: 40,
+      });
+
+      Body.setAngle(body, (Math.random() - 0.5) * 0.16);
+      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.02);
+      World.add(engine.world, body);
+
+      activeEntriesRef.current.push({
+        index,
+        body,
+        element,
+        width,
+        height,
+        sleepFrames: 0,
+      });
+      spawnedIndicesRef.current.add(index);
+      showElement(element);
+      setSettledState(false);
+    },
+    [setSettledState],
+  );
+
+  const spawnEligibleForRoute = useCallback(
+    (routeSlug: string) => {
+      const container = containerRef.current;
+      const engine = engineRef.current;
+      if (!container || !engine) return;
+
+      const containerWidth = container.getBoundingClientRect().width;
+      const itemElements = itemRefs.current
+        .slice(0, childCount)
+        .filter((element): element is HTMLDivElement => !!element);
+
+      itemElements.forEach((element, index) => {
+        if (spawnedIndicesRef.current.has(index)) return;
+
+        const childRoot = element.firstElementChild as HTMLElement | null;
+        const dropPage = childRoot?.getAttribute('data-action-drop-page');
+        if (dropPage && dropPage !== routeSlug) {
+          hideElement(element);
+          return;
+        }
+
+        spawnEntry(index, element, containerWidth);
+      });
+    },
+    [childCount, spawnEntry],
+  );
+
+  const startRenderLoop = useCallback(() => {
+    const renderFrame = () => {
+      const activeEntries = activeEntriesRef.current;
+
+      for (let index = activeEntries.length - 1; index >= 0; index -= 1) {
+        const entry = activeEntries[index];
+        const { body, element, width, height } = entry;
+
+        const x = body.position.x - width / 2;
+        const y = body.position.y - height / 2;
+        element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${body.angle}rad)`;
+
+        if (body.isSleeping) {
+          entry.sleepFrames += 1;
+        } else {
+          entry.sleepFrames = 0;
+        }
+
+        if (entry.sleepFrames >= SETTLE_FRAME_COUNT) {
+          Body.setVelocity(body, { x: 0, y: 0 });
+          Body.setAngularVelocity(body, 0);
+          Body.setStatic(body, true);
+
+          const finalX = body.position.x - width / 2;
+          const finalY = body.position.y - height / 2;
+          const finalAngle = body.angle;
+          element.style.transform = `translate3d(${finalX}px, ${finalY}px, 0) rotate(${finalAngle}rad)`;
+          persistedStatesRef.current.set(entry.index, {
+            x: finalX,
+            y: finalY,
+            angle: finalAngle,
+            width,
+            height,
+          });
+
+          activeEntries.splice(index, 1);
+        }
+      }
+
+      setSettledState(activeEntries.length === 0);
+      rafIdRef.current = window.requestAnimationFrame(renderFrame);
+    };
+
+    rafIdRef.current = window.requestAnimationFrame(renderFrame);
+  }, [setSettledState]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -113,14 +268,32 @@ const ActionButtonContainer = ({
 
     if (!container || itemElements.length === 0) return;
 
-    setIsSettled(false);
+    setSettledState(true);
+    activeEntriesRef.current = [];
+
+    if (rafIdRef.current !== null) {
+      window.cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    if (runnerRef.current) {
+      Runner.stop(runnerRef.current);
+      runnerRef.current = null;
+    }
+    if (engineRef.current) {
+      World.clear(engineRef.current.world, false);
+      Engine.clear(engineRef.current);
+      engineRef.current = null;
+    }
 
     const engine = Engine.create();
     engine.enableSleeping = true;
     engine.gravity.y = 1;
-    engine.gravity.scale = 0.0016;
+    engine.gravity.scale = 0.0018;
+    engineRef.current = engine;
 
     const runner = Runner.create();
+    runnerRef.current = runner;
+
     const containerRect = container.getBoundingClientRect();
     const containerWidth = containerRect.width;
     const containerHeight = containerRect.height;
@@ -156,170 +329,58 @@ const ActionButtonContainer = ({
 
     World.add(engine.world, [floor, leftWall, rightWall]);
 
-    const entries = itemElements
-      .map((element, index): PhysicsEntry | null => {
-        const persistedState = persistedTransformsRef.current.get(index);
-        if (persistedState) {
-          const {
-            x,
-            y,
-            angle,
-            width: persistedWidth,
-            height: persistedHeight,
-          } = persistedState;
-          element.style.opacity = '1';
-          element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad)`;
+    itemElements.forEach((element, index) => {
+      const persistedState = persistedStatesRef.current.get(index);
+      if (!persistedState) return;
 
-          // Rebuild settled items as static physics bodies so new drops collide.
-          const persistedBody = Bodies.rectangle(
-            x + persistedWidth / 2,
-            y + persistedHeight / 2,
-            persistedWidth,
-            persistedHeight,
-            {
-              isStatic: true,
-              restitution: 0.1,
-              friction: 0.8,
-            },
-          );
-          Body.setAngle(persistedBody, angle);
-          World.add(engine.world, persistedBody);
-          return null;
-        }
+      const { x, y, angle, width, height } = persistedState;
+      showElement(element);
+      element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${angle}rad)`;
 
-        const rect = element.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const spawnPadding = 4;
-        const minX = width / 2 + spawnPadding;
-        const maxX = containerWidth - width / 2 - spawnPadding;
-        const childRoot = element.firstElementChild as HTMLElement | null;
-        const dropPage = childRoot?.getAttribute('data-action-drop-page');
+      const persistedBody = Bodies.rectangle(
+        x + width / 2,
+        y + height / 2,
+        width,
+        height,
+        {
+          isStatic: true,
+          restitution: 0.1,
+          friction: 0.8,
+        },
+      );
+      Body.setAngle(persistedBody, angle);
+      World.add(engine.world, persistedBody);
+      spawnedIndicesRef.current.add(index);
+    });
 
-        if (dropPage && dropPage !== pageSlug) {
-          element.style.opacity = '0';
-          element.style.transform = 'translate3d(-200vw, -200vh, 0)';
-          return null;
-        }
-
-        element.style.opacity = '1';
-
-        const preferredLeftValue = childRoot?.getAttribute(
-          'data-action-drop-left',
-        );
-        const preferredCenterPercentValue = childRoot?.getAttribute(
-          'data-action-drop-center-percent',
-        );
-        const preferredLeftPx =
-          preferredLeftValue === null ? Number.NaN : Number(preferredLeftValue);
-        const preferredCenterPercent =
-          preferredCenterPercentValue === null
-            ? Number.NaN
-            : Number(preferredCenterPercentValue);
-        const hasPreferredLeft = Number.isFinite(preferredLeftPx);
-        const hasPreferredCenterPercent = Number.isFinite(
-          preferredCenterPercent,
-        );
-        const randomSpawnX = minX + Math.random() * Math.max(1, maxX - minX);
-        const preferredCenterX = hasPreferredCenterPercent
-          ? (containerWidth * preferredCenterPercent) / 100
-          : Number.NaN;
-        const spawnX = hasPreferredLeft
-          ? Math.min(maxX, Math.max(minX, preferredLeftPx + width / 2))
-          : hasPreferredCenterPercent
-            ? Math.min(maxX, Math.max(minX, preferredCenterX))
-            : randomSpawnX;
-        const spawnY = -height - index * (height + 16);
-
-        const body = Bodies.rectangle(spawnX, spawnY, width, height, {
-          restitution: 0.33,
-          friction: 0.5,
-          frictionAir: 0.01,
-          sleepThreshold: 40,
-        });
-
-        Body.setAngle(body, (Math.random() - 0.5) * 0.16);
-        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.02);
-        World.add(engine.world, body);
-
-        return {
-          index,
-          body,
-          element,
-          width,
-          height,
-        };
-      })
-      .filter((entry): entry is PhysicsEntry => entry !== null);
-
-    if (entries.length === 0) {
-      setIsSettled(true);
-      return () => {
-        Runner.stop(runner);
-        World.clear(engine.world, false);
-        Engine.clear(engine);
-      };
-    }
+    // If an item was already triggered but wasn't settled yet (e.g. resize),
+    // spawn it again regardless of current route.
+    itemElements.forEach((element, index) => {
+      if (persistedStatesRef.current.has(index)) return;
+      if (!spawnedIndicesRef.current.has(index)) return;
+      spawnEntry(index, element, containerWidth);
+    });
 
     Runner.run(runner, engine);
-
-    let settleFrames = 0;
-    let rafId = 0;
-    const renderFrame = () => {
-      let allBodiesSleeping = true;
-
-      entries.forEach((entry) => {
-        const { body, element, width, height } = entry;
-
-        const x = body.position.x - width / 2;
-        const y = body.position.y - height / 2;
-        element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${body.angle}rad)`;
-
-        if (!body.isSleeping) {
-          allBodiesSleeping = false;
-        }
-      });
-
-      if (allBodiesSleeping) {
-        settleFrames += 1;
-      } else {
-        settleFrames = 0;
-      }
-
-      if (settleFrames >= SETTLE_FRAME_COUNT) {
-        entries.forEach(({ index, body, element, width, height }) => {
-          Body.setVelocity(body, { x: 0, y: 0 });
-          Body.setAngularVelocity(body, 0);
-          Body.setStatic(body, true);
-          const finalX = body.position.x - width / 2;
-          const finalY = body.position.y - height / 2;
-          const finalAngle = body.angle;
-          element.style.transform = `translate3d(${finalX}px, ${finalY}px, 0) rotate(${finalAngle}rad)`;
-          persistedTransformsRef.current.set(index, {
-            x: finalX,
-            y: finalY,
-            angle: finalAngle,
-            width,
-            height,
-          });
-        });
-        Runner.stop(runner);
-        setIsSettled(true);
-        return;
-      }
-
-      rafId = window.requestAnimationFrame(renderFrame);
-    };
-
-    rafId = window.requestAnimationFrame(renderFrame);
+    startRenderLoop();
 
     return () => {
-      window.cancelAnimationFrame(rafId);
+      if (rafIdRef.current !== null) {
+        window.cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       Runner.stop(runner);
+      runnerRef.current = null;
       World.clear(engine.world, false);
       Engine.clear(engine);
+      engineRef.current = null;
+      activeEntriesRef.current = [];
     };
-  }, [childCount, pathname, pageSlug, layoutVersion]);
+  }, [childCount, layoutVersion, setSettledState, spawnEntry, startRenderLoop]);
+
+  useEffect(() => {
+    spawnEligibleForRoute(pageSlug);
+  }, [pageSlug, spawnEligibleForRoute]);
 
   return (
     <div
