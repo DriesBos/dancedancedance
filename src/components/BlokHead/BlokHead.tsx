@@ -94,11 +94,26 @@ const BlokHead = ({}: Props) => {
     return projectSlugs.indexOf(currentSlug);
   }, [projectSlugs, currentSlug]);
 
-  const hasPrev = currentProjectIndex > 0;
-  const hasNext =
-    currentProjectIndex !== -1 &&
-    !!projectSlugs &&
-    currentProjectIndex < projectSlugs.length - 1;
+  const prevProjectSlug = useMemo(() => {
+    if (!projectSlugs || currentProjectIndex <= 0) return null;
+    return projectSlugs[currentProjectIndex - 1] ?? null;
+  }, [projectSlugs, currentProjectIndex]);
+
+  const nextProjectSlug = useMemo(() => {
+    if (
+      !projectSlugs ||
+      currentProjectIndex === -1 ||
+      currentProjectIndex >= projectSlugs.length - 1
+    ) {
+      return null;
+    }
+    return projectSlugs[currentProjectIndex + 1] ?? null;
+  }, [projectSlugs, currentProjectIndex]);
+
+  const prevProjectHref = prevProjectSlug ? `/projects/${prevProjectSlug}` : null;
+  const nextProjectHref = nextProjectSlug ? `/projects/${nextProjectSlug}` : null;
+  const hasPrev = !!prevProjectHref;
+  const hasNext = !!nextProjectHref;
 
   const projectName = useMemo(() => {
     if (!currentSlug) return '';
@@ -195,23 +210,14 @@ const BlokHead = ({}: Props) => {
   }, [cycleTheme]);
 
   const clickNext = useCallback(() => {
-    if (!projectSlugs || projectSlugs.length === 0) return;
-    if (
-      currentProjectIndex !== -1 &&
-      currentProjectIndex < projectSlugs.length - 1
-    ) {
-      const nextSlug = `/projects/${projectSlugs[currentProjectIndex + 1]}`;
-      router.push(nextSlug);
-    }
-  }, [router, projectSlugs, currentProjectIndex]);
+    if (!nextProjectHref) return;
+    router.push(nextProjectHref);
+  }, [router, nextProjectHref]);
 
   const clickPrev = useCallback(() => {
-    if (!projectSlugs || projectSlugs.length === 0) return;
-    if (currentProjectIndex > 0) {
-      const prevSlug = `/projects/${projectSlugs[currentProjectIndex - 1]}`;
-      router.push(prevSlug);
-    }
-  }, [router, projectSlugs, currentProjectIndex]);
+    if (!prevProjectHref) return;
+    router.push(prevProjectHref);
+  }, [router, prevProjectHref]);
 
   const projectPageSwipeHandlers = useSwipeable({
     trackTouch: true,
@@ -737,6 +743,17 @@ const BlokHead = ({}: Props) => {
     };
   }, [pathName, projectPageSwipeHandlers]);
 
+  useEffect(() => {
+    if (pathName !== 'projects') return;
+
+    if (prevProjectHref) {
+      router.prefetch(prevProjectHref);
+    }
+    if (nextProjectHref) {
+      router.prefetch(nextProjectHref);
+    }
+  }, [router, pathName, prevProjectHref, nextProjectHref]);
+
   // Set Escape Key and Arrow Keys
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -745,17 +762,11 @@ const BlokHead = ({}: Props) => {
         return;
       }
 
-      if (pathName === 'projects' && projectSlugs && projectSlugs.length > 0) {
-        if (e.key === 'ArrowLeft' && currentProjectIndex > 0) {
-          const prevSlug = `/projects/${projectSlugs[currentProjectIndex - 1]}`;
-          router.push(prevSlug);
-        } else if (
-          e.key === 'ArrowRight' &&
-          currentProjectIndex !== -1 &&
-          currentProjectIndex < projectSlugs.length - 1
-        ) {
-          const nextSlug = `/projects/${projectSlugs[currentProjectIndex + 1]}`;
-          router.push(nextSlug);
+      if (pathName === 'projects') {
+        if (e.key === 'ArrowLeft' && prevProjectHref) {
+          router.push(prevProjectHref);
+        } else if (e.key === 'ArrowRight' && nextProjectHref) {
+          router.push(nextProjectHref);
         }
       }
     };
@@ -764,7 +775,7 @@ const BlokHead = ({}: Props) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [router, pathName, projectSlugs, currentProjectIndex]);
+  }, [router, pathName, prevProjectHref, nextProjectHref]);
 
   return (
     <div
