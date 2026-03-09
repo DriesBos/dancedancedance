@@ -149,6 +149,9 @@ const DitheringVideoPortrait = ({
     Math.round(clamp(contrast, 0, 2) * 10) / 10,
   );
   const [currentInvert, setCurrentInvert] = useState<boolean>(Boolean(invert));
+  const [isDocumentVisible, setIsDocumentVisible] = useState<boolean>(
+    typeof document === 'undefined' ? true : !document.hidden,
+  );
   const renderSettingsRef = useRef<RenderSettings>({
     mode: currentMode,
     pixelSize: currentPixelSize,
@@ -220,6 +223,17 @@ const DitheringVideoPortrait = ({
   }, [invert]);
 
   useEffect(() => {
+    const onVisibilityChange = () => {
+      setIsDocumentVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const bodyStyles = window.getComputedStyle(document.body);
     const themeType =
       bodyStyles.getPropertyValue('--theme-type').trim() || '#ffffff';
@@ -269,6 +283,7 @@ const DitheringVideoPortrait = ({
     const video = videoRef.current;
     const outputCanvas = outputCanvasRef.current;
     if (!video || !outputCanvas) return;
+    if (!isDocumentVisible) return;
 
     let disposed = false;
     let rafId: number | null = null;
@@ -512,7 +527,7 @@ const DitheringVideoPortrait = ({
     };
 
     failTimer = window.setTimeout(() => {
-      if (disposed || didRenderAtLeastOneFrame) return;
+      if (disposed || didRenderAtLeastOneFrame || document.hidden) return;
       setDidFail(true);
       setIsLoading(false);
     }, 7000);
@@ -534,7 +549,7 @@ const DitheringVideoPortrait = ({
       video.pause();
       video.removeEventListener('error', onError);
     };
-  }, [src]);
+  }, [src, isDocumentVisible]);
 
   const cycleMode = () => {
     setCurrentMode((prev) => (prev === 'cross' ? 'pixel' : 'cross'));
