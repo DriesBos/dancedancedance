@@ -186,7 +186,7 @@ export default async function RootLayout({
                 dropOnPage="projects"
               />
               <ActionButton
-                copy="Book a discovery call"
+                copy="Schedule a discovery call"
                 link="https://calendly.com/info-b9c/30min"
                 linkType="url"
                 className="cursorInteract"
