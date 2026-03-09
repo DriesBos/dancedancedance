@@ -66,16 +66,16 @@ export type SegmentsParams = {
 };
 
 export const SEGMENTS_DEFAULT_PARAMS: SegmentsParams = {
-  angle: 0,
-  verticalBias: 0.5,
-  fairness: 0.5,
-  uniformity: 0.5,
-  lineThickness: 1,
-  opacity: 1,
-  speed: 4,
-  hue: 0,
-  saturation: 0,
-  lightness: 0,
+  angle: 0, // Rotates split lines in degrees relative to the base axis.
+  verticalBias: 0.5, // 0-1 preference for vertical vs horizontal cuts on square-ish regions.
+  fairness: 0.5, // 0-1 balance of how evenly split priority is shared between child regions.
+  uniformity: 0.5, // 0-1 how evenly cuts spread across region sizes (higher = more uniform).
+  lineThickness: 1, // Stroke width (in px) for each drawn split line.
+  opacity: 1, // Global alpha multiplier for the line color after color shifts.
+  speed: 12, // Split steps added per frame; higher values draw faster.
+  hue: 0, // Hue shift in degrees applied to the base line color.
+  saturation: 0, // Saturation shift in percentage points (-100 to 100).
+  lightness: 0, // Lightness shift in percentage points (-100 to 100).
   fill: false,
 };
 
