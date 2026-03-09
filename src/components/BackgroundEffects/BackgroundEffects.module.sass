@@ -30,6 +30,12 @@
   --be-birds-bg-color: #FFFFFF
   --be-birds-color: #000000
   --be-birds-opacity: 1
+  --be-terrain-bg-color: #050A12
+  --be-terrain-low-color: #0A1626
+  --be-terrain-mid-color: #365A84
+  --be-terrain-high-color: #CBDFF5
+  --be-terrain-snow-color: #FFFFFF
+  --be-terrain-opacity: 1
   position: fixed
   top: 50%
   left: 50%
@@ -162,6 +168,41 @@
   height: 100% !important
   display: block
   contain: strict
+
+.terrainRoot
+  opacity: var(--be-terrain-opacity)
+  pointer-events: auto
+
+.terrainCanvas
+  width: 100% !important
+  height: 100% !important
+  display: block
+  contain: strict
+  touch-action: none
+
+.terrainResetButton
+  position: fixed
+  right: var(--spacing-side)
+  top: var(--spacing-base)
+  z-index: 30
+  pointer-events: auto
+  border: var(--border-width) solid var(--border-color)
+  background: rgba(0, 0, 0, 0.28)
+  color: var(--theme-type)
+  padding: 0.45rem 0.75rem
+  font-size: 0.72rem
+  line-height: 1
+  text-transform: uppercase
+  letter-spacing: 0.04em
+  backdrop-filter: blur(6px)
+  transition: background var(--transition-theme-quick), color var(--transition-theme-quick), border-color var(--transition-theme-quick)
+  &:hover
+    @media (hover: hover)
+      background: rgba(0, 0, 0, 0.45)
+  @media (max-width: 770px)
+    right: calc(var(--spacing-side) / 2)
+    top: calc(var(--spacing-base) / 2)
+    font-size: 0.68rem
 
 .birdsVariationToggle
   position: fixed

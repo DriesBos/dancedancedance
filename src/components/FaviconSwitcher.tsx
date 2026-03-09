@@ -72,6 +72,10 @@ export default function FaviconSwitcher() {
         return '#FF0000';
       case 'TRON':
         return '#80FFE9';
+      case 'GLACIAL':
+        return '#B9E8FF';
+      case 'GLACIAL_HD':
+        return '#E9F6FF';
       case 'RADIANT':
         return '#FA5942';
       case 'SKY':

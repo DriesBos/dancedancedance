@@ -10,6 +10,18 @@ export default function BackgroundEffectsByTheme() {
     return <BackgroundEffects version="birds" />;
   }
 
+  if (theme === 'GLACIAL') {
+    return (
+      <BackgroundEffects version="terrain" densityScale={1} terrainProfile="standard" />
+    );
+  }
+
+  if (theme === 'GLACIAL_HD') {
+    return (
+      <BackgroundEffects version="terrain" densityScale={1} terrainProfile="hd" />
+    );
+  }
+
   if (theme === 'RADIANT') {
     return <BackgroundEffects version="radiating" />;
   }

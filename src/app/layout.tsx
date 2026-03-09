@@ -27,6 +27,7 @@ import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundE
 import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverlayEffectsByTheme';
 import GrainyGradient from '@/components/GrainyGradient';
 import CurrentTheme from '@/components/CurrentTheme';
+import TerrainDockedContent from '@/components/TerrainDockedContent';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -37,6 +38,8 @@ const INITIAL_UI_STATE_SCRIPT = `
     var themeMetaColors = {
       NIGHT: '#000000',
       TRON: '#000000',
+      GLACIAL: '#04111F',
+      GLACIAL_HD: '#020913',
       RADIANT: '#DAD9E0',
       SKY: 'transparent',
       KERMIT: '#FFFFFF',
@@ -141,32 +144,34 @@ export default async function RootLayout({
           <StoryblokProvider>
             <ThemeFilter />
             <CurrentTheme />
-            <main className="main">
-              <BlokHeadWrapper />
-              {children}
-              <BlokAction />
-              <BlokFooterWrapper />
-            </main>
-            <ActionButtonContainer>
-              {/* <ActionBlock variant="square" />*/}
-              {/* <ActionBlock variant="round" /> */}
-              <ActionButton
-                copy="Start your project"
-                link="info@driesbos.com?subject=Let's Make Internet"
-                linkType="email"
-                className="cursorInteract"
-                dropLeftPx={40}
-                dropOnPage="projects"
-              />
-              <ActionButton
-                copy="Schedule a discovery call"
-                link="https://calendly.com/info-b9c/30min"
-                linkType="url"
-                className="cursorInteract"
-                dropLeftPx={130}
-                dropOnPage="about"
-              />
-            </ActionButtonContainer>
+            <TerrainDockedContent>
+              <main className="main">
+                <BlokHeadWrapper />
+                {children}
+                <BlokAction />
+                <BlokFooterWrapper />
+              </main>
+              <ActionButtonContainer>
+                {/* <ActionBlock variant="square" />*/}
+                {/* <ActionBlock variant="round" /> */}
+                <ActionButton
+                  copy="Start your project"
+                  link="info@driesbos.com?subject=Let's Make Internet"
+                  linkType="email"
+                  className="cursorInteract"
+                  dropLeftPx={40}
+                  dropOnPage="projects"
+                />
+                <ActionButton
+                  copy="Schedule a discovery call"
+                  link="https://calendly.com/info-b9c/30min"
+                  linkType="url"
+                  className="cursorInteract"
+                  dropLeftPx={130}
+                  dropOnPage="about"
+                />
+              </ActionButtonContainer>
+            </TerrainDockedContent>
           </StoryblokProvider>
         </ProjectsProvider>
         <DotsOverlayEffectsByTheme />

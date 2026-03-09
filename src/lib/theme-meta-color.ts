@@ -3,6 +3,8 @@ import { Theme } from '@/store/store';
 const THEME_META_COLORS: Record<Theme, string> = {
   NIGHT: '#000000',
   TRON: '#000000',
+  GLACIAL: '#04111F',
+  GLACIAL_HD: '#020913',
   RADIANT: '#DAD9E0',
   SKY: 'transparent',
   KERMIT: '#FFFFFF',

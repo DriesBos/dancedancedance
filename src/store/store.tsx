@@ -3,6 +3,8 @@ import { create } from 'zustand';
 export type Theme =
   | 'NIGHT'
   | 'TRON'
+  | 'GLACIAL'
+  | 'GLACIAL_HD'
   | 'RADIANT'
   | 'SKY'
   | 'KERMIT'
@@ -17,6 +19,7 @@ export type Props = {
   theme: Theme;
   layout: Layout;
   topPanel: boolean;
+  terrainDocked: boolean;
 };
 
 export type Actions = {
@@ -24,6 +27,7 @@ export type Actions = {
   setDefault: () => void;
   setTheme: (theme: Theme) => void;
   cycleTheme: () => void;
+  setTerrainDocked: (docked: boolean) => void;
   setTwoD: () => void;
   setThreeD: () => void;
   setTopPanelTrue: () => void;
@@ -33,6 +37,8 @@ export type Actions = {
 export const THEME_ORDER: Theme[] = [
   'RADIANT',
   'TRON',
+  'GLACIAL',
+  'GLACIAL_HD',
   'SKY',
   'SEGMENTS',
   'LIGHT',
@@ -67,13 +73,18 @@ export const useStore = create<Props & Actions>()((set) => ({
   theme: 'LIGHT',
   layout: '3D',
   topPanel: true,
-  setNightmode: () => set({ theme: 'NIGHT' }),
-  setDefault: () => set({ theme: 'LIGHT' }),
-  setTheme: (theme: Theme) => set({ theme }),
+  terrainDocked: false,
+  setNightmode: () => set({ theme: 'NIGHT', terrainDocked: false }),
+  setDefault: () => set({ theme: 'LIGHT', terrainDocked: false }),
+  setTheme: (theme: Theme) => set({ theme, terrainDocked: false }),
   cycleTheme: () =>
     set((state) => {
-      return { theme: getNextThemeForButtonCycle(state.theme) };
+      return {
+        theme: getNextThemeForButtonCycle(state.theme),
+        terrainDocked: false,
+      };
     }),
+  setTerrainDocked: (docked: boolean) => set({ terrainDocked: docked }),
   setTwoD: () => set({ layout: 'DESKTOP' }),
   setThreeD: () => set({ layout: '3D' }),
   setTopPanelTrue: () => set({ topPanel: true }),

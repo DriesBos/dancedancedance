@@ -137,6 +137,14 @@ export default async function Home({ params }: { params: Params }) {
         background: 'var(--theme-bg)',
       },
       TRON: { foreground: 'var(--theme-type)', background: 'var(--theme-bg)' },
+      GLACIAL: {
+        foreground: 'var(--theme-type)',
+        background: 'var(--theme-bg)',
+      },
+      GLACIAL_HD: {
+        foreground: 'var(--theme-type)',
+        background: 'var(--theme-bg)',
+      },
       SKY: { foreground: 'var(--theme-type)', background: '#0D111A' },
       SEGMENTS: {
         foreground: 'var(--theme-type)',

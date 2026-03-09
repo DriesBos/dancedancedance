@@ -10,6 +10,8 @@ import {
 } from './segmentsSketch';
 import { createKusamaSketch, KUSAMA_DEFAULT_PARAMS } from './kusamaSketch';
 import DotsScene from './dotsScene';
+import TerrainScene from './terrainScene';
+import { useStore } from '@/store/store';
 
 const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
 
@@ -38,8 +40,9 @@ const isIosSafari = () => {
 };
 
 type BackgroundEffectsProps = {
-  version: 'radiating' | 'segments' | 'kusama' | 'dots' | 'birds';
+  version: 'radiating' | 'segments' | 'kusama' | 'dots' | 'birds' | 'terrain';
   densityScale?: number;
+  terrainProfile?: 'standard' | 'hd';
   layer?: 'background' | 'overlay';
   active?: boolean;
 };
@@ -500,9 +503,170 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
   );
 }
 
+function TerrainBackground({
+  densityScale = 1,
+  terrainProfile = 'standard',
+}: {
+  densityScale?: number;
+  terrainProfile?: 'standard' | 'hd';
+}) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const scrollProgressRef = useRef(0);
+  const [disableInputEffects, setDisableInputEffects] = useState(false);
+  const [resetSignal, setResetSignal] = useState(0);
+  const setTerrainDocked = useStore((state) => state.setTerrainDocked);
+  const [sceneColors, setSceneColors] = useState({
+    background: '#050A12',
+    palette: {
+      low: '#0A1626',
+      mid: '#365A84',
+      high: '#CBDFF5',
+      snow: '#FFFFFF',
+    },
+  });
+
+  useEffect(() => {
+    const isTouchDevice =
+      window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+      (navigator.maxTouchPoints ?? 0) > 0;
+    setDisableInputEffects(isTouchDevice);
+  }, []);
+
+  useEffect(() => {
+    const host = rootRef.current;
+    if (!host) return;
+
+    const updateColors = () => {
+      const styles = getComputedStyle(host);
+      const background =
+        styles.getPropertyValue('--be-terrain-bg-color').trim() ||
+        styles.getPropertyValue('--theme-bg').trim() ||
+        '#050A12';
+      const low =
+        styles.getPropertyValue('--be-terrain-low-color').trim() || '#0A1626';
+      const mid =
+        styles.getPropertyValue('--be-terrain-mid-color').trim() || '#365A84';
+      const high =
+        styles.getPropertyValue('--be-terrain-high-color').trim() || '#CBDFF5';
+      const snow =
+        styles.getPropertyValue('--be-terrain-snow-color').trim() || '#FFFFFF';
+
+      setSceneColors((previous) => {
+        if (
+          previous.background === background &&
+          previous.palette.low === low &&
+          previous.palette.mid === mid &&
+          previous.palette.high === high &&
+          previous.palette.snow === snow
+        ) {
+          return previous;
+        }
+
+        return {
+          background,
+          palette: {
+            low,
+            mid,
+            high,
+            snow,
+          },
+        };
+      });
+    };
+
+    updateColors();
+    window.addEventListener('resize', updateColors, { passive: true });
+
+    const observer = new MutationObserver(updateColors);
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateColors);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (disableInputEffects) {
+      scrollProgressRef.current = 0;
+      return;
+    }
+
+    const updateScrollProgress = () => {
+      const root = document.documentElement;
+      const viewportHeight = root.clientHeight;
+      const maxScroll = Math.max(1, root.scrollHeight - viewportHeight);
+      const progress = window.scrollY / maxScroll;
+      scrollProgressRef.current = Math.max(0, Math.min(1, progress));
+    };
+
+    updateScrollProgress();
+
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    window.addEventListener('orientationchange', updateScrollProgress, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener('scroll', updateScrollProgress);
+      window.removeEventListener('orientationchange', updateScrollProgress);
+    };
+  }, [disableInputEffects]);
+
+  useEffect(() => {
+    setTerrainDocked(false);
+
+    return () => {
+      setTerrainDocked(false);
+    };
+  }, [setTerrainDocked]);
+
+  const handleResetCamera = () => {
+    scrollProgressRef.current = 0;
+    setTerrainDocked(false);
+    setResetSignal((previous) => previous + 1);
+  };
+
+  return (
+    <>
+      <div
+        ref={rootRef}
+        className={`${styles.root} ${styles.terrainRoot}`}
+        data-version="terrain"
+        aria-hidden="true"
+      >
+        <TerrainScene
+          className={styles.terrainCanvas}
+          backgroundColor={sceneColors.background}
+          palette={sceneColors.palette}
+          densityScale={densityScale}
+          profile={terrainProfile}
+          scrollProgressRef={scrollProgressRef}
+          disableInputs={disableInputEffects}
+          resetSignal={resetSignal}
+          onDockedChange={setTerrainDocked}
+        />
+      </div>
+      {!disableInputEffects && (
+        <button
+          type="button"
+          className={styles.terrainResetButton}
+          onClick={handleResetCamera}
+        >
+          Reset Camera
+        </button>
+      )}
+    </>
+  );
+}
+
 export default function BackgroundEffects({
   version,
   densityScale,
+  terrainProfile,
   layer,
   active,
 }: BackgroundEffectsProps) {
@@ -568,6 +732,15 @@ export default function BackgroundEffects({
 
   if (version === 'kusama') {
     return <KusamaBackground />;
+  }
+
+  if (version === 'terrain') {
+    return (
+      <TerrainBackground
+        densityScale={densityScale}
+        terrainProfile={terrainProfile}
+      />
+    );
   }
 
   if (version === 'segments') {
