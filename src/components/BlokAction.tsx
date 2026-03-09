@@ -1,7 +1,6 @@
 'use client';
 
 import Row from './Row';
-import IconArrow from './Icons/IconArrow';
 import GrainyGradient from './GrainyGradient';
 import IconAbout from './Icons/IconAbout';
 
@@ -32,7 +31,7 @@ export default function BlokAction() {
                     {Array.from({ length: MARQUEE_REPEATS_PER_GROUP }).map(
                       (_, unitIndex) => (
                         <div className="animateSlideLeftUnit" key={unitIndex}>
-                          <span>Hire this guy</span>
+                          <span>Start your project</span>
                           <div className="icon">
                             <IconAbout variant="mixed" animate />
                           </div>

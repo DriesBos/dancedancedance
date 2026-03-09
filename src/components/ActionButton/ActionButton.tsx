@@ -1,5 +1,6 @@
 import styles from './ActionButton.module.sass';
 import GrainyGradient from '../GrainyGradient';
+import IconMail from '../Icons/IconMail';
 
 type ActionButtonLinkType = 'email' | 'url';
 type ActionButtonDropPage = 'home' | 'projects' | 'about' | 'blurbs';
@@ -64,6 +65,9 @@ const ActionButton = ({
     >
       <GrainyGradient variant="blok" />
       <span className={styles.copy}>{copy}</span>
+      <div className="icon">
+        <IconMail />
+      </div>
     </a>
   );
 };

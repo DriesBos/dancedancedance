@@ -775,7 +775,7 @@ const BlokHead = ({}: Props) => {
       data-scrollborder={hasScrollBorder}
     >
       <GrainyGradient variant="blok" />
-      <BlokSidePanels />
+      <BlokSidePanels showTopPanelPortrait={pathName === 'about'} />
       <Row className={styles.row}>
         <div className={`column column-Title ${styles.title}`}>
           <div ref={titleViewportRef} className={styles.titleMarqueeViewport}>
