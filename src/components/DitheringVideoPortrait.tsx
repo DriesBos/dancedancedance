@@ -594,8 +594,8 @@ const DitheringVideoPortrait = ({
         className={styles.canvas}
         role="img"
         aria-label={alt}
-        aria-hidden={didFail}
-        style={{ opacity: didFail ? 0 : 1 }}
+        aria-hidden={isLoading || didFail}
+        style={{ opacity: !isLoading && !didFail ? 1 : 0 }}
       />
 
       {showControls && (
@@ -619,21 +619,6 @@ const DitheringVideoPortrait = ({
             Theme: {theme}
           </button>
         </div>
-      )}
-
-      {isLoading && variant !== 'panel' && (
-        <div className={styles.loading}>Rendering dithered video</div>
-      )}
-
-      {!isLoading && didFail && (
-        <video
-          className={styles.fallbackVideo}
-          src={src}
-          muted
-          loop
-          playsInline
-          autoPlay
-        />
       )}
     </div>
   );
