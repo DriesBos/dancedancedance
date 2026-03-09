@@ -31,9 +31,8 @@ export default function BlokProjectListClient({
   projects,
 }: BlokProjectListClientProps) {
   const [sortField, setSortField] = useState<ProjectSortField>('year');
-  const [sortDirection, setSortDirection] = useState<ProjectSortDirection>(
-    'desc',
-  );
+  const [sortDirection, setSortDirection] =
+    useState<ProjectSortDirection>('desc');
   const [searchValue, setSearchValue] = useState('');
 
   const handleSortChange = (field: ProjectSortField) => {
@@ -97,7 +96,7 @@ export default function BlokProjectListClient({
           <Row>
             <GrainyGradient variant="blok" className="grainyInRow" />
             <div className="column column-Year"></div>
-            <div className="column column-Project">No projects found.</div>
+            <div className="column column-Project">No work found..</div>
             <div className="column column-Category"></div>
             <div className="column column-Icons"></div>
           </Row>

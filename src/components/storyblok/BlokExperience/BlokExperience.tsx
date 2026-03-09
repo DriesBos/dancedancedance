@@ -21,7 +21,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
       <div className={styles.content}>
         <div className={styles.row}>
           <div className={styles.rowItem}>
-            <span className={styles.rowPeriod}>2025 — Present</span>
+            <span className={styles.rowPeriod}>2025—Present</span>
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Dries Bos Studio</span>
@@ -31,7 +31,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
 
         <div className={styles.row}>
           <div className={styles.rowItem}>
-            <span className={styles.rowPeriod}>2022 — 2025</span>
+            <span className={styles.rowPeriod}>2022—2025</span>
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Mmerch</span>
@@ -41,7 +41,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
 
         <div className={styles.row}>
           <div className={styles.rowItem}>
-            <span className={styles.rowPeriod}>2020 — 2022</span>
+            <span className={styles.rowPeriod}>2020—2022</span>
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Anatha</span>
@@ -51,7 +51,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
 
         <div className={styles.row}>
           <div className={styles.rowItem}>
-            <span className={styles.rowPeriod}>2017 — 2019</span>
+            <span className={styles.rowPeriod}>2017—2019</span>
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Fotomat</span>
@@ -61,7 +61,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
 
         <div className={styles.row}>
           <div className={styles.rowItem}>
-            <span className={styles.rowPeriod}>2011 — 2015</span>
+            <span className={styles.rowPeriod}>2011—2015</span>
           </div>
           <div className={styles.rowItem}>
             <span className={styles.rowName}>Close My Eyes</span>
