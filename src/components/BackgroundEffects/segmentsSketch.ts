@@ -72,7 +72,7 @@ export const SEGMENTS_DEFAULT_PARAMS: SegmentsParams = {
   uniformity: 0.5,
   lineThickness: 1,
   opacity: 1,
-  speed: 2,
+  speed: 4,
   hue: 0,
   saturation: 0,
   lightness: 0,
