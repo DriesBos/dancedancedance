@@ -192,7 +192,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     <div
       className={`${styles.newsletter} ${className || ''} ${showCursorMessage ? 'cursorMessage' : ''}`}
       data-cursor-message={
-        showCursorMessage ? 'infrequent but spirited mails' : undefined
+        showCursorMessage ? 'infrequent but spirited mail' : undefined
       }
       data-active={isActive}
     >

@@ -2,7 +2,7 @@ import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import { getStoryblokApi } from '@/lib/storyblok';
 import PageTransition from '@/components/PageTransition';
-import DitheringVideoPortrait from '@/components/DitheringVideoPortrait';
+import LazyDitheringVideoPortrait from '@/components/LazyDitheringVideoPortrait';
 import type { Metadata } from 'next';
 import { cache } from 'react';
 
@@ -187,7 +187,7 @@ export default async function Home({ params }: { params: Params }) {
         <>
           <StoryblokStory story={pageData.story} />
           {/* {showPortrait && (
-            <DitheringVideoPortrait
+            <LazyDitheringVideoPortrait
               src="/portraits/portrait_movie.mp4"
               alt="Dries Bos dithered video portrait"
               {...portraitOptions}

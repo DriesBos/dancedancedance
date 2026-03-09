@@ -1,5 +1,5 @@
 import GrainyGradient from '../GrainyGradient/GrainyGradient';
-import DitheringVideoPortrait from '@/components/DitheringVideoPortrait';
+import LazyDitheringVideoPortrait from '@/components/LazyDitheringVideoPortrait';
 import styles from './BlokSidePanels.module.sass';
 
 interface TopPanelProps {
@@ -8,10 +8,13 @@ interface TopPanelProps {
 
 const TopPanel = ({ showPortrait = false }: TopPanelProps) => {
   return (
-    <div className={`${styles.side} ${styles.side_Top} side side_Top`}>
+    <div
+      className={`${styles.side} ${styles.side_Top} ${showPortrait ? 'cursorMessage' : null} side side_Top`}
+      data-cursor-message={showPortrait ? "Let's talk" : undefined}
+    >
       <GrainyGradient variant="blok" />
       {showPortrait && (
-        <DitheringVideoPortrait
+        <LazyDitheringVideoPortrait
           src="/portraits/portrait_movie.mp4"
           alt="Dries Bos top panel dithered portrait"
           variant="panel"

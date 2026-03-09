@@ -12,7 +12,13 @@ type ThemeColorPair = {
 
 type ThemeColorMap = Partial<Record<Theme, ThemeColorPair>>;
 
-interface DitheringVideoPortraitProps {
+type ResolvedThemeConfig = {
+  foregroundColor: string;
+  backgroundColor: string | null;
+  threshold: number;
+};
+
+export interface DitheringVideoPortraitProps {
   src: string;
   alt?: string;
   variant?: 'blok' | 'panel';
@@ -127,6 +133,11 @@ const DitheringVideoPortrait = ({
   const frameSizeRef = useRef({ width: 0, height: 0 });
   const themeRef = useRef(theme);
   const themeColorsRef = useRef<ThemeColorMap | undefined>(themeColors);
+  const resolvedThemeConfigRef = useRef<ResolvedThemeConfig>({
+    foregroundColor: '#ffffff',
+    backgroundColor: '#000000',
+    threshold: 138,
+  });
   const [currentMode, setCurrentMode] = useState<'cross' | 'pixel'>(mode);
   const [currentThreshold, setCurrentThreshold] = useState<number>(
     Math.round(clamp(threshold ?? 138, 0, 255)),
@@ -209,12 +220,59 @@ const DitheringVideoPortrait = ({
   }, [invert]);
 
   useEffect(() => {
+    const bodyStyles = window.getComputedStyle(document.body);
+    const themeType =
+      bodyStyles.getPropertyValue('--theme-type').trim() || '#ffffff';
+    const themeBg = bodyStyles.getPropertyValue('--theme-bg').trim() || '#000';
+    const themeTypeContrast =
+      bodyStyles.getPropertyValue('--theme-type-contrast').trim() || '#000';
+    const currentTheme = themeRef.current;
+    const themeColorOverrides = themeColorsRef.current?.[currentTheme];
+    const baseForeground = themeColorOverrides?.foreground ?? themeType;
+    const baseBackground = themeColorOverrides?.background ?? themeBg;
+    const cssBlackness = parseNumber(
+      bodyStyles.getPropertyValue('--portrait-dither-blackness'),
+    );
+    const cssThreshold = parseNumber(
+      bodyStyles.getPropertyValue('--portrait-dither-threshold'),
+    );
+    const cssInvert = parseBoolean(
+      bodyStyles.getPropertyValue('--portrait-dither-invert'),
+    );
+
+    const settings = renderSettingsRef.current;
+    const resolvedInvert = settings.invert ?? cssInvert ?? false;
+    const rawForeground = resolvedInvert ? baseBackground : baseForeground;
+    const rawBackground = resolvedInvert ? baseForeground : baseBackground;
+    const resolvedForeground =
+      resolveCanvasColor(rawForeground, bodyStyles, themeTypeContrast) ||
+      themeTypeContrast;
+    const resolvedBackground = resolveCanvasColor(rawBackground, bodyStyles);
+    const resolvedThreshold = Math.round(
+      clamp(
+        settings.threshold ??
+          cssThreshold ??
+          (settings.blackness ?? cssBlackness ?? 0.54) * 255,
+        0,
+        255,
+      ),
+    );
+
+    resolvedThemeConfigRef.current = {
+      foregroundColor: resolvedForeground,
+      backgroundColor: resolvedBackground,
+      threshold: resolvedThreshold,
+    };
+  }, [theme, themeColors, currentInvert, currentThreshold, blackness]);
+
+  useEffect(() => {
     const video = videoRef.current;
     const outputCanvas = outputCanvasRef.current;
     if (!video || !outputCanvas) return;
 
     let disposed = false;
     let rafId: number | null = null;
+    let videoFrameCallbackId: number | null = null;
     let failTimer: number | null = null;
     let didRenderAtLeastOneFrame = false;
     let lastFrameAt = 0;
@@ -225,63 +283,6 @@ const DitheringVideoPortrait = ({
     const sourceCanvas =
       sourceCanvasRef.current || document.createElement('canvas');
     sourceCanvasRef.current = sourceCanvas;
-
-    const readThemeConfig = () => {
-      const bodyStyles = window.getComputedStyle(document.body);
-      const themeType =
-        bodyStyles.getPropertyValue('--theme-type').trim() || '#ffffff';
-      const themeBg =
-        bodyStyles.getPropertyValue('--theme-bg').trim() || '#000';
-      const themeTypeContrast =
-        bodyStyles.getPropertyValue('--theme-type-contrast').trim() || '#000';
-      const currentTheme = themeRef.current;
-      const themeColorOverrides = themeColorsRef.current?.[currentTheme];
-      const baseForeground = themeColorOverrides?.foreground ?? themeType;
-      const baseBackground = themeColorOverrides?.background ?? themeBg;
-      const cssBlackness = parseNumber(
-        bodyStyles.getPropertyValue('--portrait-dither-blackness'),
-      );
-      const cssThreshold = parseNumber(
-        bodyStyles.getPropertyValue('--portrait-dither-threshold'),
-      );
-      const cssInvert = parseBoolean(
-        bodyStyles.getPropertyValue('--portrait-dither-invert'),
-      );
-
-      const settings = renderSettingsRef.current;
-      const resolvedBlackness = clamp(
-        settings.blackness ?? cssBlackness ?? 0.54,
-        0.02,
-        0.98,
-      );
-      const resolvedInvert = settings.invert ?? cssInvert ?? false;
-      const rawForeground = resolvedInvert ? baseBackground : baseForeground;
-      const rawBackground = resolvedInvert ? baseForeground : baseBackground;
-      const resolvedForeground =
-        resolveCanvasColor(rawForeground, bodyStyles, themeTypeContrast) ||
-        themeTypeContrast;
-      const resolvedBackground = resolveCanvasColor(
-        rawBackground,
-        bodyStyles,
-        null,
-      );
-      const resolvedThreshold = Math.round(
-        clamp(
-          settings.threshold ??
-            cssThreshold ??
-            (settings.blackness ?? cssBlackness ?? 0.54) * 255,
-          0,
-          255,
-        ),
-      );
-
-      return {
-        foregroundColor: resolvedForeground,
-        backgroundColor: resolvedBackground,
-        threshold: resolvedThreshold,
-        blackness: resolvedBlackness,
-      };
-    };
 
     const renderFrame = (now: number) => {
       if (disposed) return;
@@ -367,7 +368,7 @@ const DitheringVideoPortrait = ({
       ).data;
       const monochrome = new Float32Array(sampleWidth * sampleHeight);
       const contrastStrength = clamp(settings.contrast, 0, 2);
-      const themeConfig = readThemeConfig();
+      const themeConfig = resolvedThemeConfigRef.current;
       const threshold = themeConfig.threshold;
 
       for (let i = 0; i < monochrome.length; i += 1) {
@@ -468,8 +469,23 @@ const DitheringVideoPortrait = ({
           failTimer = null;
         }
       }
+    };
 
-      rafId = window.requestAnimationFrame(renderFrame);
+    const scheduleNextFrame = () => {
+      if (disposed) return;
+
+      if (typeof video.requestVideoFrameCallback === 'function') {
+        videoFrameCallbackId = video.requestVideoFrameCallback((time) => {
+          renderFrame(time);
+          scheduleNextFrame();
+        });
+        return;
+      }
+
+      rafId = window.requestAnimationFrame((time) => {
+        renderFrame(time);
+        scheduleNextFrame();
+      });
     };
 
     const start = () => {
@@ -478,7 +494,7 @@ const DitheringVideoPortrait = ({
         .play()
         .then(() => {
           if (!disposed) {
-            rafId = window.requestAnimationFrame(renderFrame);
+            scheduleNextFrame();
           }
         })
         .catch(() => {
@@ -508,6 +524,12 @@ const DitheringVideoPortrait = ({
     return () => {
       disposed = true;
       if (rafId !== null) window.cancelAnimationFrame(rafId);
+      if (
+        videoFrameCallbackId !== null &&
+        typeof video.cancelVideoFrameCallback === 'function'
+      ) {
+        video.cancelVideoFrameCallback(videoFrameCallbackId);
+      }
       if (failTimer !== null) window.clearTimeout(failTimer);
       video.pause();
       video.removeEventListener('error', onError);
