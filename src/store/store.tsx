@@ -42,7 +42,10 @@ export const THEME_ORDER: Theme[] = [
   'KERMIT',
 ];
 
-export const THEME_BUTTON_ORDER: Theme[] = THEME_ORDER;
+// Keep KERMIT available in the codebase, but hide it from user theme cycling for now.
+export const THEME_BUTTON_ORDER: Theme[] = THEME_ORDER.filter(
+  (theme) => theme !== 'KERMIT',
+);
 
 const getNextThemeForButtonCycle = (currentTheme: Theme): Theme => {
   const currentIndex = THEME_ORDER.indexOf(currentTheme);
