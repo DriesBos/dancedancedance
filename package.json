@@ -9,7 +9,7 @@
   },
   "scripts": {
     "preinstall": "node -e \"if (!/pnpm/.test(process.env.npm_execpath || '')) { console.error('This project uses pnpm. Run: pnpm install'); process.exit(1) }\"",
-    "dev": "next dev --turbopack --experimental-https",
+    "dev": "__NEXT_DEV_INDICATOR=false next dev --turbopack --experimental-https",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

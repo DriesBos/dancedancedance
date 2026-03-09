@@ -50,12 +50,14 @@
 
 .indicatorAnchor
   position: absolute
+
   top: var(--spacing-base)
   left: var(--spacing-side)
   width: calc(100% - (var(--spacing-side) * 2))
   aspect-ratio: 16 / 9
   pointer-events: none
   z-index: 2
+  transition: top var(--transition-theme)
   @media (orientation: portrait)
     aspect-ratio: 3 / 2
 

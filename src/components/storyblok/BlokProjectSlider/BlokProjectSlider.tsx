@@ -43,12 +43,7 @@ interface SlideItemProps {
   progressRef?: React.RefObject<HTMLDivElement>;
 }
 
-const SlideItem = ({
-  item,
-  isActive,
-  index,
-  progressRef,
-}: SlideItemProps) => {
+const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const muxPlayerRef = useRef<any>(null);
 
@@ -279,7 +274,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
           progressRef={activeIndex === index ? progressRef : undefined}
         />
       ))}
-      <div className={styles.indicatorAnchor}>
+      <div className={`${styles.indicatorAnchor} indicatorAnchor`}>
         <SliderIndicators total={blok.body.length} activeIndex={activeIndex} />
       </div>
 

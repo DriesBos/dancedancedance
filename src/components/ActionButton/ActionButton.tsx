@@ -66,7 +66,7 @@ const ActionButton = ({
     >
       <GrainyGradient variant="blok" />
       <span className={styles.copy}>{copy}</span>
-      <div className="icon">
+      <div className={`${styles.icon} icon`}>
         {isEmail ? <IconMail /> : <IconCalendar />}
       </div>
     </a>
