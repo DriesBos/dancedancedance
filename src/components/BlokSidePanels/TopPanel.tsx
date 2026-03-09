@@ -7,13 +7,26 @@ interface TopPanelProps {
 }
 
 const TopPanel = ({ showPortrait = false }: TopPanelProps) => {
-  return (
-    <div
-      className={`${styles.side} ${styles.side_Top} ${showPortrait ? 'cursorMessage' : null} side side_Top`}
-      data-cursor-message={showPortrait ? "Let's talk" : undefined}
-    >
-      <GrainyGradient variant="blok" />
-      {showPortrait && (
+  const className = `${styles.side} ${styles.side_Top} ${
+    showPortrait ? 'cursorMessage' : ''
+  } side side_Top`;
+
+  const sharedProps = {
+    className,
+    'data-cursor-message': showPortrait
+      ? 'Schedule a discovery call'
+      : undefined,
+  } as const;
+
+  if (showPortrait) {
+    return (
+      <a
+        {...sharedProps}
+        href="https://calendly.com/info-b9c/30min"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <GrainyGradient variant="blok" />
         <LazyDitheringVideoPortrait
           src="/portraits/portrait_movie.mp4"
           alt="Dries Bos top panel dithered portrait"
@@ -24,7 +37,13 @@ const TopPanel = ({ showPortrait = false }: TopPanelProps) => {
           contrast={1.2}
           threshold={138}
         />
-      )}
+      </a>
+    );
+  }
+
+  return (
+    <div {...sharedProps}>
+      <GrainyGradient variant="blok" />
     </div>
   );
 };
