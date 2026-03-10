@@ -541,6 +541,15 @@ mux-player, .muxPlayer
     cursor: pointer
 
   // Specific Bloks
+  &-Intro
+    display: flex !important
+    flex-direction: row
+    align-items: flex-end 
+    justify-content: space-between 
+    .column-Icons
+      .icon
+        padding: var(--spacing-base) var(--spacing-icons)
+        padding-left: 0
   &-Footer
     transition: margin-top var(--transition-theme)
   &-Animate
@@ -548,9 +557,6 @@ mux-player, .muxPlayer
     .column-Icons
       & > .icon-Footer
         height: calc(100% - (var(--spacing-base) * 2))
-    .column-Icons
-      & > div:first-child
-        opacity: 0
   &-ProjectList
     position: relative
     padding-top: var(--blok-height)
@@ -572,6 +578,9 @@ mux-player, .muxPlayer
     transition: transform 0.5s
     border-top: var(--border-width) solid var(--border-color) !important
     background: var(--theme-blok)
+    .column-Icons
+      & > div:first-child
+        opacity: 0
     .row
       position: relative
       overflow: hidden

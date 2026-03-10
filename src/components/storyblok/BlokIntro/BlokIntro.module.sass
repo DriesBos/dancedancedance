@@ -27,6 +27,8 @@
       .moreButton
         background: var(--theme-type)
         color: var(--theme-type-contrast)
+      .moreButtonIcon
+        transform: translate(1px, -1px)
 
 .moreButton
   display: inline-flex
@@ -45,3 +47,14 @@
   text-transform: lowercase
   transform: translateY(-1px)
   transition: color var(--transition-button), background var(--transition-button), border-color var(--transition-button)
+
+.moreButtonIcon
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  align-self: flex-start
+  width: 25px
+  height: 12px
+  color: var(--theme-type)
+  transform: translateY(-1px)
+  transition: color var(--transition-button), transform var(--transition-button)
