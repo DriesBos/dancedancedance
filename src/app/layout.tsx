@@ -12,7 +12,7 @@ import StoryblokProvider from '@/providers/storyblok-provider';
 import { ProjectsProvider } from '@/providers/projects-provider';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import AppInitializer from '@/components/AppInitStore';
-import BlokHeadWrapper from '@/components/BlokHeadWrapper';
+import BlokHead from '@/components/BlokHead';
 import BlokAction from '@/components/BlokAction';
 import ActionButton, {
   ActionBlock,
@@ -145,7 +145,7 @@ export default async function RootLayout({
             <OuterNavigation />
             <OuterTheming />
             <main className="main">
-              <BlokHeadWrapper />
+              <BlokHead />
               {children}
               <BlokAction />
               <BlokFooter />

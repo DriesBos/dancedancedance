@@ -84,7 +84,7 @@ const BlokHead = ({}: Props) => {
 
   const pathName = useMemo(() => {
     const route = currentPath.split('/')[1];
-    if (route === 'about' || route === 'projects' || route === 'blurbs') {
+    if (route === 'about' || route === 'projects') {
       return route;
     }
     return 'home';
@@ -857,9 +857,6 @@ const BlokHead = ({}: Props) => {
               >
                 <IconAbout variant="mixed" animate={isAboutMixedHovered} />
               </Link>
-              {/* <Link href="/blurbs" className="icon cursorMagnetic">
-                <IconThoughts />
-              </Link> */}
             </>
           )}
           {pathName === 'about' && (
@@ -932,14 +929,6 @@ const BlokHead = ({}: Props) => {
               </Link>
             </>
           )}
-          {pathName === 'blurbs' && (
-            <Link href="/" className="icon cursorMagnetic">
-              <IconClose />
-            </Link>
-          )}
-          {/* <div className="icon cursorMagnetic">
-            <IconLocation />
-          </div> */}
         </div>
       </Row>
     </div>

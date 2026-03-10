@@ -4,7 +4,7 @@ import IconMail from '../Icons/IconMail';
 import IconCalendar from '../Icons/IconCalendar';
 
 type ActionButtonLinkType = 'email' | 'url';
-type ActionButtonDropPage = 'home' | 'projects' | 'about' | 'blurbs';
+type ActionButtonDropPage = 'home' | 'projects' | 'about';
 
 interface ActionButtonProps {
   copy: string;

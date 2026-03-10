@@ -14,12 +14,9 @@ import ColumnVideo from '@/components/storyblok/ColumnVideo';
 import ColumnText from '@/components/storyblok/ColumnText';
 import ColumnTextExpandable from '@/components/storyblok/ColumnTextExpandable';
 import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
-import BlokBlurb from '@/components/storyblok/BlokBlurb';
-import PageBlurbs from '@/components/storyblok/PageBlurbs';
 
 const components = {
   Page: Page,
-  'Page Blurbs': PageBlurbs,
   'Page Project': Project,
   'Blok Highlights': BlokHighlights,
   'Blok Project List': BlokProjectList,
@@ -27,7 +24,6 @@ const components = {
   'Blok Experience': BlokExperience,
   'Blok Intro': BlokIntro,
   'Blok Container': BlokContainer,
-  'Blok Blurp': BlokBlurb,
   'Column Image': ColumnImage,
   'Column Slider': ColumnSlider,
   'Column Video': ColumnVideo,
