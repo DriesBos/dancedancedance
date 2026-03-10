@@ -3,6 +3,7 @@ import Row from '@/components/Row';
 import IconExternal from '@/components/Icons/IconExternal';
 import Newsletter from '@/components/Newsletter/Newsletter';
 import IconArrowHead from '@/components/Icons/IconArrowHead';
+import ScrollToTopLink from './ScrollToTopLink';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import styles from './BlokFooter.module.sass';
@@ -58,14 +59,12 @@ const BlokFooter = () => {
           </div>
         </div>
         <div className={`column column-Icons ${styles.footerIcons}`}>
-          <a
-            href="#page-top"
+          <ScrollToTopLink
             className={`icon icon-High icon-Footer cursorMagnetic ${styles.footerIcon}`}
-            aria-label="Scroll to top"
           >
             <div className="iconLine" />
             <IconArrowHead />
-          </a>
+          </ScrollToTopLink>
         </div>
         </div>
       </Row>
