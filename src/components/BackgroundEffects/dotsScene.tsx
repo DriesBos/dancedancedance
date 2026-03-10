@@ -2,6 +2,12 @@ import { useEffect, useMemo, useRef } from 'react';
 import type { MutableRefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import {
+  createParallaxTween,
+  retargetParallaxTween,
+  sampleParallaxTween,
+  snapParallaxTween,
+} from './parallaxEasing';
 
 type DotsSceneProps = {
   backgroundColor: string;
@@ -25,8 +31,20 @@ type DotParticle = {
   phase: number;
 };
 
+const DOTS_PARALLAX_REFERENCE_WIDTH_PX = 1440;
+const DOTS_PARALLAX_MIN_SCALE = 0.7;
+const DOTS_PARALLAX_MAX_SCALE = 1.35;
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
+}
+
+function getDotsParallaxScale(viewportWidth: number): number {
+  return clamp(
+    viewportWidth / DOTS_PARALLAX_REFERENCE_WIDTH_PX,
+    DOTS_PARALLAX_MIN_SCALE,
+    DOTS_PARALLAX_MAX_SCALE,
+  );
 }
 
 function DotsField({
@@ -218,121 +236,95 @@ function CameraRig({
   enableParallax?: boolean;
 }) {
   const { camera } = useThree();
-  const mouseXRef = useRef(0);
-  const mouseXSmoothedRef = useRef(0);
+  const pointerTweenRef = useRef({
+    x: createParallaxTween(0),
+    y: createParallaxTween(0),
+  });
+  const tuning = {
+    maxOffsetX: 2.8,
+    maxOffsetY: 1.6,
+    maxYaw: THREE.MathUtils.degToRad(2),
+    maxPitch: THREE.MathUtils.degToRad(1.2),
+    depthPush: 0.35,
+    scrollTravelY: 3,
+  };
 
   useEffect(() => {
     if (!enableParallax) {
-      mouseXRef.current = 0;
-      mouseXSmoothedRef.current = 0;
+      snapParallaxTween(pointerTweenRef.current.x, 0);
+      snapParallaxTween(pointerTweenRef.current.y, 0);
       return;
     }
 
-    const handleMouseMove = (event: MouseEvent) => {
+    const updatePointer = (clientX: number, clientY: number) => {
       const viewportWidth = Math.max(1, window.innerWidth);
-      const normalizedX = (event.clientX / viewportWidth) * 2 - 1;
-      mouseXRef.current = clamp(normalizedX, -1, 1);
+      const viewportHeight = Math.max(1, window.innerHeight);
+      // Matches Shopify's `x / width - 0.5` coordinate space.
+      const normalizedX = clientX / viewportWidth - 0.5;
+      const normalizedY = clientY / viewportHeight - 0.5;
+      const nextX = clamp(normalizedX, -1, 1);
+      const nextY = clamp(normalizedY, -1, 1);
+      const nowMs = performance.now();
+
+      retargetParallaxTween(pointerTweenRef.current.x, nextX, nowMs);
+      retargetParallaxTween(pointerTweenRef.current.y, nextY, nowMs);
     };
 
-    const resetMouseX = () => {
-      mouseXRef.current = 0;
+    const handlePointerMove = (event: PointerEvent) => {
+      updatePointer(event.clientX, event.clientY);
     };
 
+    const handleMouseMove = (event: MouseEvent) => {
+      updatePointer(event.clientX, event.clientY);
+    };
+
+    const resetPointer = () => {
+      const nowMs = performance.now();
+      retargetParallaxTween(pointerTweenRef.current.x, 0, nowMs);
+      retargetParallaxTween(pointerTweenRef.current.y, 0, nowMs);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    window.addEventListener('blur', resetMouseX);
-    document.addEventListener('mouseleave', resetMouseX);
+    window.addEventListener('blur', resetPointer);
+    document.addEventListener('mouseleave', resetPointer);
 
     return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('blur', resetMouseX);
-      document.removeEventListener('mouseleave', resetMouseX);
+      window.removeEventListener('blur', resetPointer);
+      document.removeEventListener('mouseleave', resetPointer);
     };
   }, [enableParallax]);
 
-  useFrame((_, delta) => {
-    // Clamp very large frame deltas (tab switch / frame drops) to prevent
-    // visible jumps in smoothing and camera catch-up.
-    const frameDelta = Math.min(delta, 1 / 30);
-
-    // Smooths raw mouse input before it drives rotation.
-    // Lower = more lag/silkier motion, higher = more immediate.
-    const inputSmoothing = 1;
-    const targetMouseX = enableParallax ? mouseXRef.current : 0;
-    mouseXSmoothedRef.current = THREE.MathUtils.damp(
-      mouseXSmoothedRef.current,
-      targetMouseX,
-      inputSmoothing,
-      frameDelta,
-    );
-
-    const mouseX = mouseXSmoothedRef.current;
-    const easedMagnitude = 1 - Math.pow(1 - Math.abs(mouseX), 2.2);
-    const easedMouseX = Math.sign(mouseX) * easedMagnitude;
-
-    // Smooths camera yaw towards the target angle.
-    // Lower = softer easing, higher = snappier catch-up.
-    const horizontalRotationSmoothing = 4;
-    // Maximum horizontal camera yaw in radians.
-    const maxYaw = THREE.MathUtils.degToRad(1.5);
-    const targetYaw = easedMouseX * maxYaw;
-    // Caps how fast yaw can change, preventing stutter on fast cursor jumps.
-    const maxYawSpeed = THREE.MathUtils.degToRad(45);
-    const yawDelta = targetYaw - camera.rotation.y;
-    const limitedYawDelta = clamp(
-      yawDelta,
-      -maxYawSpeed * frameDelta,
-      maxYawSpeed * frameDelta,
-    );
-    const limitedTargetYaw = camera.rotation.y + limitedYawDelta;
-
-    camera.position.x = THREE.MathUtils.damp(
-      camera.position.x,
-      0,
-      10,
-      frameDelta,
-    );
-    camera.rotation.y = THREE.MathUtils.damp(
-      camera.rotation.y,
-      limitedTargetYaw,
-      horizontalRotationSmoothing,
-      frameDelta,
-    );
-    camera.rotation.x = THREE.MathUtils.damp(
-      camera.rotation.x,
-      0,
-      horizontalRotationSmoothing,
-      frameDelta,
-    );
-    camera.rotation.z = THREE.MathUtils.damp(
-      camera.rotation.z,
-      0,
-      horizontalRotationSmoothing,
-      frameDelta,
-    );
-
-    if (!enableParallax) {
-      camera.position.y = THREE.MathUtils.damp(
-        camera.position.y,
-        0,
-        12,
-        frameDelta,
-      );
-      camera.position.z = 28;
-      return;
-    }
+  useFrame(() => {
+    const nowMs = performance.now();
+    const pointerX = enableParallax
+      ? sampleParallaxTween(pointerTweenRef.current.x, nowMs)
+      : 0;
+    const pointerY = enableParallax
+      ? sampleParallaxTween(pointerTweenRef.current.y, nowMs)
+      : 0;
+    const viewportWidth =
+      typeof window !== 'undefined'
+        ? window.innerWidth
+        : DOTS_PARALLAX_REFERENCE_WIDTH_PX;
+    const viewportScale = getDotsParallaxScale(viewportWidth);
+    const targetOffsetX = -pointerX * tuning.maxOffsetX * viewportScale;
+    const targetOffsetY = -pointerY * tuning.maxOffsetY * viewportScale;
+    const interaction = clamp(Math.hypot(pointerX, pointerY) / 0.75, 0, 1);
+    const targetZ = 28 - interaction * tuning.depthPush * viewportScale;
 
     const progress = clamp(scrollProgressRef.current, 0, 1);
-    const travelY = 3;
-    const targetY = -progress * travelY;
-    const smoothing = 9;
+    const travelY = tuning.scrollTravelY * viewportScale;
+    const targetY = -progress * travelY + targetOffsetY;
 
-    camera.position.y = THREE.MathUtils.damp(
-      camera.position.y,
-      targetY,
-      smoothing,
-      frameDelta,
-    );
-    camera.position.z = 28;
+    camera.position.x = targetOffsetX;
+    camera.position.y = targetY;
+    camera.position.z = targetZ;
+    camera.rotation.y = pointerX * tuning.maxYaw * viewportScale;
+    camera.rotation.x = -pointerY * tuning.maxPitch * viewportScale;
+    camera.rotation.z = 0;
   });
 
   return null;

@@ -1,5 +1,11 @@
 import type p5 from 'p5';
 import { Delaunay } from 'd3-delaunay';
+import {
+  createParallaxTween,
+  retargetParallaxTween,
+  sampleParallaxTween,
+  snapParallaxTween,
+} from './parallaxEasing';
 
 export type KusamaParams = {
   cellSize: number;
@@ -21,6 +27,15 @@ export const KUSAMA_DEFAULT_PARAMS: KusamaParams = {
 const MOBILE_KUSAMA_CELL_SIZE = 25;
 const KUSAMA_MOBILE_BREAKPOINT_PX = 770;
 const KUSAMA_MOBILE_VIEWPORT_DELTA_IGNORE_PX = 200;
+const KUSAMA_PARALLAX_REFERENCE_WIDTH_PX = 1440;
+const KUSAMA_PARALLAX_MIN_SCALE = 0.7;
+const KUSAMA_PARALLAX_MAX_SCALE = 1.35;
+const KUSAMA_PARALLAX_TUNING = {
+  maxTranslateX: 32,
+  maxTranslateY: 15,
+  maxRotateRadians: 0,
+  baseScale: 1,
+};
 
 type KusamaSketchOptions = {
   host: HTMLDivElement;
@@ -53,6 +68,11 @@ type PointerState = {
   velocity: number;
 };
 
+type ParallaxState = {
+  tweenX: ReturnType<typeof createParallaxTween>;
+  tweenY: ReturnType<typeof createParallaxTween>;
+};
+
 type Edge = {
   ax: number;
   ay: number;
@@ -67,6 +87,14 @@ function clamp(value: number, min: number, max: number): number {
 
 function clamp01(value: number): number {
   return clamp(value, 0, 1);
+}
+
+function getKusamaParallaxScale(viewportWidth: number): number {
+  return clamp(
+    viewportWidth / KUSAMA_PARALLAX_REFERENCE_WIDTH_PX,
+    KUSAMA_PARALLAX_MIN_SCALE,
+    KUSAMA_PARALLAX_MAX_SCALE,
+  );
 }
 
 function quantize(value: number, step = 0.5): number {
@@ -275,7 +303,12 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       intensity: 0,
       velocity: 0,
     };
+    const parallax: ParallaxState = {
+      tweenX: createParallaxTween(0),
+      tweenY: createParallaxTween(0),
+    };
     const teardownFns: Array<() => void> = [];
+    let parallaxEnabled = false;
 
     const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
     const getOrientation = (width: number, height: number) =>
@@ -283,6 +316,38 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     const isCoarsePointerDevice = () =>
       window.matchMedia('(pointer: coarse)').matches ||
       (navigator.maxTouchPoints ?? 0) > 0;
+    const supportsParallaxInput = () =>
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    const setParallaxTargetFromClient = (clientX: number, clientY: number) => {
+      if (!parallaxEnabled) return;
+
+      const viewportWidth = Math.max(1, window.innerWidth);
+      const viewportHeight = Math.max(1, window.innerHeight);
+      // Matches Shopify's `x / width - 0.5` coordinate space.
+      const normalizedX = clientX / viewportWidth - 0.5;
+      const normalizedY = clientY / viewportHeight - 0.5;
+
+      const nextX = clamp(normalizedX, -1, 1);
+      const nextY = clamp(normalizedY, -1, 1);
+      const nowMs = performance.now();
+
+      retargetParallaxTween(parallax.tweenX, nextX, nowMs);
+      retargetParallaxTween(parallax.tweenY, nextY, nowMs);
+    };
+
+    const resetParallaxTargets = (immediate = false) => {
+      const nowMs = performance.now();
+
+      if (immediate) {
+        snapParallaxTween(parallax.tweenX, 0);
+        snapParallaxTween(parallax.tweenY, 0);
+        return;
+      }
+
+      retargetParallaxTween(parallax.tweenX, 0, nowMs);
+      retargetParallaxTween(parallax.tweenY, 0, nowMs);
+    };
 
     const setupSeeds = () => {
       const resolvedSettings = isNarrowViewport()
@@ -327,15 +392,23 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       lastViewportWidth = instance.windowWidth;
       lastViewportHeight = instance.windowHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
+      parallaxEnabled = supportsParallaxInput();
 
       const onPointerMove = (event: PointerEvent) => {
         updatePointer(event.clientX, event.clientY, 0.72);
+        setParallaxTargetFromClient(event.clientX, event.clientY);
       };
       const onPointerDown = (event: PointerEvent) => {
         updatePointer(event.clientX, event.clientY, 1);
+        setParallaxTargetFromClient(event.clientX, event.clientY);
       };
       const onPointerLeave = () => {
         pointer.active = false;
+        resetParallaxTargets();
+      };
+      const onBlur = () => {
+        pointer.active = false;
+        resetParallaxTargets();
       };
 
       window.addEventListener('pointermove', onPointerMove, { passive: true });
@@ -343,6 +416,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       window.addEventListener('pointerleave', onPointerLeave, {
         passive: true,
       });
+      window.addEventListener('blur', onBlur);
       const handleVisibilityChange = () => {
         if (document.hidden) {
           instance.noLoop();
@@ -356,6 +430,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerdown', onPointerDown);
         window.removeEventListener('pointerleave', onPointerLeave);
+        window.removeEventListener('blur', onBlur);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       });
 
@@ -377,10 +452,32 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       styles = resolveStyles(options.host, settings);
       instance.background(styles.backgroundColor);
 
+      const nowMs = performance.now();
+      const pointerX = parallaxEnabled
+        ? sampleParallaxTween(parallax.tweenX, nowMs)
+        : 0;
+      const pointerY = parallaxEnabled
+        ? sampleParallaxTween(parallax.tweenY, nowMs)
+        : 0;
+      const viewportScale = getKusamaParallaxScale(instance.width);
+      const meshTranslateX =
+        pointerX * KUSAMA_PARALLAX_TUNING.maxTranslateX * viewportScale;
+      const meshTranslateY =
+        -pointerY * KUSAMA_PARALLAX_TUNING.maxTranslateY * viewportScale;
+      const meshRotate =
+        pointerX * KUSAMA_PARALLAX_TUNING.maxRotateRadians * viewportScale;
+      const meshScale = KUSAMA_PARALLAX_TUNING.baseScale;
+      const ripplePointer: PointerState = {
+        ...pointer,
+        // Keep pointer-centered ripple aligned after parallax translation.
+        x: pointer.x - meshTranslateX,
+        y: pointer.y - meshTranslateY,
+      };
+
       const points = buildAnimatedPoints(
         seeds,
         settings,
-        pointer,
+        ripplePointer,
         instance.width,
         instance.height,
       );
@@ -395,7 +492,16 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         ]);
         const edges = getVoronoiEdges(voronoi, instance.width, instance.height);
         const context = instance.drawingContext as CanvasRenderingContext2D;
+        context.save();
+        context.translate(
+          instance.width * 0.5 + meshTranslateX,
+          instance.height * 0.5 + meshTranslateY,
+        );
+        context.rotate(meshRotate);
+        context.scale(meshScale, meshScale);
+        context.translate(-instance.width * 0.5, -instance.height * 0.5);
         renderStraightEdges(context, edges, styles);
+        context.restore();
       }
 
       if (pointer.active) {
@@ -418,6 +524,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
 
       if (isLikelyMobileViewportChurn) {
         return;
+      }
+
+      parallaxEnabled = supportsParallaxInput();
+      if (!parallaxEnabled) {
+        resetParallaxTargets(true);
       }
 
       instance.resizeCanvas(nextWidth, nextHeight);
