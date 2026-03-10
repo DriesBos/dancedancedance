@@ -43,9 +43,10 @@ export default function BlokFilter({
         >
           year
         </button>
+        <div className="column column-Title mobile">Selected work</div>
         <button
           type="button"
-          className={`column column-Project cursorInteract ${styles.sortButton}`}
+          className={`column column-Project cursorInteract desktop ${styles.sortButton}`}
           data-active={isSortActive('title')}
           data-inactive={!isSortActive('title')}
           onClick={() => onSortChange('title')}
