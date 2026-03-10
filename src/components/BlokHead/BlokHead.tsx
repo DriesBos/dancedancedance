@@ -12,11 +12,12 @@ import IconArrow from '@/components/Icons/IconArrow';
 import IconArrowLong from '@/components/Icons/IconArrowLong';
 import IconMail from '../Icons/IconMail';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
+import IconFullscreen from '@/components/Icons/IconFullscreen';
+import IconSmallScreen from '@/components/Icons/IconSmallScreen';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import { gsap } from '@/lib/gsap';
 import GrainyGradient from '@/components/GrainyGradient';
-import IconRocket from '@/components/Icons/IconRocket';
 import { useShallow } from 'zustand/react/shallow';
 import styles from './BlokHead.module.sass';
 
@@ -830,12 +831,25 @@ const BlokHead = ({}: Props) => {
               </button>
               <button
                 type="button"
-                className={`icon iconRocket cursorMagnetic ${styles.layoutButton}`}
+                className={`icon cursorMagnetic ${styles.layoutButton}`}
                 onClick={toggleLayout}
                 title={`Layout: ${layoutLabel}`}
               >
-                <span className={styles.rocketWrap}>
-                  <IconRocket />
+                <span className={styles.layoutIconWrap}>
+                  <span
+                    className={styles.layoutIcon}
+                    data-active={layout === 'DESKTOP'}
+                    aria-hidden={layout !== 'DESKTOP'}
+                  >
+                    <IconSmallScreen />
+                  </span>
+                  <span
+                    className={styles.layoutIcon}
+                    data-active={layout !== 'DESKTOP'}
+                    aria-hidden={layout === 'DESKTOP'}
+                  >
+                    <IconFullscreen />
+                  </span>
                 </span>
               </button>
               <Link

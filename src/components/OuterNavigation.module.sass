@@ -1,0 +1,29 @@
+.outerNavigation
+  position: fixed
+  top: var(--spacing-base)
+  left: var(--spacing-side)
+  z-index: 1
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: .33rem
+  @media (max-width: 1500px)
+    display: none
+
+.outerNavigationLink
+  appearance: none
+  border: 0
+  background: transparent
+  color: var(--cursor-color-bg)
+  font-size: var(--font-size-outer) !important
+  line-height: 1
+  text-transform: uppercase
+  letter-spacing: 0.02em
+  user-select: none
+  padding: 0
+  &:hover
+    @media (hover: hover)
+      color: var(--theme-type)
+
+.isActive
+  color: var(--theme-type)

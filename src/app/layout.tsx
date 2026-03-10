@@ -26,7 +26,8 @@ import CursorLoader from '@/components/CursorLoader';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
 import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverlayEffectsByTheme';
 import GrainyGradient from '@/components/GrainyGradient';
-import CurrentTheme from '@/components/CurrentTheme';
+import OuterTheming from '@/components/OuterTheming';
+import OuterNavigation from '@/components/OuterNavigation';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -140,7 +141,8 @@ export default async function RootLayout({
           )}
           <StoryblokProvider>
             <ThemeFilter />
-            <CurrentTheme />
+            <OuterNavigation />
+            <OuterTheming />
             <main className="main">
               <BlokHeadWrapper />
               {children}

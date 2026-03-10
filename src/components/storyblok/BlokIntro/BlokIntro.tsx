@@ -17,8 +17,9 @@ interface BlokIntroProps {
 
 const BlokIntro = ({ blok }: BlokIntroProps) => {
   return (
-    <div
-      className={`blok blok-Intro blok-Animate ${styles.blokIntro}`}
+    <Link
+      href="/about"
+      className={`blok blok-Intro blok-Animate ${styles.blokIntro} ${styles.blokIntroLink} cursorInteract`}
       {...storyblokEditable(blok)}
     >
       <GrainyGradient variant="blok" />
@@ -33,27 +34,21 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
         {blok.line_two ? (
           <p className={`${styles.line} ${styles.lineTwo} desktop`}>
             <InlineWordSwapText text={blok.line_two} keyPrefix="line-two" />
-            <Link
-              href="/about"
-              className={`${styles.moreButtonContainer} cursorMagnetic`}
-            >
+            <span className={`${styles.moreButtonContainer} cursorMagnetic`}>
               <span className={styles.moreButton}>More</span>
-            </Link>
+            </span>
           </p>
         ) : null}
         {blok.line_combined ? (
           <p className={`${styles.line} ${styles.lineCombined} mobile`}>
             <InlineWordSwapText text={blok.line_combined} keyPrefix="line-combined" />
-            <Link
-              href="/about"
-              className={`${styles.moreButtonContainer} cursorMagnetic`}
-            >
+            <span className={`${styles.moreButtonContainer} cursorMagnetic`}>
               <span className={styles.moreButton}>More</span>
-            </Link>
+            </span>
           </p>
         ) : null}
       </div>
-    </div>
+    </Link>
   );
 };
 
