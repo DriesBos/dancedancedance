@@ -1,5 +1,3 @@
-'use client';
-
 import Row from './Row';
 import GrainyGradient from './GrainyGradient';
 import IconAbout from './Icons/IconAbout';

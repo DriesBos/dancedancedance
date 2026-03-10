@@ -1,5 +1,3 @@
-'use client';
-
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import MuxPlayer from '../MuxPlayer';
 
