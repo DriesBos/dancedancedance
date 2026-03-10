@@ -1,0 +1,56 @@
+.rotator
+  display: inline-grid
+  align-items: baseline
+  vertical-align: baseline
+
+.rotatorSizer
+  grid-area: 1 / 1
+  display: grid
+  visibility: hidden
+  pointer-events: none
+  & > *
+    grid-area: 1 / 1
+
+.rotatorViewport
+  grid-area: 1 / 1
+  height: calc(var(--line-height) * 1em)
+  overflow: hidden
+  display: block
+
+.rotatorTrack
+  display: flex
+  flex-direction: column
+  will-change: transform
+  animation: swapWords var(--rotator-duration, 4.4s) cubic-bezier(0.2, 0.8, 0.2, 1) infinite
+
+@media (hover: hover)
+  .rotator:hover .rotatorTrack
+    // Switch keyframe name on hover to restart the cycle immediately
+    animation-name: swapWordsHover
+
+.rotatorWord
+  display: block
+  white-space: nowrap
+  height: calc(var(--line-height) * 1em)
+  line-height: var(--line-height)
+
+@keyframes swapWords
+  0%, 45.454%
+    transform: translateY(0)
+  50%, 95.454%
+    transform: translateY(calc(var(--line-height) * -1em))
+  100%
+    transform: translateY(calc(var(--line-height) * -2em))
+
+@keyframes swapWordsHover
+  0%, 45.454%
+    transform: translateY(0)
+  50%, 95.454%
+    transform: translateY(calc(var(--line-height) * -1em))
+  100%
+    transform: translateY(calc(var(--line-height) * -2em))
+
+@media (prefers-reduced-motion: reduce)
+  .rotatorTrack
+    animation: none
+    transform: translateY(0)

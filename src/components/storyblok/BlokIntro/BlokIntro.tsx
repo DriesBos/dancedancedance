@@ -1,6 +1,7 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient';
+import InlineWordSwapText from '@/components/InlineWordSwapText';
 import styles from './BlokIntro.module.sass';
 
 interface SbBlokIntroData extends SbBlokData {
@@ -24,13 +25,19 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
 
       <div className={styles.copy}>
         {blok.line_one ? (
-          <p className={`${styles.lineOne} desktop`}>{blok.line_one}</p>
+          <p className={`${styles.line} ${styles.lineOne} desktop`}>
+            <InlineWordSwapText text={blok.line_one} keyPrefix="line-one" />
+          </p>
         ) : null}
         {blok.line_two ? (
-          <p className={`${styles.lineTwo} desktop`}>{blok.line_two}</p>
+          <p className={`${styles.line} ${styles.lineTwo} desktop`}>
+            <InlineWordSwapText text={blok.line_two} keyPrefix="line-two" />
+          </p>
         ) : null}
         {blok.line_combined ? (
-          <p className={`${styles.lineCombined} mobile`}>{blok.line_combined}</p>
+          <p className={`${styles.line} ${styles.lineCombined} mobile`}>
+            <InlineWordSwapText text={blok.line_combined} keyPrefix="line-combined" />
+          </p>
         ) : null}
       </div>
     </div>
