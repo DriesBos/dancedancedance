@@ -28,39 +28,15 @@
   -webkit-transform: translate3d(0, 0, 0)
   backface-visibility: hidden
   -webkit-backface-visibility: hidden
-  animation: swapWords var(--rotator-duration, 4.4s) cubic-bezier(0.2, 0.8, 0.2, 1) infinite
+  transition: none
 
-.rotator:hover .rotatorTrack
-  // Switch keyframe name on hover to restart with an immediate visible transition
-  animation-name: swapWordsHover
+.isAnimating
+  transition: transform var(--rotator-duration, 200ms) cubic-bezier(0.2, 0.8, 0.2, 1)
+  transform: translate3d(0, -33.333333%, 0)
+  -webkit-transform: translate3d(0, -33.333333%, 0)
 
 .rotatorWord
   display: block
   white-space: nowrap
   height: calc(var(--line-height) * 1em)
   line-height: var(--line-height)
-
-@keyframes swapWords
-  0%, 45.454%
-    transform: translate3d(0, 0%, 0)
-  50%, 95.454%
-    transform: translate3d(0, -33.333333%, 0)
-  100%
-    transform: translate3d(0, -66.666667%, 0)
-
-@keyframes swapWordsHover
-  0%
-    transform: translate3d(0, 0%, 0)
-  4.545%
-    transform: translate3d(0, -33.333333%, 0)
-  50%
-    transform: translate3d(0, -33.333333%, 0)
-  54.545%
-    transform: translate3d(0, -66.666667%, 0)
-  100%
-    transform: translate3d(0, -66.666667%, 0)
-
-@media (prefers-reduced-motion: reduce)
-  .rotatorTrack
-    animation: none
-    transform: translate3d(0, 0%, 0)

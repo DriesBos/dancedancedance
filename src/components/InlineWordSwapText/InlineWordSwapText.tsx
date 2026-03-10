@@ -1,5 +1,7 @@
-import { Fragment } from 'react';
-import type { CSSProperties, ReactNode } from 'react';
+'use client';
+
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import type { CSSProperties, PointerEvent, ReactNode } from 'react';
 import styles from './InlineWordSwapText.module.sass';
 
 type TextSegment =
@@ -13,6 +15,7 @@ type RotatorStyle = CSSProperties & {
 const ROTATOR_TOKEN_REGEX = /([^\s=]+)\s*=\s*([^\s=]+)/g;
 const ROTATOR_DURATION_MIN_SECONDS = 4;
 const ROTATOR_DURATION_MAX_SECONDS = 6;
+const SWAP_TRANSITION_MS = 200;
 
 const hashToUnitInterval = (value: string) => {
   // FNV-1a style hash for stable pseudo-random values across server/client render
@@ -57,22 +60,84 @@ const RotatorToken = ({
   second: string;
   durationSeconds: number;
 }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [phase, setPhase] = useState<'hold' | 'slide'>('hold');
+  const currentWord = currentIndex === 0 ? first : second;
+  const nextWord = currentIndex === 0 ? second : first;
+  const holdDurationMs = useMemo(
+    () =>
+      Math.max(
+        400,
+        ((durationSeconds * 1000 - SWAP_TRANSITION_MS * 2) / 2) | 0,
+      ),
+    [durationSeconds],
+  );
+
+  useEffect(() => {
+    setCurrentIndex(0);
+    setPhase('hold');
+  }, [first, second]);
+
+  useEffect(() => {
+    const timeout =
+      phase === 'hold'
+        ? window.setTimeout(() => {
+            setPhase('slide');
+          }, holdDurationMs)
+        : window.setTimeout(() => {
+            setCurrentIndex((prev) => (prev === 0 ? 1 : 0));
+            setPhase('hold');
+          }, SWAP_TRANSITION_MS);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [phase, holdDurationMs]);
+
+  const triggerSwap = () => {
+    if (phase === 'hold') {
+      setPhase('slide');
+    }
+  };
+
+  const handleMouseEnter = () => {
+    triggerSwap();
+  };
+
+  const handlePointerDown = (event: PointerEvent<HTMLSpanElement>) => {
+    if (event.pointerType === 'touch') {
+      triggerSwap();
+    }
+  };
+
+  const handleTouchStart = () => {
+    triggerSwap();
+  };
+
   const style: RotatorStyle = {
-    '--rotator-duration': `${durationSeconds.toFixed(3)}s`,
+    '--rotator-duration': `${SWAP_TRANSITION_MS}ms`,
   };
 
   return (
-    <span className={styles.rotator}>
+    <span
+      className={styles.rotator}
+      onMouseEnter={handleMouseEnter}
+      onPointerDown={handlePointerDown}
+      onTouchStart={handleTouchStart}
+    >
       <span className={styles.rotatorSizer} aria-hidden="true">
         <span className={styles.rotatorWord}>{first}</span>
         <span className={styles.rotatorWord}>{second}</span>
       </span>
       <span className={styles.rotatorViewport}>
-        <span className={styles.rotatorTrack} style={style}>
-          <span className={styles.rotatorWord}>{first}</span>
-          <span className={styles.rotatorWord}>{second}</span>
+        <span
+          className={`${styles.rotatorTrack} ${phase === 'slide' ? styles.isAnimating : ''}`}
+          style={style}
+        >
+          <span className={styles.rotatorWord}>{currentWord}</span>
+          <span className={styles.rotatorWord}>{nextWord}</span>
           <span className={styles.rotatorWord} aria-hidden="true">
-            {first}
+            {currentWord}
           </span>
         </span>
       </span>
