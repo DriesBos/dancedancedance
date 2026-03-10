@@ -4,7 +4,6 @@ import Page from '@/components/storyblok/Page';
 import Project from '@/components/storyblok/PageProject';
 import BlokProjectList from '@/components/storyblok/BlokProjectList';
 import BlokProjectSlider from '@/components/storyblok/BlokProjectSlider';
-import BlokHighlights from '@/components/storyblok/BlokHighlights';
 import BlokExperience from '@/components/storyblok/BlokExperience/BlokExperience';
 import BlokIntro from '@/components/storyblok/BlokIntro/BlokIntro';
 import BlokContainer from '@/components/storyblok/BlokContainer';
@@ -18,7 +17,6 @@ import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
 const components = {
   Page: Page,
   'Page Project': Project,
-  'Blok Highlights': BlokHighlights,
   'Blok Project List': BlokProjectList,
   'Blok Project Slider': BlokProjectSlider,
   'Blok Experience': BlokExperience,

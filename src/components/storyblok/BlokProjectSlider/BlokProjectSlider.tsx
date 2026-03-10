@@ -5,11 +5,11 @@ import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useSwipeable } from 'react-swipeable';
-import { gsap, useGSAP } from '@/lib/gsap';
 import MuxPlayer from '@/components/MuxPlayer';
 import SliderIndicators from '@/components/SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
+import { storyblokImageLoader } from '@/lib/storyblok-image';
 import styles from './BlokProjectSlider.module.sass';
 
 interface SbPageData extends SbBlokData {
@@ -40,10 +40,9 @@ interface SlideItemProps {
   item: SbPageData['body'][0];
   isActive: boolean;
   index: number;
-  progressRef?: React.RefObject<HTMLDivElement>;
 }
 
-const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
+const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const muxPlayerRef = useRef<any>(null);
 
@@ -96,7 +95,8 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
           noControls={true}
           muted
           playsInline
-          preload="metadata"
+          loading={isActive ? 'page' : 'viewport'}
+          preload={isActive ? 'metadata' : 'none'}
         />
       );
     } else if (item.video_link && item.media?.filename) {
@@ -106,7 +106,7 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
           src={item.video_link}
           muted
           playsInline
-          preload="auto"
+          preload={isActive ? 'metadata' : 'none'}
           className="imageItem"
           poster={item.media?.filename}
           style={{ width: '100%', height: 'auto' }}
@@ -117,17 +117,20 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
       typeof item.media === 'object' &&
       'filename' in item.media
     ) {
+      const media = item.media as { filename: string; alt?: string };
+
       return (
         <Image
-          src={(item.media as any).filename}
-          alt={(item.name as string) || 'Project Image'}
-          width={0}
-          height={0}
-          sizes="100vw"
-          quality={80}
+          loader={storyblokImageLoader}
+          src={media.filename}
+          alt={media.alt || (item.name as string) || 'Project Image'}
+          fill
+          sizes="(max-width: 770px) 100vw, 100vw"
+          quality={65}
           className="imageItem"
           priority={index === 0} // Only prioritize first image
-          style={{ width: '100%', height: 'auto' }}
+          loading={index === 0 ? 'eager' : 'lazy'}
+          fetchPriority={index === 0 ? 'high' : 'low'}
         />
       );
     }
@@ -142,11 +145,6 @@ const SlideItem = ({ item, isActive, index, progressRef }: SlideItemProps) => {
       <div className={styles.caption}>
         {/* <div className={styles.captionYear}>{item.year}</div> */}
         <div className={styles.captionTitle}>
-          {/* {isActive && progressRef && (
-            <div className={styles.progressWrapper}>
-              <div className={styles.progress} ref={progressRef} />
-            </div>
-          )} */}
           <span>Featured work</span>
         </div>
         <div>{String(item.name)}</div>
@@ -160,7 +158,6 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [hasCursor, setHasCursor] = useState(false);
-  const progressRef = useRef<HTMLDivElement>(null);
   const suppressTapUntilRef = useRef(0);
 
   const currentItem = blok.body?.[activeIndex];
@@ -172,29 +169,6 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     const hasFineCursor = window.matchMedia('(pointer: fine)').matches;
     setHasCursor(hasFineCursor);
   }, []);
-
-  // Animate progress bar
-  useGSAP(
-    () => {
-      if (!progressRef.current || !currentItem) return;
-
-      const duration = currentDuration / 1000;
-
-      gsap.fromTo(
-        progressRef.current,
-        { width: '0%' },
-        {
-          width: '100%',
-          duration: duration,
-          ease: 'linear',
-        },
-      );
-    },
-    {
-      dependencies: [activeIndex, currentItem, currentDuration],
-      revertOnUpdate: true,
-    },
-  );
 
   // Auto-advance slides (paused when hovering)
   useEffect(() => {
@@ -255,7 +229,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     e.stopPropagation();
   };
 
-  if (!blok.body || blok.body.length === 0) return null;
+  if (!blok.body || blok.body.length === 0 || !currentItem) return null;
 
   return (
     <div
@@ -265,15 +239,12 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
-      {blok.body.map((item, index) => (
-        <SlideItem
-          key={item._uid}
-          item={item}
-          isActive={activeIndex === index}
-          index={index}
-          progressRef={activeIndex === index ? progressRef : undefined}
-        />
-      ))}
+      <SlideItem
+        key={currentItem._uid}
+        item={currentItem}
+        isActive={true}
+        index={activeIndex}
+      />
       <div className={`${styles.indicatorAnchor} indicatorAnchor`}>
         <SliderIndicators total={blok.body.length} activeIndex={activeIndex} />
       </div>
