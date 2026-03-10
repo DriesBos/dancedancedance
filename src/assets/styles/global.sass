@@ -479,10 +479,11 @@ mux-player, .muxPlayer
             flex: 0 0 auto
             position: relative
             z-index: 1
+            padding-bottom: var(--filter-bottom-padding) !important
           &-Field
             position: absolute
             right: 100%
-            top: 50%
+            bottom: 0
             transform: translateY(-50%)
             width: 0
             min-width: 0
@@ -533,7 +534,6 @@ mux-player, .muxPlayer
     appearance: none
     border: 0
     background: none
-    color: inherit
     font: inherit
     line-height: inherit
     margin: 0

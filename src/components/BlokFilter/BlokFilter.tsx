@@ -1,10 +1,11 @@
 'use client';
 
-import Row from './Row';
-import BlokSidePanels from './BlokSidePanels';
+import BlokSidePanels from '@/components/BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient';
-import SearchInput from './SearchInput';
-import IconArrow from './Icons/IconArrow';
+import IconArrow from '@/components/Icons/IconArrow';
+import Row from '@/components/Row';
+import SearchInput from '@/components/SearchInput';
+import styles from './BlokFilter.module.sass';
 
 export type ProjectSortField = 'year' | 'title' | 'category';
 export type ProjectSortDirection = 'asc' | 'desc';
@@ -29,39 +30,39 @@ export default function BlokFilter({
     isSortActive(field) ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
 
   return (
-    <div className="blok blok-Filter blok-Animate">
+    <div className={`blok blok-Filter blok-Animate ${styles.blokFilter}`}>
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row>
         <button
           type="button"
-          className="column column-Year cursorInteract desktop"
+          className={`column column-Year cursorInteract desktop ${styles.sortButton}`}
           data-active={isSortActive('year')}
           data-inactive={!isSortActive('year')}
           onClick={() => onSortChange('year')}
         >
-          Year
+          year
         </button>
         <button
           type="button"
-          className="column column-Project cursorInteract"
+          className={`column column-Project cursorInteract ${styles.sortButton}`}
           data-active={isSortActive('title')}
           data-inactive={!isSortActive('title')}
           onClick={() => onSortChange('title')}
         >
-          Selected work
+          selected work
         </button>
         <button
           type="button"
-          className="column column-Category cursorInteract"
+          className={`column column-Category cursorInteract ${styles.sortButton}`}
           data-active={isSortActive('category')}
           data-inactive={!isSortActive('category')}
           onClick={() => onSortChange('category')}
         >
-          Category
+          category
         </button>
-        <div className="column column-Icons">
-          <div className="icon">
+        <div className={`column column-Icons ${styles.iconWrapper}`}>
+          <div className={`icon ${styles.icon}`}>
             <IconArrow />
           </div>
           <SearchInput value={searchValue} onChange={onSearchChange} />
