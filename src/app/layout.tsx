@@ -122,6 +122,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
+        id="page-top"
         className={`body ${myFont.className}`}
         data-border="minimal"
         data-page="home"
@@ -143,7 +144,7 @@ export default async function RootLayout({
             <ThemeFilter />
             <OuterNavigation />
             <OuterTheming />
-            <main id="page-top" className="main">
+            <main className="main">
               <BlokHeadWrapper />
               {children}
               <BlokAction />
