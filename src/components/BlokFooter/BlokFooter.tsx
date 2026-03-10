@@ -12,44 +12,12 @@ import { useStore } from '@/store/store';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import styles from './BlokFooter.module.sass';
 
-const getPortugalTime = () =>
-  new Intl.DateTimeFormat('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZone: 'Europe/Lisbon',
-  }).format(new Date());
-
 const BlokFooter = () => {
   const theme = useStore((state) => state.theme);
   const layout = useStore((state) => state.layout);
   const cycleTheme = useStore((state) => state.cycleTheme);
   const setTwoD = useStore((state) => state.setTwoD);
   const setThreeD = useStore((state) => state.setThreeD);
-  const [portugalTime, setPortugalTime] = useState('00:00:00');
-  const themeLabel = theme.toLowerCase();
-  const layoutLabel = layout === 'DESKTOP' ? 'desktop' : '3d';
-
-  useEffect(() => {
-    setPortugalTime(getPortugalTime());
-    const intervalId = window.setInterval(() => {
-      setPortugalTime(getPortugalTime());
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
-  }, []);
-
-  const handleCycleTheme = () => {
-    cycleTheme();
-  };
-  const handleCycleLayout = () => {
-    if (layout === 'DESKTOP') {
-      setThreeD();
-      return;
-    }
-    setTwoD();
-  };
 
   const ScrollToTop = () => {
     try {
@@ -74,29 +42,6 @@ const BlokFooter = () => {
             <Link href="/about" className="cursorInteract linkAnimation">
               about
             </Link>
-            {/* <Link href="/thoughts" className="cursorInteract linkAnimation">
-              Thoughts
-            </Link> */}
-          <br />
-          {/* <button
-            type="button"
-            onClick={handleCycleTheme}
-            className="cursorInteract linkAnimation"
-            aria-label={`Cycle theme. Current theme: ${themeLabel}`}
-            title={`Theme: ${themeLabel}`}
-          >
-            theme: {themeLabel}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleCycleLayout}
-            className="cursorInteract linkAnimation"
-            aria-label={`Cycle layout. Current layout: ${layoutLabel}`}
-            title={`Layout: ${layoutLabel}`}
-          >
-            layout: {layoutLabel}
-          </button> */}
         </div>
         </div>
         <div className={styles.footerColumnRight}>
