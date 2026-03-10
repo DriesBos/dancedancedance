@@ -6,23 +6,30 @@ import styles from './OuterNavigation.module.sass';
 
 const OuterNavigation = () => {
   const pathname = usePathname() || '/';
-  const isAboutPage = pathname === '/about' || pathname.startsWith('/about/');
+  const isAboutRoute = pathname === '/about' || pathname.startsWith('/about/');
+  const isRouteActive = (href: string) => {
+    if (href === '/about') return isAboutRoute;
+    if (href === '/') return !isAboutRoute;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <nav className={styles.outerNavigation} aria-label="Main navigation">
       <Link
         href="/"
         className={`${styles.outerNavigationLink} ${
-          !isAboutPage ? styles.isActive : ''
+          isRouteActive('/') ? styles.isActive : ''
         } cursorInteract linkAnimation`}
+        data-actie={isRouteActive('/')}
       >
         Work
       </Link>
       <Link
         href="/about"
         className={`${styles.outerNavigationLink} ${
-          isAboutPage ? styles.isActive : ''
+          isRouteActive('/about') ? styles.isActive : ''
         } cursorInteract linkAnimation`}
+        data-actie={isRouteActive('/about')}
       >
         About
       </Link>
