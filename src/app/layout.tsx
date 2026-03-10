@@ -157,15 +157,15 @@ export default async function RootLayout({
                 link="info@driesbos.com?subject=Let's Make Internet"
                 linkType="email"
                 className="cursorInteract"
-                dropLeftPx={40}
+                dropLeftPx={10}
                 dropOnPage="projects"
               />
               <ActionButton
-                copy="Mail"
+                copy="Let's talk"
                 link="info@driesbos.com?subject=Let's Make Internet"
                 linkType="email"
                 className="cursorInteract"
-                dropLeftPx={90}
+                dropLeftPx={20}
                 dropOnPage="about"
               />
               <ActionButton
@@ -173,7 +173,7 @@ export default async function RootLayout({
                 link="https://calendly.com/info-b9c/30min"
                 linkType="url"
                 className="cursorInteract"
-                dropLeftPx={130}
+                dropLeftPx={50}
                 dropOnPage="about"
               />
             </ActionButtonContainer>
