@@ -4,14 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type p5 from 'p5';
 import dynamic from 'next/dynamic';
 import styles from './BackgroundEffects.module.sass';
-import {
-  createSegmentsSketch,
-  SEGMENTS_DEFAULT_PARAMS,
-} from './segmentsSketch';
-import { createKusamaSketch, KUSAMA_DEFAULT_PARAMS } from './kusamaSketch';
-import DotsScene from './dotsScene';
 
 const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
+const DotsScene = dynamic(() => import('./dotsScene'), { ssr: false });
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
@@ -192,7 +187,8 @@ function SegmentsBackground() {
       const host = hostRef.current;
       if (!host) return;
 
-      const { default: P5 } = await import('p5');
+      const [{ default: P5 }, { createSegmentsSketch, SEGMENTS_DEFAULT_PARAMS }] =
+        await Promise.all([import('p5'), import('./segmentsSketch')]);
       if (isDisposed || !hostRef.current) return;
 
       instance = new P5(
@@ -280,7 +276,8 @@ function KusamaBackground() {
       const host = rootRef.current;
       if (!host) return;
 
-      const { default: P5 } = await import('p5');
+      const [{ default: P5 }, { createKusamaSketch, KUSAMA_DEFAULT_PARAMS }] =
+        await Promise.all([import('p5'), import('./kusamaSketch')]);
       if (isDisposed || !rootRef.current) return;
 
       instance = new P5(

@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bodies, Body, Engine, Runner, World } from 'matter-js';
+import type { Body, Engine, Runner } from 'matter-js';
 import styles from './ActionButtonContainer.module.sass';
 
 interface ActionButtonContainerProps {
@@ -35,6 +35,8 @@ interface PersistedItemState {
   height: number;
 }
 
+type MatterJsModule = typeof import('matter-js');
+
 const SETTLE_FRAME_COUNT = 20;
 
 const hideElement = (element: HTMLDivElement) => {
@@ -52,6 +54,7 @@ const ActionButtonContainer = ({
 }: ActionButtonContainerProps) => {
   const [isSettled, setIsSettled] = useState(false);
   const [layoutVersion, setLayoutVersion] = useState(0);
+  const [matterModule, setMatterModule] = useState<MatterJsModule | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
   const engineRef = useRef<Engine | null>(null);
@@ -66,8 +69,31 @@ const ActionButtonContainer = ({
   );
   const pathname = usePathname() || '/';
   const pageSlug = pathname.split('/')[1] || 'home';
+  const shouldRenderOnRoute = pageSlug === 'about' || pageSlug === 'projects';
   const childItems = useMemo(() => Children.toArray(children), [children]);
   const childCount = childItems.length;
+
+  useEffect(() => {
+    if (!shouldRenderOnRoute) {
+      setMatterModule(null);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const loadMatter = async () => {
+      const matterLib = await import('matter-js');
+      if (!isCancelled) {
+        setMatterModule(matterLib);
+      }
+    };
+
+    loadMatter();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [shouldRenderOnRoute]);
 
   const setSettledState = useCallback((nextValue: boolean) => {
     if (latestSettledRef.current === nextValue) return;
@@ -78,7 +104,8 @@ const ActionButtonContainer = ({
   const spawnEntry = useCallback(
     (index: number, element: HTMLDivElement, containerWidth: number) => {
       const engine = engineRef.current;
-      if (!engine) return;
+      const matter = matterModule;
+      if (!engine || !matter) return;
 
       const rect = element.getBoundingClientRect();
       const width = rect.width;
@@ -110,16 +137,16 @@ const ActionButtonContainer = ({
           : randomSpawnX;
       const spawnY = -height - index * (height + 16);
 
-      const body = Bodies.rectangle(spawnX, spawnY, width, height, {
+      const body = matter.Bodies.rectangle(spawnX, spawnY, width, height, {
         restitution: 0.33,
         friction: 0.5,
         frictionAir: 0.01,
         sleepThreshold: 40,
       });
 
-      Body.setAngle(body, (Math.random() - 0.5) * 0.16);
-      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.02);
-      World.add(engine.world, body);
+      matter.Body.setAngle(body, (Math.random() - 0.5) * 0.16);
+      matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.02);
+      matter.World.add(engine.world, body);
 
       activeEntriesRef.current.push({
         index,
@@ -133,7 +160,7 @@ const ActionButtonContainer = ({
       showElement(element);
       setSettledState(false);
     },
-    [setSettledState],
+    [matterModule, setSettledState],
   );
 
   const spawnEligibleForRoute = useCallback(
@@ -164,6 +191,9 @@ const ActionButtonContainer = ({
   );
 
   const startRenderLoop = useCallback(() => {
+    const matter = matterModule;
+    if (!matter) return;
+
     const renderFrame = () => {
       const activeEntries = activeEntriesRef.current;
 
@@ -182,9 +212,9 @@ const ActionButtonContainer = ({
         }
 
         if (entry.sleepFrames >= SETTLE_FRAME_COUNT) {
-          Body.setVelocity(body, { x: 0, y: 0 });
-          Body.setAngularVelocity(body, 0);
-          Body.setStatic(body, true);
+          matter.Body.setVelocity(body, { x: 0, y: 0 });
+          matter.Body.setAngularVelocity(body, 0);
+          matter.Body.setStatic(body, true);
 
           const finalX = body.position.x - width / 2;
           const finalY = body.position.y - height / 2;
@@ -207,9 +237,11 @@ const ActionButtonContainer = ({
     };
 
     rafIdRef.current = window.requestAnimationFrame(renderFrame);
-  }, [setSettledState]);
+  }, [matterModule, setSettledState]);
 
   useEffect(() => {
+    if (!shouldRenderOnRoute) return;
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -258,15 +290,19 @@ const ActionButtonContainer = ({
         window.cancelAnimationFrame(resizeRafId);
       }
     };
-  }, []);
+  }, [shouldRenderOnRoute]);
 
   useEffect(() => {
+    if (!shouldRenderOnRoute || !matterModule) return;
+
     const container = containerRef.current;
     const itemElements = itemRefs.current
       .slice(0, childCount)
       .filter((element): element is HTMLDivElement => !!element);
 
     if (!container || itemElements.length === 0) return;
+
+    const { Bodies, Body, Engine, Runner, World } = matterModule;
 
     setSettledState(true);
     activeEntriesRef.current = [];
@@ -376,11 +412,24 @@ const ActionButtonContainer = ({
       engineRef.current = null;
       activeEntriesRef.current = [];
     };
-  }, [childCount, layoutVersion, setSettledState, spawnEntry, startRenderLoop]);
+  }, [
+    childCount,
+    layoutVersion,
+    matterModule,
+    setSettledState,
+    shouldRenderOnRoute,
+    spawnEntry,
+    startRenderLoop,
+  ]);
 
   useEffect(() => {
+    if (!shouldRenderOnRoute || !matterModule) return;
     spawnEligibleForRoute(pageSlug);
-  }, [pageSlug, spawnEligibleForRoute]);
+  }, [matterModule, pageSlug, shouldRenderOnRoute, spawnEligibleForRoute]);
+
+  if (!shouldRenderOnRoute) {
+    return null;
+  }
 
   return (
     <div
