@@ -3,8 +3,18 @@
   top: var(--spacing-base)
   right: var(--spacing-side)
   z-index: 1
+  opacity: 1
+  visibility: visible
+  pointer-events: auto
+  transition: opacity var(--transition-theme), visibility 0s linear 0s
   @media (max-width: 1500px)
     display: none
+
+:global(body[data-layout='DESKTOP']) .outerTheming
+  opacity: 0
+  visibility: hidden
+  pointer-events: none
+  transition: opacity var(--transition-theme), visibility 0s linear var(--transition-theme)
 
 .outerThemingContainer
   display: flex
