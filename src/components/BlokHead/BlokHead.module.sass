@@ -43,7 +43,7 @@
   border-radius: 1000px
   border: 1.5px solid currentColor
   background: conic-gradient(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg), var(--theme-blok-solid)
-  transition: transform 0.25s ease, border-color var(--transition-theme), background var(--transition-theme)
+  transition: transform 0.25s ease, color var(--transition-theme-quick), border-color var(--transition-theme-quick), background var(--transition-theme-quick)
   will-change: transform
 
 .themeButton
@@ -52,6 +52,44 @@
   @media (hover: hover)
     &:hover .themeCycle
       transform: rotate(45deg)
+      color: var(--theme-cycle-next-color, currentColor)
+      background: conic-gradient(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg), var(--theme-cycle-next-blok, var(--theme-blok-solid))
+
+:global(body[data-theme='RADIANT']) .themeCycle
+  --theme-cycle-next-color: #FA5942
+  --theme-cycle-next-blok: hsla(172, 100%, 75%, 1)
+
+:global(body[data-theme='TRON']) .themeCycle
+  --theme-cycle-next-color: hsla(172, 100%, 75%, 1)
+  --theme-cycle-next-blok: lightblue
+
+:global(body[data-theme='SKY']) .themeCycle
+  --theme-cycle-next-color: var(--color-dark-type)
+  --theme-cycle-next-blok: hsla(0, 0%, 10.2%, 1)
+
+:global(body[data-theme='SEGMENTS']) .themeCycle
+  --theme-cycle-next-color: white
+  --theme-cycle-next-blok: hsla(20, 100%, 01%, 1)
+
+:global(body[data-theme='LIGHT']) .themeCycle
+  --theme-cycle-next-color: black
+  --theme-cycle-next-blok: #DA4B9A
+
+:global(body[data-theme='KUSAMA']) .themeCycle
+  --theme-cycle-next-color: #DA4B9A
+  --theme-cycle-next-blok: white
+
+:global(body[data-theme='SPACE']) .themeCycle
+  --theme-cycle-next-color: white
+  --theme-cycle-next-blok: hsla(0, 100%, 50%, 1)
+
+:global(body[data-theme='NIGHT']) .themeCycle
+  --theme-cycle-next-color: #FA5942
+  --theme-cycle-next-blok: hsla(249, 10%, 86%, 1)
+
+:global(body[data-theme='KERMIT']) .themeCycle
+  --theme-cycle-next-color: #FA5942
+  --theme-cycle-next-blok: hsla(249, 10%, 86%, 1)
 
 .themeCycleSpinning
   animation: themeCycleSpin360 0.7s cubic-bezier(0.22, 1, 0.36, 1)
