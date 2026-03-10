@@ -67,12 +67,12 @@ $break-desktop: 1370px
   --border-gap: 0
   --border-shape:
   --border-hyperlink: 1.5px
-  --blok-padding: 1.25rem
   --blok-height: calc(var(--blok-padding) * 2 + var(--line-height) * 1rem)
+  --blok-padding: 1.25rem
+  --blok-padding-extraTop: var(--blok-height)
   --filter-bottom-padding: 1rem
   --panel-height: 150px
   --panel-perspective-origin: 50% 0vh
-  --top-padding-filter: 0
   --spacing-side: 1.25rem
   --spacing-between-images: 1.25rem
   --spacing-base: 1.25rem
@@ -101,11 +101,9 @@ $break-desktop: 1370px
 
 // LAYOUTS
 body[data-layout='DESKTOP']
-  --top-padding-filter: calc(#{var(--blok-height)} * 3)
   --panel-perspective-origin: 50% 0vh
 
 body[data-layout='3D']
-  --top-padding-filter: calc(#{var(--blok-height)} * 2)
   --spacing-containerTopDistance: calc(124px + var(--blok-height) + 27vh)
   --panel-perspective-origin: 50% -70rem
   @media (max-width: 770px)
