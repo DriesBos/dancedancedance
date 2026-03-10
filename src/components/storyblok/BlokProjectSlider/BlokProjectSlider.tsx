@@ -259,7 +259,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
 
   return (
     <div
-      className={`blok blok-Animate blok-ProjectSlider ${styles.root}`}
+      className={`blok blok-Animate blok-ProjectSlider ${styles.projectSlider}`}
       {...storyblokEditable(blok)}
       {...swipeHandlers}
     >
