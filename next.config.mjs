@@ -14,7 +14,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'a.storyblok.com',
+        hostname: '**.storyblok.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.storyblokchina.cn',
       },
     ],
     qualities: [50, 75, 80, 90],

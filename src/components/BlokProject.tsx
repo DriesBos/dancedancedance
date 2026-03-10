@@ -6,6 +6,7 @@ import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from './BlokSidePanels';
+import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
 
 interface Props {
   slug?: String;
@@ -30,15 +31,13 @@ const BlokProject = ({
   const cursorPreviewImage = (() => {
     const base = thumbnail?.filename;
     if (!base) return undefined;
-
-    const shouldTransform =
-      base.includes('a.storyblok.com') || base.includes('img2.storyblok.com');
-    if (!shouldTransform || base.includes('/m/')) return base;
-
-    const [path, query] = base.split('?');
-    const transformed = `${path}/m/640x480/smart/filters:format(webp):quality(70)`;
-
-    return query ? `${transformed}?${query}` : transformed;
+    return transformStoryblokImageUrl(base, {
+      width: 640,
+      height: 480,
+      quality: 70,
+      smart: true,
+      noUpscale: true,
+    });
   })();
 
   const handleClick = () => {

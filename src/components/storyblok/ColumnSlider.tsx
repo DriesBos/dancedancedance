@@ -4,6 +4,7 @@ import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
+import { storyblokImageLoader } from '@/lib/storyblok-image';
 import SliderIndicators from '../SliderIndicators';
 
 interface SbPageData extends SbBlokData {
@@ -31,7 +32,6 @@ interface ColumnSliderProps {
 const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const progressRef = useRef<HTMLDivElement>(null);
   const itemRef = useRef<HTMLDivElement>(null);
 
   // Determine if we should use mobile images
@@ -86,7 +86,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
     return () => clearInterval(interval);
   }, [activeImages, blok.speed]);
 
-  if (!currentImage) return null;
+  if (!currentImage?.filename) return null;
 
   return (
     <div className="column column-Slider" {...storyblokEditable(blok)}>
@@ -94,15 +94,17 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
       <div ref={itemRef} className="column-Slider-Item">
         <div className="column-Slider-ImageWrapper">
           <Image
+            loader={storyblokImageLoader}
             src={currentImage.filename}
-            alt={currentImage.alt}
+            alt={currentImage.alt || currentImage.name || 'Project image'}
             width={0}
             height={0}
-            sizes="100vw"
-            quality={80}
+            sizes="(max-width: 770px) 100vw, 50vw"
+            quality={70}
             className="imageItem"
             priority={activeIndex === 0}
             loading={activeIndex === 0 ? 'eager' : 'lazy'}
+            fetchPriority={activeIndex === 0 ? 'high' : 'auto'}
             style={{ width: '100%', height: 'auto' }}
           />
           <SliderIndicators

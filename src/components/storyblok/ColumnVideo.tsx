@@ -1,5 +1,6 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import MuxPlayer from '../MuxPlayer';
+import { storyblokVideoPosterUrl } from '@/lib/storyblok-image';
 
 interface SbPageData extends SbBlokData {
   link?: string; // Legacy: direct video URL
@@ -22,6 +23,7 @@ interface ColumnVideoProps {
 const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
   // Support both Mux playback ID and legacy direct video URLs
   const useMux = !!blok.mux_playback_id;
+  const optimizedPoster = storyblokVideoPosterUrl(blok.placeholder?.filename);
 
   return (
     <div
@@ -32,7 +34,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
       {useMux ? (
         <MuxPlayer
           playbackId={blok.mux_playback_id!}
-          poster={blok.placeholder?.filename}
+          poster={optimizedPoster}
           loop={blok.loop}
           className="muxPlayer imageItem"
           pause={blok.pause}
@@ -54,7 +56,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
           playsInline
           preload="auto"
           className="imageItem"
-          poster={blok.placeholder?.filename}
+          poster={optimizedPoster}
           style={{ width: '100%', height: 'auto' }}
         />
       )}

@@ -9,7 +9,7 @@ import MuxPlayer from '@/components/MuxPlayer';
 import SliderIndicators from '@/components/SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
-import { storyblokImageLoader } from '@/lib/storyblok-image';
+import { storyblokImageLoader, storyblokVideoPosterUrl } from '@/lib/storyblok-image';
 import styles from './BlokProjectSlider.module.sass';
 
 interface SbPageData extends SbBlokData {
@@ -45,6 +45,7 @@ interface SlideItemProps {
 const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const muxPlayerRef = useRef<any>(null);
+  const optimizedPoster = storyblokVideoPosterUrl(item.media?.filename);
 
   // Control video playback based on isActive state
   useEffect(() => {
@@ -88,7 +89,7 @@ const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
         <MuxPlayer
           ref={muxPlayerRef}
           playbackId={item.mux_playback_id}
-          poster={item.media?.filename}
+          poster={optimizedPoster}
           className="muxPlayer imageItem"
           aspectRatio={item.aspect_ratio || '16 / 9'}
           dynamicAspectRatio={!item.aspect_ratio}
@@ -108,7 +109,7 @@ const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
           playsInline
           preload={isActive ? 'metadata' : 'none'}
           className="imageItem"
-          poster={item.media?.filename}
+          poster={optimizedPoster}
           style={{ width: '100%', height: 'auto' }}
         />
       );
@@ -126,7 +127,7 @@ const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
           alt={media.alt || (item.name as string) || 'Project Image'}
           fill
           sizes="(max-width: 770px) 100vw, 100vw"
-          quality={65}
+          quality={60}
           className="imageItem"
           priority={index === 0} // Only prioritize first image
           loading={index === 0 ? 'eager' : 'lazy'}
