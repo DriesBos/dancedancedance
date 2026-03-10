@@ -6,6 +6,7 @@ import styles from './BlokIntro.module.sass';
 interface SbBlokIntroData extends SbBlokData {
   line_one?: string;
   line_two?: string;
+  line_combined?: string;
 }
 
 interface BlokIntroProps {
@@ -23,10 +24,13 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
 
       <div className={styles.copy}>
         {blok.line_one ? (
-          <p className={styles.lineOne}>{blok.line_one}</p>
+          <p className={`${styles.lineOne} desktop`}>{blok.line_one}</p>
         ) : null}
         {blok.line_two ? (
-          <p className={styles.lineTwo}>{blok.line_two}</p>
+          <p className={`${styles.lineTwo} desktop`}>{blok.line_two}</p>
+        ) : null}
+        {blok.line_combined ? (
+          <p className={`${styles.lineCombined} mobile`}>{blok.line_combined}</p>
         ) : null}
       </div>
     </div>
