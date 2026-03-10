@@ -250,45 +250,73 @@ function CameraRig({
   }, [enableParallax]);
 
   useFrame((_, delta) => {
-    const inputSmoothing = 4;
+    // Clamp very large frame deltas (tab switch / frame drops) to prevent
+    // visible jumps in smoothing and camera catch-up.
+    const frameDelta = Math.min(delta, 1 / 30);
+
+    // Smooths raw mouse input before it drives rotation.
+    // Lower = more lag/silkier motion, higher = more immediate.
+    const inputSmoothing = 1;
     const targetMouseX = enableParallax ? mouseXRef.current : 0;
     mouseXSmoothedRef.current = THREE.MathUtils.damp(
       mouseXSmoothedRef.current,
       targetMouseX,
       inputSmoothing,
-      delta,
+      frameDelta,
     );
 
     const mouseX = mouseXSmoothedRef.current;
     const easedMagnitude = 1 - Math.pow(1 - Math.abs(mouseX), 2.2);
     const easedMouseX = Math.sign(mouseX) * easedMagnitude;
 
-    const horizontalRotationSmoothing = 5;
-    const maxYaw = THREE.MathUtils.degToRad(0.45);
+    // Smooths camera yaw towards the target angle.
+    // Lower = softer easing, higher = snappier catch-up.
+    const horizontalRotationSmoothing = 4;
+    // Maximum horizontal camera yaw in radians.
+    const maxYaw = THREE.MathUtils.degToRad(1.5);
     const targetYaw = easedMouseX * maxYaw;
+    // Caps how fast yaw can change, preventing stutter on fast cursor jumps.
+    const maxYawSpeed = THREE.MathUtils.degToRad(45);
+    const yawDelta = targetYaw - camera.rotation.y;
+    const limitedYawDelta = clamp(
+      yawDelta,
+      -maxYawSpeed * frameDelta,
+      maxYawSpeed * frameDelta,
+    );
+    const limitedTargetYaw = camera.rotation.y + limitedYawDelta;
 
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, 0, 10, delta);
+    camera.position.x = THREE.MathUtils.damp(
+      camera.position.x,
+      0,
+      10,
+      frameDelta,
+    );
     camera.rotation.y = THREE.MathUtils.damp(
       camera.rotation.y,
-      targetYaw,
+      limitedTargetYaw,
       horizontalRotationSmoothing,
-      delta,
+      frameDelta,
     );
     camera.rotation.x = THREE.MathUtils.damp(
       camera.rotation.x,
       0,
       horizontalRotationSmoothing,
-      delta,
+      frameDelta,
     );
     camera.rotation.z = THREE.MathUtils.damp(
       camera.rotation.z,
       0,
       horizontalRotationSmoothing,
-      delta,
+      frameDelta,
     );
 
     if (!enableParallax) {
-      camera.position.y = THREE.MathUtils.damp(camera.position.y, 0, 12, delta);
+      camera.position.y = THREE.MathUtils.damp(
+        camera.position.y,
+        0,
+        12,
+        frameDelta,
+      );
       camera.position.z = 28;
       return;
     }
@@ -302,7 +330,7 @@ function CameraRig({
       camera.position.y,
       targetY,
       smoothing,
-      delta,
+      frameDelta,
     );
     camera.position.z = 28;
   });
