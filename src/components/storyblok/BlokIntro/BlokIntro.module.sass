@@ -12,13 +12,23 @@
   margin: 0
   white-space: pre-wrap
 
+.moreButtonContainer
+  display: inline-flex
+  padding: .5em
+  text-decoration: none
+  user-select: none
+  &:hover
+    @media (hover: hover)
+      .moreButton
+        background: var(--theme-type)
+        color: var(--theme-type-contrast)
+
 .moreButton
   display: inline-flex
   align-items: center
   justify-content: center
   align-self: flex-start
-  padding: 0px 4px 0px !important
-  margin-left: .5em
+  padding: 0px 4px .5px !important
   height: 16px
   border-radius: 1000px
   border: var(--border-width) solid var(--border-color)
@@ -30,7 +40,3 @@
   text-transform: lowercase
   transform: translateY(-1px)
   transition: color var(--transition-button), background var(--transition-button), border-color var(--transition-button)
-  &:hover
-    @media (hover: hover)
-      background: var(--theme-type)
-      color: var(--theme-type-contrast)
