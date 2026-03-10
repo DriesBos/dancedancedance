@@ -6,6 +6,7 @@ import BlokProjectList from '@/components/storyblok/BlokProjectList';
 import BlokProjectSlider from '@/components/storyblok/BlokProjectSlider';
 import BlokHighlights from '@/components/storyblok/BlokHighlights';
 import BlokExperience from '@/components/storyblok/BlokExperience/BlokExperience';
+import BlokIntro from '@/components/storyblok/BlokIntro/BlokIntro';
 import BlokContainer from '@/components/storyblok/BlokContainer';
 import ColumnImage from '@/components/storyblok/ColumnImage';
 import ColumnSlider from '@/components/storyblok/ColumnSlider';
@@ -24,6 +25,7 @@ const components = {
   'Blok Project List': BlokProjectList,
   'Blok Project Slider': BlokProjectSlider,
   'Blok Experience': BlokExperience,
+  'Blok Intro': BlokIntro,
   'Blok Container': BlokContainer,
   'Blok Blurp': BlokBlurb,
   'Column Image': ColumnImage,

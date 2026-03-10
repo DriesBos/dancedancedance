@@ -89,27 +89,27 @@ function DotsField({
     ? (initialViewportRef.current?.height ?? liveViewportHeight)
     : liveViewportHeight;
 
-  const dotCount = useMemo(
-    () => {
-      const clampedDensityScale = clamp(densityScale, 0.05, 1.5);
-      const clampedCountScale = clamp(countScale, 0.2, 1);
-      const minCount = Math.max(6, Math.round(90 * clampedDensityScale));
-      const maxCount = Math.max(minCount, Math.round(270 * clampedDensityScale));
-      const count = Math.round(
-        viewportWidth * viewportHeight * 4.2 * clampedDensityScale,
-      );
-      const baseCount = clamp(count, minCount, maxCount);
-      const scaledMinCount = Math.max(3, Math.round(minCount * clampedCountScale));
-      const scaledMaxCount = Math.max(
-        scaledMinCount,
-        Math.round(maxCount * clampedCountScale),
-      );
-      const scaledCount = Math.round(baseCount * clampedCountScale);
+  const dotCount = useMemo(() => {
+    const clampedDensityScale = clamp(densityScale, 0.05, 1.5);
+    const clampedCountScale = clamp(countScale, 0.2, 1);
+    const minCount = Math.max(6, Math.round(90 * clampedDensityScale));
+    const maxCount = Math.max(minCount, Math.round(270 * clampedDensityScale));
+    const count = Math.round(
+      viewportWidth * viewportHeight * 4.2 * clampedDensityScale,
+    );
+    const baseCount = clamp(count, minCount, maxCount);
+    const scaledMinCount = Math.max(
+      3,
+      Math.round(minCount * clampedCountScale),
+    );
+    const scaledMaxCount = Math.max(
+      scaledMinCount,
+      Math.round(maxCount * clampedCountScale),
+    );
+    const scaledCount = Math.round(baseCount * clampedCountScale);
 
-      return clamp(scaledCount, scaledMinCount, scaledMaxCount);
-    },
-    [countScale, densityScale, viewportHeight, viewportWidth],
-  );
+    return clamp(scaledCount, scaledMinCount, scaledMaxCount);
+  }, [countScale, densityScale, viewportHeight, viewportWidth]);
   const positions = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
   const colors = useMemo(() => new Float32Array(dotCount * 3), [dotCount]);
 
@@ -218,8 +218,75 @@ function CameraRig({
   enableParallax?: boolean;
 }) {
   const { camera } = useThree();
+  const mouseXRef = useRef(0);
+  const mouseXSmoothedRef = useRef(0);
+
+  useEffect(() => {
+    if (!enableParallax) {
+      mouseXRef.current = 0;
+      mouseXSmoothedRef.current = 0;
+      return;
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const viewportWidth = Math.max(1, window.innerWidth);
+      const normalizedX = (event.clientX / viewportWidth) * 2 - 1;
+      mouseXRef.current = clamp(normalizedX, -1, 1);
+    };
+
+    const resetMouseX = () => {
+      mouseXRef.current = 0;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('blur', resetMouseX);
+    document.addEventListener('mouseleave', resetMouseX);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('blur', resetMouseX);
+      document.removeEventListener('mouseleave', resetMouseX);
+    };
+  }, [enableParallax]);
 
   useFrame((_, delta) => {
+    const inputSmoothing = 4;
+    const targetMouseX = enableParallax ? mouseXRef.current : 0;
+    mouseXSmoothedRef.current = THREE.MathUtils.damp(
+      mouseXSmoothedRef.current,
+      targetMouseX,
+      inputSmoothing,
+      delta,
+    );
+
+    const mouseX = mouseXSmoothedRef.current;
+    const easedMagnitude = 1 - Math.pow(1 - Math.abs(mouseX), 2.2);
+    const easedMouseX = Math.sign(mouseX) * easedMagnitude;
+
+    const horizontalRotationSmoothing = 5;
+    const maxYaw = THREE.MathUtils.degToRad(0.45);
+    const targetYaw = easedMouseX * maxYaw;
+
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, 0, 10, delta);
+    camera.rotation.y = THREE.MathUtils.damp(
+      camera.rotation.y,
+      targetYaw,
+      horizontalRotationSmoothing,
+      delta,
+    );
+    camera.rotation.x = THREE.MathUtils.damp(
+      camera.rotation.x,
+      0,
+      horizontalRotationSmoothing,
+      delta,
+    );
+    camera.rotation.z = THREE.MathUtils.damp(
+      camera.rotation.z,
+      0,
+      horizontalRotationSmoothing,
+      delta,
+    );
+
     if (!enableParallax) {
       camera.position.y = THREE.MathUtils.damp(camera.position.y, 0, 12, delta);
       camera.position.z = 28;
