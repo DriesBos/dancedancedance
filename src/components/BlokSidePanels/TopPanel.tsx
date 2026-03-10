@@ -1,5 +1,6 @@
 import GrainyGradient from '../GrainyGradient/GrainyGradient';
 import LazyDitheringVideoPortrait from '@/components/LazyDitheringVideoPortrait';
+import IconFullscreen from '@/components/Icons/IconFullscreen';
 import styles from './BlokSidePanels.module.sass';
 
 interface TopPanelProps {
@@ -37,6 +38,9 @@ const TopPanel = ({ showPortrait = false }: TopPanelProps) => {
           contrast={1.2}
           threshold={138}
         />
+        {/* <span className={styles.topPanelFullscreenIcon} aria-hidden="true">
+          <IconFullscreen />
+        </span> */}
       </a>
     );
   }

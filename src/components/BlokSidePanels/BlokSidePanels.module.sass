@@ -32,3 +32,19 @@
     height: 100%
     transform: translateZ(calc(var(--panel-height) * -1))
     transform-origin: 0 0
+
+.topPanelFullscreenIcon
+  position: absolute
+  right: var(--spacing-base)
+  bottom: var(--spacing-base)
+  width: var(--icon-size)
+  height: var(--icon-size)
+  display: grid
+  place-items: center
+  transform: translateZ(1px)
+  color: var(--theme-type)
+  z-index: 2
+  pointer-events: none
+  svg
+    width: 100%
+    height: 100%
