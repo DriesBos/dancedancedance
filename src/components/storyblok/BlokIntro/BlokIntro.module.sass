@@ -11,3 +11,26 @@
 .line
   margin: 0
   white-space: pre-wrap
+
+.moreButton
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  align-self: flex-start
+  padding: 0px 4px 0px !important
+  margin-left: .5em
+  height: 16px
+  border-radius: 1000px
+  border: var(--border-width) solid var(--border-color)
+  color: var(--theme-type)
+  text-decoration: none
+  background: transparent
+  line-height: 1
+  font-size: 12px !important
+  text-transform: lowercase
+  transform: translateY(-1px)
+  transition: color var(--transition-button), background var(--transition-button), border-color var(--transition-button)
+  &:hover
+    @media (hover: hover)
+      background: var(--theme-type)
+      color: var(--theme-type-contrast)
