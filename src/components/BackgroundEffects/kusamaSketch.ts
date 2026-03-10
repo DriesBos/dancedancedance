@@ -1,5 +1,4 @@
 import type p5 from 'p5';
-import { Delaunay } from 'd3-delaunay';
 import {
   createParallaxTween,
   retargetParallaxTween,
@@ -14,15 +13,21 @@ export type KusamaParams = {
   rippleStrength: number;
   lineThickness: number;
   opacity: number;
+  driftAmount: number;
+  driftSpeed: number;
+  edgeCurvature: number;
 };
 
 export const KUSAMA_DEFAULT_PARAMS: KusamaParams = {
-  cellSize: 50,
-  jitter: 1,
+  cellSize: 48,
+  jitter: 0.4,
   rippleRadius: 250,
-  rippleStrength: 50,
+  rippleStrength: 44,
   lineThickness: 1,
   opacity: 0.9,
+  driftAmount: 2.4,
+  driftSpeed: 0.00022,
+  edgeCurvature: 0.18,
 };
 const MOBILE_KUSAMA_CELL_SIZE = 25;
 const KUSAMA_MOBILE_BREAKPOINT_PX = 770;
@@ -36,6 +41,8 @@ const KUSAMA_PARALLAX_TUNING = {
   maxRotateRadians: 0,
   baseScale: 1,
 };
+const KUSAMA_INITIAL_DENSE_DURATION_MS = 2000;
+const KUSAMA_INITIAL_DENSE_CELL_MULTIPLIER = 1.1;
 
 type KusamaSketchOptions = {
   host: HTMLDivElement;
@@ -51,6 +58,12 @@ type KusamaSeed = {
   freqX: number;
   freqY: number;
   ampScale: number;
+};
+
+type KusamaSeedGrid = {
+  seeds: KusamaSeed[];
+  columnCount: number;
+  rowCount: number;
 };
 
 type ResolvedStyles = {
@@ -78,15 +91,48 @@ type Edge = {
   ay: number;
   bx: number;
   by: number;
-  key: string;
 };
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+function getCellSizeForDensity(baseCellSize: number, densityMultiplier: number) {
+  return baseCellSize / Math.sqrt(Math.max(0.0001, densityMultiplier));
+}
+
 function clamp01(value: number): number {
   return clamp(value, 0, 1);
+}
+
+function fract(value: number): number {
+  return value - Math.floor(value);
+}
+
+function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t;
+}
+
+function hash2D(x: number, y: number): number {
+  return fract(Math.sin(x * 127.1 + y * 311.7) * 43758.5453123);
+}
+
+function smoothNoise2D(x: number, y: number): number {
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  const fx = x - ix;
+  const fy = y - iy;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sy = fy * fy * (3 - 2 * fy);
+
+  const n00 = hash2D(ix, iy);
+  const n10 = hash2D(ix + 1, iy);
+  const n01 = hash2D(ix, iy + 1);
+  const n11 = hash2D(ix + 1, iy + 1);
+
+  const nx0 = lerp(n00, n10, sx);
+  const nx1 = lerp(n01, n11, sx);
+  return lerp(nx0, nx1, sy);
 }
 
 function getKusamaParallaxScale(viewportWidth: number): number {
@@ -97,37 +143,92 @@ function getKusamaParallaxScale(viewportWidth: number): number {
   );
 }
 
-function quantize(value: number, step = 0.5): number {
-  return Math.round(value / step) * step;
-}
-
-function edgeKey(ax: number, ay: number, bx: number, by: number): string {
-  const aX = quantize(ax);
-  const aY = quantize(ay);
-  const bX = quantize(bx);
-  const bY = quantize(by);
-
-  if (aX < bX || (aX === bX && aY <= bY)) {
-    return `${aX},${aY}|${bX},${bY}`;
-  }
-  return `${bX},${bY}|${aX},${aY}`;
-}
-
 function createSeeds(
   width: number,
   height: number,
   params: KusamaParams,
-): KusamaSeed[] {
-  const spacing = Math.max(28, params.cellSize);
-  const cols = Math.ceil(width / spacing) + 3;
-  const rows = Math.ceil(height / spacing) + 3;
+): KusamaSeedGrid {
+  const spacing = Math.max(26, params.cellSize);
+  const columnCount = Math.ceil(width / spacing) + 4;
+  const rowCount = Math.ceil(height / spacing) + 4;
   const seeds: KusamaSeed[] = [];
-  const jitterDistance = spacing * clamp(params.jitter, 0, 0.49);
+  const jitterDistance = spacing * clamp(params.jitter, 0, 0.62);
+  const flowScale = 1 / Math.max(96, spacing * 2.8);
+  const flowOffsetX = Math.random() * 1000;
+  const flowOffsetY = Math.random() * 1000;
+  const flowOffsetX2 = Math.random() * 1000;
+  const flowOffsetY2 = Math.random() * 1000;
+  const flowStrength = spacing * 0.26;
+  const twistScale = flowScale * 2.1;
+  const microScale = flowScale * 5.6;
+  const twistOffsetX = Math.random() * 1000;
+  const twistOffsetY = Math.random() * 1000;
+  const twistOffsetX2 = Math.random() * 1000;
+  const twistOffsetY2 = Math.random() * 1000;
+  const microOffsetX = Math.random() * 1000;
+  const microOffsetY = Math.random() * 1000;
+  const microOffsetX2 = Math.random() * 1000;
+  const microOffsetY2 = Math.random() * 1000;
+  const twistStrength = spacing * 0.34;
+  const microTwistStrength = spacing * 0.16;
 
-  for (let row = -1; row < rows; row += 1) {
-    for (let col = -1; col < cols; col += 1) {
-      const x = col * spacing + spacing * 0.5;
-      const y = row * spacing + spacing * 0.5;
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+    const row = rowIndex - 1;
+    for (let columnIndex = 0; columnIndex < columnCount; columnIndex += 1) {
+      const column = columnIndex - 1;
+      let x = column * spacing + spacing * 0.5;
+      let y = row * spacing + spacing * 0.5;
+
+      const flowA = smoothNoise2D(
+        (x + flowOffsetX) * flowScale,
+        (y + flowOffsetY) * flowScale,
+      );
+      const flowB = smoothNoise2D(
+        (x + flowOffsetX2) * flowScale,
+        (y + flowOffsetY2) * flowScale,
+      );
+      const flowAngle = flowA * Math.PI * 4 + flowB * Math.PI * 2;
+      const flowMagnitude = flowStrength * (0.45 + flowB * 0.8);
+
+      x += Math.cos(flowAngle) * flowMagnitude;
+      y += Math.sin(flowAngle) * flowMagnitude;
+
+      const twistX =
+        (smoothNoise2D(
+          (x + twistOffsetX) * twistScale,
+          (y + twistOffsetY) * twistScale,
+        ) -
+          0.5) *
+        2 *
+        twistStrength;
+      const twistY =
+        (smoothNoise2D(
+          (x + twistOffsetX2) * twistScale,
+          (y + twistOffsetY2) * twistScale,
+        ) -
+          0.5) *
+        2 *
+        twistStrength;
+      const microAngle =
+        smoothNoise2D(
+          (x + microOffsetX) * microScale,
+          (y + microOffsetY) * microScale,
+        ) *
+        Math.PI *
+        4;
+      const microMagnitude =
+        microTwistStrength *
+        (0.35 +
+          smoothNoise2D(
+            (x + microOffsetX2) * microScale,
+            (y + microOffsetY2) * microScale,
+          ) *
+            0.9);
+      const axisBias = (flowB - 0.5) * spacing * 0.22;
+
+      x += twistX + Math.cos(microAngle) * microMagnitude + axisBias;
+      y += twistY + Math.sin(microAngle) * microMagnitude - axisBias * 0.85;
+
       const jitterAngle = Math.random() * Math.PI * 2;
       const jitterScale = Math.random() * jitterDistance;
 
@@ -143,7 +244,11 @@ function createSeeds(
     }
   }
 
-  return seeds;
+  return {
+    seeds,
+    columnCount,
+    rowCount,
+  };
 }
 
 function resolveStyles(
@@ -179,16 +284,26 @@ function buildAnimatedPoints(
   seeds: KusamaSeed[],
   params: KusamaParams,
   pointer: PointerState,
+  timeMs: number,
   width: number,
   height: number,
 ): [number, number][] {
   const points: [number, number][] = [];
   const radius = Math.max(24, params.rippleRadius);
   const radiusSq = radius * radius;
+  const driftAmount = Math.max(0, params.driftAmount);
+  const driftTime = timeMs * Math.max(0, params.driftSpeed);
 
   for (const seed of seeds) {
-    let x = seed.anchorX;
-    let y = seed.anchorY;
+    const driftScale = driftAmount * seed.ampScale;
+    let x =
+      seed.anchorX +
+      Math.sin(driftTime * seed.freqX + seed.phaseX) * driftScale +
+      Math.cos(driftTime * seed.freqY + seed.phaseY) * driftScale * 0.25;
+    let y =
+      seed.anchorY +
+      Math.cos(driftTime * seed.freqY + seed.phaseY) * driftScale +
+      Math.sin(driftTime * seed.freqX + seed.phaseX) * driftScale * 0.25;
 
     if (pointer.intensity > 0) {
       const dx = x - pointer.x;
@@ -210,75 +325,102 @@ function buildAnimatedPoints(
       }
     }
 
-    points.push([clamp(x, -12, width + 12), clamp(y, -12, height + 12)]);
+    points.push([clamp(x, -18, width + 18), clamp(y, -18, height + 18)]);
   }
 
   return points;
 }
 
-function getVoronoiEdges(voronoi: any, width: number, height: number): Edge[] {
-  const map = new Map<string, Edge>();
-  const epsilon = 0.75;
+function getQuadMeshEdges(
+  points: [number, number][],
+  columnCount: number,
+  rowCount: number,
+  width: number,
+  height: number,
+): Edge[] {
+  if (columnCount < 2 || rowCount < 2 || points.length < columnCount * rowCount) {
+    return [];
+  }
 
-  for (const polygon of voronoi.cellPolygons()) {
-    const points = Array.from(polygon as Iterable<[number, number]>);
-    if (points.length < 2) {
-      continue;
-    }
+  const edges: Edge[] = [];
+  const viewportMargin = 24;
 
-    for (let i = 0; i < points.length - 1; i += 1) {
-      const [ax, ay] = points[i];
-      const [bx, by] = points[i + 1];
-      if (
-        !Number.isFinite(ax) ||
-        !Number.isFinite(ay) ||
-        !Number.isFinite(bx) ||
-        !Number.isFinite(by)
-      ) {
-        continue;
+  const isVisible = (ax: number, ay: number, bx: number, by: number) => {
+    const beyondLeft = ax < -viewportMargin && bx < -viewportMargin;
+    const beyondRight = ax > width + viewportMargin && bx > width + viewportMargin;
+    const beyondTop = ay < -viewportMargin && by < -viewportMargin;
+    const beyondBottom = ay > height + viewportMargin && by > height + viewportMargin;
+    return !(beyondLeft || beyondRight || beyondTop || beyondBottom);
+  };
+
+  for (let row = 0; row < rowCount; row += 1) {
+    for (let column = 0; column < columnCount; column += 1) {
+      const index = row * columnCount + column;
+      const [ax, ay] = points[index];
+
+      if (column < columnCount - 1) {
+        const [bx, by] = points[index + 1];
+        if (isVisible(ax, ay, bx, by) && Math.hypot(bx - ax, by - ay) >= 1) {
+          edges.push({ ax, ay, bx, by });
+        }
       }
 
-      if (Math.hypot(bx - ax, by - ay) < 1) {
-        continue;
-      }
-
-      const onLeft = Math.abs(ax) <= epsilon && Math.abs(bx) <= epsilon;
-      const onRight =
-        Math.abs(ax - width) <= epsilon && Math.abs(bx - width) <= epsilon;
-      const onTop = Math.abs(ay) <= epsilon && Math.abs(by) <= epsilon;
-      const onBottom =
-        Math.abs(ay - height) <= epsilon && Math.abs(by - height) <= epsilon;
-      if (onLeft || onRight || onTop || onBottom) {
-        continue;
-      }
-
-      const key = edgeKey(ax, ay, bx, by);
-      if (!map.has(key)) {
-        map.set(key, { ax, ay, bx, by, key });
+      if (row < rowCount - 1) {
+        const [bx, by] = points[index + columnCount];
+        if (isVisible(ax, ay, bx, by) && Math.hypot(bx - ax, by - ay) >= 1) {
+          edges.push({ ax, ay, bx, by });
+        }
       }
     }
   }
 
-  return [...map.values()];
+  return edges;
 }
 
-function renderStraightEdges(
+function renderOrganicEdges(
   context: CanvasRenderingContext2D,
   edges: Edge[],
   styles: ResolvedStyles,
+  params: KusamaParams,
 ) {
   context.save();
   context.globalAlpha = styles.opacity;
   context.beginPath();
+  const curvature = clamp(params.edgeCurvature, 0, 1.5);
+  const shouldRenderStraight = curvature < 0.045;
 
   for (const edge of edges) {
+    const dx = edge.bx - edge.ax;
+    const dy = edge.by - edge.ay;
+    const length = Math.hypot(dx, dy);
+    if (length < 1) {
+      continue;
+    }
+
+    const nx = -dy / length;
+    const ny = dx / length;
+    const wave = Math.sin(
+      edge.ax * 0.031 +
+        edge.ay * 0.017 +
+        edge.bx * 0.027 +
+        edge.by * 0.021,
+    );
+    const maxOffset = Math.min(length * 0.14, 5.5) * curvature;
+    const offset = wave * maxOffset;
+    const controlX = (edge.ax + edge.bx) * 0.5 + nx * offset;
+    const controlY = (edge.ay + edge.by) * 0.5 + ny * offset;
+
     context.moveTo(edge.ax, edge.ay);
-    context.lineTo(edge.bx, edge.by);
+    if (shouldRenderStraight) {
+      context.lineTo(edge.bx, edge.by);
+    } else {
+      context.quadraticCurveTo(controlX, controlY, edge.bx, edge.by);
+    }
   }
 
   context.lineWidth = styles.lineWidth;
-  context.lineCap = 'butt';
-  context.lineJoin = 'miter';
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
   context.strokeStyle = styles.lineColor;
   context.stroke();
   context.restore();
@@ -292,6 +434,8 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
 
   return (instance: p5) => {
     let seeds: KusamaSeed[] = [];
+    let seedColumnCount = 0;
+    let seedRowCount = 0;
     let styles = resolveStyles(options.host, settings);
     let lastViewportWidth = 0;
     let lastViewportHeight = 0;
@@ -309,6 +453,8 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     };
     const teardownFns: Array<() => void> = [];
     let parallaxEnabled = false;
+    let activationStartedAtMs = 0;
+    let hasAppliedNormalDensity = false;
 
     const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
     const getOrientation = (width: number, height: number) =>
@@ -349,11 +495,26 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       retargetParallaxTween(parallax.tweenY, 0, nowMs);
     };
 
-    const setupSeeds = () => {
+    const getCurrentDensityMultiplier = (nowMs: number) =>
+      nowMs - activationStartedAtMs < KUSAMA_INITIAL_DENSE_DURATION_MS
+        ? KUSAMA_INITIAL_DENSE_CELL_MULTIPLIER
+        : 1;
+
+    const setupSeeds = (densityMultiplier = 1) => {
       const resolvedSettings = isNarrowViewport()
         ? { ...settings, cellSize: MOBILE_KUSAMA_CELL_SIZE }
         : settings;
-      seeds = createSeeds(instance.width, instance.height, resolvedSettings);
+      const resolvedCellSize = getCellSizeForDensity(
+        resolvedSettings.cellSize,
+        densityMultiplier,
+      );
+      const seedGrid = createSeeds(instance.width, instance.height, {
+        ...resolvedSettings,
+        cellSize: resolvedCellSize,
+      });
+      seeds = seedGrid.seeds;
+      seedColumnCount = seedGrid.columnCount;
+      seedRowCount = seedGrid.rowCount;
     };
 
     const updatePointer = (x: number, y: number, boost: number) => {
@@ -388,7 +549,9 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
 
       instance.pixelDensity(1);
       instance.frameRate(30);
-      setupSeeds();
+      activationStartedAtMs = performance.now();
+      hasAppliedNormalDensity = false;
+      setupSeeds(KUSAMA_INITIAL_DENSE_CELL_MULTIPLIER);
       lastViewportWidth = instance.windowWidth;
       lastViewportHeight = instance.windowHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
@@ -453,6 +616,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       instance.background(styles.backgroundColor);
 
       const nowMs = performance.now();
+      const densityMultiplier = getCurrentDensityMultiplier(nowMs);
+      if (densityMultiplier === 1 && !hasAppliedNormalDensity) {
+        setupSeeds(1);
+        hasAppliedNormalDensity = true;
+      }
       const pointerX = parallaxEnabled
         ? sampleParallaxTween(parallax.tweenX, nowMs)
         : 0;
@@ -478,19 +646,19 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         seeds,
         settings,
         ripplePointer,
+        nowMs,
         instance.width,
         instance.height,
       );
 
       if (points.length >= 3) {
-        const delaunay = Delaunay.from(points);
-        const voronoi = delaunay.voronoi([
-          0,
-          0,
+        const edges = getQuadMeshEdges(
+          points,
+          seedColumnCount,
+          seedRowCount,
           instance.width,
           instance.height,
-        ]);
-        const edges = getVoronoiEdges(voronoi, instance.width, instance.height);
+        );
         const context = instance.drawingContext as CanvasRenderingContext2D;
         context.save();
         context.translate(
@@ -500,7 +668,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         context.rotate(meshRotate);
         context.scale(meshScale, meshScale);
         context.translate(-instance.width * 0.5, -instance.height * 0.5);
-        renderStraightEdges(context, edges, styles);
+        renderOrganicEdges(context, edges, styles, settings);
         context.restore();
       }
 
@@ -532,7 +700,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       }
 
       instance.resizeCanvas(nextWidth, nextHeight);
-      setupSeeds();
+      const densityMultiplier = getCurrentDensityMultiplier(performance.now());
+      setupSeeds(densityMultiplier);
+      if (densityMultiplier === 1) {
+        hasAppliedNormalDensity = true;
+      }
       lastViewportWidth = nextWidth;
       lastViewportHeight = nextHeight;
       lastOrientation = nextOrientation;
