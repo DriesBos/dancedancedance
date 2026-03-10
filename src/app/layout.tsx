@@ -18,7 +18,7 @@ import ActionButton, {
   ActionBlock,
   ActionButtonContainer,
 } from '@/components/ActionButton';
-import BlokFooterWrapper from '@/components/BlokFooterWrapper';
+import BlokFooter from '@/components/BlokFooter';
 import ThemeFilter from '@/components/ThemeFilter';
 import TitleSwitcher from '@/components/TitleSwitcher';
 import FaviconSwitcher from '@/components/FaviconSwitcher';
@@ -143,11 +143,11 @@ export default async function RootLayout({
             <ThemeFilter />
             <OuterNavigation />
             <OuterTheming />
-            <main className="main">
+            <main id="page-top" className="main">
               <BlokHeadWrapper />
               {children}
               <BlokAction />
-              <BlokFooterWrapper />
+              <BlokFooter />
             </main>
             <ActionButtonContainer>
               {/* <ActionBlock variant="square" />*/}

@@ -1,51 +1,30 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Row from '@/components/Row';
-import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import IconExternal from '@/components/Icons/IconExternal';
 import Newsletter from '@/components/Newsletter/Newsletter';
 import IconArrowHead from '@/components/Icons/IconArrowHead';
 import GrainyGradient from '@/components/GrainyGradient';
-import { useStore } from '@/store/store';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import styles from './BlokFooter.module.sass';
 
 const BlokFooter = () => {
-  const theme = useStore((state) => state.theme);
-  const layout = useStore((state) => state.layout);
-  const cycleTheme = useStore((state) => state.cycleTheme);
-  const setTwoD = useStore((state) => state.setTwoD);
-  const setThreeD = useStore((state) => state.setThreeD);
-
-  const ScrollToTop = () => {
-    try {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-    } catch {
-      window.scrollTo(0, 0);
-    }
-  };
   return (
     <div className={`blok blok-Footer blok-Animate ${styles.blokFooter}`}>
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row>
         <div className={styles.footerColumnLeft}>
-          <div className={`column column-FooterColumn`}>
+          <div className={`column column-FooterColumn ${styles.leftside}`}>
             <Link href="/" className="cursorInteract linkAnimation">
-              work
+              Work
             </Link>
             <Link href="/about" className="cursorInteract linkAnimation">
-              about
+              About
             </Link>
         </div>
         </div>
         <div className={styles.footerColumnRight}>
-        <div className={`column column-FooterColumn ${styles.footerColumn}`}>
+        <div className={`column column-FooterColumn ${styles.footerColumn} ${styles.rightside}`}>
           <a
             href="mailto:info@driesbos.com?subject=Let's Make Internet"
             target="_blank"
@@ -53,8 +32,8 @@ const BlokFooter = () => {
             data-cursor-message="Let's talk"
           >
             <div className="hasExternalIcon">
-              <span className="mailMobile">email</span>
-              <span className="mailDesktop">info@driesbos.com</span>
+              <span className="mailMobile">Email</span>
+              <span className="mailDesktop">Info@driesbos.com</span>
               <IconExternal />
             </div>
           </a>
@@ -63,7 +42,7 @@ const BlokFooter = () => {
             target="blank"
             className="cursorInteract linkAnimation hasExternalIcon"
           >
-            instagram
+            Instagram
             <IconExternal />
           </a>
           <a
@@ -71,7 +50,7 @@ const BlokFooter = () => {
             target="blank"
             className="cursorInteract linkAnimation hasExternalIcon"
           >
-            linkedin
+            LinkedIn
             <IconExternal />
           </a>
           <div className={`column-Subscribe ${styles.newsletter}`}>
@@ -79,13 +58,14 @@ const BlokFooter = () => {
           </div>
         </div>
         <div className={`column column-Icons ${styles.footerIcons}`}>
-          <div
-            onClick={ScrollToTop}
+          <a
+            href="#page-top"
             className={`icon icon-High icon-Footer cursorMagnetic ${styles.footerIcon}`}
+            aria-label="Scroll to top"
           >
             <div className="iconLine" />
             <IconArrowHead />
-          </div>
+          </a>
         </div>
         </div>
       </Row>

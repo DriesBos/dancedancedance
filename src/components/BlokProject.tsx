@@ -62,24 +62,28 @@ const BlokProject = ({
       <GrainyGradient variant="blok" />
       <Row>
         <GrainyGradient variant="blok" className="grainyInRow" />
-        {displayYear && <div className="column column-Year">{displayYear}</div>}
-        {title && <div className="column column-Project">{title}</div>}
-        {category && (
-          <div className="column column-Category">{category.join(', ')}</div>
-        )}
-        <div className="column column-Icons">
-          <a
-            className="icon icon-ExternalLink cursorMagnetic"
-            href={external_link?.cached_url ? external_link.cached_url : '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            data-active={external_link?.cached_url ? true : false}
-          >
-            <IconLinkOutside />
-          </a>
-          <div className="icon cursorMagnetic">
-            <IconArrow />
+        <div className="column column-Left">
+          {displayYear && <div className="column column-Year">{displayYear}</div>}
+          {title && <div className="column column-Project">{title}</div>}
+        </div>
+        <div className="column column-Right">
+          {category && (
+            <div className="column column-Category">{category.join(', ')}</div>
+          )}
+          <div className="column column-Icons">
+            <a
+              className="icon icon-ExternalLink cursorMagnetic"
+              href={external_link?.cached_url ? external_link.cached_url : '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              data-active={external_link?.cached_url ? true : false}
+            >
+              <IconLinkOutside />
+            </a>
+            <div className="icon cursorMagnetic">
+              <IconArrow />
+            </div>
           </div>
         </div>
       </Row>

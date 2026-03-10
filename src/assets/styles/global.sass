@@ -575,6 +575,11 @@ mux-player, .muxPlayer
     transition: transform 0.5s
     border-top: var(--border-width) solid var(--border-color) !important
     background: var(--theme-blok)
+    .column-Left, .column-Right
+      width: 50%
+      padding: 0 !important
+      display: flex
+      min-width: 0
     .column-Icons
       & > div:first-child
         opacity: 0
@@ -583,6 +588,8 @@ mux-player, .muxPlayer
       @media (hover: hover)
         .icon:last-child:hover svg
           transform: translateX(2px)
+    .column-Category
+      padding-left: calc(var(--spacing-base) / 2) !important
     .row
       position: relative
       overflow: hidden
@@ -594,8 +601,12 @@ mux-player, .muxPlayer
         position: relative
         z-index: 1
     @media (max-width: 770px)
-      .column:nth-child(n+4):not(.column-Icons)
-        display: none
+      .column-Left
+        width: auto
+        flex: 1 1 auto
+      .column-Right
+        width: auto
+        flex: 0 0 auto
   &-Portrait
     background: var(--theme-blok)
     .grainyGradient
