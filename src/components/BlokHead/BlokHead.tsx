@@ -836,19 +836,12 @@ const BlokHead = ({}: Props) => {
                 title={`Layout: ${layoutLabel}`}
               >
                 <span className={styles.layoutIconWrap}>
-                  <span
-                    className={styles.layoutIcon}
-                    data-active={layout === 'DESKTOP'}
-                    aria-hidden={layout !== 'DESKTOP'}
-                  >
-                    <IconSmallScreen />
-                  </span>
+
                   <span
                     className={styles.layoutIcon}
                     data-active={layout !== 'DESKTOP'}
-                    aria-hidden={layout === 'DESKTOP'}
                   >
-                    <IconFullscreen />
+                    <IconFullscreen active={layout !== 'DESKTOP'} />
                   </span>
                 </span>
               </button>
@@ -872,7 +865,7 @@ const BlokHead = ({}: Props) => {
           {pathName === 'about' && (
             <>
               <div
-                className="icon cursorMessage"
+                className="icon cursorMessage desktop"
                 data-cursor-message="Let's talk"
               >
                 <Link href="mailto:info@driesbos.com?subject=Let's Make Internet">

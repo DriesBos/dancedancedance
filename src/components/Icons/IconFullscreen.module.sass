@@ -1,0 +1,47 @@
+.iconFullscreen
+  --arrow-rotation: 0deg
+  overflow: visible
+
+  .arrow
+    --arrow-offset-x: 0px
+    --arrow-offset-y: 0px
+    transform: translate(var(--arrow-offset-x), var(--arrow-offset-y)) rotate(var(--arrow-rotation))
+    transform-box: fill-box
+    transform-origin: center
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)
+    will-change: transform
+    overflow: visible
+
+  &[data-active='false']
+    --arrow-rotation: 180deg
+
+  @media (hover: hover)
+    &:hover
+      .arrow
+        &:nth-of-type(1)
+          --arrow-offset-x: -1px
+          --arrow-offset-y: -1px
+        &:nth-of-type(2)
+          --arrow-offset-x: 1px
+          --arrow-offset-y: -1px
+        &:nth-of-type(3)
+          --arrow-offset-x: -1px
+          --arrow-offset-y: 1px
+        &:nth-of-type(4)
+          --arrow-offset-x: 1px
+          --arrow-offset-y: 1px
+
+    :global(.icon:hover) &
+      .arrow
+        &:nth-of-type(1)
+          --arrow-offset-x: -1px
+          --arrow-offset-y: -1px
+        &:nth-of-type(2)
+          --arrow-offset-x: 1px
+          --arrow-offset-y: -1px
+        &:nth-of-type(3)
+          --arrow-offset-x: -1px
+          --arrow-offset-y: 1px
+        &:nth-of-type(4)
+          --arrow-offset-x: 1px
+          --arrow-offset-y: 1px
