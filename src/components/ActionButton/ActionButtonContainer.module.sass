@@ -27,3 +27,8 @@
 .actionButtonContainer[data-settled='true']
   .physicsItem
     pointer-events: auto
+
+:global(body[data-theme='SKY']) .physicsItem
+  background: hsla(0, 0%, 100%, 0.5)
+  backdrop-filter: blur(var(--backdrop-filter))
+  -webkit-backdrop-filter: blur(var(--backdrop-filter))

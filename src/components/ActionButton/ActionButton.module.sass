@@ -2,7 +2,6 @@
   display: flex
   align-items: center
   position: relative
-  z-index: 0
   isolation: isolate
   overflow: hidden
   gap: .5rem
@@ -32,14 +31,4 @@
   transition: color var(--transition-theme)
 
 :global(body[data-theme='SKY']) .actionButton
-  isolation: auto
   background: transparent
-
-:global(body[data-theme='SKY']) .actionButton::before
-  content: ''
-  position: absolute
-  inset: 0
-  background: hsla(0, 0%, 100%, 0.33)
-  backdrop-filter: blur(var(--backdrop-filter))
-  -webkit-backdrop-filter: blur(var(--backdrop-filter))
-  pointer-events: none

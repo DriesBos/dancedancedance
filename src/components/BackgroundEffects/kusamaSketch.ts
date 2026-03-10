@@ -41,8 +41,11 @@ const KUSAMA_PARALLAX_TUNING = {
   maxRotateRadians: 0,
   baseScale: 1,
 };
-const KUSAMA_INITIAL_DENSE_DURATION_MS = 2000;
-const KUSAMA_INITIAL_DENSE_CELL_MULTIPLIER = 1.1;
+const KUSAMA_GENERATION_DURATION_MS = 3000;
+const KUSAMA_GENERATION_START_DENSITY = 1;
+const KUSAMA_GENERATION_END_DENSITY = 1.08;
+const KUSAMA_GENERATION_ADDITION_COUNT = 6;
+const KUSAMA_GENERATION_ADDITION_RADIUS_MULTIPLIER = 1.28;
 
 type KusamaSketchOptions = {
   host: HTMLDivElement;
@@ -93,6 +96,13 @@ type Edge = {
   by: number;
 };
 
+type CellAdditionEvent = {
+  activateAtMs: number;
+  x: number;
+  y: number;
+  radius: number;
+};
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -141,6 +151,72 @@ function getKusamaParallaxScale(viewportWidth: number): number {
     KUSAMA_PARALLAX_MIN_SCALE,
     KUSAMA_PARALLAX_MAX_SCALE,
   );
+}
+
+function getEdgeRevealRank(
+  row: number,
+  column: number,
+  orientation: 'horizontal' | 'vertical',
+): number {
+  const orientationOffset = orientation === 'horizontal' ? 0.17 : 0.63;
+  const noise = smoothNoise2D(
+    (column + orientationOffset) * 0.235,
+    (row + orientationOffset) * 0.235,
+  );
+  const parityBias = ((row & 1) + (column & 1)) * 0.07;
+  return clamp01(noise * 0.86 + parityBias);
+}
+
+function pickCoordinateWithin(size: number, margin: number): number {
+  const min = margin;
+  const max = size - margin;
+  if (max <= min) {
+    return size * 0.5;
+  }
+  return min + Math.random() * (max - min);
+}
+
+function createCellAdditionEvents(
+  width: number,
+  height: number,
+  startAtMs: number,
+  cellSize: number,
+): CellAdditionEvent[] {
+  const events: CellAdditionEvent[] = [];
+  const count = KUSAMA_GENERATION_ADDITION_COUNT;
+  const margin = Math.max(24, cellSize * 1.6);
+  const minDistance = cellSize * 2.25;
+
+  for (let index = 0; index < count; index += 1) {
+    const progress =
+      (index + 1) / (count + 1) + (Math.random() * 2 - 1) * 0.08;
+    const clampedProgress = clamp01(progress);
+
+    let x = width * 0.5;
+    let y = height * 0.5;
+    let attempts = 0;
+    do {
+      x = pickCoordinateWithin(width, margin);
+      y = pickCoordinateWithin(height, margin);
+      attempts += 1;
+    } while (
+      attempts < 28 &&
+      events.some((event) => Math.hypot(event.x - x, event.y - y) < minDistance)
+    );
+
+    events.push({
+      activateAtMs: startAtMs + clampedProgress * KUSAMA_GENERATION_DURATION_MS,
+      x,
+      y,
+      radius:
+        cellSize *
+        KUSAMA_GENERATION_ADDITION_RADIUS_MULTIPLIER *
+        (0.86 + Math.random() * 0.28),
+    });
+  }
+
+  events.sort((a, b) => a.activateAtMs - b.activateAtMs);
+  return events;
 }
 
 function createSeeds(
@@ -337,6 +413,8 @@ function getQuadMeshEdges(
   rowCount: number,
   width: number,
   height: number,
+  baseRevealFraction: number,
+  additions: CellAdditionEvent[],
 ): Edge[] {
   if (columnCount < 2 || rowCount < 2 || points.length < columnCount * rowCount) {
     return [];
@@ -344,6 +422,7 @@ function getQuadMeshEdges(
 
   const edges: Edge[] = [];
   const viewportMargin = 24;
+  const revealThreshold = clamp01(baseRevealFraction);
 
   const isVisible = (ax: number, ay: number, bx: number, by: number) => {
     const beyondLeft = ax < -viewportMargin && bx < -viewportMargin;
@@ -360,14 +439,44 @@ function getQuadMeshEdges(
 
       if (column < columnCount - 1) {
         const [bx, by] = points[index + 1];
-        if (isVisible(ax, ay, bx, by) && Math.hypot(bx - ax, by - ay) >= 1) {
+        const midpointX = (ax + bx) * 0.5;
+        const midpointY = (ay + by) * 0.5;
+        const edgeVisibleByBase =
+          getEdgeRevealRank(row, column, 'horizontal') <= revealThreshold;
+        const edgeVisibleByAddition =
+          !edgeVisibleByBase &&
+          additions.some((event) => {
+            const dx = midpointX - event.x;
+            const dy = midpointY - event.y;
+            return dx * dx + dy * dy <= event.radius * event.radius;
+          });
+        if (
+          isVisible(ax, ay, bx, by) &&
+          Math.hypot(bx - ax, by - ay) >= 1 &&
+          (edgeVisibleByBase || edgeVisibleByAddition)
+        ) {
           edges.push({ ax, ay, bx, by });
         }
       }
 
       if (row < rowCount - 1) {
         const [bx, by] = points[index + columnCount];
-        if (isVisible(ax, ay, bx, by) && Math.hypot(bx - ax, by - ay) >= 1) {
+        const midpointX = (ax + bx) * 0.5;
+        const midpointY = (ay + by) * 0.5;
+        const edgeVisibleByBase =
+          getEdgeRevealRank(row, column, 'vertical') <= revealThreshold;
+        const edgeVisibleByAddition =
+          !edgeVisibleByBase &&
+          additions.some((event) => {
+            const dx = midpointX - event.x;
+            const dy = midpointY - event.y;
+            return dx * dx + dy * dy <= event.radius * event.radius;
+          });
+        if (
+          isVisible(ax, ay, bx, by) &&
+          Math.hypot(bx - ax, by - ay) >= 1 &&
+          (edgeVisibleByBase || edgeVisibleByAddition)
+        ) {
           edges.push({ ax, ay, bx, by });
         }
       }
@@ -454,7 +563,8 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     const teardownFns: Array<() => void> = [];
     let parallaxEnabled = false;
     let activationStartedAtMs = 0;
-    let hasAppliedNormalDensity = false;
+    let resolvedSceneCellSize = settings.cellSize;
+    let cellAdditionEvents: CellAdditionEvent[] = [];
 
     const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
     const getOrientation = (width: number, height: number) =>
@@ -495,10 +605,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       retargetParallaxTween(parallax.tweenY, 0, nowMs);
     };
 
-    const getCurrentDensityMultiplier = (nowMs: number) =>
-      nowMs - activationStartedAtMs < KUSAMA_INITIAL_DENSE_DURATION_MS
-        ? KUSAMA_INITIAL_DENSE_CELL_MULTIPLIER
-        : 1;
+    const getEdgeBaseRevealFraction = () =>
+      clamp01(KUSAMA_GENERATION_START_DENSITY / KUSAMA_GENERATION_END_DENSITY);
+
+    const getActiveAdditionEvents = (nowMs: number) =>
+      cellAdditionEvents.filter((event) => nowMs >= event.activateAtMs);
 
     const setupSeeds = (densityMultiplier = 1) => {
       const resolvedSettings = isNarrowViewport()
@@ -515,6 +626,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       seeds = seedGrid.seeds;
       seedColumnCount = seedGrid.columnCount;
       seedRowCount = seedGrid.rowCount;
+      resolvedSceneCellSize = resolvedCellSize;
     };
 
     const updatePointer = (x: number, y: number, boost: number) => {
@@ -550,8 +662,13 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       instance.pixelDensity(1);
       instance.frameRate(30);
       activationStartedAtMs = performance.now();
-      hasAppliedNormalDensity = false;
-      setupSeeds(KUSAMA_INITIAL_DENSE_CELL_MULTIPLIER);
+      setupSeeds(KUSAMA_GENERATION_END_DENSITY);
+      cellAdditionEvents = createCellAdditionEvents(
+        instance.width,
+        instance.height,
+        activationStartedAtMs,
+        resolvedSceneCellSize,
+      );
       lastViewportWidth = instance.windowWidth;
       lastViewportHeight = instance.windowHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
@@ -616,11 +733,8 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       instance.background(styles.backgroundColor);
 
       const nowMs = performance.now();
-      const densityMultiplier = getCurrentDensityMultiplier(nowMs);
-      if (densityMultiplier === 1 && !hasAppliedNormalDensity) {
-        setupSeeds(1);
-        hasAppliedNormalDensity = true;
-      }
+      const edgeBaseRevealFraction = getEdgeBaseRevealFraction();
+      const activeAdditionEvents = getActiveAdditionEvents(nowMs);
       const pointerX = parallaxEnabled
         ? sampleParallaxTween(parallax.tweenX, nowMs)
         : 0;
@@ -658,6 +772,8 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
           seedRowCount,
           instance.width,
           instance.height,
+          edgeBaseRevealFraction,
+          activeAdditionEvents,
         );
         const context = instance.drawingContext as CanvasRenderingContext2D;
         context.save();
@@ -700,11 +816,13 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       }
 
       instance.resizeCanvas(nextWidth, nextHeight);
-      const densityMultiplier = getCurrentDensityMultiplier(performance.now());
-      setupSeeds(densityMultiplier);
-      if (densityMultiplier === 1) {
-        hasAppliedNormalDensity = true;
-      }
+      setupSeeds(KUSAMA_GENERATION_END_DENSITY);
+      cellAdditionEvents = createCellAdditionEvents(
+        nextWidth,
+        nextHeight,
+        activationStartedAtMs,
+        resolvedSceneCellSize,
+      );
       lastViewportWidth = nextWidth;
       lastViewportHeight = nextHeight;
       lastOrientation = nextOrientation;
