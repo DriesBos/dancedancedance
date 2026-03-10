@@ -73,6 +73,11 @@
   width: calc(var(--icon-size) / 2)
   height: calc(var(--icon-size) / 2)
   transform: translate(75%, 50%)
+  transition: transform .165s ease-out
+
+@media (hover: hover)
+  .hasExternalIcon:hover > svg
+    transform: translate(calc(75% + 1px), calc(50% - 2px))
 
 .linkAnimation
   --var: 0%

@@ -821,7 +821,7 @@ const BlokHead = ({}: Props) => {
                 className={`icon cursorMagnetic ${styles.themeButton}`}
                 onClick={handleCycleTheme}
                 aria-label={`Cycle theme. Current theme: ${themeLabel}`}
-                title={`${themeLabel} mode`}
+                title={`${themeLabel} theme`}
               >
                 <span
                   className={`${styles.themeCycle} ${
@@ -833,7 +833,7 @@ const BlokHead = ({}: Props) => {
                 type="button"
                 className={`icon cursorMagnetic ${styles.layoutButton}`}
                 onClick={toggleLayout}
-                title={`Layout: ${layoutLabel}`}
+                title={`${layoutLabel} layout`}
               >
                 <span className={styles.layoutIconWrap}>
 

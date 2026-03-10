@@ -43,7 +43,7 @@ const OuterTheming = () => {
           aria-label={`Cycle theme. Current theme: ${themeLabel}`}
           title={`${themeLabel} mode`}
         >
-          <span>{themeLabel} MODE</span>
+          <span>{themeLabel} THEME</span>
         </button>
       </div>
     </div>

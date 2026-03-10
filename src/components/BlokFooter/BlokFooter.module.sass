@@ -1,0 +1,30 @@
+.blokFooter
+  transition: margin-top var(--transition-theme)
+
+.footerColumn
+  :global(.mailDesktop)
+    display: inline
+    @media (max-width: 450px)
+      display: none
+  :global(.mailMobile)
+    display: none
+    @media (max-width: 450px)
+      display: inline
+
+.footerIcon
+  height: calc(100% - var(--spacing-base) * 2)
+
+.footerColumnLeft, .footerColumnRight
+  width: 50%
+  padding: 0 !important
+
+.footerColumnRight
+  display: flex
+
+.sitemap
+  display: flex
+  flex-direction: row
+  gap: var(--spacing-side)
+
+.newsletter
+  text-transform: lowercase

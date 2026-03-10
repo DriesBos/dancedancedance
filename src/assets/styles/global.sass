@@ -344,18 +344,8 @@ mux-player, .muxPlayer
         display: flex
         flex-direction: column
         align-items: flex-start
-        gap: var(--spacing-half)
-        & .mailDesktop
-          display: inline
-          @media (max-width: 450px)
-            display: none
-        & .mailMobile
-          display: none
-          @media (max-width: 450px)
-            display: inline
-      // &-Sitemap
-      //   @media (max-width: 770px)
-      //     display: none
+        gap: calc(var(--spacing-half) / 2) 
+        width: 100%
       &-Text
         --var: 0%
         min-width: 0 // Ellipsis hack
@@ -548,13 +538,13 @@ mux-player, .muxPlayer
       bottom: 0
       .icon
         padding: var(--spacing-base) var(--spacing-icons)
-  &-Footer
-    transition: margin-top var(--transition-theme)
+        svg
+          transition: transform var(--transition-button)
+      @media (hover: hover)
+        .icon:hover svg
+          transform: translateX(2px)
   &-Animate
     opacity: 0
-    .column-Icons
-      & > .icon-Footer
-        height: calc(100% - (var(--spacing-base) * 2))
   &-ProjectList
     position: relative
     padding-top: var(--blok-padding-extraTop)
@@ -588,6 +578,11 @@ mux-player, .muxPlayer
     .column-Icons
       & > div:first-child
         opacity: 0
+      .icon:last-child svg
+        transition: transform var(--transition-button)
+      @media (hover: hover)
+        .icon:last-child:hover svg
+          transform: translateX(2px)
     .row
       position: relative
       overflow: hidden

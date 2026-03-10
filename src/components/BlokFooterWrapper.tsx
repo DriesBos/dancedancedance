@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import BlokFooter from '@/components/BlokFooter';
+import BlokFooter from '@/components/BlokFooter/BlokFooter';
 
 export default function BlokFooterWrapper() {
   const pathname = usePathname();
