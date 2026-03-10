@@ -17,6 +17,34 @@ const ROTATOR_DURATION_MIN_SECONDS = 4;
 const ROTATOR_DURATION_MAX_SECONDS = 6;
 const SWAP_TRANSITION_MS = 200;
 
+const getTerminalPunctuation = (word: string) => {
+  const lastCharacter = word.at(-1);
+  if (lastCharacter === '.' || lastCharacter === ',') {
+    return lastCharacter;
+  }
+
+  return null;
+};
+
+const normalizeTerminalPunctuation = (first: string, second: string) => {
+  const firstPunctuation = getTerminalPunctuation(first);
+  const secondPunctuation = getTerminalPunctuation(second);
+
+  if (!firstPunctuation && !secondPunctuation) {
+    return { first, second };
+  }
+
+  if (firstPunctuation && secondPunctuation) {
+    return { first, second };
+  }
+
+  if (firstPunctuation) {
+    return { first, second: `${second}${firstPunctuation}` };
+  }
+
+  return { first: `${first}${secondPunctuation}`, second };
+};
+
 const hashToUnitInterval = (value: string) => {
   // FNV-1a style hash for stable pseudo-random values across server/client render
   let hash = 2166136261;
@@ -40,7 +68,12 @@ const parseTextSegments = (text: string): TextSegment[] => {
       segments.push({ type: 'text', value: text.slice(cursor, index) });
     }
 
-    segments.push({ type: 'rotator', first: match[1], second: match[2] });
+    const normalizedWords = normalizeTerminalPunctuation(match[1], match[2]);
+    segments.push({
+      type: 'rotator',
+      first: normalizedWords.first,
+      second: normalizedWords.second,
+    });
     cursor = index + match[0].length;
   }
 
