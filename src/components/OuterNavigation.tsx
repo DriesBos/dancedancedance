@@ -18,8 +18,8 @@ const OuterNavigation = () => {
       <Link
         href="/"
         className={`${styles.outerNavigationLink} ${
-          isRouteActive('/') ? styles.isActive : ''
-        } cursorInteract linkAnimation`}
+          isRouteActive('/') ? 'linkHyperAnimation' : 'linkAnimation'
+        } cursorInteract`}
         data-actie={isRouteActive('/')}
       >
         Work
@@ -27,8 +27,8 @@ const OuterNavigation = () => {
       <Link
         href="/about"
         className={`${styles.outerNavigationLink} ${
-          isRouteActive('/about') ? styles.isActive : ''
-        } cursorInteract linkAnimation`}
+          isRouteActive('/about') ? 'linkHyperAnimation' : 'linkAnimation'
+        } cursorInteract`}
         data-actie={isRouteActive('/about')}
       >
         About

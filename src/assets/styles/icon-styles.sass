@@ -79,7 +79,12 @@
   position: relative
   overflow: visible
 
-.linkAnimation::before
+.linkHyperAnimation
+  --var: 100%
+  position: relative
+  overflow: visible
+
+.linkAnimation::before, .linkHyperAnimation::before
   content: ''
   position: absolute
   left: 0
@@ -98,6 +103,12 @@
 .linkAnimation:hover::before
   @media (hover: hover)
     animation: hyperLink .66s ease
+    animation-iteration-count: 1
+    animation-fill-mode: forwards
+
+.linkHyperAnimation:hover::before
+  @media (hover: hover)
+    animation: hyperHyperLink .66s ease
     animation-iteration-count: 1
     animation-fill-mode: forwards
 
