@@ -13,11 +13,12 @@
 - [2026-03-11] Storyblok image `remotePatterns` now constrain assets to `/f/**` with empty search query strings.
 - [2026-03-11] Non-critical layout enhancements now load lazily through client-side dynamic imports.
 - [2026-03-11] Unused runtime packages were removed to reduce install size and lockfile churn.
+- [2026-03-11] CustomCursor now runs a single RAF pointer loop and uses `quickSetter` for lower-cost high-frequency writes.
+- [2026-03-11] CustomCursor now derives hover targets without subtree observers or per-node listener binding.
+- [2026-03-11] CustomCursor preview image preloading is now demand-driven on hover instead of eager page-wide scanning.
 
 ## 2. To Do
 - Storyblok API should cache and refresh the `cv` value from `/cdn/spaces/me` to maximize CDN hit rate.
-- GSAP pointer code should benchmark `quickSetter` for immediate-set branches to cut per-event overhead further.
-- GSAP target discovery should avoid broad `document.querySelectorAll` scans on every mutation.
 - React Three Fiber dots should move to demand-driven rendering with manual `invalidate` where motion is idle.
 - Three.js bird and dots renderers should dynamically scale DPR using real FPS regression signals.
 - p5.js sketches should add adaptive `frameRate` tiers based on device capability and reduced-motion preferences.
