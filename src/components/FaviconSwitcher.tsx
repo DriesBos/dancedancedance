@@ -84,8 +84,6 @@ export default function FaviconSwitcher() {
         return defaultColor;
       case 'KUSAMA':
         return '#BA3A52';
-      case 'SPACE':
-        return defaultColor;
       default:
         return defaultColor;
     }

@@ -22,9 +22,5 @@ export default function BackgroundEffectsByTheme() {
     return <BackgroundEffects version="kusama" />;
   }
 
-  if (theme === 'SPACE') {
-    return <BackgroundEffects version="dots" />;
-  }
-
   return null;
 }

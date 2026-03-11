@@ -8,8 +8,7 @@ export type Theme =
   | 'KERMIT'
   | 'LIGHT'
   | 'SEGMENTS'
-  | 'KUSAMA'
-  | 'SPACE';
+  | 'KUSAMA';
 
 export type Layout = 'DESKTOP' | '3D';
 
@@ -37,7 +36,6 @@ export const THEME_ORDER: Theme[] = [
   'SEGMENTS',
   'LIGHT',
   'KUSAMA',
-  'SPACE',
   'NIGHT',
   'KERMIT',
 ];

@@ -20,14 +20,23 @@ export type KusamaParams = {
 };
 
 export const KUSAMA_DEFAULT_PARAMS: KusamaParams = {
-  cellSize: 48,
-  jitter: 0.4,
+  // Base grid spacing in px. Suggested range: 26-120 (effective minimum is 26).
+  cellSize: 140,
+  // Random seed offset factor per cell. Range: 0-0.62 (0 = rigid grid; values above 0.62 are clamped).
+  jitter: 1,
+  // Pointer interaction radius in px. Suggested range: 24-600 (effective minimum is 24).
   rippleRadius: 250,
-  rippleStrength: 44,
+  // Pointer repulsion force applied within rippleRadius. Suggested range: 0-120.
+  rippleStrength: 120,
+  // Multiplier applied on top of CSS --be-kusama-line-width. Suggested range: 0.25-3.
   lineThickness: 1,
-  opacity: 0.9,
+  // Global line opacity. Range: 0-1 (clamped).
+  opacity: 1,
+  // Amount of idle point drift in px. Suggested range: 0-8.
   driftAmount: 2.4,
-  driftSpeed: 0.00022,
+  // Time scale for drift motion (higher = faster movement). Suggested range: 0-0.002.
+  driftSpeed: 0.0002,
+  // Curvature intensity for edges. Range: 0-1.5 (clamped, 0 = straight lines).
   edgeCurvature: 0.18,
 };
 const MOBILE_KUSAMA_CELL_SIZE = 22;

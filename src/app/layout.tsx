@@ -17,7 +17,6 @@ import ActionButton, {
 } from '@/components/ActionButton';
 import BlokFooter from '@/components/BlokFooter';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
-import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverlayEffectsByTheme';
 import GrainyGradient from '@/components/GrainyGradient';
 import OuterTheming from '@/components/OuterTheming';
 import OuterNavigation from '@/components/OuterNavigation';
@@ -39,7 +38,6 @@ const INITIAL_UI_STATE_SCRIPT = `
       LIGHT: '#E8E7E3',
       SEGMENTS: '#1A1A1A',
       KUSAMA: '#000000',
-      SPACE: '#000000',
     };
     var themeColor =
       theme === 'SKY'
@@ -188,7 +186,6 @@ export default async function RootLayout({
             />
           </ActionButtonContainer>
         </PerformanceTelemetry>
-        <DotsOverlayEffectsByTheme />
       </body>
     </html>
   );

@@ -9,7 +9,6 @@ const THEME_META_COLORS: Record<Theme, string> = {
   LIGHT: '#E8E7E3',
   SEGMENTS: '#1A1A1A',
   KUSAMA: '#000000',
-  SPACE: '#000000',
 };
 
 export const getThemeMetaColor = (theme: Theme): string =>

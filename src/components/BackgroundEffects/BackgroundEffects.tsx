@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import styles from './BackgroundEffects.module.sass';
 
 const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
-const DotsScene = dynamic(() => import('./dotsScene'), { ssr: false });
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
@@ -33,10 +32,8 @@ const isIosSafari = () => {
 };
 
 type BackgroundEffectsProps = {
-  version: 'radiating' | 'segments' | 'kusama' | 'dots' | 'birds';
+  version: 'radiating' | 'segments' | 'kusama' | 'birds';
   densityScale?: number;
-  layer?: 'background' | 'overlay';
-  active?: boolean;
 };
 
 function RadiatingBackground() {
@@ -308,128 +305,6 @@ function KusamaBackground() {
   );
 }
 
-function DotsBackground({
-  densityScale = 1,
-  layer = 'background',
-  active = true,
-}: {
-  densityScale?: number;
-  layer?: 'background' | 'overlay';
-  active?: boolean;
-}) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const scrollProgressRef = useRef(0);
-  const [disableInputEffects, setDisableInputEffects] = useState(false);
-  const [sceneColors, setSceneColors] = useState({
-    background: '#050709',
-    dotColors: ['#ffffff'],
-    dotSize: 0.5,
-  });
-
-  useEffect(() => {
-    const isTouchDevice =
-      window.matchMedia('(hover: none), (pointer: coarse)').matches ||
-      (navigator.maxTouchPoints ?? 0) > 0;
-    setDisableInputEffects(isTouchDevice);
-  }, []);
-
-  useEffect(() => {
-    const host = rootRef.current;
-    if (!host) return;
-
-    const updateColors = () => {
-      const styles = getComputedStyle(host);
-      const background =
-        styles.getPropertyValue('--be-dots-bg-color').trim() ||
-        styles.getPropertyValue('--theme-bg').trim() ||
-        '#050709';
-      const dot =
-        styles.getPropertyValue('--be-dots-dot-color').trim() ||
-        styles.getPropertyValue('--theme-type').trim() ||
-        '#ffffff';
-      setSceneColors((previous) => {
-        if (
-          previous.background === background &&
-          previous.dotColors[0] === dot &&
-          previous.dotSize === 0.5
-        ) {
-          return previous;
-        }
-
-        return {
-          background,
-          dotColors: [dot],
-          dotSize: 0.5,
-        };
-      });
-    };
-
-    updateColors();
-    window.addEventListener('resize', updateColors, { passive: true });
-
-    const observer = new MutationObserver(updateColors);
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-
-    return () => {
-      window.removeEventListener('resize', updateColors);
-      observer.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (disableInputEffects) {
-      scrollProgressRef.current = 0;
-      return;
-    }
-
-    const updateScrollProgress = () => {
-      const root = document.documentElement;
-      const viewportHeight = root.clientHeight;
-      const maxScroll = Math.max(1, root.scrollHeight - viewportHeight);
-      const progress = window.scrollY / maxScroll;
-      scrollProgressRef.current = Math.max(0, Math.min(1, progress));
-    };
-
-    updateScrollProgress();
-
-    window.addEventListener('scroll', updateScrollProgress, { passive: true });
-    window.addEventListener('orientationchange', updateScrollProgress, {
-      passive: true,
-    });
-
-    return () => {
-      window.removeEventListener('scroll', updateScrollProgress);
-      window.removeEventListener('orientationchange', updateScrollProgress);
-    };
-  }, [disableInputEffects]);
-
-  return (
-    <div
-      ref={rootRef}
-      className={`${styles.root} ${styles.dotsRoot} ${
-        layer === 'overlay' ? styles.overlayRoot : ''
-      } ${layer === 'overlay' && active ? styles.overlayVisible : ''}`}
-      data-version="dots"
-      aria-hidden="true"
-    >
-      <DotsScene
-        className={styles.dotsCanvas}
-        backgroundColor={sceneColors.background}
-        dotColors={sceneColors.dotColors}
-        dotSize={sceneColors.dotSize}
-        densityScale={densityScale}
-        drawBackground={layer !== 'overlay'}
-        scrollProgressRef={scrollProgressRef}
-        disableInputs={disableInputEffects}
-        active={active}
-      />
-    </div>
-  );
-}
-
 function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [sceneColors, setSceneColors] = useState({
@@ -501,11 +376,9 @@ function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
 export default function BackgroundEffects({
   version,
   densityScale,
-  layer,
-  active,
 }: BackgroundEffectsProps) {
   useEffect(() => {
-    if (layer === 'overlay' || !isIosSafari()) return;
+    if (!isIosSafari()) return;
 
     const root = document.documentElement;
     const viewport = window.visualViewport;
@@ -548,20 +421,10 @@ export default function BackgroundEffects({
       window.removeEventListener('orientationchange', update);
       window.removeEventListener('pageshow', update);
     };
-  }, [layer]);
+  }, []);
 
   if (version === 'birds') {
     return <BirdsBackground densityScale={densityScale} />;
-  }
-
-  if (version === 'dots') {
-    return (
-      <DotsBackground
-        densityScale={densityScale}
-        layer={layer}
-        active={active}
-      />
-    );
   }
 
   if (version === 'kusama') {

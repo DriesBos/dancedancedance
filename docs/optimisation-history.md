@@ -35,5 +35,6 @@
 - [2026-03-11] App Router error handling boundaries are in place with `error.tsx`, `global-error.tsx`, and `not-found.tsx`.
 - [2026-03-11] Three.js `birds` and R3F `dots` now adapt DPR with FPS-regression tracking to lower pixel ratio under sustained slow frames and recover when performance stabilizes.
 - [2026-03-11] Linting moved from deprecated `next lint` to ESLint CLI with a GitHub Actions workflow running `pnpm lint` on pushes and pull requests.
+- [2026-03-11] The `SPACE`/DOTS theme was fully removed, including the R3F dots background and overlay renderer, reducing shipped JS and theme-switch runtime paths.
 
 ## 2. To Do
