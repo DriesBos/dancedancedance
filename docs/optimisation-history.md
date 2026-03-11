@@ -19,7 +19,7 @@
 - [2026-03-11] Root layout no longer wraps the app in `ProjectsProvider`, and `BlokHead` now receives project data directly from the server layout.
 - [2026-03-11] `BlokHead` replaced `react-swipeable` with route-scoped native swipe listeners so project swipe logic only runs when needed.
 - [2026-03-11] `ActionButtonContainer` now waits for near-viewport visibility before loading `matter-js` and starting physics work.
-- [2026-03-11] `StoryblokProvider` now initializes Storyblok client code only in preview/editor contexts instead of every published page load.
+- [2026-03-11] Storyblok Live Preview was fully removed, including preview route, provider bootstrap, and client init code.
 - [2026-03-11] `CursorLoader` is now mounted eagerly while still gate-loading the cursor to fine-pointer devices for faster desktop startup.
 - [2026-03-11] `BlokHead` theme cycler hover now only rotates the icon and no longer applies next-theme color previews.
 
