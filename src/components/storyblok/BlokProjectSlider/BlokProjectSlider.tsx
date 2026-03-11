@@ -2,8 +2,9 @@
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSwipeable } from 'react-swipeable';
 import MuxPlayer from '@/components/MuxPlayer';
 import SliderIndicators from '@/components/SliderIndicators';
@@ -34,6 +35,19 @@ interface SbPageData extends SbBlokData {
 interface BlokProjectSliderProps {
   blok: SbPageData;
 }
+
+const normalizeInternalHref = (href?: string) => {
+  if (!href) return null;
+  if (
+    href.startsWith('http://') ||
+    href.startsWith('https://') ||
+    href.startsWith('mailto:') ||
+    href.startsWith('#')
+  ) {
+    return null;
+  }
+  return href.startsWith('/') ? href : `/${href}`;
+};
 
 // Separate component for each slide item
 interface SlideItemProps {
@@ -156,13 +170,23 @@ const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
 };
 
 const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
+  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [hasCursor, setHasCursor] = useState(false);
   const suppressTapUntilRef = useRef(0);
+  const prefetchedRoutesRef = useRef(new Set<string>());
 
   const currentItem = blok.body?.[activeIndex];
   const currentDuration = currentItem?.duration || 800;
+  const prefetchRoute = useCallback(
+    (href: string | null) => {
+      if (!href || prefetchedRoutesRef.current.has(href)) return;
+      router.prefetch(href);
+      prefetchedRoutesRef.current.add(href);
+    },
+    [router],
+  );
 
   // Detect if device has a cursor (not mobile/tablet)
   useEffect(() => {
@@ -185,9 +209,15 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     return () => clearTimeout(timeout);
   }, [blok.body, activeIndex, currentDuration, isHovering]);
 
+  // Prefetch just the current active route on demand instead of prefetching all links.
+  useEffect(() => {
+    prefetchRoute(normalizeInternalHref(currentItem?.link?.cached_url));
+  }, [currentItem?.link?.cached_url, prefetchRoute]);
+
   // Handle hover zone interaction
   const handleZoneEnter = (index: number) => {
     if (!hasCursor) return;
+    prefetchRoute(normalizeInternalHref(blok.body[index]?.link?.cached_url));
     setIsHovering(true);
     setActiveIndex(index);
   };
@@ -253,9 +283,13 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
       {!hasCursor && currentItem?.link?.cached_url && (
         <Link
           href={currentItem.link.cached_url}
+          prefetch={false}
           className={styles.tapTarget}
           aria-label={`Open project ${String(currentItem.name || '')}`.trim()}
           onClick={handleTapTargetClick}
+          onMouseEnter={() =>
+            prefetchRoute(normalizeInternalHref(currentItem.link?.cached_url))
+          }
         />
       )}
 
@@ -266,6 +300,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
             <Link
               key={`zone-${item._uid}`}
               href={item.link?.cached_url || '#'}
+              prefetch={false}
               className={`${styles.hoverZone} cursorInteract`}
               style={{ width: `${100 / blok.body.length}%` }}
               onMouseEnter={() => handleZoneEnter(index)}
