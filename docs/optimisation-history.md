@@ -32,7 +32,7 @@
 - [2026-03-11] Storyblok published requests now reuse a cached `/cdn/spaces/me` `cv` and append it across Storyblok SDK and direct Storyblok fetches, with webhook-driven `cv` revalidation.
 - [2026-03-11] React Three Fiber dots now keep `frameloop="demand"` and gate manual `invalidate()` to active scene states so hidden overlays stop motion listeners and idle rendering work.
 - [2026-03-11] p5 `segments` and `kusama` sketches now apply adaptive frame-rate tiers (18/24/30 FPS) from viewport load and device capability.
+- [2026-03-11] App Router error handling boundaries are in place with `error.tsx`, `global-error.tsx`, and `not-found.tsx`.
 
 ## 2. To Do
 - Three.js bird and dots renderers should dynamically scale DPR using real FPS regression signals.
-- Add App Router error handling files (`error.tsx`, `global-error.tsx`, and `not-found.tsx`) so runtime failures and 404s are handled through framework boundaries instead of inline JSX fallbacks.
