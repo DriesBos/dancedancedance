@@ -18,17 +18,13 @@ type DotsSceneProps = {
   className?: string;
   scrollProgressRef: MutableRefObject<number>;
   disableInputs?: boolean;
+  active?: boolean;
 };
 
 type DotParticle = {
   baseX: number;
   baseY: number;
   baseZ: number;
-  driftX: number;
-  driftY: number;
-  driftZ: number;
-  speed: number;
-  phase: number;
 };
 
 const DOTS_PARALLAX_REFERENCE_WIDTH_PX = 1440;
@@ -60,7 +56,6 @@ function DotsField({
   lockToInitialViewport?: boolean;
   countScale?: number;
 }) {
-  const pointsRef = useRef<THREE.Points>(null);
   const geometryRef = useRef<THREE.BufferGeometry>(null);
   const initialViewportRef = useRef<{ width: number; height: number } | null>(
     null,
@@ -139,11 +134,6 @@ function DotsField({
       baseX: THREE.MathUtils.randFloatSpread(spreadX * 2),
       baseY: THREE.MathUtils.randFloatSpread(spreadY * 2),
       baseZ: THREE.MathUtils.randFloatSpread(20),
-      driftX: THREE.MathUtils.randFloat(0.2, 1.6),
-      driftY: THREE.MathUtils.randFloat(0.2, 1.2),
-      driftZ: THREE.MathUtils.randFloat(0.08, 0.6),
-      speed: THREE.MathUtils.randFloat(0.28, 0.92),
-      phase: Math.random() * Math.PI * 2,
     }));
   }, [dotCount, viewportHeight, viewportWidth]);
 
@@ -154,11 +144,15 @@ function DotsField({
     const palette = dotColors.length > 0 ? dotColors : ['#ffffff'];
     const fallbackColor = new THREE.Color('#ffffff');
     for (let index = 0; index < dotCount; index += 1) {
+      const particle = particles[index];
       const paletteColor = new THREE.Color(palette[index % palette.length]);
       const resolvedColor = Number.isFinite(paletteColor.r)
         ? paletteColor
         : fallbackColor;
       const cursor = index * 3;
+      positions[cursor] = particle.baseX;
+      positions[cursor + 1] = particle.baseY;
+      positions[cursor + 2] = particle.baseZ;
       colors[cursor] = resolvedColor.r;
       colors[cursor + 1] = resolvedColor.g;
       colors[cursor + 2] = resolvedColor.b;
@@ -169,7 +163,7 @@ function DotsField({
     geometry.setAttribute('position', positionAttribute);
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.computeBoundingSphere();
-  }, [colors, dotColors, dotCount, positions]);
+  }, [colors, dotColors, dotCount, particles, positions]);
 
   useEffect(() => {
     return () => {
@@ -177,39 +171,9 @@ function DotsField({
     };
   }, [dotTexture]);
 
-  useFrame((state) => {
-    const geometry = geometryRef.current;
-    if (!geometry) return;
-
-    const movementScale = 1;
-    const elapsed = state.clock.elapsedTime;
-
-    for (let index = 0; index < dotCount; index += 1) {
-      const particle = particles[index];
-      const time = elapsed * particle.speed + particle.phase;
-      const cursor = index * 3;
-
-      const positionX = particle.baseX + Math.sin(time * 0.9) * particle.driftX;
-      const positionY =
-        particle.baseY + Math.cos(time * 1.05) * particle.driftY;
-      const positionZ =
-        particle.baseZ +
-        Math.sin(time * 0.62) * particle.driftZ * movementScale;
-
-      positions[cursor] = positionX;
-      positions[cursor + 1] = positionY;
-      positions[cursor + 2] = positionZ;
-    }
-
-    const positionAttribute = geometry.getAttribute(
-      'position',
-    ) as THREE.BufferAttribute;
-    positionAttribute.needsUpdate = true;
-  });
-
   return (
     <>
-      <points ref={pointsRef} frustumCulled={false}>
+      <points frustumCulled={false}>
         <bufferGeometry ref={geometryRef} />
         <pointsMaterial
           vertexColors
@@ -231,14 +195,23 @@ function DotsField({
 function CameraRig({
   scrollProgressRef,
   enableParallax = true,
+  active = true,
 }: {
   scrollProgressRef: MutableRefObject<number>;
   enableParallax?: boolean;
+  active?: boolean;
 }) {
-  const { camera } = useThree();
+  const { camera, invalidate } = useThree();
   const pointerTweenRef = useRef({
     x: createParallaxTween(0),
     y: createParallaxTween(0),
+  });
+  const previousTransformRef = useRef({
+    x: 0,
+    y: 0,
+    z: 28,
+    rotationX: 0,
+    rotationY: 0,
   });
   const tuning = {
     maxOffsetX: 2.8,
@@ -250,9 +223,10 @@ function CameraRig({
   };
 
   useEffect(() => {
-    if (!enableParallax) {
+    if (!active || !enableParallax) {
       snapParallaxTween(pointerTweenRef.current.x, 0);
       snapParallaxTween(pointerTweenRef.current.y, 0);
+      invalidate();
       return;
     }
 
@@ -268,6 +242,7 @@ function CameraRig({
 
       retargetParallaxTween(pointerTweenRef.current.x, nextX, nowMs);
       retargetParallaxTween(pointerTweenRef.current.y, nextY, nowMs);
+      invalidate();
     };
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -282,6 +257,7 @@ function CameraRig({
       const nowMs = performance.now();
       retargetParallaxTween(pointerTweenRef.current.x, 0, nowMs);
       retargetParallaxTween(pointerTweenRef.current.y, 0, nowMs);
+      invalidate();
     };
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
@@ -295,9 +271,32 @@ function CameraRig({
       window.removeEventListener('blur', resetPointer);
       document.removeEventListener('mouseleave', resetPointer);
     };
-  }, [enableParallax]);
+  }, [active, enableParallax, invalidate]);
+
+  useEffect(() => {
+    if (!active || !enableParallax) return;
+
+    const requestRender = () => {
+      invalidate();
+    };
+
+    window.addEventListener('scroll', requestRender, { passive: true });
+    window.addEventListener('orientationchange', requestRender, {
+      passive: true,
+    });
+    window.addEventListener('resize', requestRender, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', requestRender);
+      window.removeEventListener('orientationchange', requestRender);
+      window.removeEventListener('resize', requestRender);
+    };
+  }, [active, enableParallax, invalidate]);
 
   useFrame(() => {
+    if (!active) return;
+
+    const prev = previousTransformRef.current;
     const nowMs = performance.now();
     const pointerX = enableParallax
       ? sampleParallaxTween(pointerTweenRef.current.x, nowMs)
@@ -325,7 +324,63 @@ function CameraRig({
     camera.rotation.y = pointerX * tuning.maxYaw * viewportScale;
     camera.rotation.x = -pointerY * tuning.maxPitch * viewportScale;
     camera.rotation.z = 0;
+
+    const positionDelta =
+      Math.abs(camera.position.x - prev.x) +
+      Math.abs(camera.position.y - prev.y) +
+      Math.abs(camera.position.z - prev.z);
+    const rotationDelta =
+      Math.abs(camera.rotation.x - prev.rotationX) +
+      Math.abs(camera.rotation.y - prev.rotationY);
+    const tweenDistance =
+      Math.abs(pointerTweenRef.current.x.to - pointerX) +
+      Math.abs(pointerTweenRef.current.y.to - pointerY);
+
+    previousTransformRef.current = {
+      x: camera.position.x,
+      y: camera.position.y,
+      z: camera.position.z,
+      rotationX: camera.rotation.x,
+      rotationY: camera.rotation.y,
+    };
+
+    if (positionDelta > 1e-5 || rotationDelta > 1e-5 || tweenDistance > 1e-4) {
+      invalidate();
+    }
   });
+
+  return null;
+}
+
+function InvalidateOnSceneChange({
+  active,
+  backgroundColor,
+  dotColors,
+  dotSize,
+  densityScale,
+  disableInputs,
+}: {
+  active: boolean;
+  backgroundColor: string;
+  dotColors: string[];
+  dotSize: number;
+  densityScale: number;
+  disableInputs: boolean;
+}) {
+  const { invalidate } = useThree();
+
+  useEffect(() => {
+    if (!active) return;
+    invalidate();
+  }, [
+    active,
+    backgroundColor,
+    dotColors,
+    dotSize,
+    densityScale,
+    disableInputs,
+    invalidate,
+  ]);
 
   return null;
 }
@@ -339,12 +394,14 @@ export default function DotsScene({
   className,
   scrollProgressRef,
   disableInputs = false,
+  active = true,
 }: DotsSceneProps) {
   const countScale = disableInputs ? 0.5 : 1;
 
   return (
     <Canvas
       className={className}
+      frameloop="demand"
       camera={{ fov: 48, near: 0.1, far: 120, position: [0, 0, 28] }}
       dpr={[1, 1.2]}
       resize={{ scroll: false, debounce: { scroll: 0, resize: 200 } }}
@@ -354,11 +411,20 @@ export default function DotsScene({
         powerPreference: 'high-performance',
       }}
     >
+      <InvalidateOnSceneChange
+        active={active}
+        backgroundColor={backgroundColor}
+        dotColors={dotColors}
+        dotSize={dotSize}
+        densityScale={densityScale}
+        disableInputs={disableInputs}
+      />
       {drawBackground && <color attach="background" args={[backgroundColor]} />}
       {drawBackground && <fog attach="fog" args={[backgroundColor, 20, 64]} />}
       <CameraRig
         scrollProgressRef={scrollProgressRef}
         enableParallax={!disableInputs}
+        active={active}
       />
       <DotsField
         dotColors={dotColors}

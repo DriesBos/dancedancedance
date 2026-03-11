@@ -424,6 +424,7 @@ function DotsBackground({
         drawBackground={layer !== 'overlay'}
         scrollProgressRef={scrollProgressRef}
         disableInputs={disableInputEffects}
+        active={active}
       />
     </div>
   );
