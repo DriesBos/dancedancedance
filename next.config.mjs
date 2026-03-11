@@ -25,7 +25,7 @@ const nextConfig = {
         search: '',
       },
     ],
-    qualities: [50, 70, 75, 80, 90],
+    qualities: [50, 60, 70, 75, 80, 90],
   },
   // Ensure proper handling on Netlify
   typescript: {

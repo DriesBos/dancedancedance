@@ -10,7 +10,11 @@ import MuxPlayer from '@/components/MuxPlayer';
 import SliderIndicators from '@/components/SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
-import { storyblokImageLoader, storyblokVideoPosterUrl } from '@/lib/storyblok-image';
+import {
+  storyblokImageLoader,
+  storyblokVideoPosterUrl,
+  transformStoryblokImageUrl,
+} from '@/lib/storyblok-image';
 import styles from './BlokProjectSlider.module.sass';
 
 interface SbPageData extends SbBlokData {
@@ -53,13 +57,42 @@ const normalizeInternalHref = (href?: string) => {
 interface SlideItemProps {
   item: SbPageData['body'][0];
   isActive: boolean;
+  isNext: boolean;
   index: number;
 }
 
-const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
+const warmedSlideImageSrcs = new Set<string>();
+
+const SlideItem = ({ item, isActive, isNext, index }: SlideItemProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const muxPlayerRef = useRef<any>(null);
   const optimizedPoster = storyblokVideoPosterUrl(item.media?.filename);
+  const shouldWarmMedia = isActive || isNext;
+  const isStillImageSlide = !item.mux_playback_id && !item.video_link;
+  const stillImageSrc =
+    isStillImageSlide && item.media?.filename ? item.media.filename : null;
+
+  // Warm the next still-image slide so decode is complete before it becomes active.
+  useEffect(() => {
+    if (!isNext || !stillImageSrc) return;
+
+    const warmSrc = transformStoryblokImageUrl(stillImageSrc, {
+      width: 1920,
+      quality: 60,
+      noUpscale: true,
+    });
+    if (!warmSrc || warmedSlideImageSrcs.has(warmSrc)) return;
+
+    warmedSlideImageSrcs.add(warmSrc);
+    const image = new window.Image();
+    if ('fetchPriority' in image) {
+      (image as HTMLImageElement & { fetchPriority?: 'high' | 'low' | 'auto' })
+        .fetchPriority = 'high';
+    }
+    image.decoding = 'async';
+    image.src = warmSrc;
+    image.decode?.().catch(() => {});
+  }, [isNext, stillImageSrc]);
 
   // Control video playback based on isActive state
   useEffect(() => {
@@ -110,8 +143,8 @@ const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
           noControls={true}
           muted
           playsInline
-          loading={isActive ? 'page' : 'viewport'}
-          preload={isActive ? 'metadata' : 'none'}
+          loading={shouldWarmMedia ? 'page' : 'viewport'}
+          preload={shouldWarmMedia ? 'metadata' : 'none'}
         />
       );
     } else if (item.video_link && item.media?.filename) {
@@ -121,7 +154,7 @@ const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
           src={item.video_link}
           muted
           playsInline
-          preload={isActive ? 'metadata' : 'none'}
+          preload={shouldWarmMedia ? 'metadata' : 'none'}
           className="imageItem"
           poster={optimizedPoster}
           style={{ width: '100%', height: 'auto' }}
@@ -144,8 +177,8 @@ const SlideItem = ({ item, isActive, index }: SlideItemProps) => {
           quality={60}
           className="imageItem"
           priority={index === 0} // Only prioritize first image
-          loading={index === 0 ? 'eager' : 'lazy'}
-          fetchPriority={index === 0 ? 'high' : 'low'}
+          loading={index === 0 || shouldWarmMedia ? 'eager' : 'lazy'}
+          fetchPriority={index === 0 || shouldWarmMedia ? 'high' : 'low'}
         />
       );
     }
@@ -270,12 +303,15 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
-      <SlideItem
-        key={currentItem._uid}
-        item={currentItem}
-        isActive={true}
-        index={activeIndex}
-      />
+      {blok.body.map((item, index) => (
+        <SlideItem
+          key={item._uid}
+          item={item}
+          isActive={index === activeIndex}
+          isNext={index === (activeIndex + 1) % blok.body.length}
+          index={index}
+        />
+      ))}
       <div className={`${styles.indicatorAnchor} indicatorAnchor`}>
         <SliderIndicators total={blok.body.length} activeIndex={activeIndex} />
       </div>

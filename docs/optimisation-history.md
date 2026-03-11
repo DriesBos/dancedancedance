@@ -27,6 +27,8 @@
 - [2026-03-11] Route-static markdown now renders on the server while inline token-swap rotators stay client-side.
 - [2026-03-11] Performance telemetry now tracks Web Vitals and sampled React Profiler commits through a batched ingestion endpoint.
 - [2026-03-11] Route prefetching is now intent-driven: project cards prefetch on hover/touch intent, and the project slider disables blanket link prefetch while manually prefetching only active/hovered internal routes.
+- [2026-03-11] `BlokProjectSlider` now keeps slide geometry fixed and toggles `visibility`/`z-index`/`pointer-events` instead of opacity-based active state changes.
+- [2026-03-11] `BlokProjectSlider` now warms the upcoming slide by pre-decoding next still images and preloading metadata for next video/Mux media.
 - [2026-03-11] Markdown handling dependency review was intentionally skipped to avoid unnecessary changes.
 - [2026-03-11] Added `app/sitemap.ts` plus robots metadata route output that explicitly includes the sitemap location.
 - [2026-03-11] Storyblok published requests now reuse a cached `/cdn/spaces/me` `cv` and append it across Storyblok SDK and direct Storyblok fetches, with webhook-driven `cv` revalidation.

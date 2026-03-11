@@ -12,15 +12,14 @@
   display: flex
   flex-direction: column
   gap: 0.4545454546rem // 10px for 22px font size
-  opacity: 0
+  opacity: 1
+  visibility: hidden
+  z-index: 0
   pointer-events: none
   &[data-active='true']
-    opacity: 1
+    visibility: visible
+    z-index: 1
     pointer-events: auto
-    position: relative
-    top: 0
-    left: 0
-    width: 100%
 
 .image
   position: relative
