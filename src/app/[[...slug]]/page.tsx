@@ -2,8 +2,8 @@ import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import { getStoryblokApi } from '@/lib/storyblok';
 import PageTransition from '@/components/PageTransition';
-import LazyDitheringVideoPortrait from '@/components/LazyDitheringVideoPortrait';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
 // Enable dynamic params for catch-all route
@@ -125,87 +125,18 @@ export async function generateMetadata({
 }
 
 export default async function Home({ params }: { params: Params }) {
-  try {
-    const slug = (await params).slug;
-    const version = getStoryVersion();
-    const slugPath = getSlugPath(slug);
-    const pageData = await getPageData(version, slugPath);
-    const showPortrait = slugPath === 'about';
-    const portraitThemeColors = {
-      RADIANT: {
-        foreground: 'var(--theme-type)',
-        background: 'var(--theme-bg)',
-      },
-      TRON: { foreground: 'var(--theme-type)', background: 'var(--theme-bg)' },
-      SKY: { foreground: 'var(--theme-type)', background: '#0D111A' },
-      SEGMENTS: {
-        foreground: 'var(--theme-type)',
-        background: 'var(--theme-bg)',
-      },
-      LIGHT: { foreground: 'var(--theme-type)', background: 'var(--theme-bg)' },
-      KUSAMA: {
-        foreground: 'var(--theme-type)',
-        background: 'var(--theme-bg)',
-      },
-      SPACE: { foreground: 'var(--theme-type)', background: 'var(--theme-bg)' },
-      NIGHT: { foreground: 'var(--theme-type)', background: '#000000' },
-      KERMIT: {
-        foreground: 'var(--theme-type)',
-        background: 'var(--theme-bg)',
-      },
-    } as const;
-    const portraitOptions = {
-      // Draw each active sample as an X/cross (alternative: 'pixel').
-      mode: 'cross' as const,
-      // Size of each sampled block; lower = more detail, higher = chunkier.
-      pixelSize: 1,
-      // Boost image separation before dithering.
-      contrast: 1.2,
-      // Dither threshold in 0..255 (start away from extremes for visible tuning).
-      threshold: 138,
-      // Swap color roles: foreground uses --theme-bg, background uses --theme-type.
-      invert: true,
-      // Per-theme pair used by the portrait renderer (foreground + background).
-      themeColors: portraitThemeColors,
-      // Frame cap for CPU control and smoother performance.
-      maxFps: 20,
-    };
+  const slug = (await params).slug;
+  const version = getStoryVersion();
+  const slugPath = getSlugPath(slug);
+  const pageData = await getPageData(version, slugPath);
 
-    if (!pageData || !pageData.story) {
-      return (
-        <PageTransition>
-          <div style={{ padding: '2rem' }}>
-            <h1>Story not found</h1>
-            <p>Could not load content from Storyblok.</p>
-          </div>
-        </PageTransition>
-      );
-    }
-
-    return (
-      <PageTransition>
-        <>
-          <StoryblokStory story={pageData.story} />
-          {/* {showPortrait && (
-            <LazyDitheringVideoPortrait
-              src="/portraits/portrait_movie.mp4"
-              alt="Dries Bos dithered video portrait"
-              {...portraitOptions}
-            />
-          )} */}
-        </>
-      </PageTransition>
-    );
-  } catch (error) {
-    console.error('Error loading page:', error);
-    return (
-      <PageTransition>
-        <div style={{ padding: '2rem' }}>
-          <h1>Error loading page</h1>
-          <p>An error occurred while loading this page.</p>
-          <pre>{error instanceof Error ? error.message : 'Unknown error'}</pre>
-        </div>
-      </PageTransition>
-    );
+  if (!pageData?.story) {
+    notFound();
   }
+
+  return (
+    <PageTransition>
+      <StoryblokStory story={pageData.story} />
+    </PageTransition>
+  );
 }
