@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import Script from 'next/script';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
 import '@/assets/styles/vars.sass';
@@ -59,6 +59,14 @@ const INITIAL_UI_STATE_SCRIPT = `
   })();
 `;
 
+const buildGoogleAnalyticsBootstrapScript = (gaId: string) => `
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag = window.gtag || gtag;
+  gtag('js', new Date());
+  gtag('config', '${gaId}');
+`;
+
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
   display: 'swap',
@@ -112,6 +120,7 @@ export default async function RootLayout({
 }>) {
   // Fetch projects at build/request time
   const projects = await fetchProjectSlugs();
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html lang="en">
@@ -123,13 +132,24 @@ export default async function RootLayout({
         data-initializing="true"
         suppressHydrationWarning
       >
-        <script dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }} />
+        <Script id="initial-ui-state" strategy="beforeInteractive">
+          {INITIAL_UI_STATE_SCRIPT}
+        </Script>
         <BackgroundEffectsByTheme />
         <GrainyGradient variant="page" />
         <AppInitializer />
         <ClientEnhancements />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        {gaId && (
+          <>
+            <Script
+              id="google-analytics-loader"
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="lazyOnload"
+            />
+            <Script id="google-analytics" strategy="lazyOnload">
+              {buildGoogleAnalyticsBootstrapScript(gaId)}
+            </Script>
+          </>
         )}
         <OuterNavigation />
         <OuterTheming />
