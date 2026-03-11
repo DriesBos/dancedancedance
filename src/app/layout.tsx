@@ -20,14 +20,12 @@ import ActionButton, {
 } from '@/components/ActionButton';
 import BlokFooter from '@/components/BlokFooter';
 import ThemeFilter from '@/components/ThemeFilter';
-import TitleSwitcher from '@/components/TitleSwitcher';
-import FaviconSwitcher from '@/components/FaviconSwitcher';
-import CursorLoader from '@/components/CursorLoader';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
 import DotsOverlayEffectsByTheme from '@/components/BackgroundEffects/DotsOverlayEffectsByTheme';
 import GrainyGradient from '@/components/GrainyGradient';
 import OuterTheming from '@/components/OuterTheming';
 import OuterNavigation from '@/components/OuterNavigation';
+import ClientEnhancements from '@/components/ClientEnhancements';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -134,9 +132,7 @@ export default async function RootLayout({
         <GrainyGradient variant="page" />
         <AppInitializer />
         <ProjectsProvider projects={projects}>
-          <CursorLoader />
-          <TitleSwitcher />
-          <FaviconSwitcher />
+          <ClientEnhancements />
           {process.env.NEXT_PUBLIC_GA_ID && (
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
           )}
