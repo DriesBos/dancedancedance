@@ -20,14 +20,13 @@ export const renderWordSwapText = (
         );
       }
 
-      const seed = `${keyPrefix}-${index}-${segment.first}-${segment.second}`;
+      const seed = `${keyPrefix}-${index}-${segment.words.join('|')}`;
       const durationSeconds = resolveDurationSeconds(seed, options.durationSeconds);
 
       return (
         <WordSwapRotatorClient
           key={`${keyPrefix}-rotator-${index}`}
-          first={segment.first}
-          second={segment.second}
+          words={segment.words}
           durationSeconds={durationSeconds}
         />
       );

@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 
 export type TextSegment =
   | { type: 'text'; value: string }
-  | { type: 'rotator'; first: string; second: string };
+  | { type: 'rotator'; words: string[] };
 
 export type TokenFormat = 'equals' | 'emdash' | 'ampersand';
 
-const ROTATOR_EQUALS_TOKEN_REGEX = /([^\s=]+)\s*=\s*([^\s=]+)/g;
+const ROTATOR_EQUALS_TOKEN_REGEX = /([^\s=]+(?:\s*=\s*[^\s=]+)+)/g;
 const ROTATOR_EMDASH_TOKEN_REGEX = /^(\s*)(.+?)\s+—\s+(.+?)(\s*)$/;
 const ROTATOR_AMPERSAND_TOKEN_REGEX = /^(\s*)(.+?)\s+&\s+(.+?)(\s*)$/;
 
@@ -23,23 +23,27 @@ const getTerminalPunctuation = (word: string) => {
   return null;
 };
 
-const normalizeTerminalPunctuation = (first: string, second: string) => {
-  const firstPunctuation = getTerminalPunctuation(first);
-  const secondPunctuation = getTerminalPunctuation(second);
+const normalizeTerminalPunctuation = (words: string[]) => {
+  const punctuations = words
+    .map((word) => getTerminalPunctuation(word))
+    .filter((punctuation): punctuation is '.' | ',' => punctuation !== null);
 
-  if (!firstPunctuation && !secondPunctuation) {
-    return { first, second };
+  if (punctuations.length === 0 || punctuations.length === words.length) {
+    return words;
   }
 
-  if (firstPunctuation && secondPunctuation) {
-    return { first, second };
+  const firstPunctuation = punctuations[0];
+  const allSamePunctuation = punctuations.every(
+    (punctuation) => punctuation === firstPunctuation,
+  );
+
+  if (!allSamePunctuation) {
+    return words;
   }
 
-  if (firstPunctuation) {
-    return { first, second: `${second}${firstPunctuation}` };
-  }
-
-  return { first: `${first}${secondPunctuation}`, second };
+  return words.map((word) =>
+    getTerminalPunctuation(word) ? word : `${word}${firstPunctuation}`,
+  );
 };
 
 export const hashToUnitInterval = (value: string) => {
@@ -69,11 +73,11 @@ export const parseTextSegments = (
     }
 
     const [, leadingText, firstWord, secondWord, trailingText] = delimiterMatch;
-    const normalizedWords = normalizeTerminalPunctuation(firstWord, secondWord);
+    const normalizedWords = normalizeTerminalPunctuation([firstWord, secondWord]);
     const formattedFirstWord =
       tokenFormat === 'ampersand'
-        ? `${normalizedWords.first} &`
-        : normalizedWords.first;
+        ? `${normalizedWords[0]} &`
+        : normalizedWords[0];
     const segments: TextSegment[] = [];
 
     if (leadingText) {
@@ -82,8 +86,7 @@ export const parseTextSegments = (
 
     segments.push({
       type: 'rotator',
-      first: formattedFirstWord,
-      second: normalizedWords.second,
+      words: [formattedFirstWord, normalizedWords[1]],
     });
 
     if (trailingText) {
@@ -104,11 +107,12 @@ export const parseTextSegments = (
       segments.push({ type: 'text', value: text.slice(cursor, index) });
     }
 
-    const normalizedWords = normalizeTerminalPunctuation(match[1], match[2]);
+    const rawWords = match[1].split(/\s*=\s*/).filter(Boolean);
+    const normalizedWords = normalizeTerminalPunctuation(rawWords);
+
     segments.push({
       type: 'rotator',
-      first: normalizedWords.first,
-      second: normalizedWords.second,
+      words: normalizedWords,
     });
     cursor = index + match[0].length;
   }

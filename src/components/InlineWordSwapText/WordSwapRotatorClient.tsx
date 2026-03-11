@@ -10,30 +10,39 @@ type RotatorStyle = CSSProperties & {
 };
 
 interface WordSwapRotatorClientProps {
-  first: string;
-  second: string;
+  words: string[];
   durationSeconds: number;
 }
 
 const WordSwapRotatorClient = ({
-  first,
-  second,
+  words,
   durationSeconds,
 }: WordSwapRotatorClientProps) => {
+  const normalizedWords = useMemo(
+    () => (words.length >= 2 ? words : [words[0] ?? '', words[0] ?? '']),
+    [words],
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [phase, setPhase] = useState<'hold' | 'slide'>('hold');
-  const currentWord = currentIndex === 0 ? first : second;
-  const nextWord = currentIndex === 0 ? second : first;
+  const nextIndex = (currentIndex + 1) % normalizedWords.length;
+  const currentWord = normalizedWords[currentIndex];
+  const nextWord = normalizedWords[nextIndex];
   const holdDurationMs = useMemo(
     () =>
-      Math.max(400, ((durationSeconds * 1000 - SWAP_TRANSITION_MS * 2) / 2) | 0),
-    [durationSeconds],
+      Math.max(
+        400,
+        ((durationSeconds * 1000 -
+          SWAP_TRANSITION_MS * normalizedWords.length) /
+          normalizedWords.length) |
+          0,
+      ),
+    [durationSeconds, normalizedWords.length],
   );
 
   useEffect(() => {
     setCurrentIndex(0);
     setPhase('hold');
-  }, [first, second]);
+  }, [normalizedWords]);
 
   useEffect(() => {
     const timeout =
@@ -42,14 +51,14 @@ const WordSwapRotatorClient = ({
             setPhase('slide');
           }, holdDurationMs)
         : window.setTimeout(() => {
-            setCurrentIndex((prev) => (prev === 0 ? 1 : 0));
+            setCurrentIndex((prev) => (prev + 1) % normalizedWords.length);
             setPhase('hold');
           }, SWAP_TRANSITION_MS);
 
     return () => {
       window.clearTimeout(timeout);
     };
-  }, [phase, holdDurationMs]);
+  }, [phase, holdDurationMs, normalizedWords.length]);
 
   const triggerSwap = () => {
     if (phase === 'hold') {
@@ -84,8 +93,11 @@ const WordSwapRotatorClient = ({
       onTouchStart={handleTouchStart}
     >
       <span className={styles.rotatorSizer} aria-hidden="true">
-        <span className={styles.rotatorWord}>{first}</span>
-        <span className={styles.rotatorWord}>{second}</span>
+        {normalizedWords.map((word, index) => (
+          <span className={styles.rotatorWord} key={`sizer-${index}-${word}`}>
+            {word}
+          </span>
+        ))}
       </span>
       <span className={styles.rotatorViewport}>
         <span
