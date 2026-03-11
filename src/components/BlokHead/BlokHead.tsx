@@ -538,6 +538,27 @@ const BlokHead = ({ projects }: Props) => {
     if (!main) return;
     const topPanel = headRef.current?.querySelector('.side_Top') || null;
 
+    const isInteractiveTouchTarget = (target: EventTarget | null) => {
+      if (!(target instanceof Element)) return false;
+      return !!target.closest(
+        [
+          'button',
+          'a',
+          'input',
+          'select',
+          'textarea',
+          'label',
+          'summary',
+          '[role="button"]',
+          '[role="link"]',
+          '[contenteditable="true"]',
+          '.icon',
+          '.cursorInteract',
+          '.cursorMagnetic',
+        ].join(','),
+      );
+    };
+
     const listenerOptions: AddEventListenerOptions = {
       passive: true,
       capture: true,
@@ -546,6 +567,7 @@ const BlokHead = ({ projects }: Props) => {
     if (typeof window.PointerEvent === 'function') {
       const onPointerDown = (e: PointerEvent) => {
         if (e.pointerType !== 'touch' && e.pointerType !== 'pen') return;
+        if (isInteractiveTouchTarget(e.target)) return;
         openTopPanelFromTouch();
       };
 
@@ -561,7 +583,8 @@ const BlokHead = ({ projects }: Props) => {
       };
     }
 
-    const onTouchStart = () => {
+    const onTouchStart = (e: TouchEvent) => {
+      if (isInteractiveTouchTarget(e.target)) return;
       openTopPanelFromTouch();
     };
 
