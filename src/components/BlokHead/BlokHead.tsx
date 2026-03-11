@@ -16,6 +16,7 @@ import IconFullscreen from '@/components/Icons/IconFullscreen';
 import IconSmallScreen from '@/components/Icons/IconSmallScreen';
 import Row from '@/components/Row';
 import BlokSidePanels from '@/components/BlokSidePanels';
+import InlineWordSwapText from '@/components/InlineWordSwapText';
 import { gsap } from '@/lib/gsap';
 import GrainyGradient from '@/components/GrainyGradient';
 import { useShallow } from 'zustand/react/shallow';
@@ -32,8 +33,7 @@ type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
 const BlokHead = ({}: Props) => {
   const headRef = useRef<HTMLDivElement>(null);
   const titleViewportRef = useRef<HTMLDivElement>(null);
-  const titleTrackRef = useRef<HTMLDivElement>(null);
-  const titleMarqueeRef = useRef<gsap.core.Timeline | null>(null);
+  const titleMeasureRef = useRef<HTMLSpanElement>(null);
   const path = usePathname();
   const currentPath = path || '/';
   const router = useRouter();
@@ -67,6 +67,7 @@ const BlokHead = ({}: Props) => {
     .join(' ');
   const layoutLabel = layout === 'DESKTOP' ? 'Desktop' : '3D';
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
+  const [isTitleOverflowing, setIsTitleOverflowing] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
   const [isAboutMixedHovered, setIsAboutMixedHovered] = useState(false);
@@ -74,8 +75,7 @@ const BlokHead = ({}: Props) => {
   const layoutToggleRafRef = useRef<number | null>(null);
   const layoutToggleTimeoutRef = useRef<number | null>(null);
   const isHoveringTopPanelZoneRef = useRef(false);
-  const TITLE_MARQUEE_PX_PER_SECOND = 10;
-  const TITLE_MARQUEE_RETURN_SPEED_MULTIPLIER = 8;
+  const TITLE_SWAP_DURATION_SECONDS = 4.8;
 
   const currentSlug = useMemo(
     () => currentPath.split('/')[2] || '',
@@ -124,6 +124,16 @@ const BlokHead = ({}: Props) => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }, [currentSlug]);
+
+  const titleText = useMemo(() => {
+    if (pathName === 'projects') {
+      return projectName ? `Dries Bos & ${projectName}` : 'Dries Bos';
+    }
+    return 'Dries Bos — Creative Developer';
+  }, [pathName, projectName]);
+
+  const shouldSwapTitleText =
+    isTitleOverflowing && titleText.includes('—');
 
   const externalLink = useMemo(() => {
     if (
@@ -638,82 +648,48 @@ const BlokHead = ({}: Props) => {
 
   useEffect(() => {
     const viewport = titleViewportRef.current;
-    const track = titleTrackRef.current;
-    if (!viewport || !track) return;
+    const measure = titleMeasureRef.current;
+    if (!viewport || !measure) return;
 
     let resizeObserver: ResizeObserver | null = null;
     let rafId: number | null = null;
 
-    const clearTitleMarquee = () => {
-      if (titleMarqueeRef.current) {
-        titleMarqueeRef.current.kill();
-        titleMarqueeRef.current = null;
-      }
-      gsap.set(track, { x: 0 });
+    const updateOverflow = () => {
+      const overflow = measure.scrollWidth - viewport.clientWidth > 1;
+      setIsTitleOverflowing((previous) =>
+        previous === overflow ? previous : overflow,
+      );
     };
 
-    const buildTitleMarquee = () => {
-      clearTitleMarquee();
-
-      const overflow = track.scrollWidth - viewport.clientWidth;
-      if (overflow <= 1) return;
-
-      const duration = overflow / TITLE_MARQUEE_PX_PER_SECOND;
-      const returnDuration = duration / TITLE_MARQUEE_RETURN_SPEED_MULTIPLIER;
-      const marquee = gsap.timeline({ repeat: -1 });
-
-      marquee
-        .to({}, { duration: 2 })
-        .to(track, {
-          x: -overflow,
-          duration,
-          ease: 'none',
-        })
-        .to({}, { duration: 2 })
-        .to(track, {
-          x: 0,
-          duration: returnDuration,
-          ease: 'power3',
-        });
-
-      titleMarqueeRef.current = marquee;
-    };
-
-    const scheduleBuild = () => {
+    const scheduleMeasure = () => {
       if (rafId !== null) {
         window.cancelAnimationFrame(rafId);
       }
       rafId = window.requestAnimationFrame(() => {
         rafId = null;
-        buildTitleMarquee();
+        updateOverflow();
       });
     };
 
-    scheduleBuild();
-    document.fonts?.ready.then(scheduleBuild).catch(() => {});
+    scheduleMeasure();
+    document.fonts?.ready.then(scheduleMeasure).catch(() => {});
 
     if (typeof window.ResizeObserver === 'function') {
-      resizeObserver = new ResizeObserver(scheduleBuild);
+      resizeObserver = new ResizeObserver(scheduleMeasure);
       resizeObserver.observe(viewport);
-      resizeObserver.observe(track);
+      resizeObserver.observe(measure);
     }
 
-    window.addEventListener('resize', scheduleBuild);
+    window.addEventListener('resize', scheduleMeasure);
 
     return () => {
-      window.removeEventListener('resize', scheduleBuild);
+      window.removeEventListener('resize', scheduleMeasure);
       if (rafId !== null) {
         window.cancelAnimationFrame(rafId);
       }
       resizeObserver?.disconnect();
-      clearTitleMarquee();
     };
-  }, [
-    pathName,
-    projectName,
-    TITLE_MARQUEE_PX_PER_SECOND,
-    TITLE_MARQUEE_RETURN_SPEED_MULTIPLIER,
-  ]);
+  }, [titleText]);
 
   useEffect(() => {
     return () => {
@@ -791,25 +767,25 @@ const BlokHead = ({}: Props) => {
       <Row className={styles.row}>
         <div className={`column column-Title ${styles.title}`}>
           <div ref={titleViewportRef} className={styles.titleMarqueeViewport}>
-            <div ref={titleTrackRef} className={styles.titleMarqueeTrack}>
-              {(pathName === 'home' ||
-                pathName === 'about' ||
-                pathName === 'projects') && (
-                <Link href="/" className="cursorInteract">
-                  Dries Bos&nbsp;
-                </Link>
+            <Link href="/" className={`cursorInteract ${styles.titleMarqueeTrack}`}>
+              {shouldSwapTitleText ? (
+                <InlineWordSwapText
+                  text={titleText}
+                  keyPrefix={`head-title-${pathName || 'home'}`}
+                  tokenFormat="emdash"
+                  durationSeconds={TITLE_SWAP_DURATION_SECONDS}
+                />
+              ) : (
+                titleText
               )}
-              <Link href="/" className="cursorInteract">
-                {(pathName === 'home' || pathName === 'about') && (
-                  <span className="cursorInteract">— Creative Developer</span>
-                )}
-              </Link>
-              <Link href="/">
-                {pathName === 'projects' && (
-                  <span className="cursorInteract ">& {projectName}</span>
-                )}
-              </Link>
-            </div>
+            </Link>
+            <span
+              ref={titleMeasureRef}
+              className={styles.titleMeasure}
+              aria-hidden="true"
+            >
+              {titleText}
+            </span>
           </div>
         </div>
 

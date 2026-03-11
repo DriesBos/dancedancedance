@@ -8,11 +8,14 @@ type TextSegment =
   | { type: 'text'; value: string }
   | { type: 'rotator'; first: string; second: string };
 
+type TokenFormat = 'equals' | 'emdash';
+
 type RotatorStyle = CSSProperties & {
   '--rotator-duration': string;
 };
 
-const ROTATOR_TOKEN_REGEX = /([^\s=]+)\s*=\s*([^\s=]+)/g;
+const ROTATOR_EQUALS_TOKEN_REGEX = /([^\s=]+)\s*=\s*([^\s=]+)/g;
+const ROTATOR_EMDASH_TOKEN_REGEX = /^(\s*)(.+?)\s+—\s+(.+?)(\s*)$/;
 const ROTATOR_DURATION_MIN_SECONDS = 4;
 const ROTATOR_DURATION_MAX_SECONDS = 6;
 const SWAP_TRANSITION_MS = 200;
@@ -56,11 +59,41 @@ const hashToUnitInterval = (value: string) => {
   return (hash >>> 0) / 4294967295;
 };
 
-const parseTextSegments = (text: string): TextSegment[] => {
+const parseTextSegments = (
+  text: string,
+  tokenFormat: TokenFormat,
+): TextSegment[] => {
+  if (tokenFormat === 'emdash') {
+    const emDashMatch = text.match(ROTATOR_EMDASH_TOKEN_REGEX);
+    if (!emDashMatch) {
+      return [{ type: 'text', value: text }];
+    }
+
+    const [, leadingText, firstWord, secondWord, trailingText] = emDashMatch;
+    const normalizedWords = normalizeTerminalPunctuation(firstWord, secondWord);
+    const segments: TextSegment[] = [];
+
+    if (leadingText) {
+      segments.push({ type: 'text', value: leadingText });
+    }
+
+    segments.push({
+      type: 'rotator',
+      first: normalizedWords.first,
+      second: normalizedWords.second,
+    });
+
+    if (trailingText) {
+      segments.push({ type: 'text', value: trailingText });
+    }
+
+    return segments;
+  }
+
   const segments: TextSegment[] = [];
   let cursor = 0;
 
-  const matches = text.matchAll(ROTATOR_TOKEN_REGEX);
+  const matches = text.matchAll(ROTATOR_EQUALS_TOKEN_REGEX);
   for (const match of matches) {
     const index = match.index ?? 0;
 
@@ -83,6 +116,11 @@ const parseTextSegments = (text: string): TextSegment[] => {
 
   return segments.length > 0 ? segments : [{ type: 'text', value: text }];
 };
+
+interface RenderWordSwapOptions {
+  tokenFormat?: TokenFormat;
+  durationSeconds?: number;
+}
 
 const RotatorToken = ({
   first,
@@ -178,8 +216,13 @@ const RotatorToken = ({
   );
 };
 
-export const renderWordSwapText = (text: string, keyPrefix: string): ReactNode =>
-  parseTextSegments(text).map((segment, index) => {
+export const renderWordSwapText = (
+  text: string,
+  keyPrefix: string,
+  options: RenderWordSwapOptions = {},
+): ReactNode =>
+  parseTextSegments(text, options.tokenFormat ?? 'equals').map(
+    (segment, index) => {
     if (segment.type === 'text') {
       return (
         <Fragment key={`${keyPrefix}-text-${index}`}>{segment.value}</Fragment>
@@ -188,29 +231,34 @@ export const renderWordSwapText = (text: string, keyPrefix: string): ReactNode =
 
     const seed = `${keyPrefix}-${index}-${segment.first}-${segment.second}`;
     const randomUnit = hashToUnitInterval(seed);
-    const durationSeconds =
-      ROTATOR_DURATION_MIN_SECONDS +
-      randomUnit * (ROTATOR_DURATION_MAX_SECONDS - ROTATOR_DURATION_MIN_SECONDS);
+    const resolvedDurationSeconds =
+      options.durationSeconds && options.durationSeconds > 0
+        ? options.durationSeconds
+        : ROTATOR_DURATION_MIN_SECONDS +
+          randomUnit *
+            (ROTATOR_DURATION_MAX_SECONDS - ROTATOR_DURATION_MIN_SECONDS);
 
     return (
       <RotatorToken
         key={`${keyPrefix}-rotator-${index}`}
         first={segment.first}
         second={segment.second}
-        durationSeconds={durationSeconds}
+        durationSeconds={resolvedDurationSeconds}
       />
     );
-  });
+    },
+  );
 
 export const renderWordSwapChildren = (
   children: ReactNode,
   keyPrefix: string,
+  options: RenderWordSwapOptions = {},
 ): ReactNode =>
   (Array.isArray(children) ? children : [children]).map((child, index) => {
     if (typeof child === 'string') {
       return (
         <Fragment key={`${keyPrefix}-child-${index}`}>
-          {renderWordSwapText(child, `${keyPrefix}-segment-${index}`)}
+          {renderWordSwapText(child, `${keyPrefix}-segment-${index}`, options)}
         </Fragment>
       );
     }
@@ -221,10 +269,17 @@ export const renderWordSwapChildren = (
 interface InlineWordSwapTextProps {
   text: string;
   keyPrefix: string;
+  tokenFormat?: TokenFormat;
+  durationSeconds?: number;
 }
 
-const InlineWordSwapText = ({ text, keyPrefix }: InlineWordSwapTextProps) => (
-  <>{renderWordSwapText(text, keyPrefix)}</>
+const InlineWordSwapText = ({
+  text,
+  keyPrefix,
+  tokenFormat,
+  durationSeconds,
+}: InlineWordSwapTextProps) => (
+  <>{renderWordSwapText(text, keyPrefix, { tokenFormat, durationSeconds })}</>
 );
 
 export default InlineWordSwapText;

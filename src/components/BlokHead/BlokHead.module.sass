@@ -24,6 +24,7 @@
   min-width: 0
 
 .titleMarqueeViewport
+  position: relative
   width: 100%
   min-width: 0
   overflow: hidden
@@ -35,7 +36,18 @@
   min-width: 100%
   align-items: center
   white-space: nowrap
-  will-change: transform
+
+.titleMeasure
+  position: absolute
+  left: 0
+  top: 0
+  padding-left: var(--spacing-side)
+  display: inline-flex
+  align-items: center
+  width: max-content
+  white-space: nowrap
+  visibility: hidden
+  pointer-events: none
 
 .themeCycle
   width: var(--icon-size)
