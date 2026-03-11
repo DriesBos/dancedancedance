@@ -153,6 +153,6 @@
     right: calc(var(--spacing-side) / 2)
     bottom: calc(var(--spacing-base) / 2)
 
-@media (prefers-reduced-motion: reduce)
+@media (prefers-reduced-motion: reduce) and (orientation: landscape)
   .root[data-version='radiating']
     --rb-rotation-duration: 120s

@@ -1,6 +1,7 @@
 'use client';
 
 import type { MouseEvent, ReactNode } from 'react';
+import { shouldApplyReducedMotion } from '@/lib/reduced-motion';
 
 type Props = {
   className?: string;
@@ -22,9 +23,7 @@ const ScrollToTopLink = ({ className, children }: Props) => {
 
     event.preventDefault();
 
-    const prefersReducedMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion = shouldApplyReducedMotion();
 
     if (prefersReducedMotion) {
       const html = document.documentElement;

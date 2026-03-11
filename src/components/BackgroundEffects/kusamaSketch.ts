@@ -1,5 +1,10 @@
 import type p5 from 'p5';
 import {
+  getPortraitOrientationMediaQuery,
+  getReducedMotionMediaQuery,
+  shouldApplyReducedMotion,
+} from '@/lib/reduced-motion';
+import {
   createParallaxTween,
   retargetParallaxTween,
   sampleParallaxTween,
@@ -477,8 +482,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     const isCoarsePointerDevice = () =>
       window.matchMedia('(pointer: coarse)').matches ||
       (navigator.maxTouchPoints ?? 0) > 0;
-    const prefersReducedMotion = () =>
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion = () => shouldApplyReducedMotion();
     const supportsParallaxInput = () =>
       window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -615,11 +619,12 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         clearPointer();
         resetParallaxTargets();
       };
-      const reducedMotionQuery = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
+      const reducedMotionQuery = window.matchMedia(getReducedMotionMediaQuery());
+      const orientationQuery = window.matchMedia(
+        getPortraitOrientationMediaQuery(),
       );
-      const onReducedMotionChange = (event: MediaQueryListEvent) => {
-        syncMotionPreference(event.matches);
+      const onReducedMotionChange = () => {
+        syncMotionPreference(prefersReducedMotion());
       };
 
       window.addEventListener('pointermove', onPointerMove, { passive: true });
@@ -632,6 +637,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         reducedMotionQuery.addEventListener('change', onReducedMotionChange);
       } else {
         reducedMotionQuery.addListener(onReducedMotionChange);
+      }
+      if (typeof orientationQuery.addEventListener === 'function') {
+        orientationQuery.addEventListener('change', onReducedMotionChange);
+      } else {
+        orientationQuery.addListener(onReducedMotionChange);
       }
       const handleVisibilityChange = () => {
         if (document.hidden) {
@@ -651,6 +661,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
           reducedMotionQuery.removeEventListener('change', onReducedMotionChange);
         } else {
           reducedMotionQuery.removeListener(onReducedMotionChange);
+        }
+        if (typeof orientationQuery.removeEventListener === 'function') {
+          orientationQuery.removeEventListener('change', onReducedMotionChange);
+        } else {
+          orientationQuery.removeListener(onReducedMotionChange);
         }
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       });
@@ -747,10 +762,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         return;
       }
 
-      parallaxEnabled = !reducedMotionEnabled && supportsParallaxInput();
-      if (!parallaxEnabled) {
-        resetParallaxTargets(true);
-      }
+      syncMotionPreference(prefersReducedMotion());
 
       instance.resizeCanvas(nextWidth, nextHeight);
       updateAdaptiveFrameRate(nextWidth, nextHeight);

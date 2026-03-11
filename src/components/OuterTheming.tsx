@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useStore } from '@/store/store';
+import {
+  getPortraitOrientationMediaQuery,
+  getReducedMotionMediaQuery,
+  shouldApplyReducedMotion,
+} from '@/lib/reduced-motion';
 import styles from './OuterTheming.module.sass';
 
 const OuterTheming = () => {
@@ -31,31 +36,45 @@ const OuterTheming = () => {
       return;
     }
 
-    const reducedMotionQuery = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
+    const reducedMotionQuery = window.matchMedia(getReducedMotionMediaQuery());
+    const orientationQuery = window.matchMedia(
+      getPortraitOrientationMediaQuery(),
     );
     const syncReducedMotionPreference = () => {
-      setPrefersReducedMotion(reducedMotionQuery.matches);
+      setPrefersReducedMotion(shouldApplyReducedMotion());
     };
 
     syncReducedMotionPreference();
 
-    if (typeof reducedMotionQuery.addEventListener === 'function') {
-      reducedMotionQuery.addEventListener(
-        'change',
-        syncReducedMotionPreference,
-      );
-      return () => {
-        reducedMotionQuery.removeEventListener(
-          'change',
-          syncReducedMotionPreference,
-        );
-      };
-    }
+    const addMediaQueryListener = (
+      query: MediaQueryList,
+      listener: () => void,
+    ) => {
+      if (typeof query.addEventListener === 'function') {
+        query.addEventListener('change', listener);
+        return () => {
+          query.removeEventListener('change', listener);
+        };
+      }
 
-    reducedMotionQuery.addListener(syncReducedMotionPreference);
+      query.addListener(listener);
+      return () => {
+        query.removeListener(listener);
+      };
+    };
+
+    const removeReducedMotionListener = addMediaQueryListener(
+      reducedMotionQuery,
+      syncReducedMotionPreference,
+    );
+    const removeOrientationListener = addMediaQueryListener(
+      orientationQuery,
+      syncReducedMotionPreference,
+    );
+
     return () => {
-      reducedMotionQuery.removeListener(syncReducedMotionPreference);
+      removeReducedMotionListener();
+      removeOrientationListener();
     };
   }, []);
 
