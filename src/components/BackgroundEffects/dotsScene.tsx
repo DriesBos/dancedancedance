@@ -8,6 +8,7 @@ import {
   sampleParallaxTween,
   snapParallaxTween,
 } from './parallaxEasing';
+import { createAdaptiveDprController } from './adaptiveDpr';
 
 type DotsSceneProps = {
   backgroundColor: string;
@@ -30,6 +31,8 @@ type DotParticle = {
 const DOTS_PARALLAX_REFERENCE_WIDTH_PX = 1440;
 const DOTS_PARALLAX_MIN_SCALE = 0.7;
 const DOTS_PARALLAX_MAX_SCALE = 1.35;
+const DOTS_MIN_DPR = 0.75;
+const DOTS_MAX_DPR = 1.2;
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
@@ -41,6 +44,14 @@ function getDotsParallaxScale(viewportWidth: number): number {
     DOTS_PARALLAX_MIN_SCALE,
     DOTS_PARALLAX_MAX_SCALE,
   );
+}
+
+function getDotsDprBounds() {
+  const deviceDpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+  const maxDpr = Math.min(deviceDpr, DOTS_MAX_DPR);
+  const minDpr = Math.min(DOTS_MIN_DPR, maxDpr);
+
+  return { minDpr, maxDpr };
 }
 
 function DotsField({
@@ -385,6 +396,69 @@ function InvalidateOnSceneChange({
   return null;
 }
 
+function AdaptiveDotsDprRig({ active }: { active: boolean }) {
+  const { setDpr, invalidate } = useThree();
+  const dprControllerRef = useRef(
+    createAdaptiveDprController({
+      minDpr: DOTS_MIN_DPR,
+      maxDpr: DOTS_MAX_DPR,
+      initialDpr: DOTS_MAX_DPR,
+      step: 0.05,
+      lowerFpsThreshold: 46,
+      upperFpsThreshold: 57,
+      minSamplesBeforeAdjust: 18,
+      cooldownMs: 1200,
+    }),
+  );
+  const currentDprRef = useRef(DOTS_MAX_DPR);
+
+  useEffect(() => {
+    const syncDprBounds = () => {
+      const nowMs = performance.now();
+      const { minDpr, maxDpr } = getDotsDprBounds();
+      const nextDpr = dprControllerRef.current.setBounds(minDpr, maxDpr, nowMs);
+
+      if (Math.abs(nextDpr - currentDprRef.current) <= 1e-4) {
+        return;
+      }
+
+      currentDprRef.current = nextDpr;
+      setDpr(nextDpr);
+      invalidate();
+    };
+
+    syncDprBounds();
+
+    window.addEventListener('resize', syncDprBounds, { passive: true });
+    window.addEventListener('orientationchange', syncDprBounds, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener('resize', syncDprBounds);
+      window.removeEventListener('orientationchange', syncDprBounds);
+    };
+  }, [invalidate, setDpr]);
+
+  useEffect(() => {
+    dprControllerRef.current.reset(performance.now());
+  }, [active]);
+
+  useFrame(() => {
+    if (!active) return;
+
+    const next = dprControllerRef.current.observeFrame(performance.now());
+    if (!next?.nextDpr) return;
+    if (Math.abs(next.nextDpr - currentDprRef.current) <= 1e-4) return;
+
+    currentDprRef.current = next.nextDpr;
+    setDpr(next.nextDpr);
+    invalidate();
+  });
+
+  return null;
+}
+
 export default function DotsScene({
   backgroundColor,
   dotColors,
@@ -397,13 +471,14 @@ export default function DotsScene({
   active = true,
 }: DotsSceneProps) {
   const countScale = disableInputs ? 0.5 : 1;
+  const initialDpr = getDotsDprBounds().maxDpr;
 
   return (
     <Canvas
       className={className}
       frameloop="demand"
       camera={{ fov: 48, near: 0.1, far: 120, position: [0, 0, 28] }}
-      dpr={[1, 1.2]}
+      dpr={initialDpr}
       resize={{ scroll: false, debounce: { scroll: 0, resize: 200 } }}
       gl={{
         antialias: false,
@@ -411,6 +486,7 @@ export default function DotsScene({
         powerPreference: 'high-performance',
       }}
     >
+      <AdaptiveDotsDprRig active={active} />
       <InvalidateOnSceneChange
         active={active}
         backgroundColor={backgroundColor}

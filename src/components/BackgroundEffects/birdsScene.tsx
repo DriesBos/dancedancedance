@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createAdaptiveDprController } from './adaptiveDpr';
 
 type BirdsSceneProps = {
   backgroundColor: string;
@@ -82,6 +83,16 @@ const INITIAL_OUTWARD_SPEED_MAX = 10.0;
 const INITIAL_VELOCITY_JITTER = 1.5;
 const INITIAL_SPAWN_SCREEN_Y = 0.9;
 const INITIAL_SPAWN_SCREEN_X = 0.1;
+const BIRDS_MIN_DPR = 0.75;
+const BIRDS_MAX_DPR = 2;
+
+const getBirdsDprBounds = () => {
+  const deviceDpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+  const maxDpr = Math.min(deviceDpr, BIRDS_MAX_DPR);
+  const minDpr = Math.min(BIRDS_MIN_DPR, maxDpr);
+
+  return { minDpr, maxDpr };
+};
 
 // Inspired by https://threejs.org/examples/webgpu_compute_birds.html
 export default function BirdsScene({
@@ -260,7 +271,19 @@ export default function BirdsScene({
           maxStorageBuffersInVertexStage: 3,
         },
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const initialDprBounds = getBirdsDprBounds();
+      const dprController = createAdaptiveDprController({
+        minDpr: initialDprBounds.minDpr,
+        maxDpr: initialDprBounds.maxDpr,
+        initialDpr: initialDprBounds.maxDpr,
+        step: 0.1,
+        lowerFpsThreshold: 50,
+        upperFpsThreshold: 58,
+        minSamplesBeforeAdjust: 22,
+        cooldownMs: 1400,
+      });
+      let currentDpr = dprController.getCurrentDpr();
+      renderer.setPixelRatio(currentDpr);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.toneMapping = THREE.NeutralToneMapping;
       host.appendChild(renderer.domElement);
@@ -556,6 +579,18 @@ export default function BirdsScene({
         .setName('Birds Position');
 
       const onWindowResize = () => {
+        const nowMs = performance.now();
+        const dprBounds = getBirdsDprBounds();
+        const nextDpr = dprController.setBounds(
+          dprBounds.minDpr,
+          dprBounds.maxDpr,
+          nowMs,
+        );
+        if (Math.abs(nextDpr - currentDpr) > 1e-4) {
+          currentDpr = nextDpr;
+          renderer.setPixelRatio(currentDpr);
+        }
+
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -605,6 +640,12 @@ export default function BirdsScene({
         } else {
           effectController.rayOrigin.value.copy(inactiveRayOrigin);
           effectController.rayDirection.value.copy(inactiveRayDirection);
+        }
+
+        const dprResult = dprController.observeFrame(now);
+        if (dprResult?.nextDpr && Math.abs(dprResult.nextDpr - currentDpr) > 1e-4) {
+          currentDpr = dprResult.nextDpr;
+          renderer.setPixelRatio(currentDpr);
         }
 
         renderer.compute(computeVelocity);

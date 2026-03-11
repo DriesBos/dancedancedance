@@ -33,6 +33,6 @@
 - [2026-03-11] React Three Fiber dots now keep `frameloop="demand"` and gate manual `invalidate()` to active scene states so hidden overlays stop motion listeners and idle rendering work.
 - [2026-03-11] p5 `segments` and `kusama` sketches now apply adaptive frame-rate tiers (18/24/30 FPS) from viewport load and device capability.
 - [2026-03-11] App Router error handling boundaries are in place with `error.tsx`, `global-error.tsx`, and `not-found.tsx`.
+- [2026-03-11] Three.js `birds` and R3F `dots` now adapt DPR with FPS-regression tracking to lower pixel ratio under sustained slow frames and recover when performance stabilizes.
 
 ## 2. To Do
-- Three.js bird and dots renderers should dynamically scale DPR using real FPS regression signals.
