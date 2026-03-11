@@ -73,6 +73,18 @@ const flushStoryblokMemoryCache = () => {
   return flushedCaches;
 };
 
+const revalidateTagWithBestProfile = (tag: string) => {
+  // Next.js versions before profile support accept a single argument only.
+  if (revalidateTag.length <= 1) {
+    revalidateTag(tag);
+    return;
+  }
+
+  (
+    revalidateTag as unknown as (cacheTag: string, profile: 'max') => void
+  )(tag, 'max');
+};
+
 export async function POST(request: NextRequest) {
   const configuredSecret = process.env.STORYBLOK_REVALIDATE_SECRET;
   if (!configuredSecret) {
@@ -109,7 +121,7 @@ export async function POST(request: NextRequest) {
   }
 
   for (const tag of tags) {
-    revalidateTag(tag);
+    revalidateTagWithBestProfile(tag);
   }
 
   const paths = new Set<string>(['/', '/projects']);

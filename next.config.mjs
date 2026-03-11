@@ -15,10 +15,14 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '**.storyblok.com',
+        pathname: '/f/**',
+        search: '',
       },
       {
         protocol: 'https',
         hostname: '**.storyblokchina.cn',
+        pathname: '/f/**',
+        search: '',
       },
     ],
     qualities: [50, 70, 75, 80, 90],
