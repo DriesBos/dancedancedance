@@ -1,5 +1,6 @@
 import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
 import { getStoryblokTagsForSlug } from '@/lib/storyblok-cache';
+import { getPublishedStoryblokCv } from '@/lib/storyblok-cv';
 
 type StoryblokResponse = { story: any };
 type StoryblokStartpageResponse = { stories?: any[] };
@@ -28,9 +29,17 @@ const isAuthError = (error: unknown): error is StoryblokHttpError =>
 const fetchStoryByPath = async (
   token: string,
   version: 'draft' | 'published',
-  path: string
+  path: string,
+  cv?: number,
 ): Promise<StoryblokResponse | null> => {
-  const url = `https://api.storyblok.com/v2/cdn/stories/${path}?version=${version}&token=${token}`;
+  const params = new URLSearchParams({
+    version,
+    token,
+  });
+  if (version === 'published' && typeof cv === 'number') {
+    params.set('cv', `${cv}`);
+  }
+  const url = `https://api.storyblok.com/v2/cdn/stories/${path}?${params.toString()}`;
 
   const response = await fetch(url, {
     next: {
@@ -59,9 +68,19 @@ const fetchStoryByPath = async (
 
 const fetchStartpageStory = async (
   token: string,
-  version: 'draft' | 'published'
+  version: 'draft' | 'published',
+  cv?: number,
 ): Promise<StoryblokResponse | null> => {
-  const url = `https://api.storyblok.com/v2/cdn/stories?version=${version}&token=${token}&is_startpage=1&per_page=1`;
+  const params = new URLSearchParams({
+    version,
+    token,
+    is_startpage: '1',
+    per_page: '1',
+  });
+  if (version === 'published' && typeof cv === 'number') {
+    params.set('cv', `${cv}`);
+  }
+  const url = `https://api.storyblok.com/v2/cdn/stories?${params.toString()}`;
 
   const response = await fetch(url, {
     next: {
@@ -111,11 +130,20 @@ export const fetchStory = async (
 
   let lastError: Error | null = null;
   let sawAuthError = false;
+  const publishedCvByToken = new Map<string, number | undefined>();
 
   for (const token of tokenCandidates) {
     if (!token) continue;
     try {
-      const story = await fetchStoryByPath(token, version, slugPath);
+      const cv =
+        version === 'published'
+          ? await getPublishedStoryblokCv(token)
+          : undefined;
+      if (version === 'published') {
+        publishedCvByToken.set(token, cv);
+      }
+
+      const story = await fetchStoryByPath(token, version, slugPath, cv);
       if (story) {
         return story;
       }
@@ -132,7 +160,12 @@ export const fetchStory = async (
     for (const token of tokenCandidates) {
       if (!token) continue;
       try {
-        const startpageStory = await fetchStartpageStory(token, version);
+        const cv =
+          version === 'published'
+            ? publishedCvByToken.get(token) ??
+              (await getPublishedStoryblokCv(token))
+            : undefined;
+        const startpageStory = await fetchStartpageStory(token, version, cv);
         if (startpageStory) {
           return startpageStory;
         }

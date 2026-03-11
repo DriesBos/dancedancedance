@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
-import { getStoryblokApi } from '@/lib/storyblok';
+import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
+import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
 
 const DEFAULT_SITE_URL = 'https://www.driesbos.com';
 
@@ -18,13 +19,18 @@ const getPublishedEntries = async (
 ): Promise<MetadataRoute.Sitemap> => {
   try {
     const storyblokApi = getStoryblokApi(false);
-    const response = await storyblokApi.get(
-      'cdn/stories',
+    const publishedToken = getStoryblokAccessToken(false);
+    const paramsWithCv = await withPublishedStoryblokCv(
       {
         version: 'published',
         is_startpage: false,
         per_page: 100,
       },
+      publishedToken,
+    );
+    const response = await storyblokApi.get(
+      'cdn/stories',
+      paramsWithCv,
       {
         cache: 'force-cache',
         next: { revalidate: 3600 },

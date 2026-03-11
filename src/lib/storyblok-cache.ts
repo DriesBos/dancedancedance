@@ -1,5 +1,6 @@
 export const STORYBLOK_TAG_ALL = 'storyblok';
 export const STORYBLOK_TAG_PROJECTS = 'storyblok:projects';
+export const STORYBLOK_TAG_CV = 'storyblok:cv';
 
 export const normalizeStorySlug = (slug?: string | null): string => {
   if (!slug) return 'home';

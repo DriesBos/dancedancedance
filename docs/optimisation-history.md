@@ -29,9 +29,9 @@
 - [2026-03-11] Route prefetching is now intent-driven: project cards prefetch on hover/touch intent, and the project slider disables blanket link prefetch while manually prefetching only active/hovered internal routes.
 - [2026-03-11] Markdown handling dependency review was intentionally skipped to avoid unnecessary changes.
 - [2026-03-11] Added `app/sitemap.ts` plus robots metadata route output that explicitly includes the sitemap location.
+- [2026-03-11] Storyblok published requests now reuse a cached `/cdn/spaces/me` `cv` and append it across Storyblok SDK and direct Storyblok fetches, with webhook-driven `cv` revalidation.
 
 ## 2. To Do
-- Storyblok API should cache and refresh the `cv` value from `/cdn/spaces/me` to maximize CDN hit rate.
 - React Three Fiber dots should move to demand-driven rendering with manual `invalidate` where motion is idle.
 - Three.js bird and dots renderers should dynamically scale DPR using real FPS regression signals.
 - p5.js sketches should add adaptive `frameRate` tiers based on device capability.

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getStoryblokApi } from '@/lib/storyblok';
 import {
   STORYBLOK_TAG_ALL,
+  STORYBLOK_TAG_CV,
   STORYBLOK_TAG_PROJECTS,
   getStoryblokTagsForSlug,
   normalizeStorySlug,
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
 
   const slugs = extractSlugs(payload);
 
-  const tags = new Set<string>([STORYBLOK_TAG_ALL]);
+  const tags = new Set<string>([STORYBLOK_TAG_ALL, STORYBLOK_TAG_CV]);
   for (const slug of slugs) {
     for (const tag of getStoryblokTagsForSlug(slug)) {
       tags.add(tag);

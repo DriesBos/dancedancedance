@@ -1,6 +1,7 @@
 import { ISbStoriesParams } from '@storyblok/react/rsc';
-import { getStoryblokApi } from '@/lib/storyblok';
+import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
 import { STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS } from '@/lib/storyblok-cache';
+import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
 
 export interface ProjectData {
   slug: string;
@@ -16,6 +17,8 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
     is_startpage: false,
     sort_by: 'content.year:desc', // Sort by year descending
   };
+  const publishedToken = getStoryblokAccessToken(false);
+  const paramsWithCv = await withPublishedStoryblokCv(sbParams, publishedToken);
 
   const storyblokApi = getStoryblokApi();
   if (!storyblokApi) {
@@ -23,7 +26,7 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
     return [];
   }
 
-  const response = await storyblokApi.get(`cdn/stories`, sbParams, {
+  const response = await storyblokApi.get(`cdn/stories`, paramsWithCv, {
     cache: 'force-cache',
     next: {
       revalidate: 3600, // Revalidate every hour
