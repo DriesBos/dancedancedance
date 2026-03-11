@@ -8,7 +8,7 @@ type TextSegment =
   | { type: 'text'; value: string }
   | { type: 'rotator'; first: string; second: string };
 
-type TokenFormat = 'equals' | 'emdash';
+type TokenFormat = 'equals' | 'emdash' | 'ampersand';
 
 type RotatorStyle = CSSProperties & {
   '--rotator-duration': string;
@@ -16,6 +16,7 @@ type RotatorStyle = CSSProperties & {
 
 const ROTATOR_EQUALS_TOKEN_REGEX = /([^\s=]+)\s*=\s*([^\s=]+)/g;
 const ROTATOR_EMDASH_TOKEN_REGEX = /^(\s*)(.+?)\s+—\s+(.+?)(\s*)$/;
+const ROTATOR_AMPERSAND_TOKEN_REGEX = /^(\s*)(.+?)\s+&\s+(.+?)(\s*)$/;
 const ROTATOR_DURATION_MIN_SECONDS = 4;
 const ROTATOR_DURATION_MAX_SECONDS = 6;
 const SWAP_TRANSITION_MS = 200;
@@ -63,14 +64,22 @@ const parseTextSegments = (
   text: string,
   tokenFormat: TokenFormat,
 ): TextSegment[] => {
-  if (tokenFormat === 'emdash') {
-    const emDashMatch = text.match(ROTATOR_EMDASH_TOKEN_REGEX);
-    if (!emDashMatch) {
+  if (tokenFormat === 'emdash' || tokenFormat === 'ampersand') {
+    const delimiterMatch = text.match(
+      tokenFormat === 'emdash'
+        ? ROTATOR_EMDASH_TOKEN_REGEX
+        : ROTATOR_AMPERSAND_TOKEN_REGEX,
+    );
+    if (!delimiterMatch) {
       return [{ type: 'text', value: text }];
     }
 
-    const [, leadingText, firstWord, secondWord, trailingText] = emDashMatch;
+    const [, leadingText, firstWord, secondWord, trailingText] = delimiterMatch;
     const normalizedWords = normalizeTerminalPunctuation(firstWord, secondWord);
+    const formattedFirstWord =
+      tokenFormat === 'ampersand'
+        ? `${normalizedWords.first} &`
+        : normalizedWords.first;
     const segments: TextSegment[] = [];
 
     if (leadingText) {
@@ -79,7 +88,7 @@ const parseTextSegments = (
 
     segments.push({
       type: 'rotator',
-      first: normalizedWords.first,
+      first: formattedFirstWord,
       second: normalizedWords.second,
     });
 

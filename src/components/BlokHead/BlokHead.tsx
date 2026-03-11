@@ -132,8 +132,12 @@ const BlokHead = ({}: Props) => {
     return 'Dries Bos — Creative Developer';
   }, [pathName, projectName]);
 
-  const shouldSwapTitleText =
-    isTitleOverflowing && titleText.includes('—');
+  const titleTokenFormat = pathName === 'projects' ? 'ampersand' : 'emdash';
+  const shouldSwapTitleText = isTitleOverflowing
+    ? titleTokenFormat === 'ampersand'
+      ? titleText.includes('&')
+      : titleText.includes('—')
+    : false;
 
   const externalLink = useMemo(() => {
     if (
@@ -772,7 +776,7 @@ const BlokHead = ({}: Props) => {
                 <InlineWordSwapText
                   text={titleText}
                   keyPrefix={`head-title-${pathName || 'home'}`}
-                  tokenFormat="emdash"
+                  tokenFormat={titleTokenFormat}
                   durationSeconds={TITLE_SWAP_DURATION_SECONDS}
                 />
               ) : (
