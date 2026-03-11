@@ -28,10 +28,10 @@
   -webkit-transform: translate3d(0, 0, 0)
   backface-visibility: hidden
   -webkit-backface-visibility: hidden
-  transition: none
+  transition: transform var(--rotator-duration, 0ms) cubic-bezier(0.2, 0.8, 0.2, 1)
+  -webkit-transition: -webkit-transform var(--rotator-duration, 0ms) cubic-bezier(0.2, 0.8, 0.2, 1)
 
 .isAnimating
-  transition: transform var(--rotator-duration, 200ms) cubic-bezier(0.2, 0.8, 0.2, 1)
   transform: translate3d(0, -33.333333%, 0)
   -webkit-transform: translate3d(0, -33.333333%, 0)
 

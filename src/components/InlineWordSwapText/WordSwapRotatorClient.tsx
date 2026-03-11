@@ -72,7 +72,8 @@ const WordSwapRotatorClient = ({
   };
 
   const style: RotatorStyle = {
-    '--rotator-duration': `${SWAP_TRANSITION_MS}ms`,
+    '--rotator-duration':
+      phase === 'slide' ? `${SWAP_TRANSITION_MS}ms` : '0ms',
   };
 
   return (
