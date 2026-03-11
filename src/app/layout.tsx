@@ -22,6 +22,7 @@ import GrainyGradient from '@/components/GrainyGradient';
 import OuterTheming from '@/components/OuterTheming';
 import OuterNavigation from '@/components/OuterNavigation';
 import ClientEnhancements from '@/components/ClientEnhancements';
+import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -151,40 +152,42 @@ export default async function RootLayout({
             </Script>
           </>
         )}
-        <OuterNavigation />
-        <OuterTheming />
-        <main className="main">
-          <BlokHead projects={projects} />
-          {children}
-          <BlokAction />
-          <BlokFooter />
-        </main>
-        <ActionButtonContainer>
-          <ActionButton
-            copy="Start your project"
-            link="info@driesbos.com?subject=Let's Make Internet"
-            linkType="email"
-            className="cursorInteract"
-            dropLeftPx={10}
-            dropOnPage="projects"
-          />
-          <ActionButton
-            copy="Let's talk"
-            link="info@driesbos.com?subject=Let's Make Internet"
-            linkType="email"
-            className="cursorInteract"
-            dropLeftPx={20}
-            dropOnPage="about"
-          />
-          <ActionButton
-            copy="Schedule a discovery call"
-            link="https://calendly.com/info-b9c/30min"
-            linkType="url"
-            className="cursorInteract"
-            dropLeftPx={50}
-            dropOnPage="about"
-          />
-        </ActionButtonContainer>
+        <PerformanceTelemetry>
+          <OuterNavigation />
+          <OuterTheming />
+          <main className="main">
+            <BlokHead projects={projects} />
+            {children}
+            <BlokAction />
+            <BlokFooter />
+          </main>
+          <ActionButtonContainer>
+            <ActionButton
+              copy="Start your project"
+              link="info@driesbos.com?subject=Let's Make Internet"
+              linkType="email"
+              className="cursorInteract"
+              dropLeftPx={10}
+              dropOnPage="projects"
+            />
+            <ActionButton
+              copy="Let's talk"
+              link="info@driesbos.com?subject=Let's Make Internet"
+              linkType="email"
+              className="cursorInteract"
+              dropLeftPx={20}
+              dropOnPage="about"
+            />
+            <ActionButton
+              copy="Schedule a discovery call"
+              link="https://calendly.com/info-b9c/30min"
+              linkType="url"
+              className="cursorInteract"
+              dropLeftPx={50}
+              dropOnPage="about"
+            />
+          </ActionButtonContainer>
+        </PerformanceTelemetry>
         <DotsOverlayEffectsByTheme />
       </body>
     </html>

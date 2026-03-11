@@ -53,6 +53,7 @@ const ActionButtonContainer = ({
   className = '',
 }: ActionButtonContainerProps) => {
   const [isSettled, setIsSettled] = useState(false);
+  const [hasCompletedDrops, setHasCompletedDrops] = useState(false);
   const [isNearViewport, setIsNearViewport] = useState(false);
   const [layoutVersion, setLayoutVersion] = useState(0);
   const [matterModule, setMatterModule] = useState<MatterJsModule | null>(null);
@@ -72,7 +73,8 @@ const ActionButtonContainer = ({
   const pageSlug = pathname.split('/')[1] || 'home';
   const shouldRenderOnRoute =
     pageSlug === 'home' || pageSlug === 'about' || pageSlug === 'projects';
-  const shouldActivatePhysics = shouldRenderOnRoute && isNearViewport;
+  const shouldActivatePhysics =
+    shouldRenderOnRoute && isNearViewport && !hasCompletedDrops;
   const childItems = useMemo(() => Children.toArray(children), [children]);
   const childCount = childItems.length;
 
@@ -136,6 +138,101 @@ const ActionButtonContainer = ({
     setIsSettled(nextValue);
   }, []);
 
+  useEffect(() => {
+    if (hasCompletedDrops) return;
+    if (!isSettled) return;
+    if (childCount === 0) return;
+    if (spawnedIndicesRef.current.size < childCount) return;
+    setHasCompletedDrops(true);
+  }, [childCount, hasCompletedDrops, isSettled]);
+
+  const stopSimulation = useCallback(() => {
+    const matter = matterModule;
+    if (rafIdRef.current !== null) {
+      window.cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    if (runnerRef.current && matter) {
+      matter.Runner.stop(runnerRef.current);
+    }
+  }, [matterModule]);
+
+  const startRenderLoop = useCallback(() => {
+    const matter = matterModule;
+    if (!matter) return;
+    if (rafIdRef.current !== null) return;
+
+    const renderFrame = () => {
+      if (document.hidden) {
+        stopSimulation();
+        return;
+      }
+
+      const activeEntries = activeEntriesRef.current;
+
+      for (let index = activeEntries.length - 1; index >= 0; index -= 1) {
+        const entry = activeEntries[index];
+        const { body, element, width, height } = entry;
+
+        const x = body.position.x - width / 2;
+        const y = body.position.y - height / 2;
+        element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${body.angle}rad)`;
+
+        if (body.isSleeping) {
+          entry.sleepFrames += 1;
+        } else {
+          entry.sleepFrames = 0;
+        }
+
+        if (entry.sleepFrames >= SETTLE_FRAME_COUNT) {
+          matter.Body.setVelocity(body, { x: 0, y: 0 });
+          matter.Body.setAngularVelocity(body, 0);
+          matter.Body.setStatic(body, true);
+
+          const finalX = body.position.x - width / 2;
+          const finalY = body.position.y - height / 2;
+          const finalAngle = body.angle;
+          element.style.transform = `translate3d(${finalX}px, ${finalY}px, 0) rotate(${finalAngle}rad)`;
+          persistedStatesRef.current.set(entry.index, {
+            x: finalX,
+            y: finalY,
+            angle: finalAngle,
+            width,
+            height,
+          });
+
+          activeEntries.splice(index, 1);
+        }
+      }
+
+      if (activeEntries.length === 0) {
+        setSettledState(true);
+        if (runnerRef.current) {
+          matter.Runner.stop(runnerRef.current);
+        }
+        rafIdRef.current = null;
+        return;
+      }
+
+      setSettledState(false);
+      rafIdRef.current = window.requestAnimationFrame(renderFrame);
+    };
+
+    rafIdRef.current = window.requestAnimationFrame(renderFrame);
+  }, [matterModule, setSettledState, stopSimulation]);
+
+  const startSimulation = useCallback(() => {
+    const matter = matterModule;
+    const engine = engineRef.current;
+    const runner = runnerRef.current;
+    if (!matter || !engine || !runner) return;
+    if (document.hidden) return;
+    if (rafIdRef.current !== null) return;
+
+    matter.Runner.run(runner, engine);
+    startRenderLoop();
+  }, [matterModule, startRenderLoop]);
+
   const spawnEntry = useCallback(
     (index: number, element: HTMLDivElement, containerWidth: number) => {
       const engine = engineRef.current;
@@ -194,8 +291,9 @@ const ActionButtonContainer = ({
       spawnedIndicesRef.current.add(index);
       showElement(element);
       setSettledState(false);
+      startSimulation();
     },
-    [matterModule, setSettledState],
+    [matterModule, setSettledState, startSimulation],
   );
 
   const spawnEligibleForRoute = useCallback(
@@ -224,55 +322,6 @@ const ActionButtonContainer = ({
     },
     [childCount, spawnEntry],
   );
-
-  const startRenderLoop = useCallback(() => {
-    const matter = matterModule;
-    if (!matter) return;
-
-    const renderFrame = () => {
-      const activeEntries = activeEntriesRef.current;
-
-      for (let index = activeEntries.length - 1; index >= 0; index -= 1) {
-        const entry = activeEntries[index];
-        const { body, element, width, height } = entry;
-
-        const x = body.position.x - width / 2;
-        const y = body.position.y - height / 2;
-        element.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${body.angle}rad)`;
-
-        if (body.isSleeping) {
-          entry.sleepFrames += 1;
-        } else {
-          entry.sleepFrames = 0;
-        }
-
-        if (entry.sleepFrames >= SETTLE_FRAME_COUNT) {
-          matter.Body.setVelocity(body, { x: 0, y: 0 });
-          matter.Body.setAngularVelocity(body, 0);
-          matter.Body.setStatic(body, true);
-
-          const finalX = body.position.x - width / 2;
-          const finalY = body.position.y - height / 2;
-          const finalAngle = body.angle;
-          element.style.transform = `translate3d(${finalX}px, ${finalY}px, 0) rotate(${finalAngle}rad)`;
-          persistedStatesRef.current.set(entry.index, {
-            x: finalX,
-            y: finalY,
-            angle: finalAngle,
-            width,
-            height,
-          });
-
-          activeEntries.splice(index, 1);
-        }
-      }
-
-      setSettledState(activeEntries.length === 0);
-      rafIdRef.current = window.requestAnimationFrame(renderFrame);
-    };
-
-    rafIdRef.current = window.requestAnimationFrame(renderFrame);
-  }, [matterModule, setSettledState]);
 
   useEffect(() => {
     if (!shouldActivatePhysics) return;
@@ -326,6 +375,26 @@ const ActionButtonContainer = ({
       }
     };
   }, [shouldActivatePhysics]);
+
+  useEffect(() => {
+    if (!shouldActivatePhysics || !matterModule) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopSimulation();
+        return;
+      }
+      if (activeEntriesRef.current.length > 0) {
+        startSimulation();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [matterModule, shouldActivatePhysics, startSimulation, stopSimulation]);
 
   useEffect(() => {
     if (!shouldActivatePhysics || !matterModule) return;
@@ -432,14 +501,14 @@ const ActionButtonContainer = ({
       spawnEntry(index, element, containerWidth);
     });
 
-    Runner.run(runner, engine);
-    startRenderLoop();
+    if (activeEntriesRef.current.length > 0) {
+      startSimulation();
+    } else {
+      stopSimulation();
+    }
 
     return () => {
-      if (rafIdRef.current !== null) {
-        window.cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
-      }
+      stopSimulation();
       Runner.stop(runner);
       runnerRef.current = null;
       World.clear(engine.world, false);
@@ -454,13 +523,21 @@ const ActionButtonContainer = ({
     setSettledState,
     shouldActivatePhysics,
     spawnEntry,
-    startRenderLoop,
+    startSimulation,
+    stopSimulation,
   ]);
 
   useEffect(() => {
     if (!shouldActivatePhysics || !matterModule) return;
+    if (spawnedIndicesRef.current.size >= childCount) return;
     spawnEligibleForRoute(pageSlug);
-  }, [matterModule, pageSlug, shouldActivatePhysics, spawnEligibleForRoute]);
+  }, [
+    childCount,
+    matterModule,
+    pageSlug,
+    shouldActivatePhysics,
+    spawnEligibleForRoute,
+  ]);
 
   if (!shouldRenderOnRoute) {
     return null;

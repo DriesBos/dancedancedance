@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useRef, useCallback } from 'react';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
@@ -28,6 +29,8 @@ const BlokProject = ({
   stackIndex,
 }: Props) => {
   const router = useRouter();
+  const hasPrefetchedRef = useRef(false);
+  const href = slug ? `/projects/${slug}` : null;
   const cursorPreviewImage = (() => {
     const base = thumbnail?.filename;
     if (!base) return undefined;
@@ -40,8 +43,15 @@ const BlokProject = ({
     });
   })();
 
+  const prefetchProject = useCallback(() => {
+    if (!href || hasPrefetchedRef.current) return;
+    router.prefetch(href);
+    hasPrefetchedRef.current = true;
+  }, [href, router]);
+
   const handleClick = () => {
-    router.push(`/projects/${slug}`);
+    if (!href) return;
+    router.push(href);
   };
 
   // Extract just the year from the date value
@@ -53,6 +63,8 @@ const BlokProject = ({
         cursorPreviewImage ? 'cursorPreview' : ''
       }`}
       onClick={handleClick}
+      onMouseEnter={prefetchProject}
+      onTouchStart={prefetchProject}
       data-cursor-preview={cursorPreviewImage || undefined}
       data-cursor-preview-alt={thumbnail?.alt || title || ''}
       style={{ cursor: 'pointer', zIndex: stackIndex ?? 0 }}
