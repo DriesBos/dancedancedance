@@ -37,6 +37,7 @@ interface PersistedItemState {
 
 type MatterJsModule = typeof import('matter-js');
 
+// Number of consecutive sleeping frames required before freezing a body.
 const SETTLE_FRAME_COUNT = 20;
 
 const hideElement = (element: HTMLDivElement) => {
@@ -308,6 +309,7 @@ const ActionButtonContainer = ({
       const rect = element.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;
+      // Keep spawned bodies slightly inset from side walls.
       const spawnPadding = 4;
       const minX = width / 2 + spawnPadding;
       const maxX = containerWidth - width / 2 - spawnPadding;
@@ -333,15 +335,21 @@ const ActionButtonContainer = ({
         : hasPreferredCenterPercent
           ? Math.min(maxX, Math.max(minX, preferredCenterX))
           : randomSpawnX;
+      // Stack initial spawn heights so entries do not all collide at the same instant.
       const spawnY = -height - index * (height + 16);
 
       const body = matter.Bodies.rectangle(spawnX, spawnY, width, height, {
-        restitution: 0.33,
+        // Bounce retained after collisions (0 = no bounce, 1 = perfectly elastic).
+        restitution: 0.2,
+        // Sliding resistance on contact with other bodies and walls.
         friction: 0.5,
+        // Air drag while falling; higher values settle faster.
         frictionAir: 0.01,
+        // Matter.js sleep threshold; lower values keep bodies active longer.
         sleepThreshold: 40,
       });
 
+      // Small randomization prevents all buttons from landing with identical orientation.
       matter.Body.setAngle(body, (Math.random() - 0.5) * 0.16);
       matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.02);
       matter.World.add(engine.world, body);
@@ -527,8 +535,11 @@ const ActionButtonContainer = ({
     }
 
     const engine = Engine.create();
+    // Allow Matter.js to mark quiet bodies as sleeping for cheaper simulation.
     engine.enableSleeping = true;
+    // Gravity direction on Y axis (1 = downward, -1 = upward, 0 = no vertical gravity).
     engine.gravity.y = 1;
+    // Gravity strength multiplier. Suggested range for this UI: 0.001-0.003.
     engine.gravity.scale = 0.0018;
     engineRef.current = engine;
 
@@ -538,11 +549,16 @@ const ActionButtonContainer = ({
     const containerRect = container.getBoundingClientRect();
     const containerWidth = containerRect.width;
     const containerHeight = containerRect.height;
+    // Collision boundary thickness in px. Suggested range: 16-64.
+    // Thicker walls reduce tunneling at higher body speeds.
     const wallThickness = 32;
 
     const staticSurfaceOptions = {
+      // Floor and walls are fixed boundaries.
       isStatic: true,
+      // Bounce on wall/floor impacts. Range: 0-1 (lower = deader impacts).
       restitution: 0.1,
+      // Surface friction. Typical range: 0-1 (higher = less sliding).
       friction: 0.8,
     };
 
