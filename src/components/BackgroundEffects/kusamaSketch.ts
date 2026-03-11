@@ -468,6 +468,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     };
     const teardownFns: Array<() => void> = [];
     let parallaxEnabled = false;
+    let reducedMotionEnabled = false;
     let activeFrameRate = 0;
 
     const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
@@ -476,6 +477,8 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     const isCoarsePointerDevice = () =>
       window.matchMedia('(pointer: coarse)').matches ||
       (navigator.maxTouchPoints ?? 0) > 0;
+    const prefersReducedMotion = () =>
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const supportsParallaxInput = () =>
       window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -549,6 +552,22 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       pointer.y = y;
       pointer.intensity = Math.max(pointer.intensity, clamp01(boost));
     };
+    const clearPointer = () => {
+      pointer.active = false;
+      pointer.intensity = 0;
+      pointer.velocity = 0;
+    };
+
+    const syncMotionPreference = (isReducedMotion: boolean) => {
+      reducedMotionEnabled = isReducedMotion;
+      parallaxEnabled = !reducedMotionEnabled && supportsParallaxInput();
+      if (!parallaxEnabled) {
+        resetParallaxTargets(true);
+      }
+      if (reducedMotionEnabled) {
+        clearPointer();
+      }
+    };
 
     const fadePointer = () => {
       pointer.intensity *= 0.93;
@@ -576,23 +595,31 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       lastViewportWidth = instance.windowWidth;
       lastViewportHeight = instance.windowHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
-      parallaxEnabled = supportsParallaxInput();
+      syncMotionPreference(prefersReducedMotion());
 
       const onPointerMove = (event: PointerEvent) => {
+        if (reducedMotionEnabled) return;
         updatePointer(event.clientX, event.clientY, 0.72);
         setParallaxTargetFromClient(event.clientX, event.clientY);
       };
       const onPointerDown = (event: PointerEvent) => {
+        if (reducedMotionEnabled) return;
         updatePointer(event.clientX, event.clientY, 1);
         setParallaxTargetFromClient(event.clientX, event.clientY);
       };
       const onPointerLeave = () => {
-        pointer.active = false;
+        clearPointer();
         resetParallaxTargets();
       };
       const onBlur = () => {
-        pointer.active = false;
+        clearPointer();
         resetParallaxTargets();
+      };
+      const reducedMotionQuery = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      );
+      const onReducedMotionChange = (event: MediaQueryListEvent) => {
+        syncMotionPreference(event.matches);
       };
 
       window.addEventListener('pointermove', onPointerMove, { passive: true });
@@ -601,6 +628,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         passive: true,
       });
       window.addEventListener('blur', onBlur);
+      if (typeof reducedMotionQuery.addEventListener === 'function') {
+        reducedMotionQuery.addEventListener('change', onReducedMotionChange);
+      } else {
+        reducedMotionQuery.addListener(onReducedMotionChange);
+      }
       const handleVisibilityChange = () => {
         if (document.hidden) {
           instance.noLoop();
@@ -615,6 +647,11 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         window.removeEventListener('pointerdown', onPointerDown);
         window.removeEventListener('pointerleave', onPointerLeave);
         window.removeEventListener('blur', onBlur);
+        if (typeof reducedMotionQuery.removeEventListener === 'function') {
+          reducedMotionQuery.removeEventListener('change', onReducedMotionChange);
+        } else {
+          reducedMotionQuery.removeListener(onReducedMotionChange);
+        }
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       });
 
@@ -710,7 +747,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         return;
       }
 
-      parallaxEnabled = supportsParallaxInput();
+      parallaxEnabled = !reducedMotionEnabled && supportsParallaxInput();
       if (!parallaxEnabled) {
         resetParallaxTargets(true);
       }

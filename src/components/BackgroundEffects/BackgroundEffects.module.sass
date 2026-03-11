@@ -152,3 +152,7 @@
   @media (max-width: 770px)
     right: calc(var(--spacing-side) / 2)
     bottom: calc(var(--spacing-base) / 2)
+
+@media (prefers-reduced-motion: reduce)
+  .root[data-version='radiating']
+    --rb-rotation-duration: 120s

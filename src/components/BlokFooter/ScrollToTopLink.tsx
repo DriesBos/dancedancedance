@@ -22,11 +22,15 @@ const ScrollToTopLink = ({ className, children }: Props) => {
 
     event.preventDefault();
 
+    const prefersReducedMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     try {
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: 'smooth',
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
       });
     } catch {
       window.scrollTo(0, 0);

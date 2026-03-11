@@ -77,6 +77,9 @@
   --transition-theme: 0.66s ease-in-out
   --transition-theme-quick: 0.33s ease
   --transition-cursor: 0.25s ease-in-out
+  @media (prefers-reduced-motion: reduce)
+    --transition-layout: 0s
+    --transition-theme: 0s
 
 // LAYOUTS
 body[data-layout='DESKTOP']
