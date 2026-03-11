@@ -1,9 +1,7 @@
-'use client';
-
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
-import { useRef } from 'react';
-import { gsap, useGSAP } from '@/lib/gsap';
+import type { HTMLAttributes } from 'react';
 import TheMarkdown from '../TheMarkdown/TheMarkdown';
+import ColumnTextClient from './ColumnTextClient';
 
 interface SbPageData extends SbBlokData {
   text?: string;
@@ -15,32 +13,18 @@ interface ColumnTextProps {
   blok: SbPageData;
 }
 
-const ColumnText: React.FunctionComponent<ColumnTextProps> = ({ blok }) => {
-  const container = useRef<HTMLDivElement>(null);
+const ColumnText = ({ blok }: ColumnTextProps) => {
+  const editableAttributes =
+    storyblokEditable(blok) as HTMLAttributes<HTMLDivElement>;
 
-  useGSAP(
-    () => {
-      if (!container.current) return;
-
-      gsap.to(container.current, {
-        '--var': '100%',
-        duration: 0.66,
-        delay: 0.33,
-        ease: 'ease',
-      });
-    },
-    { scope: container }
-  );
   return (
-    <div
-      className="column column-Text"
-      data-display={blok.display}
-      data-color={blok.color}
-      ref={container}
-      {...storyblokEditable(blok)}
+    <ColumnTextClient
+      color={blok.color}
+      display={blok.display}
+      editableAttributes={editableAttributes}
     >
-      <TheMarkdown content={blok.text} />
-    </div>
+      <TheMarkdown content={blok.text || ''} />
+    </ColumnTextClient>
   );
 };
 

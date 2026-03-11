@@ -1,10 +1,6 @@
-'use client';
-
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useRef } from 'react';
-import { gsap, useGSAP } from '@/lib/gsap';
-import { renderWordSwapChildren } from '@/components/InlineWordSwapText';
+import { renderWordSwapChildren } from '@/components/InlineWordSwapText/renderWordSwap';
 import styles from './TheMarkdown.module.sass';
 
 interface MarkdownProps {
@@ -12,32 +8,13 @@ interface MarkdownProps {
   className?: string;
 }
 
-const Markdown: React.FunctionComponent<MarkdownProps> = ({
-  content,
-  className = '',
-}) => {
-  const markdownRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      if (!markdownRef.current) return;
-
-      gsap.to(markdownRef.current, {
-        '--var': '100%',
-        duration: 0.66,
-        delay: 0.33,
-        ease: 'ease',
-      });
-    },
-    { scope: markdownRef, dependencies: [content], revertOnUpdate: true }
-  );
-
+const Markdown = ({ content, className = '' }: MarkdownProps) => {
   if (!content) {
     return null;
   }
 
   return (
-    <div ref={markdownRef} className={`${className} ${styles.markdown} markdown`}>
+    <div className={`${className} ${styles.markdown} markdown`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         skipHtml

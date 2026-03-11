@@ -22,6 +22,8 @@
 - [2026-03-11] Storyblok Live Preview was fully removed, including preview route, provider bootstrap, and client init code.
 - [2026-03-11] `CursorLoader` is now mounted eagerly while still gate-loading the cursor to fine-pointer devices for faster desktop startup.
 - [2026-03-11] `BlokHead` theme cycler hover now only rotates the icon and no longer applies next-theme color previews.
+- [2026-03-11] Third-party Google Analytics loading now uses Next.js `Script` with `lazyOnload`, and the root bootstrap script now uses `Script` with `beforeInteractive`.
+- [2026-03-11] Route-static markdown now renders on the server while inline token-swap rotators stay client-side.
 
 ## 2. To Do
 - Storyblok API should cache and refresh the `cv` value from `/cdn/spaces/me` to maximize CDN hit rate.
@@ -30,6 +32,5 @@
 - p5.js sketches should add adaptive `frameRate` tiers based on device capability and reduced-motion preferences.
 - Performance telemetry should add Web Vitals and React profiler hooks for ongoing regression tracking.
 - MatterJS optimisation. Look at the Matter.js instances. Check if we can do optimizations. 
-- Optimizing Third-Party Scripts with the Next.js Script Component
-- Move route-static markdown rendering to SSR and keep only interactive token swaps client-side.
 - Analyse the current state of pre-fetching. And if needed, optimize. If it's already looking good, add it to the "have been optimized" list. 
+- Review MarkDown handling with Storyblok and NextJS best practices. See if there are better/new dependencies that are better or offer better storyblok integration.
