@@ -9,13 +9,11 @@ import '@/assets/styles/transitions.sass';
 import '@/assets/styles/global.sass';
 import '@/assets/styles/icon-styles.sass';
 import StoryblokProvider from '@/providers/storyblok-provider';
-import { ProjectsProvider } from '@/providers/projects-provider';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import AppInitializer from '@/components/AppInitStore';
 import BlokHead from '@/components/BlokHead';
 import BlokAction from '@/components/BlokAction';
 import ActionButton, {
-  ActionBlock,
   ActionButtonContainer,
 } from '@/components/ActionButton';
 import BlokFooter from '@/components/BlokFooter';
@@ -131,51 +129,47 @@ export default async function RootLayout({
         <BackgroundEffectsByTheme />
         <GrainyGradient variant="page" />
         <AppInitializer />
-        <ProjectsProvider projects={projects}>
-          <ClientEnhancements />
-          {process.env.NEXT_PUBLIC_GA_ID && (
-            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-          )}
-          <StoryblokProvider>
-            <ThemeFilter />
-            <OuterNavigation />
-            <OuterTheming />
-            <main className="main">
-              <BlokHead />
-              {children}
-              <BlokAction />
-              <BlokFooter />
-            </main>
-            <ActionButtonContainer>
-              {/* <ActionBlock variant="square" />*/}
-              {/* <ActionBlock variant="round" /> */}
-              <ActionButton
-                copy="Start your project"
-                link="info@driesbos.com?subject=Let's Make Internet"
-                linkType="email"
-                className="cursorInteract"
-                dropLeftPx={10}
-                dropOnPage="projects"
-              />
-              <ActionButton
-                copy="Let's talk"
-                link="info@driesbos.com?subject=Let's Make Internet"
-                linkType="email"
-                className="cursorInteract"
-                dropLeftPx={20}
-                dropOnPage="about"
-              />
-              <ActionButton
-                copy="Schedule a discovery call"
-                link="https://calendly.com/info-b9c/30min"
-                linkType="url"
-                className="cursorInteract"
-                dropLeftPx={50}
-                dropOnPage="about"
-              />
-            </ActionButtonContainer>
-          </StoryblokProvider>
-        </ProjectsProvider>
+        <ClientEnhancements />
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
+        <StoryblokProvider>
+          <ThemeFilter />
+          <OuterNavigation />
+          <OuterTheming />
+          <main className="main">
+            <BlokHead projects={projects} />
+            {children}
+            <BlokAction />
+            <BlokFooter />
+          </main>
+          <ActionButtonContainer>
+            <ActionButton
+              copy="Start your project"
+              link="info@driesbos.com?subject=Let's Make Internet"
+              linkType="email"
+              className="cursorInteract"
+              dropLeftPx={10}
+              dropOnPage="projects"
+            />
+            <ActionButton
+              copy="Let's talk"
+              link="info@driesbos.com?subject=Let's Make Internet"
+              linkType="email"
+              className="cursorInteract"
+              dropLeftPx={20}
+              dropOnPage="about"
+            />
+            <ActionButton
+              copy="Schedule a discovery call"
+              link="https://calendly.com/info-b9c/30min"
+              linkType="url"
+              className="cursorInteract"
+              dropLeftPx={50}
+              dropOnPage="about"
+            />
+          </ActionButtonContainer>
+        </StoryblokProvider>
         <DotsOverlayEffectsByTheme />
       </body>
     </html>

@@ -16,6 +16,12 @@
 - [2026-03-11] CustomCursor now runs a single RAF pointer loop and uses `quickSetter` for lower-cost high-frequency writes.
 - [2026-03-11] CustomCursor now derives hover targets without subtree observers or per-node listener binding.
 - [2026-03-11] CustomCursor preview image preloading is now demand-driven on hover instead of eager page-wide scanning.
+- [2026-03-11] Root layout no longer wraps the app in `ProjectsProvider`, and `BlokHead` now receives project data directly from the server layout.
+- [2026-03-11] `BlokHead` replaced `react-swipeable` with route-scoped native swipe listeners so project swipe logic only runs when needed.
+- [2026-03-11] `ActionButtonContainer` now waits for near-viewport visibility before loading `matter-js` and starting physics work.
+- [2026-03-11] `StoryblokProvider` now initializes Storyblok client code only in preview/editor contexts instead of every published page load.
+- [2026-03-11] `CursorLoader` is now mounted eagerly while still gate-loading the cursor to fine-pointer devices for faster desktop startup.
+- [2026-03-11] `BlokHead` theme cycler hover now only rotates the icon and no longer applies next-theme color previews.
 
 ## 2. To Do
 - Storyblok API should cache and refresh the `cv` value from `/cdn/spaces/me` to maximize CDN hit rate.
@@ -25,5 +31,5 @@
 - Performance telemetry should add Web Vitals and React profiler hooks for ongoing regression tracking.
 - MatterJS optimisation. Look at the Matter.js instances. Check if we can do optimizations. 
 - Optimizing Third-Party Scripts with the Next.js Script Component
-- NextJS lazy loading. Analyse components and make a plan for where to implement more lazy loading. Also consider code splitting welcome to Next.js and React best practices. When code splitting, use opportunities to move components to SSR. 
+- Move route-static markdown rendering to SSR and keep only interactive token swaps client-side.
 - Analyse the current state of pre-fetching. And if needed, optimize. If it's already looking good, add it to the "have been optimized" list. 

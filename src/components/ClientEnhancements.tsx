@@ -1,10 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import CursorLoader from '@/components/CursorLoader';
 
-const CursorLoader = dynamic(() => import('@/components/CursorLoader'), {
-  ssr: false,
-});
 const TitleSwitcher = dynamic(() => import('@/components/TitleSwitcher'), {
   ssr: false,
 });

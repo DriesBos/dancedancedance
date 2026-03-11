@@ -2,10 +2,8 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '@/store/store';
-import { useProjects } from '@/providers/projects-provider';
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useSwipeable } from 'react-swipeable';
 import IconAbout from '@/components/Icons/IconAbout';
 import IconClose from '@/components/Icons/IconClose';
 import IconArrow from '@/components/Icons/IconArrow';
@@ -23,21 +21,25 @@ import { useShallow } from 'zustand/react/shallow';
 import styles from './BlokHead.module.sass';
 
 interface Props {
-  blok?: unknown;
-  float?: boolean;
-  params?: unknown;
+  projects: Array<{
+    slug: string;
+    external_link?: { cached_url: string };
+  }>;
 }
 
 type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
 
-const BlokHead = ({}: Props) => {
+const BlokHead = ({ projects }: Props) => {
   const headRef = useRef<HTMLDivElement>(null);
   const titleViewportRef = useRef<HTMLDivElement>(null);
   const titleMeasureRef = useRef<HTMLSpanElement>(null);
   const path = usePathname();
   const currentPath = path || '/';
   const router = useRouter();
-  const { projectSlugs, projects } = useProjects();
+  const projectSlugs = useMemo(
+    () => projects.map((project) => project.slug),
+    [projects],
+  );
   const {
     theme,
     cycleTheme,
@@ -233,21 +235,6 @@ const BlokHead = ({}: Props) => {
     if (!prevProjectHref) return;
     router.push(prevProjectHref);
   }, [router, prevProjectHref]);
-
-  const projectPageSwipeHandlers = useSwipeable({
-    trackTouch: true,
-    trackMouse: false,
-    delta: { left: 56, right: 56 },
-    preventScrollOnSwipe: false,
-    onSwipedLeft: () => {
-      if (pathName !== 'projects') return;
-      clickNext();
-    },
-    onSwipedRight: () => {
-      if (pathName !== 'projects') return;
-      clickPrev();
-    },
-  });
 
   const isPagePastTop = useCallback(() => {
     const page = document.querySelector('.page');
@@ -710,19 +697,93 @@ const BlokHead = ({}: Props) => {
   }, []);
 
   useEffect(() => {
+    if (pathName !== 'projects') return;
     const main = document.querySelector('main');
     if (!(main instanceof HTMLElement)) return;
 
-    if (pathName !== 'projects') {
-      projectPageSwipeHandlers.ref(null);
-      return;
+    const SWIPE_X_THRESHOLD = 56;
+    const SWIPE_Y_THRESHOLD = 56;
+    let startX: number | null = null;
+    let startY: number | null = null;
+    let activePointerId: number | null = null;
+
+    const maybeHandleSwipe = (endX: number, endY: number) => {
+      if (startX === null || startY === null) return;
+
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
+      startX = null;
+      startY = null;
+
+      if (Math.abs(deltaX) < SWIPE_X_THRESHOLD) return;
+      if (Math.abs(deltaY) > SWIPE_Y_THRESHOLD) return;
+      if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+      if (deltaX < 0) {
+        clickNext();
+        return;
+      }
+      clickPrev();
+    };
+
+    if (typeof window.PointerEvent === 'function') {
+      const onPointerDown = (e: PointerEvent) => {
+        if (e.pointerType !== 'touch') return;
+        activePointerId = e.pointerId;
+        startX = e.clientX;
+        startY = e.clientY;
+      };
+
+      const onPointerUp = (e: PointerEvent) => {
+        if (activePointerId !== e.pointerId) return;
+        activePointerId = null;
+        maybeHandleSwipe(e.clientX, e.clientY);
+      };
+
+      const onPointerCancel = (e: PointerEvent) => {
+        if (activePointerId !== e.pointerId) return;
+        activePointerId = null;
+        startX = null;
+        startY = null;
+      };
+
+      main.addEventListener('pointerdown', onPointerDown, { passive: true });
+      main.addEventListener('pointerup', onPointerUp, { passive: true });
+      main.addEventListener('pointercancel', onPointerCancel, { passive: true });
+      return () => {
+        main.removeEventListener('pointerdown', onPointerDown);
+        main.removeEventListener('pointerup', onPointerUp);
+        main.removeEventListener('pointercancel', onPointerCancel);
+      };
     }
 
-    projectPageSwipeHandlers.ref(main);
-    return () => {
-      projectPageSwipeHandlers.ref(null);
+    const onTouchStart = (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+      startX = touch.clientX;
+      startY = touch.clientY;
     };
-  }, [pathName, projectPageSwipeHandlers]);
+
+    const onTouchEnd = (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+      maybeHandleSwipe(touch.clientX, touch.clientY);
+    };
+
+    const onTouchCancel = () => {
+      startX = null;
+      startY = null;
+    };
+
+    main.addEventListener('touchstart', onTouchStart, { passive: true });
+    main.addEventListener('touchend', onTouchEnd, { passive: true });
+    main.addEventListener('touchcancel', onTouchCancel, { passive: true });
+    return () => {
+      main.removeEventListener('touchstart', onTouchStart);
+      main.removeEventListener('touchend', onTouchEnd);
+      main.removeEventListener('touchcancel', onTouchCancel);
+    };
+  }, [pathName, clickNext, clickPrev]);
 
   useEffect(() => {
     if (pathName !== 'projects') return;

@@ -8,15 +8,38 @@ const CustomCursor = dynamic(() => import('./CustomCursor'), {
 });
 
 export default function CursorLoader() {
-  const [hasFinePointer, setHasFinePointer] = useState(false);
+  const [hasFinePointer, setHasFinePointer] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    if (typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia('(pointer: fine)').matches;
+  });
 
   useEffect(() => {
-    // Check if device has a fine pointer (mouse, stylus)
-    // This is more accurate than (hover: hover) for detecting cursor devices
-    const hasFinePointer =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(pointer: fine)').matches;
-    setHasFinePointer(hasFinePointer);
+    if (typeof window.matchMedia !== 'function') {
+      setHasFinePointer(false);
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(pointer: fine)');
+    setHasFinePointer(mediaQuery.matches);
+
+    const onChange = (event: MediaQueryListEvent) => {
+      setHasFinePointer(event.matches);
+    };
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', onChange);
+    } else {
+      mediaQuery.addListener(onChange);
+    }
+
+    return () => {
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', onChange);
+      } else {
+        mediaQuery.removeListener(onChange);
+      }
+    };
   }, []);
 
   // Don't render anything on touch devices or devices without fine pointers

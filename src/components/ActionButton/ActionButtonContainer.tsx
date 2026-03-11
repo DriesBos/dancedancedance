@@ -53,6 +53,7 @@ const ActionButtonContainer = ({
   className = '',
 }: ActionButtonContainerProps) => {
   const [isSettled, setIsSettled] = useState(false);
+  const [isNearViewport, setIsNearViewport] = useState(false);
   const [layoutVersion, setLayoutVersion] = useState(0);
   const [matterModule, setMatterModule] = useState<MatterJsModule | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,11 +72,44 @@ const ActionButtonContainer = ({
   const pageSlug = pathname.split('/')[1] || 'home';
   const shouldRenderOnRoute =
     pageSlug === 'home' || pageSlug === 'about' || pageSlug === 'projects';
+  const shouldActivatePhysics = shouldRenderOnRoute && isNearViewport;
   const childItems = useMemo(() => Children.toArray(children), [children]);
   const childCount = childItems.length;
 
   useEffect(() => {
     if (!shouldRenderOnRoute) {
+      setIsNearViewport(false);
+      return;
+    }
+    if (isNearViewport) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+    if (typeof IntersectionObserver !== 'function') {
+      setIsNearViewport(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const hasIntersectingEntry = entries.some((entry) => entry.isIntersecting);
+        if (!hasIntersectingEntry) return;
+        setIsNearViewport(true);
+        observer.disconnect();
+      },
+      {
+        rootMargin: '240px 0px',
+      },
+    );
+
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+    };
+  }, [isNearViewport, shouldRenderOnRoute]);
+
+  useEffect(() => {
+    if (!shouldActivatePhysics) {
       setMatterModule(null);
       return;
     }
@@ -94,7 +128,7 @@ const ActionButtonContainer = ({
     return () => {
       isCancelled = true;
     };
-  }, [shouldRenderOnRoute]);
+  }, [shouldActivatePhysics]);
 
   const setSettledState = useCallback((nextValue: boolean) => {
     if (latestSettledRef.current === nextValue) return;
@@ -241,7 +275,7 @@ const ActionButtonContainer = ({
   }, [matterModule, setSettledState]);
 
   useEffect(() => {
-    if (!shouldRenderOnRoute) return;
+    if (!shouldActivatePhysics) return;
 
     const container = containerRef.current;
     if (!container) return;
@@ -291,10 +325,10 @@ const ActionButtonContainer = ({
         window.cancelAnimationFrame(resizeRafId);
       }
     };
-  }, [shouldRenderOnRoute]);
+  }, [shouldActivatePhysics]);
 
   useEffect(() => {
-    if (!shouldRenderOnRoute || !matterModule) return;
+    if (!shouldActivatePhysics || !matterModule) return;
 
     const container = containerRef.current;
     const itemElements = itemRefs.current
@@ -418,15 +452,15 @@ const ActionButtonContainer = ({
     layoutVersion,
     matterModule,
     setSettledState,
-    shouldRenderOnRoute,
+    shouldActivatePhysics,
     spawnEntry,
     startRenderLoop,
   ]);
 
   useEffect(() => {
-    if (!shouldRenderOnRoute || !matterModule) return;
+    if (!shouldActivatePhysics || !matterModule) return;
     spawnEligibleForRoute(pageSlug);
-  }, [matterModule, pageSlug, shouldRenderOnRoute, spawnEligibleForRoute]);
+  }, [matterModule, pageSlug, shouldActivatePhysics, spawnEligibleForRoute]);
 
   if (!shouldRenderOnRoute) {
     return null;
