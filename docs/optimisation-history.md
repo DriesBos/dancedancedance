@@ -19,18 +19,18 @@
 - [2026-03-11] Root layout no longer wraps the app in `ProjectsProvider`, and `BlokHead` now receives project data directly from the server layout.
 - [2026-03-11] `BlokHead` replaced `react-swipeable` with route-scoped native swipe listeners so project swipe logic only runs when needed.
 - [2026-03-11] `ActionButtonContainer` now waits for near-viewport visibility before loading `matter-js` and starting physics work.
-- [2026-03-11] `ActionButtonContainer` now stops Matter.js runner/RAF loops when items settle, pauses simulation while the document is hidden, and tears down physics once all route-scoped buttons have spawned and settled.
+- [2026-03-11] `ActionButtonContainer` now stops Matter.js runner/RAF loops when items settle, pauses simulation while the document is hidden, tears down physics once all route-scoped buttons have spawned and settled, and keeps a lightweight resize/orientation sync for persisted button positions.
 - [2026-03-11] Storyblok Live Preview was fully removed, including preview route, provider bootstrap, and client init code.
 - [2026-03-11] `CursorLoader` is now mounted eagerly while still gate-loading the cursor to fine-pointer devices for faster desktop startup.
 - [2026-03-11] `BlokHead` theme cycler hover now only rotates the icon and no longer applies next-theme color previews.
 - [2026-03-11] Third-party Google Analytics loading now uses Next.js `Script` with `lazyOnload`, and the root bootstrap script now uses `Script` with `beforeInteractive`.
 - [2026-03-11] Route-static markdown now renders on the server while inline token-swap rotators stay client-side.
 - [2026-03-11] Performance telemetry now tracks Web Vitals and sampled React Profiler commits through a batched ingestion endpoint.
+- [2026-03-11] Route prefetching is now intent-driven: project cards prefetch on hover/touch intent, and the project slider disables blanket link prefetch while manually prefetching only active/hovered internal routes.
 
 ## 2. To Do
 - Storyblok API should cache and refresh the `cv` value from `/cdn/spaces/me` to maximize CDN hit rate.
 - React Three Fiber dots should move to demand-driven rendering with manual `invalidate` where motion is idle.
 - Three.js bird and dots renderers should dynamically scale DPR using real FPS regression signals.
 - p5.js sketches should add adaptive `frameRate` tiers based on device capability and reduced-motion preferences.
-- Analyse the current state of pre-fetching. And if needed, optimize. If it's already looking good, add it to the "have been optimized" list. 
 - Review MarkDown handling with Storyblok and NextJS best practices. See if there are better/new dependencies that are better or offer better storyblok integration.

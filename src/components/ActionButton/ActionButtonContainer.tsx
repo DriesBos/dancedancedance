@@ -79,6 +79,7 @@ const ActionButtonContainer = ({
   const childCount = childItems.length;
 
   useEffect(() => {
+    if (hasCompletedDrops) return;
     if (!shouldRenderOnRoute) {
       setIsNearViewport(false);
       return;
@@ -108,7 +109,7 @@ const ActionButtonContainer = ({
     return () => {
       observer.disconnect();
     };
-  }, [isNearViewport, shouldRenderOnRoute]);
+  }, [hasCompletedDrops, isNearViewport, shouldRenderOnRoute]);
 
   useEffect(() => {
     if (!shouldActivatePhysics) {
@@ -137,6 +138,71 @@ const ActionButtonContainer = ({
     latestSettledRef.current = nextValue;
     setIsSettled(nextValue);
   }, []);
+
+  const applyPersistedLayoutForSize = useCallback(
+    (containerWidth: number, containerHeight: number) => {
+      const previousSize = lastKnownSizeRef.current;
+      const hasPreviousSize =
+        !!previousSize && previousSize.width > 0 && previousSize.height > 0;
+
+      if (
+        hasPreviousSize &&
+        previousSize.width === containerWidth &&
+        previousSize.height === containerHeight
+      ) {
+        return;
+      }
+
+      for (const [index, persistedState] of persistedStatesRef.current.entries()) {
+        const element = itemRefs.current[index];
+        if (!element) continue;
+
+        const { width, height, angle, x, y } = persistedState;
+        let nextX = x;
+        let nextY = y;
+
+        if (hasPreviousSize && previousSize) {
+          const centerX = x + width / 2;
+          const centerRatioX = centerX / previousSize.width;
+          const nextCenterX = Math.min(
+            containerWidth - width / 2,
+            Math.max(width / 2, centerRatioX * containerWidth),
+          );
+          nextX = nextCenterX - width / 2;
+
+          const previousBottomGap = Math.max(
+            0,
+            previousSize.height - (y + height),
+          );
+          const nextBottomGap =
+            previousSize.height > 0
+              ? (previousBottomGap / previousSize.height) * containerHeight
+              : previousBottomGap;
+          nextY = Math.min(
+            containerHeight - height,
+            Math.max(0, containerHeight - height - nextBottomGap),
+          );
+        } else {
+          nextX = Math.min(containerWidth - width, Math.max(0, x));
+          nextY = Math.min(containerHeight - height, Math.max(0, y));
+        }
+
+        element.style.transform = `translate3d(${nextX}px, ${nextY}px, 0) rotate(${angle}rad)`;
+        showElement(element);
+        persistedStatesRef.current.set(index, {
+          ...persistedState,
+          x: nextX,
+          y: nextY,
+        });
+      }
+
+      lastKnownSizeRef.current = {
+        width: containerWidth,
+        height: containerHeight,
+      };
+    },
+    [],
+  );
 
   useEffect(() => {
     if (hasCompletedDrops) return;
@@ -375,6 +441,41 @@ const ActionButtonContainer = ({
       }
     };
   }, [shouldActivatePhysics]);
+
+  useEffect(() => {
+    if (!hasCompletedDrops || !shouldRenderOnRoute) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    let resizeRafId = 0;
+    const syncPersistedLayout = () => {
+      const rect = container.getBoundingClientRect();
+      applyPersistedLayoutForSize(Math.round(rect.width), Math.round(rect.height));
+    };
+
+    const requestPersistedLayoutSync = () => {
+      if (resizeRafId !== 0) {
+        window.cancelAnimationFrame(resizeRafId);
+      }
+      resizeRafId = window.requestAnimationFrame(() => {
+        resizeRafId = 0;
+        syncPersistedLayout();
+      });
+    };
+
+    requestPersistedLayoutSync();
+    window.addEventListener('resize', requestPersistedLayoutSync);
+    window.addEventListener('orientationchange', requestPersistedLayoutSync);
+
+    return () => {
+      window.removeEventListener('resize', requestPersistedLayoutSync);
+      window.removeEventListener('orientationchange', requestPersistedLayoutSync);
+      if (resizeRafId !== 0) {
+        window.cancelAnimationFrame(resizeRafId);
+      }
+    };
+  }, [applyPersistedLayoutForSize, hasCompletedDrops, shouldRenderOnRoute]);
 
   useEffect(() => {
     if (!shouldActivatePhysics || !matterModule) return;
