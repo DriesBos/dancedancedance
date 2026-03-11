@@ -55,6 +55,28 @@ const INITIAL_UI_STATE_SCRIPT = `
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', themeColor);
     }
+
+    var clearInitializing = function () {
+      if (!document.body) return;
+      document.body.removeAttribute('data-initializing');
+    };
+
+    var scheduleClearInitializing = function () {
+      if (typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(function () {
+          window.requestAnimationFrame(clearInitializing);
+        });
+      }
+      window.setTimeout(clearInitializing, 450);
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scheduleClearInitializing, {
+        once: true,
+      });
+    } else {
+      scheduleClearInitializing();
+    }
   })();
 `;
 

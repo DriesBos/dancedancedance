@@ -49,6 +49,7 @@ const applyBodyState = (theme: Theme, layout: Layout, slug: string) => {
 const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const readyFrameRef = useRef<number | null>(null);
+  const readyTimeoutRef = useRef<number | null>(null);
   const { setTwoD, setThreeD, setTheme, theme, layout } = useStore(
     useShallow((state) => ({
       setTwoD: state.setTwoD,
@@ -61,6 +62,9 @@ const AppInitializer = () => {
   const path = usePathname();
   const slug = (path || '/').split('/')[1] || 'home';
   const pathname = path || '/';
+  const clearInitializingAttr = () => {
+    document.body?.removeAttribute('data-initializing');
+  };
 
   useLayoutEffect(() => {
     if (!hasInitializedUIRef.current) {
@@ -83,9 +87,23 @@ const AppInitializer = () => {
 
       if (readyFrameRef.current === null) {
         readyFrameRef.current = window.requestAnimationFrame(() => {
-          document.body?.removeAttribute('data-initializing');
+          clearInitializingAttr();
+          if (readyTimeoutRef.current !== null) {
+            window.clearTimeout(readyTimeoutRef.current);
+            readyTimeoutRef.current = null;
+          }
           readyFrameRef.current = null;
         });
+      }
+      if (readyTimeoutRef.current === null) {
+        readyTimeoutRef.current = window.setTimeout(() => {
+          clearInitializingAttr();
+          if (readyFrameRef.current !== null) {
+            window.cancelAnimationFrame(readyFrameRef.current);
+            readyFrameRef.current = null;
+          }
+          readyTimeoutRef.current = null;
+        }, 450);
       }
 
       return;
@@ -98,6 +116,9 @@ const AppInitializer = () => {
     return () => {
       if (readyFrameRef.current !== null) {
         window.cancelAnimationFrame(readyFrameRef.current);
+      }
+      if (readyTimeoutRef.current !== null) {
+        window.clearTimeout(readyTimeoutRef.current);
       }
     };
   }, []);
