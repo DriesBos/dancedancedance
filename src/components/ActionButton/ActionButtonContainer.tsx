@@ -69,7 +69,8 @@ const ActionButtonContainer = ({
   );
   const pathname = usePathname() || '/';
   const pageSlug = pathname.split('/')[1] || 'home';
-  const shouldRenderOnRoute = pageSlug === 'about' || pageSlug === 'projects';
+  const shouldRenderOnRoute =
+    pageSlug === 'home' || pageSlug === 'about' || pageSlug === 'projects';
   const childItems = useMemo(() => Children.toArray(children), [children]);
   const childCount = childItems.length;
 
