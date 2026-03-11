@@ -76,8 +76,19 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || 'https://www.driesbos.com',
   ),
+  applicationName: 'Dries Bos',
+  manifest: '/manifest.webmanifest',
   title: 'Dries Bos — Creative Developer',
   description: 'Dries Bos — Creative Developer',
+  icons: {
+    apple: [
+      {
+        url: '/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+  },
   appleWebApp: {
     title: 'Dries Bos',
     statusBarStyle: 'black-translucent',
