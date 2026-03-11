@@ -303,15 +303,17 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
-      {blok.body.map((item, index) => (
-        <SlideItem
-          key={item._uid}
-          item={item}
-          isActive={index === activeIndex}
-          isNext={index === (activeIndex + 1) % blok.body.length}
-          index={index}
-        />
-      ))}
+      <div className={styles.slideStack}>
+        {blok.body.map((item, index) => (
+          <SlideItem
+            key={item._uid}
+            item={item}
+            isActive={index === activeIndex}
+            isNext={index === (activeIndex + 1) % blok.body.length}
+            index={index}
+          />
+        ))}
+      </div>
       <div className={`${styles.indicatorAnchor} indicatorAnchor`}>
         <SliderIndicators total={blok.body.length} activeIndex={activeIndex} />
       </div>
