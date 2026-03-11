@@ -27,10 +27,15 @@
 - [2026-03-11] Route-static markdown now renders on the server while inline token-swap rotators stay client-side.
 - [2026-03-11] Performance telemetry now tracks Web Vitals and sampled React Profiler commits through a batched ingestion endpoint.
 - [2026-03-11] Route prefetching is now intent-driven: project cards prefetch on hover/touch intent, and the project slider disables blanket link prefetch while manually prefetching only active/hovered internal routes.
+- [2026-03-11] Markdown handling dependency review was intentionally skipped to avoid unnecessary changes.
 
 ## 2. To Do
 - Storyblok API should cache and refresh the `cv` value from `/cdn/spaces/me` to maximize CDN hit rate.
 - React Three Fiber dots should move to demand-driven rendering with manual `invalidate` where motion is idle.
 - Three.js bird and dots renderers should dynamically scale DPR using real FPS regression signals.
-- p5.js sketches should add adaptive `frameRate` tiers based on device capability and reduced-motion preferences.
-- Review MarkDown handling with Storyblok and NextJS best practices. See if there are better/new dependencies that are better or offer better storyblok integration.
+- p5.js sketches should add adaptive `frameRate` tiers based on device capability.
+- Add App Router error handling files (`error.tsx`, `global-error.tsx`, and `not-found.tsx`) so runtime failures and 404s are handled through framework boundaries instead of inline JSX fallbacks.
+- Add `app/sitemap.ts` and include sitemap location in robots output for stronger crawlability and metadata-route completeness.
+- Add a Content Security Policy rollout (start in report-only mode, then enforce) and document handling for required inline scripts.
+- Add a repeatable bundle-analysis workflow (`@next/bundle-analyzer` + `pnpm analyze`) and track route-level JS budgets.
+- Run a production-like verification pass (`next build && next start`) with Lighthouse/Web Vitals budget checks and basic load testing before releases.
