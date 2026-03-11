@@ -148,7 +148,7 @@ const DitheringVideoPortrait = ({
   const [currentContrast, setCurrentContrast] = useState<number>(
     Math.round(clamp(contrast, 0, 2) * 10) / 10,
   );
-  const [currentInvert, setCurrentInvert] = useState<boolean>(Boolean(invert));
+  const [currentInvert, setCurrentInvert] = useState<boolean | undefined>(invert);
   const [isDocumentVisible, setIsDocumentVisible] = useState<boolean>(
     typeof document === 'undefined' ? true : !document.hidden,
   );
@@ -219,7 +219,7 @@ const DitheringVideoPortrait = ({
   }, [contrast]);
 
   useEffect(() => {
-    setCurrentInvert(Boolean(invert));
+    setCurrentInvert(invert);
   }, [invert]);
 
   useEffect(() => {
@@ -571,7 +571,7 @@ const DitheringVideoPortrait = ({
   };
 
   const toggleInvert = () => {
-    setCurrentInvert((prev) => !prev);
+    setCurrentInvert((prev) => !Boolean(prev));
   };
 
   const frameClassName =

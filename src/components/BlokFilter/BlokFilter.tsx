@@ -34,39 +34,43 @@ export default function BlokFilter({
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row>
-        <button
-          type="button"
-          className={`column column-Year cursorInteract desktop ${styles.sortButton}`}
-          data-active={isSortActive('year')}
-          data-inactive={!isSortActive('year')}
-          onClick={() => onSortChange('year')}
-        >
-          year
-        </button>
-        <div className="column column-Title mobile">Selected work</div>
-        <button
-          type="button"
-          className={`column column-Project cursorInteract desktop ${styles.sortButton}`}
-          data-active={isSortActive('title')}
-          data-inactive={!isSortActive('title')}
-          onClick={() => onSortChange('title')}
-        >
-          selected work
-        </button>
-        <button
-          type="button"
-          className={`column column-Category cursorInteract ${styles.sortButton}`}
-          data-active={isSortActive('category')}
-          data-inactive={!isSortActive('category')}
-          onClick={() => onSortChange('category')}
-        >
-          category
-        </button>
-        <div className={`column column-Icons ${styles.iconWrapper}`}>
-          <div className={`icon ${styles.icon}`}>
-            <IconArrow />
+        <div className="column column-Left">
+          <button
+            type="button"
+            className={`column column-Year cursorInteract desktop ${styles.sortButton}`}
+            data-active={isSortActive('year')}
+            data-inactive={!isSortActive('year')}
+            onClick={() => onSortChange('year')}
+          >
+            year
+          </button>
+          <div className="column column-Title mobile">Selected work</div>
+          <button
+            type="button"
+            className={`column column-Project cursorInteract desktop ${styles.sortButton}`}
+            data-active={isSortActive('title')}
+            data-inactive={!isSortActive('title')}
+            onClick={() => onSortChange('title')}
+          >
+            selected work
+          </button>
+        </div>
+        <div className="column column-Right">
+          <button
+            type="button"
+            className={`column column-Category cursorInteract ${styles.sortButton}`}
+            data-active={isSortActive('category')}
+            data-inactive={!isSortActive('category')}
+            onClick={() => onSortChange('category')}
+          >
+            category
+          </button>
+          <div className={`column column-Icons ${styles.iconWrapper}`}>
+            <div className={`icon ${styles.icon}`}>
+              <IconArrow />
+            </div>
+            <SearchInput value={searchValue} onChange={onSearchChange} />
           </div>
-          <SearchInput value={searchValue} onChange={onSearchChange} />
         </div>
       </Row>
     </div>

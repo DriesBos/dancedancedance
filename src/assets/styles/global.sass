@@ -564,6 +564,13 @@ mux-player, .muxPlayer
     justify-content: flex-end
     @media (max-width: 770px)
       display: none
+    .column-Left, .column-Right
+      width: 50%
+      padding: 0 !important
+      display: flex
+      min-width: 0
+    .column-Category
+      padding-left: calc(var(--spacing-base) / 2) !important
     .icon
       opacity: 0 !important
     .mobile
