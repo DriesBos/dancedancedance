@@ -5,6 +5,7 @@ import {
   sampleParallaxTween,
   snapParallaxTween,
 } from './parallaxEasing';
+import { resolveAdaptiveP5FrameRate } from './p5AdaptiveFrameRate';
 
 export type KusamaParams = {
   cellSize: number;
@@ -458,6 +459,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     };
     const teardownFns: Array<() => void> = [];
     let parallaxEnabled = false;
+    let activeFrameRate = 0;
 
     const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
     const getOrientation = (width: number, height: number) =>
@@ -515,6 +517,20 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       seedRowCount = seedGrid.rowCount;
     };
 
+    const updateAdaptiveFrameRate = (
+      viewportWidth: number,
+      viewportHeight: number,
+    ) => {
+      const nextFrameRate = resolveAdaptiveP5FrameRate({
+        viewportWidth,
+        viewportHeight,
+        coarsePointer: isCoarsePointerDevice(),
+      });
+      if (nextFrameRate === activeFrameRate) return;
+      activeFrameRate = nextFrameRate;
+      instance.frameRate(activeFrameRate);
+    };
+
     const updatePointer = (x: number, y: number, boost: number) => {
       const dx = x - pointer.x;
       const dy = y - pointer.y;
@@ -546,7 +562,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       }
 
       instance.pixelDensity(1);
-      instance.frameRate(30);
+      updateAdaptiveFrameRate(instance.windowWidth, instance.windowHeight);
       setupSeeds(KUSAMA_SCENE_DENSITY);
       lastViewportWidth = instance.windowWidth;
       lastViewportHeight = instance.windowHeight;
@@ -691,6 +707,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       }
 
       instance.resizeCanvas(nextWidth, nextHeight);
+      updateAdaptiveFrameRate(nextWidth, nextHeight);
       setupSeeds(KUSAMA_SCENE_DENSITY);
       lastViewportWidth = nextWidth;
       lastViewportHeight = nextHeight;

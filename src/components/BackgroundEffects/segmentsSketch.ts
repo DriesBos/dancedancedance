@@ -1,4 +1,5 @@
 import type p5 from 'p5';
+import { resolveAdaptiveP5FrameRate } from './p5AdaptiveFrameRate';
 
 const EPSILON = 1e-9;
 const POINT_EPSILON = 1e-6;
@@ -966,6 +967,7 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
     let lastViewportWidth = 0;
     let lastViewportHeight = 0;
     let lastOrientation: 'portrait' | 'landscape' = 'landscape';
+    let activeFrameRate = 0;
 
     const getOrientation = (width: number, height: number) =>
       width >= height ? 'landscape' : 'portrait';
@@ -990,6 +992,21 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
       window.matchMedia('(pointer: coarse)').matches ||
       (navigator.maxTouchPoints ?? 0) > 0;
 
+    const updateAdaptiveFrameRate = (
+      viewportWidth: number,
+      viewportHeight: number,
+    ) => {
+      const nextFrameRate = resolveAdaptiveP5FrameRate({
+        viewportWidth,
+        viewportHeight,
+        coarsePointer: isCoarsePointerDevice(),
+      });
+
+      if (nextFrameRate === activeFrameRate) return;
+      activeFrameRate = nextFrameRate;
+      instance.frameRate(activeFrameRate);
+    };
+
     const reset = () => {
       state.regionPool = createRegionPool();
       const root = createRootRegion(instance.width, instance.height);
@@ -1011,10 +1028,10 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
       }
 
       instance.pixelDensity(1);
-      instance.frameRate(30);
       instance.noFill();
       const { width: viewportWidth, height: viewportHeight } =
         getViewportDimensions();
+      updateAdaptiveFrameRate(viewportWidth, viewportHeight);
       lastViewportWidth = viewportWidth;
       lastViewportHeight = viewportHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
@@ -1113,6 +1130,7 @@ export function createSegmentsSketch(options: SegmentsSketchOptions) {
       const { width: nextCanvasWidth, height: nextCanvasHeight } =
         getCanvasDimensions();
       instance.resizeCanvas(nextCanvasWidth, nextCanvasHeight);
+      updateAdaptiveFrameRate(nextViewportWidth, nextViewportHeight);
       ink = resolveInkStyle(options.host, settings);
       reset();
       lastViewportWidth = nextViewportWidth;
