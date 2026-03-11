@@ -26,11 +26,28 @@ const ScrollToTopLink = ({ className, children }: Props) => {
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    if (prefersReducedMotion) {
+      const html = document.documentElement;
+      const body = document.body;
+      const previousHtmlScrollBehavior = html.style.scrollBehavior;
+      const previousBodyScrollBehavior = body.style.scrollBehavior;
+
+      html.style.scrollBehavior = 'auto';
+      body.style.scrollBehavior = 'auto';
+      window.scrollTo(0, 0);
+
+      window.requestAnimationFrame(() => {
+        html.style.scrollBehavior = previousHtmlScrollBehavior;
+        body.style.scrollBehavior = previousBodyScrollBehavior;
+      });
+      return;
+    }
+
     try {
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        behavior: 'smooth',
       });
     } catch {
       window.scrollTo(0, 0);

@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useStore } from '@/store/store';
 import styles from './OuterTheming.module.sass';
 
 const OuterTheming = () => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const theme = useStore((state) => state.theme);
   const layout = useStore((state) => state.layout);
   const cycleTheme = useStore((state) => state.cycleTheme);
@@ -24,9 +26,53 @@ const OuterTheming = () => {
     setTwoD();
   };
 
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    const reducedMotionQuery = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    );
+    const syncReducedMotionPreference = () => {
+      setPrefersReducedMotion(reducedMotionQuery.matches);
+    };
+
+    syncReducedMotionPreference();
+
+    if (typeof reducedMotionQuery.addEventListener === 'function') {
+      reducedMotionQuery.addEventListener(
+        'change',
+        syncReducedMotionPreference,
+      );
+      return () => {
+        reducedMotionQuery.removeEventListener(
+          'change',
+          syncReducedMotionPreference,
+        );
+      };
+    }
+
+    reducedMotionQuery.addListener(syncReducedMotionPreference);
+    return () => {
+      reducedMotionQuery.removeListener(syncReducedMotionPreference);
+    };
+  }, []);
+
   return (
     <div className={styles.outerTheming}>
       <div className={styles.outerThemingContainer}>
+        {prefersReducedMotion && (
+          <span
+            className={`${styles.outerThemingButton} ${styles.outerThemingStatus}`}
+            aria-hidden="true"
+          >
+            <span>
+              REDUCED MOTION{' '}
+              <span className={styles.outerThemingStatusActive}>ACTIVE</span>
+            </span>
+          </span>
+        )}
         <button
           type="button"
           className={`${styles.outerThemingButton} cursorInteract linkAnimation`}

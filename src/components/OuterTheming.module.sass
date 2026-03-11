@@ -41,3 +41,16 @@
   //   display: inline-block
   //   transform: rotate(-90deg) translate(1.15rem, 0)
   //   transform-origin: bottom right
+
+.outerThemingStatus
+  pointer-events: none
+
+.outerThemingStatusActive
+  display: inline-block
+  animation: outerThemingStatusBlink 1s steps(1, end) infinite
+
+@keyframes outerThemingStatusBlink
+  0%, 49%
+    opacity: 1
+  50%, 100%
+    opacity: 0
