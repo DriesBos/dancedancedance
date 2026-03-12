@@ -11,6 +11,12 @@ type TextTweenSetters = {
   xTo: QuickToSetter;
   yTo: QuickToSetter;
 };
+type PositionBoundary = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
 
 export default function CustomCursor() {
   const pathname = usePathname();
@@ -114,9 +120,9 @@ export default function CustomCursor() {
       ease: 'power3',
     }) as QuickToSetter;
 
-    const followerDefaultSize = '0.9090909091rem';
-    const followerInteractSize = '1.8181818182rem';
-    const followerMagneticSize = '2.7272727273rem';
+    const followerDefaultSize = '1rem';
+    const followerInteractSize = '2rem';
+    const followerMagneticSize = '3rem';
     let currentFollowerMode: FollowerMode = 'default';
 
     const setFollowerMode = (mode: FollowerMode) => {
@@ -172,6 +178,7 @@ export default function CustomCursor() {
 
     let messageOffsetX = 0;
     let messageOffsetY = 0;
+    let previewRightInset = 0;
 
     const updateMessageOffsets = () => {
       const remInPixels = parseFloat(
@@ -181,7 +188,44 @@ export default function CustomCursor() {
       messageOffsetY = 0.4545454545 * remInPixels;
     };
 
-    updateMessageOffsets();
+    const toPixels = (cssLength: string, remInPixels: number): number => {
+      if (!cssLength) return 0;
+      const value = cssLength.trim();
+
+      if (value.endsWith('rem')) {
+        const remValue = parseFloat(value.slice(0, -3));
+        return Number.isFinite(remValue) ? remValue * remInPixels : 0;
+      }
+
+      if (value.endsWith('px')) {
+        const pixelValue = parseFloat(value.slice(0, -2));
+        return Number.isFinite(pixelValue) ? pixelValue : 0;
+      }
+
+      const numericValue = parseFloat(value);
+      return Number.isFinite(numericValue) ? numericValue : 0;
+    };
+
+    const updatePreviewBoundaryInset = () => {
+      const rootStyle = getComputedStyle(document.documentElement);
+      const remInPixels = parseFloat(rootStyle.fontSize) || 16;
+      const iconSize = toPixels(
+        rootStyle.getPropertyValue('--icon-size'),
+        remInPixels,
+      );
+      const iconSpacing = toPixels(
+        rootStyle.getPropertyValue('--spacing-icons'),
+        remInPixels,
+      );
+      previewRightInset = iconSize + iconSpacing;
+    };
+
+    const updateCursorMeasurements = () => {
+      updateMessageOffsets();
+      updatePreviewBoundaryInset();
+    };
+
+    updateCursorMeasurements();
 
     const getTextTweens = (textEl: HTMLElement): TextTweenSetters => {
       const existing = textTweenMap.get(textEl);
@@ -225,23 +269,63 @@ export default function CustomCursor() {
       }
     };
 
+    const getPreviewBoundary = (): PositionBoundary => {
+      const viewportBoundary: PositionBoundary = {
+        left: 0,
+        top: 0,
+        right: window.innerWidth,
+        bottom: window.innerHeight,
+      };
+
+      const mainContainer =
+        document.querySelector<HTMLElement>('main.main') ??
+        document.querySelector<HTMLElement>('main');
+
+      if (!mainContainer) {
+        return viewportBoundary;
+      }
+
+      const rect = mainContainer.getBoundingClientRect();
+      const mainBoundary: PositionBoundary = {
+        left: Math.max(0, rect.left),
+        top: Math.max(0, rect.top),
+        right: Math.min(window.innerWidth, rect.right) - previewRightInset,
+        bottom: Math.min(window.innerHeight, rect.bottom),
+      };
+
+      if (
+        mainBoundary.right <= mainBoundary.left ||
+        mainBoundary.bottom <= mainBoundary.top
+      ) {
+        return viewportBoundary;
+      }
+
+      return mainBoundary;
+    };
+
     const clampPreviewPosition = (clientX: number, clientY: number) => {
       const previewWidth = previewContainer.offsetWidth || 360;
       const previewHeight = previewContainer.offsetHeight || 270;
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
+      const boundary = getPreviewBoundary();
       const padding = 16;
       let x = clientX - previewWidth / 2;
       let y = clientY - previewHeight / 2;
+      const minX = boundary.left + padding;
+      const minY = boundary.top + padding;
+      const maxX = boundary.right - previewWidth - padding;
+      const maxY = boundary.bottom - previewHeight - padding;
 
-      x = Math.max(
-        padding,
-        Math.min(viewportWidth - previewWidth - padding, x),
-      );
-      y = Math.max(
-        padding,
-        Math.min(viewportHeight - previewHeight - padding, y),
-      );
+      if (maxX < minX) {
+        x = boundary.left + (boundary.right - boundary.left - previewWidth) / 2;
+      } else {
+        x = Math.max(minX, Math.min(maxX, x));
+      }
+
+      if (maxY < minY) {
+        y = boundary.top + (boundary.bottom - boundary.top - previewHeight) / 2;
+      } else {
+        y = Math.max(minY, Math.min(maxY, y));
+      }
 
       return { x, y };
     };
@@ -556,7 +640,9 @@ export default function CustomCursor() {
     showNavigationHintRef.current = showProjectNavigationHint;
     showProjectNavigationHint();
 
-    window.addEventListener('resize', updateMessageOffsets, { passive: true });
+    window.addEventListener('resize', updateCursorMeasurements, {
+      passive: true,
+    });
     window.addEventListener('blur', handleMouseLeaveWindow);
     if (typeof window.PointerEvent === 'function') {
       document.addEventListener('pointermove', handlePointerMove, {
@@ -569,7 +655,7 @@ export default function CustomCursor() {
     document.addEventListener('click', handleClick);
 
     return () => {
-      window.removeEventListener('resize', updateMessageOffsets);
+      window.removeEventListener('resize', updateCursorMeasurements);
       window.removeEventListener('blur', handleMouseLeaveWindow);
       if (typeof window.PointerEvent === 'function') {
         document.removeEventListener('pointermove', handlePointerMove);
