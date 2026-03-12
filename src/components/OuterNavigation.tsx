@@ -17,21 +17,29 @@ const OuterNavigation = () => {
     <nav className={styles.outerNavigation} aria-label="Main navigation">
       <Link
         href="/"
-        className={`${styles.outerNavigationLink} ${
-          isRouteActive('/') ? 'linkHyperAnimation' : 'linkAnimation'
-        } cursorInteract`}
+        className={`${styles.outerNavigationButton} cursorInteract`}
         data-actie={isRouteActive('/')}
       >
-        Work
+        <span
+          className={`${styles.outerNavigationLink} ${
+            isRouteActive('/') ? 'linkHyperAnimation' : 'linkAnimation'
+          }`}
+        >
+          Work
+        </span>
       </Link>
       <Link
         href="/about"
-        className={`${styles.outerNavigationLink} ${
-          isRouteActive('/about') ? 'linkHyperAnimation' : 'linkAnimation'
-        } cursorInteract`}
+        className={`${styles.outerNavigationButton} cursorInteract`}
         data-actie={isRouteActive('/about')}
       >
-        About
+        <span
+          className={`${styles.outerNavigationLink} ${
+            isRouteActive('/about') ? 'linkHyperAnimation' : 'linkAnimation'
+          }`}
+        >
+          About
+        </span>
       </Link>
     </nav>
   );

@@ -1,11 +1,11 @@
 .outerNavigation
   position: fixed
-  top: var(--spacing-base)
-  left: var(--spacing-side)
+  top: 0
+  left: 0
   z-index: 1
   display: flex
   align-items: flex-start
-  gap: calc(var(--spacing-side) / 1)
+  gap: 0
   opacity: 1
   visibility: visible
   pointer-events: auto
@@ -19,14 +19,25 @@
   pointer-events: none
   transition: opacity var(--transition-theme), visibility 0s linear var(--transition-theme)
 
-.outerNavigationLink
+.outerNavigationButton
+  display: inline-flex
+  align-items: flex-start
   appearance: none
   border: 0
   background: transparent
   color: var(--cursor-color-bg)
+  text-decoration: none
+  user-select: none
+  padding: var(--spacing-base) calc(var(--spacing-side) / 2)
+  &:first-child
+    padding-left: var(--spacing-side)
+  &:last-child
+    padding-right: var(--spacing-side)
+
+.outerNavigationLink
+  display: inline-block
   font-size: var(--font-size-outer) !important
   line-height: 1
   text-transform: uppercase
   letter-spacing: 0.02em
-  user-select: none
   padding: 0

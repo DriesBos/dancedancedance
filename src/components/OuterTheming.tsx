@@ -86,7 +86,7 @@ const OuterTheming = () => {
             className={`${styles.outerThemingButton} ${styles.outerThemingStatus}`}
             aria-hidden="true"
           >
-            <span>
+            <span className={styles.outerThemingButtonInner}>
               REDUCED MOTION{' '}
               <span className={styles.outerThemingStatusActive}>ACTIVE</span>
             </span>
@@ -94,21 +94,25 @@ const OuterTheming = () => {
         )}
         <button
           type="button"
-          className={`${styles.outerThemingButton} cursorInteract linkAnimation`}
+          className={`${styles.outerThemingButton} cursorInteract`}
           onClick={handleLayoutToggle}
           aria-label={`Toggle layout. Current layout: ${layoutLabel}`}
           title={`${layoutLabel} layout`}
         >
-          <span>{layoutLabel} LAYOUT</span>
+          <span className={`${styles.outerThemingButtonInner} linkAnimation`}>
+            {layoutLabel} LAYOUT
+          </span>
         </button>
         <button
           type="button"
-          className={`${styles.outerThemingButton} cursorInteract linkAnimation`}
+          className={`${styles.outerThemingButton} cursorInteract`}
           onClick={handleThemeCycle}
           aria-label={`Cycle theme. Current theme: ${themeLabel}`}
           title={`${themeLabel} mode`}
         >
-          <span>{themeLabel} THEME</span>
+          <span className={`${styles.outerThemingButtonInner} linkAnimation`}>
+            {themeLabel} THEME
+          </span>
         </button>
       </div>
     </div>
