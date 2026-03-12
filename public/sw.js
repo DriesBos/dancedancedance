@@ -1,6 +1,9 @@
-const CACHE_NAME = 'driesbos-webapp-v1';
+const CACHE_NAME = 'driesbos-webapp-v3';
 const APP_SHELL = [
   '/',
+  '/manifest.webmanifest',
+  '/web-app-icon.svg',
+  '/web-app-icon-180.png',
   '/apple-touch-icon.png',
   '/web-app-icon-192.png',
   '/web-app-icon-512.png',

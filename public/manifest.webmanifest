@@ -1,13 +1,66 @@
 {
+  "id": "/",
   "name": "Dries Bos — Creative Developer",
   "short_name": "Dries Bos",
   "description": "Dries Bos — Creative Developer",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0D111A",
   "theme_color": "#0D111A",
+  "screenshots": [
+    {
+      "src": "/PWA-image-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Homepage in desktop layout"
+    },
+    {
+      "src": "/PWA-image-narrow.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Homepage in mobile layout"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "About",
+      "short_name": "About",
+      "description": "Learn more about Dries Bos",
+      "url": "/about",
+      "icons": [
+        {
+          "src": "/web-app-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "short_name": "Projects",
+      "description": "Browse selected projects",
+      "url": "/projects",
+      "icons": [
+        {
+          "src": "/web-app-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
   "icons": [
+    {
+      "src": "/web-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
     {
       "src": "/web-app-icon-192.png",
       "sizes": "192x192",
