@@ -8,11 +8,7 @@ const CustomCursor = dynamic(() => import('./CustomCursor'), {
 });
 
 export default function CursorLoader() {
-  const [hasFinePointer, setHasFinePointer] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    if (typeof window.matchMedia !== 'function') return false;
-    return window.matchMedia('(pointer: fine)').matches;
-  });
+  const [hasFinePointer, setHasFinePointer] = useState(false);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') {

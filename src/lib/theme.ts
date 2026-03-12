@@ -14,8 +14,8 @@ const WIDE_THEME_ORDER_BREAKPOINT_PX = 1500;
 export const NIGHT_THEME: Theme = 'NIGHT';
 
 export const THEME_ORDER: Theme[] = [
-  'TRON',
   'RADIANT',
+  'TRON',
   'SKY',
   'LIGHT',
   'KUSAMA',
@@ -25,9 +25,9 @@ export const THEME_ORDER: Theme[] = [
 ];
 
 const WIDE_THEME_ORDER: Theme[] = [
+  'RADIANT',
   'TRON',
   'SKY',
-  'RADIANT',
   'LIGHT',
   'KUSAMA',
   'SEGMENTS',
@@ -43,7 +43,7 @@ const WIDE_THEME_BUTTON_ORDER: Theme[] = WIDE_THEME_ORDER.filter(
   (theme) => theme !== 'KERMIT',
 );
 
-export const DEFAULT_THEME: Theme = THEME_ORDER[0] ?? FALLBACK_THEME;
+export const DEFAULT_THEME: Theme = 'RADIANT';
 
 const getViewportWidth = (): number | null => {
   if (typeof window === 'undefined') {

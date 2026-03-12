@@ -1,6 +1,8 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-12] The RADIANT intro start-length calculation now derives directly from viewport units instead of reading `getBoundingClientRect()` during line-geometry updates.
+- [2026-03-12] The RADIANT radial background intro and dotted-length morphs now update existing SVG nodes through imperative RAF writes instead of re-rendering the full spoke list every frame.
 - [2026-03-10] Storyblok images were centralized into `storyblok-image.ts` with `/m` transforms, quality controls, and `no_upscale()`.
 - [2026-03-10] Storyblok images for sliders and project media now use the shared Storyblok loader and optimized poster URLs.
 - [2026-03-04] Storyblok API requests were moved to tag-aware cache settings with hourly `revalidate` for published content and `no-store` for draft content.

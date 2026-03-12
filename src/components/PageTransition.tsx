@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { gsap, useGSAP } from '@/lib/gsap';
+import { useStore } from '@/store/store';
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -13,6 +14,8 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const BLOCK_STAGGER = 0.165;
   const PROJECT_SPEED_MULTIPLIER = 2;
   const pathname = usePathname();
+  const pageContentVisible = useStore((state) => state.pageContentVisible);
+  const pageContentRevealKey = useStore((state) => state.pageContentRevealKey);
   const hasAnimatedHeader = useRef(false);
   const getHeaderTargets = () =>
     Array.from(document.querySelectorAll<HTMLElement>('.blok-AnimateHead'));
@@ -30,7 +33,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   // Animate header only on initial load
   useGSAP(() => {
-    if (hasAnimatedHeader.current) return;
+    if (!pageContentVisible || hasAnimatedHeader.current) return;
 
     const headerTargets = getHeaderTargets();
     if (headerTargets.length === 0) {
@@ -50,10 +53,12 @@ export default function PageTransition({ children }: PageTransitionProps) {
     });
 
     hasAnimatedHeader.current = true;
-  }, []); // Empty dependency array = run once on mount
+  }, [pageContentVisible]);
 
   useGSAP(
     () => {
+      if (!pageContentVisible) return;
+
       const blockTargets = getBlockTargets();
       if (blockTargets.length === 0) return;
 
@@ -83,7 +88,10 @@ export default function PageTransition({ children }: PageTransitionProps) {
         offset += gap;
       });
     },
-    { dependencies: [pathname], revertOnUpdate: true }
+    {
+      dependencies: [pathname, pageContentRevealKey, pageContentVisible],
+      revertOnUpdate: true,
+    }
   ); // Re-run animation on route change
 
   return <>{children}</>;

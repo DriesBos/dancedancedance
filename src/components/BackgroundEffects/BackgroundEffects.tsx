@@ -1,8 +1,17 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type p5 from 'p5';
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
+import { useStore } from '@/store/store';
 import styles from './BackgroundEffects.module.sass';
 
 const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
@@ -10,8 +19,20 @@ const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
+const MOBILE_BREAKPOINT_PX = 770;
 const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
+const MAX_LINE_COUNT = 1440;
+// Intro test: start at a viewport-relative spoke length, then wait for the
+// next click or Tab key before growing beyond the viewport while rotating.
+const INTRO_ROTATION_DEGREES = 45;
+const INTRO_START_LINE_LENGTH_VMIN = 25;
+const INTRO_START_LINE_LENGTH_VMIN_MOBILE = 66;
+const INTRO_START_LINE_LENGTH_VIEWBOX_FALLBACK = 66;
+const INTRO_GROWTH_DURATION_MS = 2000;
+const INTRO_TARGET_LINE_SCALE = 1.15;
+const DOT_LENGTH_MORPH_DURATION_MS = 420;
+const LINE_DOT_RADIUS = 1.5;
 const SEGMENTS_SCALE_DURATION_MS = 60000;
 const SEGMENTS_SCALE_DURATION_PORTRAIT_MS = 30000;
 const IOS_IMMERSIVE_HEIGHT_VAR = '--be-ios-immersive-height';
@@ -36,10 +57,219 @@ type BackgroundEffectsProps = {
   densityScale?: number;
 };
 
+type RadiatingVariant = 'standard' | 'variable-dots' | 'all-dots';
+type RadiatingLineDescriptor = {
+  dx: number;
+  dy: number;
+  fullScale: number;
+  index: number;
+  opacity: number;
+};
+
+const parseDurationMs = (
+  rawDuration: string,
+  fallbackDurationMs = DEFAULT_ROTATION_DURATION_MS,
+) => {
+  const normalized = rawDuration.trim();
+  const parsedDuration = Number.parseFloat(normalized);
+  if (!Number.isFinite(parsedDuration)) {
+    return fallbackDurationMs;
+  }
+
+  return normalized.endsWith('ms') ? parsedDuration : parsedDuration * 1000;
+};
+
+const easeOutCubic = (progress: number) => 1 - (1 - progress) ** 3;
+
+const getIntroStartLineLength = () => {
+  if (typeof window === 'undefined') {
+    return INTRO_START_LINE_LENGTH_VIEWBOX_FALLBACK;
+  }
+
+  const viewportMin = Math.min(window.innerWidth, window.innerHeight);
+  const viewportMax = Math.max(window.innerWidth, window.innerHeight);
+  const introStartLengthVmin =
+    window.innerWidth < MOBILE_BREAKPOINT_PX
+      ? INTRO_START_LINE_LENGTH_VMIN_MOBILE
+      : INTRO_START_LINE_LENGTH_VMIN;
+  const spinLayerSizePx = viewportMax * 2;
+
+  if (!Number.isFinite(spinLayerSizePx) || spinLayerSizePx <= 0) {
+    return INTRO_START_LINE_LENGTH_VIEWBOX_FALLBACK;
+  }
+
+  const introStartLengthPx = viewportMin * (introStartLengthVmin / 100);
+
+  return (introStartLengthPx / spinLayerSizePx) * VIEWBOX_SIZE;
+};
+
+const useStableEvent = <Args extends unknown[], Return>(
+  handler: (...args: Args) => Return,
+) => {
+  const handlerRef = useRef(handler);
+
+  useLayoutEffect(() => {
+    handlerRef.current = handler;
+  }, [handler]);
+
+  return useCallback((...args: Args) => handlerRef.current(...args), []);
+};
+
+// Returns the variable-length profile used by dotted variants. The offset lets
+// CHANGE LENGTHS re-roll the composition without changing the overall pattern range.
+const getDotLengthFactor = (index: number, offset: number) =>
+  0.18 +
+  0.72 *
+    (0.5 +
+      0.5 *
+        Math.sin(
+          index * 0.47 + offset * 1.31 + 0.9 * Math.cos(index * 0.13 + offset),
+        ));
+
+type IntroAnimationControllers = {
+  applyLineGeometry: () => void;
+  introActiveRef: { current: boolean };
+  introFrameRef: { current: number | null };
+  introProgressRef: { current: number };
+  introRotationOffsetRef: { current: number };
+  lineGrowthMultiplierRef: { current: number };
+  introInteractionCleanupRef: { current: (() => void) | null };
+  onComplete?: () => void;
+};
+
+const startRadiatingIntro = ({
+  applyLineGeometry,
+  introActiveRef,
+  introFrameRef,
+  introProgressRef,
+  introRotationOffsetRef,
+  lineGrowthMultiplierRef,
+  introInteractionCleanupRef,
+  onComplete,
+}: IntroAnimationControllers) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (introFrameRef.current !== null) {
+    window.cancelAnimationFrame(introFrameRef.current);
+  }
+
+  introInteractionCleanupRef.current?.();
+  introInteractionCleanupRef.current = null;
+
+  lineGrowthMultiplierRef.current = INTRO_TARGET_LINE_SCALE;
+  introActiveRef.current = true;
+  introProgressRef.current = 0;
+  applyLineGeometry();
+
+  const beginGrowthPhase = () => {
+    introInteractionCleanupRef.current?.();
+    introInteractionCleanupRef.current = null;
+
+    const startTime = performance.now();
+    const startRotationOffset = introRotationOffsetRef.current;
+    const targetRotationOffset = startRotationOffset + INTRO_ROTATION_DEGREES;
+
+    const animate = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / INTRO_GROWTH_DURATION_MS);
+      const easedProgress = easeOutCubic(progress);
+      introProgressRef.current = easedProgress;
+      introRotationOffsetRef.current =
+        startRotationOffset +
+        (targetRotationOffset - startRotationOffset) * easedProgress;
+      applyLineGeometry();
+
+      if (progress < 1) {
+        introFrameRef.current = window.requestAnimationFrame(animate);
+        return;
+      }
+
+      introActiveRef.current = false;
+      introProgressRef.current = 1;
+      applyLineGeometry();
+      introFrameRef.current = null;
+      onComplete?.();
+    };
+
+    introFrameRef.current = window.requestAnimationFrame(animate);
+  };
+
+  const handlePointerDown = () => {
+    beginGrowthPhase();
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    beginGrowthPhase();
+  };
+
+  window.addEventListener('pointerdown', handlePointerDown, { passive: true });
+  window.addEventListener('keydown', handleKeyDown);
+  introInteractionCleanupRef.current = () => {
+    window.removeEventListener('pointerdown', handlePointerDown);
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+};
+
+const getRadiatingLineScale = (
+  descriptor: RadiatingLineDescriptor,
+  variant: RadiatingVariant,
+  dotLengthVariationMix: number,
+  dotLengthPatternOffset: number,
+  lineGrowthMultiplier: number,
+  introStartLineLength: number,
+  introActive: boolean,
+  introProgress: number,
+) => {
+  const dottedLengthFactor = getDotLengthFactor(
+    descriptor.index,
+    dotLengthPatternOffset,
+  );
+  const lengthFactor =
+    variant !== 'standard'
+      ? 1 - dotLengthVariationMix + dotLengthVariationMix * dottedLengthFactor
+      : 1;
+  const targetScale = descriptor.fullScale * lengthFactor * lineGrowthMultiplier;
+
+  // During the intro test, lines start at a fixed viewport-relative length
+  // before growing toward their normal target scale.
+  if (introActive) {
+    return (
+      introStartLineLength +
+      (targetScale - introStartLineLength) * introProgress
+    );
+  }
+
+  return targetScale;
+};
+
 function RadiatingBackground() {
+  const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
   const spinLayerRef = useRef<HTMLDivElement>(null);
-  const [lineCount, setLineCount] = useState(220);
+  const lineRefs = useRef<(SVGLineElement | null)[]>([]);
+  const dotRefs = useRef<(SVGCircleElement | null)[]>([]);
+  const lineGrowthMultiplierRef = useRef(1);
+  const introActiveRef = useRef(false);
+  const introFrameRef = useRef<number | null>(null);
+  const introInteractionCleanupRef = useRef<(() => void) | null>(null);
+  const introProgressRef = useRef(1);
+  const introRotationOffsetRef = useRef(0);
+  const dotLengthMorphFrameRef = useRef<number | null>(null);
+  const dotLengthVariationMixRef = useRef(1);
+  const dotLengthPatternOffsetRef = useRef(0);
+  const hasSeenPathnameRef = useRef(false);
+  const hidePageContent = useStore((state) => state.hidePageContent);
+  const showPageContent = useStore((state) => state.showPageContent);
+  const revealPageContent = useStore((state) => state.revealPageContent);
+  const [baseLineCount, setBaseLineCount] = useState(220);
+  const variant: RadiatingVariant = 'variable-dots';
+
+  const lineCount = Math.min(MAX_LINE_COUNT, Math.max(48, baseLineCount));
 
   useEffect(() => {
     const root = rootRef.current;
@@ -56,7 +286,7 @@ function RadiatingBackground() {
       const computedCount = Math.round(circumference / gap);
       const clampedCount = Math.min(720, Math.max(48, computedCount));
 
-      setLineCount(clampedCount);
+      setBaseLineCount(clampedCount);
     };
 
     updateLineCount();
@@ -74,7 +304,7 @@ function RadiatingBackground() {
     };
   }, []);
 
-  const radialLines = useMemo(
+  const lineDescriptors = useMemo<RadiatingLineDescriptor[]>(
     () =>
       Array.from({ length: lineCount }, (_, index) => {
         const angle = (index / lineCount) * Math.PI * 2;
@@ -83,45 +313,86 @@ function RadiatingBackground() {
         const baseToScale =
           EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy), 0.0001);
 
-        const fromScale = 0;
         // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
-        const toScale = baseToScale * (1 + 0.025 * Math.sin(index * 0.39));
+        const fullScale = baseToScale * (1 + 0.025 * Math.sin(index * 0.39));
 
         return {
-          x1: CENTER + dx * fromScale,
-          y1: CENTER + dy * fromScale,
-          x2: CENTER + dx * toScale,
-          y2: CENTER + dy * toScale,
+          dx,
+          dy,
+          fullScale,
+          index,
           opacity: 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(index * 0.61)),
         };
       }),
     [lineCount],
   );
 
+  const applyLineGeometry = useStableEvent(() => {
+    const introStartLineLength = getIntroStartLineLength();
+
+    for (let index = 0; index < lineDescriptors.length; index += 1) {
+      const descriptor = lineDescriptors[index];
+      if (!descriptor) continue;
+
+      // Standard keeps full-length spokes; the dotted presets blend into the
+      // variable-length pattern and can be re-shaped by CHANGE LENGTHS.
+      const scale = getRadiatingLineScale(
+        descriptor,
+        variant,
+        dotLengthVariationMixRef.current,
+        dotLengthPatternOffsetRef.current,
+        lineGrowthMultiplierRef.current,
+        introStartLineLength,
+        introActiveRef.current,
+        introProgressRef.current,
+      );
+      const x2 = CENTER + descriptor.dx * scale;
+      const y2 = CENTER + descriptor.dy * scale;
+      const line = lineRefs.current[index];
+      const dot = dotRefs.current[index];
+
+      if (line) {
+        line.x2.baseVal.value = x2;
+        line.y2.baseVal.value = y2;
+      }
+
+      if (dot) {
+        dot.cx.baseVal.value = x2;
+        dot.cy.baseVal.value = y2;
+      }
+    }
+  });
+
+  useLayoutEffect(() => {
+    lineRefs.current.length = lineDescriptors.length;
+    dotRefs.current.length = lineDescriptors.length;
+    applyLineGeometry();
+  }, [applyLineGeometry, lineDescriptors, variant]);
+
   useEffect(() => {
     const root = rootRef.current;
     const spinLayer = spinLayerRef.current;
     if (!root || !spinLayer) return;
 
-    const rawDuration = getComputedStyle(root)
-      .getPropertyValue('--rb-rotation-duration')
-      .trim();
-    const parsedDuration = Number.parseFloat(rawDuration);
-    const isMs = rawDuration.endsWith('ms');
-    const durationMs = Number.isFinite(parsedDuration)
-      ? isMs
-        ? parsedDuration
-        : parsedDuration * 1000
-      : DEFAULT_ROTATION_DURATION_MS;
+    const durationMs = parseDurationMs(
+      getComputedStyle(root).getPropertyValue('--rb-rotation-duration'),
+    );
     const safeDurationMs = Math.max(1, durationMs);
+    const baseDegreesPerMs = 360 / safeDurationMs;
 
     let frameId = 0;
-    const start = performance.now();
+    let lastTimestamp = 0;
+    let rotation = 0;
 
     const animate = (now: number) => {
-      const elapsed = now - start;
-      const progress = (elapsed % safeDurationMs) / safeDurationMs;
-      const degrees = progress * 360;
+      if (!lastTimestamp) {
+        lastTimestamp = now;
+      }
+
+      const deltaMs = now - lastTimestamp;
+      lastTimestamp = now;
+      rotation = (rotation + deltaMs * baseDegreesPerMs) % 360;
+      const degrees = rotation + introRotationOffsetRef.current;
 
       spinLayer.style.transform = `translate3d(-50%, -50%, 0) rotate(${degrees}deg)`;
       frameId = window.requestAnimationFrame(animate);
@@ -134,6 +405,104 @@ function RadiatingBackground() {
       spinLayer.style.transform = 'translate3d(-50%, -50%, 0) rotate(0deg)';
     };
   }, []);
+
+  useEffect(() => {
+    const introAnimationFrameRef = introFrameRef;
+    const dotLengthAnimationFrameRef = dotLengthMorphFrameRef;
+
+    return () => {
+      if (introAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(introAnimationFrameRef.current);
+      }
+      if (dotLengthAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(dotLengthAnimationFrameRef.current);
+      }
+    };
+  }, []);
+
+  // Auto-run the intro whenever the radiating theme is entered.
+  useEffect(() => {
+    hidePageContent();
+    startRadiatingIntro({
+      applyLineGeometry,
+      introActiveRef,
+      introFrameRef,
+      introProgressRef,
+      introRotationOffsetRef,
+      lineGrowthMultiplierRef,
+      introInteractionCleanupRef,
+      onComplete: revealPageContent,
+    });
+
+    return () => {
+      if (introFrameRef.current !== null) {
+        window.cancelAnimationFrame(introFrameRef.current);
+        introFrameRef.current = null;
+      }
+      introInteractionCleanupRef.current?.();
+      introInteractionCleanupRef.current = null;
+
+      showPageContent();
+    };
+  }, [
+    applyLineGeometry,
+    hidePageContent,
+    revealPageContent,
+    showPageContent,
+  ]);
+
+  const animateDotLengthsTo = (targetMix: number, targetOffset: number) => {
+    if (dotLengthMorphFrameRef.current !== null) {
+      window.cancelAnimationFrame(dotLengthMorphFrameRef.current);
+    }
+
+    const startMix = dotLengthVariationMixRef.current;
+    const startOffset = dotLengthPatternOffsetRef.current;
+    const startTime = performance.now();
+
+    const animate = (now: number) => {
+      const progress = Math.min(
+        1,
+        (now - startTime) / DOT_LENGTH_MORPH_DURATION_MS,
+      );
+      const easedProgress = easeOutCubic(progress);
+      const nextMix = startMix + (targetMix - startMix) * easedProgress;
+      const nextOffset =
+        startOffset + (targetOffset - startOffset) * easedProgress;
+
+      dotLengthVariationMixRef.current = nextMix;
+      dotLengthPatternOffsetRef.current = nextOffset;
+      applyLineGeometry();
+
+      if (progress < 1) {
+        dotLengthMorphFrameRef.current = window.requestAnimationFrame(animate);
+        return;
+      }
+
+      dotLengthMorphFrameRef.current = null;
+    };
+
+    dotLengthMorphFrameRef.current = window.requestAnimationFrame(animate);
+  };
+
+  const shiftDotLengths = useStableEvent(() => {
+    const nextOffset = dotLengthPatternOffsetRef.current + 1.35;
+
+    animateDotLengthsTo(1, nextOffset);
+  });
+
+  // Route changes reshuffle the dotted spoke lengths so each page lands on a
+  // slightly different composition without restarting the background.
+  useEffect(() => {
+    if (!hasSeenPathnameRef.current) {
+      hasSeenPathnameRef.current = true;
+      return;
+    }
+
+    shiftDotLengths();
+  }, [pathname, shiftDotLengths]);
+
+  const renderIntroStartLineLength = getIntroStartLineLength();
 
   return (
     <div
@@ -155,17 +524,46 @@ function RadiatingBackground() {
             height={VIEWBOX_SIZE}
           />
           <g className={styles.lines}>
-            {radialLines.map((line, index) => (
-              <line
-                key={index}
-                className={styles.line}
-                x1={line.x1}
-                y1={line.y1}
-                x2={line.x2}
-                y2={line.y2}
-                opacity={line.opacity}
-              />
-            ))}
+            {lineDescriptors.map((descriptor, index) => {
+              const scale = getRadiatingLineScale(
+                descriptor,
+                variant,
+                dotLengthVariationMixRef.current,
+                dotLengthPatternOffsetRef.current,
+                lineGrowthMultiplierRef.current,
+                renderIntroStartLineLength,
+                introActiveRef.current,
+                introProgressRef.current,
+              );
+              const x2 = CENTER + descriptor.dx * scale;
+              const y2 = CENTER + descriptor.dy * scale;
+
+              return (
+                <g key={index}>
+                  <line
+                    ref={(node) => {
+                      lineRefs.current[index] = node;
+                    }}
+                    className={styles.line}
+                    x1={CENTER}
+                    y1={CENTER}
+                    x2={x2}
+                    y2={y2}
+                    opacity={descriptor.opacity}
+                  />
+                  <circle
+                    ref={(node) => {
+                      dotRefs.current[index] = node;
+                    }}
+                    className={styles.lineDot}
+                    cx={x2}
+                    cy={y2}
+                    opacity={descriptor.opacity}
+                    r={LINE_DOT_RADIUS}
+                  />
+                </g>
+              );
+            })}
           </g>
         </svg>
       </div>

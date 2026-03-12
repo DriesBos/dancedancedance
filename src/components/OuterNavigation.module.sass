@@ -19,6 +19,11 @@
   pointer-events: none
   transition: opacity var(--transition-theme), visibility 0s linear var(--transition-theme)
 
+:global(body[data-page-content-visible='false']) .outerNavigation
+  opacity: 0
+  visibility: hidden
+  pointer-events: none
+
 .outerNavigationButton
   display: inline-flex
   align-items: flex-start

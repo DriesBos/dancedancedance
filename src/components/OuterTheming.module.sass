@@ -16,6 +16,11 @@
   pointer-events: none
   transition: opacity var(--transition-theme), visibility 0s linear var(--transition-theme)
 
+:global(body[data-page-content-visible='false']) .outerTheming
+  opacity: 0
+  visibility: hidden
+  pointer-events: none
+
 .outerThemingContainer
   display: flex
   flex-direction: column

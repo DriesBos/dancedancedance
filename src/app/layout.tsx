@@ -21,6 +21,7 @@ import GrainyGradient from '@/components/GrainyGradient';
 import OuterTheming from '@/components/OuterTheming';
 import OuterNavigation from '@/components/OuterNavigation';
 import ClientEnhancements from '@/components/ClientEnhancements';
+import PageContentGate from '@/components/PageContentGate';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 import { DEFAULT_THEME, NIGHT_THEME } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
@@ -30,6 +31,7 @@ const INITIAL_UI_STATE_SCRIPT = `
     var hour = new Date().getHours();
     var theme = hour >= 0 && hour < 5 ? ${JSON.stringify(NIGHT_THEME)} : ${JSON.stringify(DEFAULT_THEME)};
     var layout = '3D';
+    var pageContentVisible = theme !== 'RADIANT';
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = themeMetaColors[theme] || '#FFFFFF';
 
@@ -38,6 +40,7 @@ const INITIAL_UI_STATE_SCRIPT = `
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
       document.body.setAttribute('data-layout', layout);
+      document.body.setAttribute('data-page-content-visible', pageContentVisible ? 'true' : 'false');
     }
 
     var metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -139,7 +142,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Fetch projects at build/request time
   const projects = await fetchProjectSlugs();
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -150,6 +152,7 @@ export default async function RootLayout({
         className={`body ${myFont.className}`}
         data-border="minimal"
         data-page="home"
+        data-page-content-visible="true"
         data-initializing="true"
         suppressHydrationWarning
       >
@@ -173,40 +176,42 @@ export default async function RootLayout({
           </>
         )}
         <PerformanceTelemetry>
-          <OuterNavigation />
-          <OuterTheming />
-          <main className="main">
-            <BlokHead projects={projects} />
-            {children}
-            <BlokAction />
-            <BlokFooter />
-          </main>
-          <ActionButtonContainer>
-            <ActionButton
-              copy="Start your project"
-              link="info@driesbos.com?subject=Let's Make Internet"
-              linkType="email"
-              className="cursorInteract"
-              dropLeftPx={10}
-              dropOnPage="projects"
-            />
-            <ActionButton
-              copy="Let's talk"
-              link="info@driesbos.com?subject=Let's Make Internet"
-              linkType="email"
-              className="cursorInteract"
-              dropLeftPx={20}
-              dropOnPage="about"
-            />
-            <ActionButton
-              copy="Schedule a discovery call"
-              link="https://calendly.com/info-b9c/30min"
-              linkType="url"
-              className="cursorInteract"
-              dropLeftPx={50}
-              dropOnPage="about"
-            />
-          </ActionButtonContainer>
+          <PageContentGate>
+            <OuterNavigation />
+            <OuterTheming />
+            <main className="main">
+              <BlokHead projects={projects} />
+              {children}
+              <BlokAction />
+              <BlokFooter />
+            </main>
+            <ActionButtonContainer>
+              <ActionButton
+                copy="Start your project"
+                link="info@driesbos.com?subject=Let's Make Internet"
+                linkType="email"
+                className="cursorInteract"
+                dropLeftPx={10}
+                dropOnPage="projects"
+              />
+              <ActionButton
+                copy="Let's talk"
+                link="info@driesbos.com?subject=Let's Make Internet"
+                linkType="email"
+                className="cursorInteract"
+                dropLeftPx={20}
+                dropOnPage="about"
+              />
+              <ActionButton
+                copy="Schedule a discovery call"
+                link="https://calendly.com/info-b9c/30min"
+                linkType="url"
+                className="cursorInteract"
+                dropLeftPx={50}
+                dropOnPage="about"
+              />
+            </ActionButtonContainer>
+          </PageContentGate>
         </PerformanceTelemetry>
       </body>
     </html>
