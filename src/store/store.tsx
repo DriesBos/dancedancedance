@@ -30,12 +30,12 @@ export type Actions = {
 };
 
 export const THEME_ORDER: Theme[] = [
-  'RADIANT',
   'TRON',
+  'RADIANT',
   'SKY',
-  'SEGMENTS',
   'LIGHT',
   'KUSAMA',
+  'SEGMENTS',
   'NIGHT',
   'KERMIT',
 ];
