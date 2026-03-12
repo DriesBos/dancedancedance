@@ -602,12 +602,14 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       syncMotionPreference(prefersReducedMotion());
 
       const onPointerMove = (event: PointerEvent) => {
-        if (reducedMotionEnabled) return;
+        if (reducedMotionEnabled || !parallaxEnabled) return;
+        if (event.pointerType && event.pointerType !== 'mouse') return;
         updatePointer(event.clientX, event.clientY, 0.72);
         setParallaxTargetFromClient(event.clientX, event.clientY);
       };
       const onPointerDown = (event: PointerEvent) => {
-        if (reducedMotionEnabled) return;
+        if (reducedMotionEnabled || !parallaxEnabled) return;
+        if (event.pointerType && event.pointerType !== 'mouse') return;
         updatePointer(event.clientX, event.clientY, 1);
         setParallaxTargetFromClient(event.clientX, event.clientY);
       };
