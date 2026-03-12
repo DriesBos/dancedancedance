@@ -2,7 +2,8 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { Layout, Theme, useStore } from '@/store/store';
+import { getInitialThemeForHour, type Theme } from '@/lib/theme';
+import { Layout, useStore } from '@/store/store';
 import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -11,18 +12,10 @@ type InitialUIState = {
   layout: Layout;
 };
 
-const getInitialTheme = (hour: number): Theme => {
-  if (hour >= 0 && hour < 5) {
-    return 'NIGHT';
-  }
-
-  return 'RADIANT';
-};
-
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
   return {
-    theme: getInitialTheme(hour),
+    theme: getInitialThemeForHour(hour),
     layout: '3D',
   };
 };

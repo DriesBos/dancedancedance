@@ -1,6 +1,6 @@
-import { Theme } from '@/store/store';
+import { Theme } from '@/lib/theme';
 
-const THEME_META_COLORS: Record<Theme, string> = {
+export const THEME_META_COLORS: Record<Theme, string> = {
   NIGHT: '#000000',
   TRON: '#000000',
   RADIANT: '#DAD9E0',

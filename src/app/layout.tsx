@@ -22,27 +22,16 @@ import OuterTheming from '@/components/OuterTheming';
 import OuterNavigation from '@/components/OuterNavigation';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
+import { DEFAULT_THEME, NIGHT_THEME } from '@/lib/theme';
+import { THEME_META_COLORS } from '@/lib/theme-meta-color';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
     var hour = new Date().getHours();
-    var theme = hour >= 0 && hour < 5 ? 'NIGHT' : 'RADIANT';
+    var theme = hour >= 0 && hour < 5 ? ${JSON.stringify(NIGHT_THEME)} : ${JSON.stringify(DEFAULT_THEME)};
     var layout = '3D';
-    var skyThemeMetaColor = 'transparent';
-    var themeMetaColors = {
-      NIGHT: '#000000',
-      TRON: '#000000',
-      RADIANT: '#DAD9E0',
-      SKY: 'transparent',
-      KERMIT: '#FFFFFF',
-      LIGHT: '#E8E7E3',
-      SEGMENTS: '#1A1A1A',
-      KUSAMA: '#000000',
-    };
-    var themeColor =
-      theme === 'SKY'
-        ? skyThemeMetaColor
-        : (themeMetaColors[theme] || '#FFFFFF');
+    var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
+    var themeColor = themeMetaColors[theme] || '#FFFFFF';
 
     window.__DDD_INITIAL_STATE__ = { theme: theme, layout: layout };
 
