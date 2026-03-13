@@ -2,7 +2,11 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { getInitialThemeForHour, type Theme } from '@/lib/theme';
+import {
+  getInitialThemeForHour,
+  shouldRunInitialIntroForTheme,
+  type Theme,
+} from '@/lib/theme';
 import { useStore } from '@/store/store';
 import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
@@ -10,13 +14,17 @@ import { useShallow } from 'zustand/react/shallow';
 type InitialUIState = {
   theme: Theme;
   fullscreen: boolean;
+  initialThemeIntroPending: boolean;
 };
 
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
+  const theme = getInitialThemeForHour(hour);
+
   return {
-    theme: getInitialThemeForHour(hour),
+    theme,
     fullscreen: false,
+    initialThemeIntroPending: shouldRunInitialIntroForTheme(theme),
   };
 };
 
@@ -43,10 +51,9 @@ const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const readyFrameRef = useRef<number | null>(null);
   const readyTimeoutRef = useRef<number | null>(null);
-  const { setFullscreen, setTheme, theme, fullscreen } = useStore(
+  const { initializeUiState, theme, fullscreen } = useStore(
     useShallow((state) => ({
-      setFullscreen: state.setFullscreen,
-      setTheme: state.setTheme,
+      initializeUiState: state.initializeUiState,
       theme: state.theme,
       fullscreen: state.fullscreen,
     })),
@@ -65,13 +72,11 @@ const AppInitializer = () => {
       const initialState = getInitialUIState();
       applyBodyState(initialState.theme, initialState.fullscreen, slug);
 
-      if (theme !== initialState.theme) {
-        setTheme(initialState.theme);
-      }
-
-      if (fullscreen !== initialState.fullscreen) {
-        setFullscreen(initialState.fullscreen);
-      }
+      initializeUiState(
+        initialState.theme,
+        initialState.fullscreen,
+        initialState.initialThemeIntroPending,
+      );
 
       if (readyFrameRef.current === null) {
         readyFrameRef.current = window.requestAnimationFrame(() => {
@@ -100,8 +105,7 @@ const AppInitializer = () => {
     applyBodyState(theme, fullscreen, slug);
   }, [
     pathname,
-    setFullscreen,
-    setTheme,
+    initializeUiState,
     slug,
     fullscreen,
     theme,

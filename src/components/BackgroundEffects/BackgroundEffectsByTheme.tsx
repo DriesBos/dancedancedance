@@ -1,7 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import BackgroundEffects from '@/components/BackgroundEffects/BackgroundEffects';
 import { useStore } from '@/store/store';
+
+const NeonTunnel = dynamic(
+  () => import('@/components/BackgroundEffects/NeonTunnel'),
+  { ssr: false },
+);
 
 export default function BackgroundEffectsByTheme() {
   const theme = useStore((state) => state.theme);
@@ -12,6 +18,10 @@ export default function BackgroundEffectsByTheme() {
 
   if (theme === 'RADIANT') {
     return <BackgroundEffects version="radiating" />;
+  }
+
+  if (theme === 'TRON') {
+    return <NeonTunnel />;
   }
 
   if (theme === 'SEGMENTS') {

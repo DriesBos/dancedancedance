@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-13] The TRON `NeonTunnel` background now lazy-loads its Three.js/postprocessing stack, renders the square tunnel through instanced geometry, and adapts DPR under sustained FPS drops.
 - [2026-03-12] The RADIANT intro start-length calculation now derives directly from viewport units instead of reading `getBoundingClientRect()` during line-geometry updates.
 - [2026-03-12] The RADIANT radial background intro and dotted-length morphs now update existing SVG nodes through imperative RAF writes instead of re-rendering the full spoke list every frame.
 - [2026-03-10] Storyblok images were centralized into `storyblok-image.ts` with `/m` transforms, quality controls, and `no_upscale()`.

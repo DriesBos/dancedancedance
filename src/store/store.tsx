@@ -5,6 +5,7 @@ import {
   THEME_BUTTON_ORDER,
   getInitialThemeForHour,
   getNextThemeForButtonCycle,
+  shouldRunInitialIntroForTheme,
   type Theme,
 } from '@/lib/theme';
 
@@ -22,9 +23,15 @@ export type Props = {
   topPanel: boolean;
   pageContentVisible: boolean;
   pageContentRevealKey: number;
+  initialThemeIntroPending: boolean;
 };
 
 export type Actions = {
+  initializeUiState: (
+    theme: Theme,
+    fullscreen: boolean,
+    initialThemeIntroPending: boolean,
+  ) => void;
   setNightmode: () => void;
   setDefault: () => void;
   setTheme: (theme: Theme) => void;
@@ -37,29 +44,38 @@ export type Actions = {
   revealPageContent: () => void;
 };
 
-const shouldShowPageContentForTheme = (theme: Theme) => theme !== 'RADIANT';
-
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
   theme: DEFAULT_THEME,
   fullscreen: false,
   topPanel: true,
-  pageContentVisible: true,
+  pageContentVisible: !shouldRunInitialIntroForTheme(DEFAULT_THEME),
   pageContentRevealKey: 0,
+  initialThemeIntroPending: shouldRunInitialIntroForTheme(DEFAULT_THEME),
+  initializeUiState: (theme, fullscreen, initialThemeIntroPending) =>
+    set({
+      theme,
+      fullscreen,
+      pageContentVisible: !initialThemeIntroPending,
+      initialThemeIntroPending,
+    }),
   setNightmode: () =>
     set({
       theme: 'NIGHT',
-      pageContentVisible: shouldShowPageContentForTheme('NIGHT'),
+      pageContentVisible: true,
+      initialThemeIntroPending: false,
     }),
   setDefault: () =>
     set({
       theme: DEFAULT_THEME,
-      pageContentVisible: shouldShowPageContentForTheme(DEFAULT_THEME),
+      pageContentVisible: true,
+      initialThemeIntroPending: false,
     }),
   setTheme: (theme: Theme) =>
     set({
       theme,
-      pageContentVisible: shouldShowPageContentForTheme(theme),
+      pageContentVisible: true,
+      initialThemeIntroPending: false,
     }),
   cycleTheme: () =>
     set((state) => {
@@ -67,17 +83,20 @@ export const useStore = create<Props & Actions>()((set) => ({
 
       return {
         theme: nextTheme,
-        pageContentVisible: shouldShowPageContentForTheme(nextTheme),
+        pageContentVisible: true,
+        initialThemeIntroPending: false,
       };
     }),
   setFullscreen: (fullscreen) => set({ fullscreen }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
   hidePageContent: () => set({ pageContentVisible: false }),
-  showPageContent: () => set({ pageContentVisible: true }),
+  showPageContent: () =>
+    set({ pageContentVisible: true, initialThemeIntroPending: false }),
   revealPageContent: () =>
     set((state) => ({
       pageContentVisible: true,
       pageContentRevealKey: state.pageContentRevealKey + 1,
+      initialThemeIntroPending: false,
     })),
 }));

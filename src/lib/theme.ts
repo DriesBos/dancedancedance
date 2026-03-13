@@ -8,10 +8,12 @@ export type Theme =
   | 'SEGMENTS'
   | 'KUSAMA';
 
-const FALLBACK_THEME: Theme = 'RADIANT';
+const FALLBACK_THEME: Theme = 'TRON';
 const WIDE_THEME_ORDER_BREAKPOINT_PX = 1500;
+export const INITIAL_THEME_MOBILE_BREAKPOINT_PX = 770;
 
 export const NIGHT_THEME: Theme = 'NIGHT';
+export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT', 'TRON'];
 
 export const THEME_ORDER: Theme[] = [
   'RADIANT',
@@ -25,8 +27,8 @@ export const THEME_ORDER: Theme[] = [
 ];
 
 const WIDE_THEME_ORDER: Theme[] = [
-  'RADIANT',
   'TRON',
+  'RADIANT',
   'SKY',
   'LIGHT',
   'KUSAMA',
@@ -43,7 +45,7 @@ const WIDE_THEME_BUTTON_ORDER: Theme[] = WIDE_THEME_ORDER.filter(
   (theme) => theme !== 'KERMIT',
 );
 
-export const DEFAULT_THEME: Theme = 'RADIANT';
+export const DEFAULT_THEME: Theme = 'TRON';
 
 const getViewportWidth = (): number | null => {
   if (typeof window === 'undefined') {
@@ -52,6 +54,9 @@ const getViewportWidth = (): number | null => {
 
   return window.innerWidth;
 };
+
+export const shouldRunInitialIntroForTheme = (theme: Theme) =>
+  THEMES_WITH_INITIAL_INTRO.includes(theme);
 
 export const getThemeOrder = (viewportWidth = getViewportWidth()): Theme[] => {
   if (viewportWidth !== null && viewportWidth > WIDE_THEME_ORDER_BREAKPOINT_PX) {
@@ -71,9 +76,19 @@ export const getThemeButtonOrder = (
   return THEME_BUTTON_ORDER;
 };
 
-export const getInitialThemeForHour = (hour: number): Theme => {
+export const getInitialThemeForHour = (
+  hour: number,
+  viewportWidth = getViewportWidth(),
+): Theme => {
   if (hour >= 0 && hour < 5) {
     return NIGHT_THEME;
+  }
+
+  if (
+    viewportWidth !== null &&
+    viewportWidth <= INITIAL_THEME_MOBILE_BREAKPOINT_PX
+  ) {
+    return 'RADIANT';
   }
 
   return DEFAULT_THEME;

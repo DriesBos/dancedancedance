@@ -12,6 +12,7 @@ import type p5 from 'p5';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/store/store';
+import IntroEnterButton from './IntroEnterButton';
 import styles from './BackgroundEffects.module.sass';
 
 const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
@@ -250,6 +251,9 @@ function RadiatingBackground() {
   const dotLengthVariationMixRef = useRef(1);
   const dotLengthPatternOffsetRef = useRef(0);
   const hasSeenPathnameRef = useRef(false);
+  const initialThemeIntroPending = useStore(
+    (state) => state.initialThemeIntroPending,
+  );
   const hidePageContent = useStore((state) => state.hidePageContent);
   const showPageContent = useStore((state) => state.showPageContent);
   const revealPageContent = useStore((state) => state.revealPageContent);
@@ -408,18 +412,28 @@ function RadiatingBackground() {
     };
   }, []);
 
-  // Prepare the intro pose whenever the radiating theme is entered.
+  // Only the first matching theme on initial site load should gate content
+  // behind the intro. Later theme switches should show the background directly.
   useEffect(() => {
-    hidePageContent();
-    setShowEnterButton(true);
-    prepareRadiatingIntro({
-      applyLineGeometry,
-      introActiveRef,
-      introFrameRef,
-      introProgressRef,
-      introRotationOffsetRef,
-      lineGrowthMultiplierRef,
-    });
+    if (initialThemeIntroPending) {
+      hidePageContent();
+      setShowEnterButton(true);
+      prepareRadiatingIntro({
+        applyLineGeometry,
+        introActiveRef,
+        introFrameRef,
+        introProgressRef,
+        introRotationOffsetRef,
+        lineGrowthMultiplierRef,
+      });
+    } else {
+      setShowEnterButton(false);
+      introActiveRef.current = false;
+      introProgressRef.current = 1;
+      introRotationOffsetRef.current = 0;
+      lineGrowthMultiplierRef.current = INTRO_TARGET_LINE_SCALE;
+      applyLineGeometry();
+    }
 
     return () => {
       if (introFrameRef.current !== null) {
@@ -432,6 +446,7 @@ function RadiatingBackground() {
   }, [
     applyLineGeometry,
     hidePageContent,
+    initialThemeIntroPending,
     showPageContent,
   ]);
 
@@ -567,15 +582,7 @@ function RadiatingBackground() {
         </div>
       </div>
       {showEnterButton && (
-        <div className={`${styles.enterButtonLayer} cursorInteract`}>
-          <button
-            type="button"
-            className={styles.enterButton}
-            onClick={handleEnter}
-          >
-            Enter
-          </button>
-        </div>
+        <IntroEnterButton onClick={handleEnter} />
       )}
     </>
   );

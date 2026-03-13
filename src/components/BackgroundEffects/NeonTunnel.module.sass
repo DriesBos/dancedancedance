@@ -1,0 +1,70 @@
+.root
+  position: fixed
+  top: 50%
+  left: 50%
+  width: 100vw
+  height: 100vh
+  width: max(100lvw, var(--be-ios-immersive-width, 0px))
+  height: max(100lvh, var(--be-ios-immersive-height, 0px))
+  transform: translate3d(-50%, -50%, 0)
+  pointer-events: none
+  z-index: -1
+  overflow: hidden
+
+.canvas
+  width: 100%
+  height: 100%
+  display: block
+
+.overlay
+  position: fixed
+  inset: 0
+  z-index: 20
+  pointer-events: none
+
+.controlColumn
+  position: absolute
+  left: var(--spacing-side)
+  bottom: var(--spacing-base)
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: calc(var(--spacing-half) / 2)
+  pointer-events: none
+
+.controlButton
+  display: inline-flex
+  align-items: center
+  gap: 0.5rem
+  pointer-events: auto
+  min-width: 14rem
+  padding: 0.78rem 1rem 0.84rem
+  border: 1px solid rgba(122, 255, 220, 0.45)
+  background: rgba(0, 0, 0, 0.68)
+  color: var(--theme-type)
+  text-transform: uppercase
+  letter-spacing: 0.08em
+  line-height: 1
+  box-shadow: 0 0 20px rgba(0, 255, 180, 0.2), inset 0 0 14px rgba(0, 255, 180, 0.08)
+  backdrop-filter: blur(10px)
+  -webkit-backdrop-filter: blur(10px)
+  transition: border-color var(--transition-theme-quick), color var(--transition-theme-quick), background var(--transition-theme-quick), box-shadow var(--transition-theme-quick)
+  @media (hover: hover)
+    &:hover
+      border-color: rgba(122, 255, 220, 0.72)
+      background: rgba(0, 0, 0, 0.78)
+      box-shadow: 0 0 26px rgba(0, 255, 180, 0.32), inset 0 0 20px rgba(0, 255, 180, 0.12)
+
+.controlLabel
+  color: var(--theme-type-inactive)
+
+.controlValue
+  color: var(--theme-type)
+
+@media (max-width: 770px)
+  .controlColumn
+    left: calc(var(--spacing-side) / 2)
+    bottom: calc(var(--spacing-base) / 2)
+
+  .controlButton
+    min-width: 12rem

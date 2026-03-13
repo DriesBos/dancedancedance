@@ -23,19 +23,39 @@ import OuterNavigation from '@/components/OuterNavigation';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import PageContentGate from '@/components/PageContentGate';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
-import { DEFAULT_THEME, NIGHT_THEME } from '@/lib/theme';
+import {
+  DEFAULT_THEME,
+  INITIAL_THEME_MOBILE_BREAKPOINT_PX,
+  NIGHT_THEME,
+  THEMES_WITH_INITIAL_INTRO,
+} from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
     var hour = new Date().getHours();
-    var theme = hour >= 0 && hour < 5 ? ${JSON.stringify(NIGHT_THEME)} : ${JSON.stringify(DEFAULT_THEME)};
+    var viewportWidth =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      0;
+    var theme =
+      hour >= 0 && hour < 5
+        ? ${JSON.stringify(NIGHT_THEME)}
+        : viewportWidth <= ${INITIAL_THEME_MOBILE_BREAKPOINT_PX}
+          ? 'RADIANT'
+          : ${JSON.stringify(DEFAULT_THEME)};
     var fullscreen = false;
-    var pageContentVisible = theme !== 'RADIANT';
+    var initialThemeIntroPending =
+      ${JSON.stringify(THEMES_WITH_INITIAL_INTRO)}.indexOf(theme) !== -1;
+    var pageContentVisible = !initialThemeIntroPending;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = themeMetaColors[theme] || '#FFFFFF';
 
-    window.__DDD_INITIAL_STATE__ = { theme: theme, fullscreen: fullscreen };
+    window.__DDD_INITIAL_STATE__ = {
+      theme: theme,
+      fullscreen: fullscreen,
+      initialThemeIntroPending: initialThemeIntroPending
+    };
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
