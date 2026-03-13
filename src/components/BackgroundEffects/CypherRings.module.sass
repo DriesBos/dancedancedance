@@ -1,0 +1,151 @@
+.root
+  position: fixed
+  top: 50%
+  left: 50%
+  width: 100vw
+  height: 100vh
+  width: max(100lvw, var(--be-ios-immersive-width, 0px))
+  height: max(100lvh, var(--be-ios-immersive-height, 0px))
+  transform: translate3d(-50%, -50%, 0)
+  pointer-events: none
+  z-index: -1
+  overflow: hidden
+  background: radial-gradient(circle at center, rgba(18, 26, 22, 0.28) 0%, rgba(2, 6, 7, 0) 44%), #020607
+  isolation: isolate
+
+  &::before
+    content: ''
+    position: absolute
+    inset: 0
+    background: radial-gradient(circle at center, transparent 0 24%, rgba(3, 8, 10, 0.18) 36%, rgba(0, 0, 0, 0.72) 100%)
+    opacity: 0.72
+
+  &::after
+    content: ''
+    position: absolute
+    inset: -8%
+    background: repeating-radial-gradient(circle at center, rgba(87, 242, 215, 0.04) 0 1px, transparent 1px 26px)
+    opacity: 0.14
+    mix-blend-mode: screen
+
+.svg
+  position: relative
+  width: 100%
+  height: 100%
+  display: block
+  transform: scale(1.08)
+  filter: saturate(1.06) contrast(1.04)
+
+.staticLayer
+  opacity: 0.96
+
+.ring
+  transform-origin: center
+  transform-box: fill-box
+  will-change: transform
+
+.rotateClockwise
+  animation: rotateClockwise var(--cypher-rotation-duration) linear infinite
+  transform: rotate(var(--cypher-rotation-angle))
+
+.rotateCounter
+  animation: rotateCounter var(--cypher-rotation-duration) linear infinite
+  transform: rotate(var(--cypher-rotation-angle))
+
+.guideRing,
+.track,
+.segment,
+.tick,
+.axisLine,
+.coreHalo
+  fill: none
+  vector-effect: non-scaling-stroke
+  mix-blend-mode: screen
+
+.guideRing,
+.track
+  stroke-linecap: round
+
+.track
+  opacity: 0.24
+
+.segment
+  stroke-linecap: round
+
+.segmentStrong
+  filter: drop-shadow(0 0 10px currentColor)
+
+.segmentSoft
+  opacity: 0.82
+  filter: drop-shadow(0 0 7px currentColor)
+
+.tick
+  stroke-linecap: square
+  opacity: 0.34
+
+.tickMajor
+  opacity: 0.58
+
+.tickMinor
+  opacity: 0.26
+
+.label
+  font-family: 'IBM Plex Mono', 'SFMono-Regular', ui-monospace, monospace
+  font-size: 11px
+  letter-spacing: 0.18em
+  text-anchor: middle
+  dominant-baseline: middle
+  opacity: 0.74
+  fill: currentColor
+  filter: drop-shadow(0 0 7px currentColor)
+  user-select: none
+
+.fillSector
+  fill: currentColor
+  mix-blend-mode: screen
+
+.axisLine
+  stroke-width: 1.2px
+  opacity: 0.38
+
+.coreVoid
+  fill: #000000
+
+.coreHalo
+  stroke-width: 1.4px
+  opacity: 0.34
+  filter: drop-shadow(0 0 10px currentColor)
+
+.innerMask
+  opacity: 0.98
+
+.accentPrimary
+  color: var(--theme-type)
+  stroke: var(--theme-type)
+
+.accentSecondary
+  color: var(--theme-cypher-secondary, #FF8A2A)
+  stroke: var(--theme-cypher-secondary, #FF8A2A)
+
+.accentTertiary
+  color: var(--theme-cypher-tertiary, #F3D26B)
+  stroke: var(--theme-cypher-tertiary, #F3D26B)
+
+@keyframes rotateClockwise
+  from
+    transform: rotate(var(--cypher-rotation-angle))
+  to
+    transform: rotate(calc(var(--cypher-rotation-angle) + 360deg))
+
+@keyframes rotateCounter
+  from
+    transform: rotate(var(--cypher-rotation-angle))
+  to
+    transform: rotate(calc(var(--cypher-rotation-angle) - 360deg))
+
+@media (max-width: 770px)
+  .svg
+    transform: scale(1.2)
+
+  .label
+    font-size: 9px

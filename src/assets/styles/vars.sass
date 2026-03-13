@@ -28,6 +28,8 @@
   --theme-type: var(--color-tron)
   --theme-type-inactive: var(--color-tron-inactive)
   --theme-type-contrast: var(--color-tron)
+  --theme-cypher-secondary: #FF8A2A
+  --theme-cypher-tertiary: #F3D26B
   --portrait-dither-blackness: 0.54
   --portrait-dither-threshold: 138
   --portrait-dither-invert: 0
@@ -188,6 +190,40 @@ body[data-theme='TRON']
   --theme-type-contrast: black
   --border-color: hsla(172, 100%, 75%, 1)
   --slider-indicator: hsla(172, 100%, 75%, 1)
+
+body[data-theme='CYPHER']
+  --theme-bg: #020607
+  --theme-blok: color-mix(in srgb, #020607 82%, transparent)
+  --theme-blok-showlines: transparent
+  --theme-blok-solid: #050A0C
+  --theme-blok-toppanel: color-mix(in srgb, #050A0C 92%, transparent)
+  --theme-type: #57F2D7
+  --theme-type-inactive: color-mix(in srgb, #57F2D7 62%, transparent)
+  --theme-type-contrast: black
+  --theme-cypher-secondary: #FF8A2A
+  --theme-cypher-tertiary: #F3D26B
+  --border-color: #57F2D7
+  --cursor-color-bg: #57F2D7
+  --cursor-color-blok: #FF8A2A
+  --slider-indicator: #FF8A2A
+  --theme-bg-gradient: 0.04
+  --theme-blok-gradient: 0.06
+
+body[data-theme='PERLIN']
+  --theme-bg: #050109
+  --theme-blok: hsla(336, 37%, 9%, 0.88)
+  --theme-blok-showlines: transparent
+  --theme-blok-solid: #130613
+  --theme-blok-toppanel: hsla(336, 37%, 9%, 0.92)
+  --theme-type: #FF6B8D
+  --theme-type-inactive: hsla(346, 100%, 71%, 0.62)
+  --theme-type-contrast: black
+  --border-color: #FF6B8D
+  --cursor-color-bg: #FF6B8D
+  --cursor-color-blok: #FF6B8D
+  --slider-indicator: #FF6B8D
+  --theme-bg-gradient: 0.07
+  --theme-blok-gradient: 0.08
 
 body[data-theme='NIGHT']
   --theme-bg: var(--color-black)

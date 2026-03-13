@@ -896,9 +896,9 @@ const BlokHead = ({ projects }: Props) => {
                 <span className={styles.layoutIconWrap}>
                   <span
                     className={styles.layoutIcon}
-                    data-active={fullscreen}
+                    data-active={!fullscreen}
                   >
-                    <IconFullscreen active={fullscreen} />
+                    <IconFullscreen active={!fullscreen} />
                   </span>
                 </span>
               </button>
