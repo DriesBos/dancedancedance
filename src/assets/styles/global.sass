@@ -430,8 +430,21 @@ mux-player, .muxPlayer
               // min-width: 8rem
               // flex-shrink: 0
       &-Slider
+        &-Stack
+          display: grid
+          width: 100%
         &-ImageWrapper
           position: relative
+        &-Item
+          grid-area: 1 / 1
+          width: 100%
+          visibility: hidden
+          z-index: 0
+          pointer-events: none
+          &[data-active='true']
+            visibility: visible
+            z-index: 1
+            pointer-events: auto
       &-Year
         width: calc(2.9em + var(--spacing-side))
       &-Icons

@@ -2,9 +2,11 @@
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
-import { gsap, useGSAP } from '@/lib/gsap';
-import { storyblokImageLoader } from '@/lib/storyblok-image';
+import { useEffect, useState } from 'react';
+import {
+  storyblokImageLoader,
+  transformStoryblokImageUrl,
+} from '@/lib/storyblok-image';
 import SliderIndicators from '../SliderIndicators';
 
 interface SbPageData extends SbBlokData {
@@ -29,10 +31,11 @@ interface ColumnSliderProps {
   blok: SbPageData;
 }
 
+const warmedColumnSliderImageSrcs = new Set<string>();
+
 const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const itemRef = useRef<HTMLDivElement>(null);
 
   // Determine if we should use mobile images
   useEffect(() => {
@@ -49,74 +52,105 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   }, []);
 
   // Select the appropriate images array based on screen width
-  const activeImages =
-    isMobile && blok.images_mobile?.length ? blok.images_mobile : blok.images;
-
-  // Get current item for rendering
-  const currentImage = activeImages?.[activeIndex];
-
-  // Fade in animation on slide change
-  useGSAP(
-    () => {
-      if (!itemRef.current) return;
-
-      gsap.fromTo(
-        itemRef.current,
-        { opacity: 0 },
-        {
-          opacity: 1,
-          duration: 0,
-          ease: 'linear',
-        },
-      );
-    },
-    { dependencies: [activeIndex], revertOnUpdate: true },
-  );
+  const activeImages = (
+    isMobile && blok.images_mobile?.length ? blok.images_mobile : blok.images
+  )?.filter((image): image is NonNullable<typeof image> & { filename: string } =>
+    Boolean(image?.filename),
+  ) ?? [];
+  const currentImage = activeImages[activeIndex];
+  const nextImage =
+    activeImages.length > 1
+      ? activeImages[(activeIndex + 1) % activeImages.length]
+      : null;
 
   useEffect(() => {
-    if (!activeImages || activeImages.length === 0) return;
+    if (activeImages.length === 0) {
+      setActiveIndex(0);
+      return;
+    }
 
-    const interval = setInterval(
-      () => {
-        setActiveIndex((prevIndex) => (prevIndex + 1) % activeImages.length);
-      },
-      blok.speed ? blok.speed : 800,
-    );
+    setActiveIndex((prevIndex) => prevIndex % activeImages.length);
+  }, [activeImages.length]);
 
-    return () => clearInterval(interval);
-  }, [activeImages, blok.speed]);
+  useEffect(() => {
+    if (!nextImage?.filename) return;
+
+    const warmSrc = transformStoryblokImageUrl(nextImage.filename, {
+      width: 1600,
+      quality: 70,
+      noUpscale: true,
+    });
+
+    if (!warmSrc || warmedColumnSliderImageSrcs.has(warmSrc)) return;
+
+    warmedColumnSliderImageSrcs.add(warmSrc);
+    const image = new window.Image();
+    if ('fetchPriority' in image) {
+      (image as HTMLImageElement & { fetchPriority?: 'high' | 'low' | 'auto' })
+        .fetchPriority = 'high';
+    }
+    image.decoding = 'async';
+    image.src = warmSrc;
+    image.decode?.().catch(() => {});
+  }, [nextImage?.filename]);
+
+  useEffect(() => {
+    if (activeImages.length <= 1) return;
+
+    const timeout = window.setTimeout(() => {
+      setActiveIndex((prevIndex) => (prevIndex + 1) % activeImages.length);
+    }, blok.speed ?? 800);
+
+    return () => window.clearTimeout(timeout);
+  }, [activeImages.length, activeIndex, blok.speed]);
 
   if (!currentImage?.filename) return null;
 
   return (
-    <div className="column column-Slider" {...storyblokEditable(blok)}>
-      {/* Current slide */}
-      <div ref={itemRef} className="column-Slider-Item">
-        <div className="column-Slider-ImageWrapper">
-          <Image
-            loader={storyblokImageLoader}
-            src={currentImage.filename}
-            alt={currentImage.alt || currentImage.name || 'Project image'}
-            width={0}
-            height={0}
-            sizes="(max-width: 770px) 100vw, 50vw"
-            quality={70}
-            className="imageItem"
-            priority={activeIndex === 0}
-            loading={activeIndex === 0 ? 'eager' : 'lazy'}
-            fetchPriority={activeIndex === 0 ? 'high' : 'auto'}
-            style={{ width: '100%', height: 'auto' }}
-          />
-          <SliderIndicators
-            total={activeImages?.length || 0}
-            activeIndex={activeIndex}
-          />
-        </div>
-        {currentImage.name && (
-          <div className="column-Caption">{currentImage.name}</div>
-        )}
-        {blok.caption && <div className="column-Caption">{blok.caption}</div>}
+    <div
+      className="column column-Slider"
+      {...storyblokEditable(blok)}
+      data-caption-side={blok.caption_side}
+    >
+      <div className="column-Slider-Stack">
+        {activeImages.map((image, index) => {
+          const isActive = index === activeIndex;
+          const isNext = index === (activeIndex + 1) % activeImages.length;
+
+          return (
+            <div
+              key={image.id || image.filename || index}
+              className="column-Slider-Item"
+              data-active={isActive}
+            >
+              <div className="column-Slider-ImageWrapper">
+                <Image
+                  loader={storyblokImageLoader}
+                  src={image.filename}
+                  alt={image.alt || image.name || 'Project image'}
+                  width={0}
+                  height={0}
+                  sizes="(max-width: 770px) 100vw, 50vw"
+                  quality={70}
+                  className="imageItem"
+                  priority={index === 0}
+                  loading={index === 0 || isActive || isNext ? 'eager' : 'lazy'}
+                  fetchPriority={
+                    index === 0 || isActive || isNext ? 'high' : 'low'
+                  }
+                  style={{ width: '100%', height: 'auto' }}
+                />
+                <SliderIndicators
+                  total={activeImages.length}
+                  activeIndex={activeIndex}
+                />
+              </div>
+              {image.name && <div className="column-Caption">{image.name}</div>}
+            </div>
+          );
+        })}
       </div>
+      {blok.caption && <div className="column-Caption">{blok.caption}</div>}
     </div>
   );
 };
