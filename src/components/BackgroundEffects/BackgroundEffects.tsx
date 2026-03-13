@@ -4,7 +4,6 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -21,9 +20,8 @@ const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const MOBILE_BREAKPOINT_PX = 770;
-const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
-const MAX_LINE_COUNT = 1440;
+const RADIANT_LINE_COUNT = 48;
 // Intro: start at a viewport-relative spoke length, then grow beyond the
 // viewport while rotating once the explicit enter control is pressed.
 const INTRO_ROTATION_DEGREES = 45;
@@ -66,6 +64,26 @@ type RadiatingLineDescriptor = {
   index: number;
   opacity: number;
 };
+
+const RADIATING_LINE_DESCRIPTORS: RadiatingLineDescriptor[] = Array.from(
+  { length: RADIANT_LINE_COUNT },
+  (_, index) => {
+    const angle = (index / RADIANT_LINE_COUNT) * Math.PI * 2;
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    const baseToScale =
+      EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy), 0.0001);
+
+    return {
+      dx,
+      dy,
+      // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
+      fullScale: baseToScale * (1 + 0.025 * Math.sin(index * 0.39)),
+      index,
+      opacity: 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(index * 0.61)),
+    };
+  },
+);
 
 const parseDurationMs = (
   rawDuration: string,
@@ -258,69 +276,11 @@ function RadiatingBackground() {
   const dotLengthVariationMixRef = useRef(1);
   const dotLengthPatternOffsetRef = useRef(0);
   const hasSeenPathnameRef = useRef(false);
-  const [baseLineCount, setBaseLineCount] = useState(220);
   const [showEnterButton, setShowEnterButton] = useState(
     initialThemeIntroPending,
   );
   const variant: RadiatingVariant = 'variable-dots';
-
-  const lineCount = Math.min(MAX_LINE_COUNT, Math.max(48, baseLineCount));
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    const updateLineCount = () => {
-      const computedStyles = getComputedStyle(root);
-      const rawGap = computedStyles.getPropertyValue('--rb-line-gap').trim();
-      const parsedGap = Number.parseFloat(rawGap);
-      const fallbackGap = DEFAULT_LINE_GAP;
-      const gap =
-        Number.isFinite(parsedGap) && parsedGap > 0 ? parsedGap : fallbackGap;
-      const circumference = 2 * Math.PI * EDGE_DISTANCE;
-      const computedCount = Math.round(circumference / gap);
-      const clampedCount = Math.min(720, Math.max(48, computedCount));
-
-      setBaseLineCount(clampedCount);
-    };
-
-    updateLineCount();
-    window.addEventListener('resize', updateLineCount, { passive: true });
-
-    const observer = new MutationObserver(updateLineCount);
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-
-    return () => {
-      window.removeEventListener('resize', updateLineCount);
-      observer.disconnect();
-    };
-  }, []);
-
-  const lineDescriptors = useMemo<RadiatingLineDescriptor[]>(
-    () =>
-      Array.from({ length: lineCount }, (_, index) => {
-        const angle = (index / lineCount) * Math.PI * 2;
-        const dx = Math.cos(angle);
-        const dy = Math.sin(angle);
-        const baseToScale =
-          EDGE_DISTANCE / Math.max(Math.abs(dx), Math.abs(dy), 0.0001);
-
-        // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
-        const fullScale = baseToScale * (1 + 0.025 * Math.sin(index * 0.39));
-
-        return {
-          dx,
-          dy,
-          fullScale,
-          index,
-          opacity: 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(index * 0.61)),
-        };
-      }),
-    [lineCount],
-  );
+  const lineDescriptors = RADIATING_LINE_DESCRIPTORS;
 
   const applyLineGeometry = useStableEvent(() => {
     const introStartLineLength = getIntroStartLineLength();
@@ -359,10 +319,10 @@ function RadiatingBackground() {
   });
 
   useLayoutEffect(() => {
-    lineRefs.current.length = lineDescriptors.length;
-    dotRefs.current.length = lineDescriptors.length;
+    lineRefs.current.length = RADIANT_LINE_COUNT;
+    dotRefs.current.length = RADIANT_LINE_COUNT;
     applyLineGeometry();
-  }, [applyLineGeometry, lineDescriptors, variant]);
+  }, [applyLineGeometry, variant]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -378,6 +338,7 @@ function RadiatingBackground() {
     let frameId = 0;
     let lastTimestamp = 0;
     let rotation = 0;
+    let isRunning = false;
 
     const animate = (now: number) => {
       if (!lastTimestamp) {
@@ -393,10 +354,39 @@ function RadiatingBackground() {
       frameId = window.requestAnimationFrame(animate);
     };
 
-    frameId = window.requestAnimationFrame(animate);
+    const startAnimation = () => {
+      if (isRunning) return;
+
+      isRunning = true;
+      lastTimestamp = 0;
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    const stopAnimation = () => {
+      if (!isRunning) return;
+
+      isRunning = false;
+      window.cancelAnimationFrame(frameId);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAnimation();
+        return;
+      }
+
+      startAnimation();
+    };
+
+    if (!document.hidden) {
+      startAnimation();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      stopAnimation();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       spinLayer.style.transform = 'translate3d(-50%, -50%, 0) rotate(0deg)';
     };
   }, []);
