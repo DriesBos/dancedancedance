@@ -11,6 +11,16 @@ const INTRO_EXPANSION_DURATION_MS = 1500;
 const INTRO_REVEAL_DELAY_MS = 880;
 const TAU = Math.PI * 2;
 
+// Lets the contour field keep evolving over time. Keep this false while tuning
+// shape/detail so the component renders once instead of repainting every frame.
+const ENABLE_BACKGROUND_MOTION = false;
+// Controls the slow "breathing" glow around the center portal only. The field
+// can stay animated even if this is false.
+const ENABLE_PORTAL_GLOW_PULSE = false;
+// Controls the enter-square expansion into the page container. Set to false if
+// you want Enter to reveal the page without the grow transition.
+const ENABLE_INTRO_EXPANSION = false;
+
 type IntroState = 'idle' | 'playing' | 'complete';
 
 type CircleTable = {
@@ -165,10 +175,9 @@ const renderPerlinField = (
   timeSeconds: number,
 ) => {
   const minDimension = Math.min(width, height);
-  const maxDimension = Math.max(width, height);
   const isMobile = width <= MOBILE_BREAKPOINT_PX;
-  const ringCount = isMobile ? 150 : maxDimension > 1500 ? 240 : 200;
-  const radialSteps = isMobile ? 150 : 196;
+  const ringCount = isMobile ? 180 : 240;
+  const radialSteps = isMobile ? 320 : 512;
   const { cos, sin } = getCircleTable(radialSteps);
 
   const centerX = width * 0.5;
@@ -180,44 +189,59 @@ const renderPerlinField = (
   const portalHalfWidth = minDimension * (isMobile ? 0.09 : 0.065);
   const portalHalfHeight = portalHalfWidth * (isMobile ? 1 : 0.88);
   const innerRadius =
-    Math.hypot(portalHalfWidth, portalHalfHeight) + minDimension * (0.05 + pulse * 0.018);
-  const outerRadius = Math.hypot(width * 0.62, height * 0.62);
-  const centerColor = hexToRgb('#ffd4be');
-  const middleColor = hexToRgb('#ff5f86');
-  const edgeColor = hexToRgb('#54153f');
+    Math.hypot(portalHalfWidth, portalHalfHeight) +
+    minDimension * (0.032 + pulse * 0.012);
+  const outerRadius = Math.hypot(width * 0.74, height * 0.74);
+  const centerColor = hexToRgb('#fff1d7');
+  const middleColor = hexToRgb('#ff2f85');
+  const edgeColor = hexToRgb('#2d093a');
 
   context.clearRect(0, 0, width, height);
   context.globalCompositeOperation = 'source-over';
-  context.fillStyle = '#050109';
+  context.fillStyle = '#000000';
   context.fillRect(0, 0, width, height);
 
   const haloGradient = context.createRadialGradient(
     centerX,
     centerY,
-    innerRadius * 0.25,
+    innerRadius * 0.55,
     centerX,
     centerY,
-    outerRadius,
+    outerRadius * 0.56,
   );
-  haloGradient.addColorStop(0, 'rgba(255, 212, 190, 0.95)');
-  haloGradient.addColorStop(0.12, 'rgba(255, 166, 125, 0.82)');
-  haloGradient.addColorStop(0.28, 'rgba(255, 95, 134, 0.26)');
-  haloGradient.addColorStop(0.62, 'rgba(84, 21, 63, 0.08)');
+  haloGradient.addColorStop(0, 'rgba(255, 226, 192, 0.98)');
+  haloGradient.addColorStop(0.12, 'rgba(255, 188, 149, 0.82)');
+  haloGradient.addColorStop(0.24, 'rgba(255, 98, 139, 0.28)');
+  haloGradient.addColorStop(0.52, 'rgba(73, 14, 48, 0.1)');
   haloGradient.addColorStop(1, 'rgba(5, 1, 9, 0)');
   context.fillStyle = haloGradient;
+  context.fillRect(0, 0, width, height);
+
+  const shadowGradient = context.createRadialGradient(
+    centerX,
+    centerY,
+    innerRadius * 1.05,
+    centerX,
+    centerY,
+    outerRadius * 0.95,
+  );
+  shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  shadowGradient.addColorStop(0.44, 'rgba(0, 0, 0, 0.1)');
+  shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0.42)');
+  context.fillStyle = shadowGradient;
   context.fillRect(0, 0, width, height);
 
   const vignette = context.createRadialGradient(
     centerX,
     centerY,
-    minDimension * 0.35,
+    minDimension * 0.26,
     centerX,
     centerY,
-    outerRadius * 1.12,
+    outerRadius * 1.08,
   );
   vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
-  vignette.addColorStop(0.7, 'rgba(0, 0, 0, 0.14)');
-  vignette.addColorStop(1, 'rgba(0, 0, 0, 0.42)');
+  vignette.addColorStop(0.66, 'rgba(8, 0, 12, 0.3)');
+  vignette.addColorStop(1, 'rgba(0, 0, 0, 0.72)');
   context.fillStyle = vignette;
   context.fillRect(0, 0, width, height);
 
@@ -226,53 +250,108 @@ const renderPerlinField = (
 
   for (let ringIndex = 0; ringIndex < ringCount; ringIndex += 1) {
     const amount = ringIndex / Math.max(1, ringCount - 1);
-    const radialMix = amount * amount;
-    const baseRadius =
-      innerRadius + Math.pow(amount, 1.22) * Math.max(0, outerRadius - innerRadius);
-    const force = minDimension * (0.006 + radialMix * 0.042);
-    const turbulence = 0.72 + radialMix * 1.55;
-    const depth = timeSeconds * 0.06 + amount * 3.4;
-    const angularDrift = 0.12 * Math.sin(timeSeconds * 0.06 + amount * 9.5);
-    const lineWidth =
-      (amount < 0.14 ? 1.08 : amount < 0.62 ? 0.78 : 0.62) * (isMobile ? 0.95 : 1);
-    const alpha = clamp(0.045 + (1 - amount) * 0.26 + pulse * 0.02, 0.04, 0.34);
-    const color = mixThreeStops(amount, centerColor, middleColor, edgeColor);
+    const normInc = amount * amount;
+    const radialMix = Math.pow(amount, 1.08);
+    const outerMountainMix = smoothstep(clamp((amount - 0.54) / 0.46, 0, 1));
+    const ringRadius =
+      innerRadius + radialMix * Math.max(0, outerRadius - innerRadius);
+    const currentForce =
+      minDimension *
+      (0.012 + normInc * 0.04 + outerMountainMix * normInc * 0.22);
+    const turbulence = 0.12 + normInc * 2.4;
+    const chaos = 0.014 + outerMountainMix * 0.032;
+    const symmetry = 0.14;
+    const lineWidth = (amount < 0.24 ? 0.92 : amount < 0.7 ? 0.82 : 0.72) * (isMobile ? 0.94 : 1);
+    const alpha = clamp(0.09 + (1 - normInc) * 0.42, 0.08, 0.52);
+    const color = mixThreeStops(normInc, centerColor, middleColor, edgeColor);
+    const shadowOffset =
+      (0.24 + outerMountainMix * 1.35) * (isMobile ? 0.85 : 1);
+    const pointCount = radialSteps + 1;
+    const xPoints = new Float32Array(pointCount);
+    const yPoints = new Float32Array(pointCount);
+
+    for (let stepIndex = 0; stepIndex <= radialSteps; stepIndex += 1) {
+      const ct = cos[stepIndex];
+      const st = sin[stepIndex];
+      const angle = (stepIndex / radialSteps) * TAU;
+      const sampleX = ct + symmetry;
+      const sampleY = st + symmetry;
+      const macroNoise = fbm3D(
+        turbulence * sampleX * 0.42 + 4.7,
+        turbulence * sampleY * 0.42 + 9.1,
+        ringIndex * chaos + timeSeconds * 0.04,
+      );
+      const ridgeNoise = fbm3D(
+        turbulence * sampleX * 1.35 + 18.2,
+        turbulence * sampleY * 1.35 + 27.5,
+        ringIndex * chaos * 2.4 + 3.3,
+      );
+      const filamentNoise = fbm3D(
+        turbulence * sampleX * 4.8 + 46.2,
+        turbulence * sampleY * 4.8 + 31.4,
+        ringIndex * chaos * 3.8 + 7.1,
+      );
+      const sectorNoise = fbm3D(
+        ct * 0.72 + 71.2,
+        st * 0.72 + 16.8,
+        ringIndex * 0.012 + 4.4,
+      );
+      const macroSigned = (macroNoise - 0.5) * 2;
+      const ridgeLift = 1 - Math.abs(ridgeNoise * 2 - 1);
+      const filamentLift = 1 - Math.abs(filamentNoise * 2 - 1);
+      const sectorLift = Math.pow(clamp(sectorNoise, 0, 1), 2.4);
+      const angularFold =
+        Math.sin(angle * 4 + sectorLift * 6.2) * 0.5 +
+        Math.sin(angle * 7 - 0.6) * 0.25;
+      const signedRelief =
+        macroSigned * currentForce * (0.42 + outerMountainMix * 0.3);
+      const ridgeRelief =
+        ridgeLift *
+        currentForce *
+        (0.14 + outerMountainMix * 1.35) *
+        (0.42 + sectorLift * 1.85);
+      const filamentRelief =
+        filamentLift *
+        currentForce *
+        (0.04 + outerMountainMix * 0.52) *
+        (0.3 + sectorLift * 0.9);
+      const foldRelief =
+        angularFold *
+        currentForce *
+        outerMountainMix *
+        (0.16 + sectorLift * 0.42);
+      const currentAperture =
+        ringRadius +
+        signedRelief +
+        ridgeRelief +
+        filamentRelief +
+        foldRelief;
+
+      xPoints[stepIndex] = centerX + currentAperture * ct;
+      yPoints[stepIndex] = centerY + currentAperture * st;
+    }
+
+    context.beginPath();
+    context.moveTo(xPoints[0] + shadowOffset * 0.45, yPoints[0] + shadowOffset);
+    for (let stepIndex = 1; stepIndex <= radialSteps; stepIndex += 1) {
+      context.lineTo(
+        xPoints[stepIndex] + shadowOffset * 0.45,
+        yPoints[stepIndex] + shadowOffset,
+      );
+    }
+    context.strokeStyle = toRgba({ r: 4, g: 0, b: 8 }, alpha * 0.8);
+    context.lineWidth = lineWidth * (1.9 + outerMountainMix * 0.45);
+    context.stroke();
 
     context.strokeStyle = toRgba(color, alpha);
     context.lineWidth = lineWidth;
     context.beginPath();
-
-    for (let stepIndex = 0; stepIndex <= radialSteps; stepIndex += 1) {
-      const cosTheta = cos[stepIndex];
-      const sinTheta = sin[stepIndex];
-      const angle = (stepIndex / radialSteps) * TAU + angularDrift;
-      const swirl = Math.sin(angle * 6 + timeSeconds * 0.24 + amount * 13) * force * 0.032;
-      const noiseSample = fbm3D(
-        cosTheta * turbulence + amount * 0.6 + 4.2,
-        sinTheta * turbulence - amount * 0.45 + 9.3,
-        depth,
-      );
-      const ridge = Math.abs(noiseSample * 2 - 1);
-      const displacement = ((noiseSample - 0.5) * 2 + (ridge - 0.5) * 0.55) * force;
-      const radius = baseRadius + displacement + swirl;
-      const x = centerX + Math.cos(angle) * radius;
-      const y = centerY + Math.sin(angle) * radius;
-
-      if (stepIndex === 0) {
-        context.moveTo(x, y);
-        continue;
-      }
-
-      context.lineTo(x, y);
+    context.moveTo(xPoints[0], yPoints[0]);
+    for (let stepIndex = 1; stepIndex <= radialSteps; stepIndex += 1) {
+      context.lineTo(xPoints[stepIndex], yPoints[stepIndex]);
     }
 
     context.stroke();
-
-    if (ringIndex % (isMobile ? 18 : 15) === 0) {
-      context.strokeStyle = toRgba(color, alpha * 0.4);
-      context.lineWidth = lineWidth * 1.8;
-      context.stroke();
-    }
   }
 };
 
@@ -322,6 +401,14 @@ export default function PerlinField() {
 
   const handleEnter = useCallback(() => {
     if (introStateRef.current !== 'idle') {
+      return;
+    }
+
+    if (!ENABLE_INTRO_EXPANSION) {
+      introStateRef.current = 'complete';
+      setIntroState('complete');
+      setShowEnterButton(false);
+      revealPageContent();
       return;
     }
 
@@ -392,6 +479,15 @@ export default function PerlinField() {
       context.setTransform(nextDpr, 0, 0, nextDpr, 0, 0);
     };
 
+    const drawFrame = (timeSeconds: number) => {
+      renderPerlinField(
+        context,
+        viewportWidth,
+        viewportHeight,
+        timeSeconds,
+      );
+    };
+
     const scheduleResize = () => {
       if (resizeFrameRef.current !== null) {
         window.cancelAnimationFrame(resizeFrameRef.current);
@@ -402,6 +498,7 @@ export default function PerlinField() {
         const bounds = getAdaptiveDprBounds();
         dprController.setBounds(bounds.minDpr, bounds.maxDpr, performance.now());
         resizeCanvas();
+        drawFrame(0);
       });
     };
 
@@ -411,12 +508,17 @@ export default function PerlinField() {
         resizeCanvas();
       }
 
-      renderPerlinField(context, viewportWidth, viewportHeight, nowMs * 0.001);
+      drawFrame(nowMs * 0.001);
       animationFrameRef.current = window.requestAnimationFrame(animate);
     };
 
     resizeCanvas();
-    animationFrameRef.current = window.requestAnimationFrame(animate);
+    drawFrame(0);
+
+    if (ENABLE_BACKGROUND_MOTION) {
+      animationFrameRef.current = window.requestAnimationFrame(animate);
+    }
+
     window.addEventListener('resize', scheduleResize);
 
     return () => {
@@ -437,7 +539,12 @@ export default function PerlinField() {
 
   return (
     <>
-      <div ref={rootRef} className={styles.root} data-intro-state={introState}>
+      <div
+        ref={rootRef}
+        className={styles.root}
+        data-intro-state={introState}
+        data-portal-pulse={ENABLE_PORTAL_GLOW_PULSE ? 'true' : 'false'}
+      >
         <canvas ref={canvasRef} className={styles.canvas} />
         <div className={styles.portal} aria-hidden="true">
           <div className={styles.portalGlow} />
