@@ -16,27 +16,43 @@ const TAU = Math.PI * 2;
 const ENABLE_BACKGROUND_MOTION = false;
 // Controls the slow "breathing" glow around the center portal only. The field
 // can stay animated even if this is false.
-const ENABLE_PORTAL_GLOW_PULSE = false;
+const ENABLE_PORTAL_GLOW_PULSE = true;
 // Controls the enter-square expansion into the page container. Set to false if
 // you want Enter to reveal the page without the grow transition.
-const ENABLE_INTRO_EXPANSION = false;
+const ENABLE_INTRO_EXPANSION = true;
 
 // Reference preset based on the trait values shown for Singularity #8000033.
 // `aperture` and `detail` are not visible in the trait panel, so they are
 // inferred here and kept explicit for tuning.
 const SINGULARITY_REFERENCE_FORMDATA = {
+  // Controls how many contour rings are drawn overall. Higher values produce a
+  // denser field with more accumulated line structure.
   mass: 0.431,
+  // Sets the size of the central opening before noise deformation expands
+  // outward. Higher values push the field farther away from the core.
   aperture: 0.34,
+  // Controls how far each ring can be displaced by the noise field. Higher
+  // values create taller "mountains" and more dramatic relief.
   force: 0.941,
+  // Offsets the polar noise sampling to break perfect circles. Higher values
+  // usually feel more centered/symmetrical after the source mapping inverts it.
   symmetry: 0.871,
+  // Controls the frequency/detail of the deformation across each ring. Higher
+  // values add more choppy, intricate contour variation.
   turbulence: 0.988,
+  // Controls how much the noise changes from one ring to the next. Higher
+  // values make neighboring rings diverge faster and feel more chaotic.
   chaos: 0.953,
+  // Controls how strongly the warm-to-magenta palette overrides the pale base
+  // line color. Higher values make the field more vivid and saturated.
   saturation: 0.98,
+  // Controls the number of noise octaves used in the source piece. Higher
+  // values add finer texture and micro-variation to the relief.
   detail: 0.9,
 };
 
 const SINGULARITY_PARAM_RANGES = {
-  lineWeight: 2,
+  lineWeight: 1,
   increment: 0.001,
   bufferSize: 2400,
   mass: { min: 600, max: 1200 },
@@ -342,6 +358,7 @@ const renderPerlinField = (
   const centerColor = hexToRgb('#fff1d7');
   const middleColor = hexToRgb('#ff2f85');
   const edgeColor = hexToRgb('#2d093a');
+  const nearBlackColor = hexToRgb('#020103');
 
   context.clearRect(0, 0, width, height);
   context.globalCompositeOperation = 'source-over';
@@ -398,6 +415,7 @@ const renderPerlinField = (
   for (let ringIndex = 0; ringIndex < ringCount; ringIndex += 1) {
     const amount = ringIndex / Math.max(1, ringCount);
     const normInc = amount * amount;
+    const outerMountainMix = smoothstep(clamp((amount - 0.52) / 0.48, 0, 1));
     const ringRadius =
       renderdata.aperture +
       ringIndex *
@@ -417,10 +435,21 @@ const renderPerlinField = (
       middleColor,
       edgeColor,
     );
+    const baseContourColor = mixColor(
+      color,
+      nearBlackColor,
+      clamp(Math.pow(amount, 1.08) * 0.88, 0, 0.94),
+    );
+    const highlightColor = mixColor(
+      color,
+      centerColor,
+      0.34 + outerMountainMix * 0.36,
+    );
     const shadowOffset = (0.4 + normInc * 1.6) * scale;
     const pointCount = radialSteps + 1;
     const xPoints = new Float32Array(pointCount);
     const yPoints = new Float32Array(pointCount);
+    const lightMask = new Float32Array(pointCount);
 
     for (let stepIndex = 0; stepIndex <= radialSteps; stepIndex += 1) {
       const ct = cos[stepIndex];
@@ -455,7 +484,6 @@ const renderPerlinField = (
       const angularFold =
         Math.sin(angle * 4 + sectorLift * 6.2) * 0.5 +
         Math.sin(angle * 7 - 0.6) * 0.25;
-      const outerMountainMix = smoothstep(clamp((amount - 0.52) / 0.48, 0, 1));
       const signedRelief =
         macroSigned * currentForce * (0.26 + outerMountainMix * 0.18);
       const ridgeRelief =
@@ -473,6 +501,15 @@ const renderPerlinField = (
         currentForce *
         outerMountainMix *
         (0.22 + sectorLift * 0.58);
+      const lightDirection =
+        clamp(0.52 + 0.48 * Math.sin(angle * 2.6 - 0.8), 0, 1) *
+        clamp(0.6 + 0.4 * Math.cos(angle * 4.8 + sectorLift * 5.5), 0, 1);
+      const highlightStrength =
+        outerMountainMix *
+        ridgeLift *
+        (0.34 + sectorLift * 0.9) *
+        (0.3 + filamentLift * 0.35) *
+        (0.24 + lightDirection * 1.12);
       const currentAperture =
         ringRadius +
         signedRelief +
@@ -482,6 +519,7 @@ const renderPerlinField = (
 
       xPoints[stepIndex] = centerX + currentAperture * ct * scale;
       yPoints[stepIndex] = centerY + currentAperture * st * scale;
+      lightMask[stepIndex] = highlightStrength;
     }
 
     context.beginPath();
@@ -496,11 +534,38 @@ const renderPerlinField = (
     context.lineWidth = lineWidth * (1.9 + amount * 0.25);
     context.stroke();
 
-    context.strokeStyle = toRgba(color, alpha);
+    context.strokeStyle = toRgba(baseContourColor, alpha);
     context.lineWidth = lineWidth;
     context.beginPath();
     context.moveTo(xPoints[0], yPoints[0]);
     for (let stepIndex = 1; stepIndex <= radialSteps; stepIndex += 1) {
+      context.lineTo(xPoints[stepIndex], yPoints[stepIndex]);
+    }
+
+    context.stroke();
+
+    const highlightThreshold = 0.34;
+    let segmentOpen = false;
+    context.strokeStyle = toRgba(
+      highlightColor,
+      clamp(alpha * (0.22 + outerMountainMix * 0.7), 0.06, 0.58),
+    );
+    context.lineWidth = lineWidth * (1.04 + outerMountainMix * 0.32);
+    context.beginPath();
+
+    for (let stepIndex = 0; stepIndex <= radialSteps; stepIndex += 1) {
+      const lit = lightMask[stepIndex] > highlightThreshold;
+      if (!lit) {
+        segmentOpen = false;
+        continue;
+      }
+
+      if (!segmentOpen) {
+        context.moveTo(xPoints[stepIndex], yPoints[stepIndex]);
+        segmentOpen = true;
+        continue;
+      }
+
       context.lineTo(xPoints[stepIndex], yPoints[stepIndex]);
     }
 
