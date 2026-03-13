@@ -21,6 +21,32 @@ const ENABLE_PORTAL_GLOW_PULSE = false;
 // you want Enter to reveal the page without the grow transition.
 const ENABLE_INTRO_EXPANSION = false;
 
+// Reference preset based on the trait values shown for Singularity #8000033.
+// `aperture` and `detail` are not visible in the trait panel, so they are
+// inferred here and kept explicit for tuning.
+const SINGULARITY_REFERENCE_FORMDATA = {
+  mass: 0.431,
+  aperture: 0.34,
+  force: 0.941,
+  symmetry: 0.871,
+  turbulence: 0.988,
+  chaos: 0.953,
+  saturation: 0.98,
+  detail: 0.9,
+};
+
+const SINGULARITY_PARAM_RANGES = {
+  lineWeight: 2,
+  increment: 0.001,
+  bufferSize: 2400,
+  mass: { min: 600, max: 1200 },
+  aperture: { min: 100, max: 400 },
+  force: { min: 550, max: 2250 },
+  turbulence: { min: 0.001, max: 1 },
+  chaos: { min: 0.001, max: 0.002 },
+  detail: { min: 4, max: 10 },
+};
+
 type IntroState = 'idle' | 'playing' | 'complete';
 
 type CircleTable = {
@@ -129,6 +155,20 @@ type RgbaColor = {
   b: number;
 };
 
+type SingularityFormData = typeof SINGULARITY_REFERENCE_FORMDATA;
+
+type SingularityRenderData = {
+  mass: number;
+  aperture: number;
+  force: number;
+  symmetry: number;
+  turbulence: number;
+  chaos: number;
+  saturation: number;
+  detail: number;
+  formPoints: number;
+};
+
 const hexToRgb = (hex: string): RgbaColor => {
   const normalized = hex.replace('#', '');
   const value =
@@ -168,6 +208,110 @@ const mixThreeStops = (
 const toRgba = (color: RgbaColor, alpha: number) =>
   `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
 
+const evaluateSingularityTrait = (value: number) => {
+  if (value === 1 || value === 0) {
+    return { form: 7, rare: 2 };
+  }
+
+  if (value <= 0.01 || value > 0.99) {
+    return { form: 5, rare: 1 };
+  }
+
+  if ((value > 0.01 && value < 0.1) || (value < 0.99 && value > 0.9)) {
+    return { form: 3, rare: 0 };
+  }
+
+  if ((value > 0.1 && value < 0.25) || (value < 0.9 && value > 0.75)) {
+    return { form: 1, rare: 0 };
+  }
+
+  return { form: 0, rare: 0 };
+};
+
+const resolveSingularityFormPoints = (formdata: SingularityFormData) => {
+  const scores = [
+    evaluateSingularityTrait(formdata.mass),
+    evaluateSingularityTrait(formdata.force),
+    evaluateSingularityTrait(formdata.symmetry),
+    evaluateSingularityTrait(formdata.turbulence),
+    evaluateSingularityTrait(formdata.chaos),
+  ];
+
+  return scores.reduce(
+    (sum, score) => sum + score.form,
+    0,
+  );
+};
+
+const resolveSingularitySaturation = (
+  saturation: number,
+  formPoints: number,
+) => {
+  if (formPoints === 0) {
+    return 0;
+  }
+
+  if (formPoints < 7) {
+    return lerp(0, 0.25, saturation);
+  }
+
+  if (formPoints < 9) {
+    return lerp(0.2, 0.75, saturation);
+  }
+
+  if (formPoints < 10) {
+    return lerp(0.75, 0.9, saturation);
+  }
+
+  if (formPoints < 11) {
+    return lerp(0.9, 1, saturation);
+  }
+
+  return 1;
+};
+
+const resolveSingularityRenderData = (
+  formdata: SingularityFormData,
+): SingularityRenderData => {
+  const formPoints = resolveSingularityFormPoints(formdata);
+
+  return {
+    mass: lerp(
+      SINGULARITY_PARAM_RANGES.mass.min,
+      SINGULARITY_PARAM_RANGES.mass.max,
+      formdata.mass,
+    ),
+    aperture: lerp(
+      SINGULARITY_PARAM_RANGES.aperture.min,
+      SINGULARITY_PARAM_RANGES.aperture.max,
+      formdata.aperture,
+    ),
+    force: lerp(
+      SINGULARITY_PARAM_RANGES.force.min,
+      SINGULARITY_PARAM_RANGES.force.max,
+      formdata.force,
+    ),
+    symmetry: 1 - formdata.symmetry,
+    turbulence: lerp(
+      SINGULARITY_PARAM_RANGES.turbulence.min,
+      SINGULARITY_PARAM_RANGES.turbulence.max,
+      formdata.turbulence,
+    ),
+    chaos: lerp(
+      SINGULARITY_PARAM_RANGES.chaos.min,
+      SINGULARITY_PARAM_RANGES.chaos.max,
+      formdata.chaos,
+    ),
+    saturation: formdata.saturation,
+    detail: lerp(
+      SINGULARITY_PARAM_RANGES.detail.min,
+      SINGULARITY_PARAM_RANGES.detail.max,
+      formdata.detail,
+    ),
+    formPoints,
+  };
+};
+
 const renderPerlinField = (
   context: CanvasRenderingContext2D,
   width: number,
@@ -176,9 +320,13 @@ const renderPerlinField = (
 ) => {
   const minDimension = Math.min(width, height);
   const isMobile = width <= MOBILE_BREAKPOINT_PX;
-  const ringCount = isMobile ? 180 : 240;
-  const radialSteps = isMobile ? 320 : 512;
+  const renderdata = resolveSingularityRenderData(
+    SINGULARITY_REFERENCE_FORMDATA,
+  );
+  const ringCount = Math.round(renderdata.mass * (isMobile ? 0.72 : 1));
+  const radialSteps = isMobile ? 384 : 512;
   const { cos, sin } = getCircleTable(radialSteps);
+  const scale = minDimension / SINGULARITY_PARAM_RANGES.bufferSize;
 
   const centerX = width * 0.5;
   const centerY = height * 0.5;
@@ -191,7 +339,6 @@ const renderPerlinField = (
   const innerRadius =
     Math.hypot(portalHalfWidth, portalHalfHeight) +
     minDimension * (0.032 + pulse * 0.012);
-  const outerRadius = Math.hypot(width * 0.74, height * 0.74);
   const centerColor = hexToRgb('#fff1d7');
   const middleColor = hexToRgb('#ff2f85');
   const edgeColor = hexToRgb('#2d093a');
@@ -207,7 +354,7 @@ const renderPerlinField = (
     innerRadius * 0.55,
     centerX,
     centerY,
-    outerRadius * 0.56,
+    minDimension * 0.48,
   );
   haloGradient.addColorStop(0, 'rgba(255, 226, 192, 0.98)');
   haloGradient.addColorStop(0.12, 'rgba(255, 188, 149, 0.82)');
@@ -223,7 +370,7 @@ const renderPerlinField = (
     innerRadius * 1.05,
     centerX,
     centerY,
-    outerRadius * 0.95,
+    minDimension * 0.72,
   );
   shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
   shadowGradient.addColorStop(0.44, 'rgba(0, 0, 0, 0.1)');
@@ -237,7 +384,7 @@ const renderPerlinField = (
     minDimension * 0.26,
     centerX,
     centerY,
-    outerRadius * 1.08,
+    minDimension * 0.78,
   );
   vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
   vignette.addColorStop(0.66, 'rgba(8, 0, 12, 0.3)');
@@ -249,23 +396,28 @@ const renderPerlinField = (
   context.lineJoin = 'round';
 
   for (let ringIndex = 0; ringIndex < ringCount; ringIndex += 1) {
-    const amount = ringIndex / Math.max(1, ringCount - 1);
+    const amount = ringIndex / Math.max(1, ringCount);
     const normInc = amount * amount;
-    const radialMix = Math.pow(amount, 1.08);
-    const outerMountainMix = smoothstep(clamp((amount - 0.54) / 0.46, 0, 1));
     const ringRadius =
-      innerRadius + radialMix * Math.max(0, outerRadius - innerRadius);
-    const currentForce =
-      minDimension *
-      (0.012 + normInc * 0.04 + outerMountainMix * normInc * 0.22);
-    const turbulence = 0.12 + normInc * 2.4;
-    const chaos = 0.014 + outerMountainMix * 0.032;
-    const symmetry = 0.14;
-    const lineWidth = (amount < 0.24 ? 0.92 : amount < 0.7 ? 0.82 : 0.72) * (isMobile ? 0.94 : 1);
-    const alpha = clamp(0.09 + (1 - normInc) * 0.42, 0.08, 0.52);
-    const color = mixThreeStops(normInc, centerColor, middleColor, edgeColor);
-    const shadowOffset =
-      (0.24 + outerMountainMix * 1.35) * (isMobile ? 0.85 : 1);
+      renderdata.aperture +
+      ringIndex *
+        (SINGULARITY_PARAM_RANGES.increment * (renderdata.mass / ringCount));
+    const currentForce = renderdata.force * normInc;
+    const normalizedTurbulence = renderdata.turbulence * normInc;
+    const lineWidth =
+      SINGULARITY_PARAM_RANGES.lineWeight * scale * (isMobile ? 0.9 : 1);
+    const alpha = clamp(1 - normInc, 0.05, 1);
+    const colorMix = resolveSingularitySaturation(
+      renderdata.saturation,
+      renderdata.formPoints,
+    );
+    const color = mixThreeStops(
+      colorMix * clamp(normInc * 1.12, 0, 1),
+      centerColor,
+      middleColor,
+      edgeColor,
+    );
+    const shadowOffset = (0.4 + normInc * 1.6) * scale;
     const pointCount = radialSteps + 1;
     const xPoints = new Float32Array(pointCount);
     const yPoints = new Float32Array(pointCount);
@@ -274,22 +426,22 @@ const renderPerlinField = (
       const ct = cos[stepIndex];
       const st = sin[stepIndex];
       const angle = (stepIndex / radialSteps) * TAU;
-      const sampleX = ct + symmetry;
-      const sampleY = st + symmetry;
+      const sampleX = ct + renderdata.symmetry;
+      const sampleY = st + renderdata.symmetry;
       const macroNoise = fbm3D(
-        turbulence * sampleX * 0.42 + 4.7,
-        turbulence * sampleY * 0.42 + 9.1,
-        ringIndex * chaos + timeSeconds * 0.04,
+        normalizedTurbulence * sampleX + 4.7,
+        normalizedTurbulence * sampleY + 9.1,
+        ringIndex * renderdata.chaos + timeSeconds * 0.04,
       );
       const ridgeNoise = fbm3D(
-        turbulence * sampleX * 1.35 + 18.2,
-        turbulence * sampleY * 1.35 + 27.5,
-        ringIndex * chaos * 2.4 + 3.3,
+        normalizedTurbulence * sampleX * 3.4 + 18.2,
+        normalizedTurbulence * sampleY * 3.4 + 27.5,
+        ringIndex * renderdata.chaos * 2.6 + 3.3,
       );
       const filamentNoise = fbm3D(
-        turbulence * sampleX * 4.8 + 46.2,
-        turbulence * sampleY * 4.8 + 31.4,
-        ringIndex * chaos * 3.8 + 7.1,
+        normalizedTurbulence * sampleX * 8.2 + 46.2,
+        normalizedTurbulence * sampleY * 8.2 + 31.4,
+        ringIndex * renderdata.chaos * 4.1 + 7.1,
       );
       const sectorNoise = fbm3D(
         ct * 0.72 + 71.2,
@@ -303,23 +455,24 @@ const renderPerlinField = (
       const angularFold =
         Math.sin(angle * 4 + sectorLift * 6.2) * 0.5 +
         Math.sin(angle * 7 - 0.6) * 0.25;
+      const outerMountainMix = smoothstep(clamp((amount - 0.52) / 0.48, 0, 1));
       const signedRelief =
-        macroSigned * currentForce * (0.42 + outerMountainMix * 0.3);
+        macroSigned * currentForce * (0.26 + outerMountainMix * 0.18);
       const ridgeRelief =
         ridgeLift *
         currentForce *
-        (0.14 + outerMountainMix * 1.35) *
-        (0.42 + sectorLift * 1.85);
+        (0.22 + outerMountainMix * 1.8) *
+        (0.56 + sectorLift * 2.2);
       const filamentRelief =
         filamentLift *
         currentForce *
-        (0.04 + outerMountainMix * 0.52) *
-        (0.3 + sectorLift * 0.9);
+        (0.08 + outerMountainMix * 0.66) *
+        (0.34 + sectorLift * 1.08);
       const foldRelief =
         angularFold *
         currentForce *
         outerMountainMix *
-        (0.16 + sectorLift * 0.42);
+        (0.22 + sectorLift * 0.58);
       const currentAperture =
         ringRadius +
         signedRelief +
@@ -327,8 +480,8 @@ const renderPerlinField = (
         filamentRelief +
         foldRelief;
 
-      xPoints[stepIndex] = centerX + currentAperture * ct;
-      yPoints[stepIndex] = centerY + currentAperture * st;
+      xPoints[stepIndex] = centerX + currentAperture * ct * scale;
+      yPoints[stepIndex] = centerY + currentAperture * st * scale;
     }
 
     context.beginPath();
@@ -340,7 +493,7 @@ const renderPerlinField = (
       );
     }
     context.strokeStyle = toRgba({ r: 4, g: 0, b: 8 }, alpha * 0.8);
-    context.lineWidth = lineWidth * (1.9 + outerMountainMix * 0.45);
+    context.lineWidth = lineWidth * (1.9 + amount * 0.25);
     context.stroke();
 
     context.strokeStyle = toRgba(color, alpha);
