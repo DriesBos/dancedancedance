@@ -1,6 +1,9 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-13] `ColumnSlider` now keeps all slides mounted in a stacked grid, swaps active state via `visibility`/`z-index` instead of opacity resets, and pre-decodes the upcoming Storyblok image to avoid flashes between slides.
+- [2026-03-13] The RADIANT rotating SVG background now pauses its RAF loop while the document is hidden and resumes cleanly on visibility restore, cutting idle tab animation work.
+- [2026-03-13] The RADIANT spoke field now uses a fixed precomputed 48-line descriptor set, removing redundant resize and theme-observer bookkeeping tied to a line-gap setting that no longer changes.
 - [2026-03-13] Initial `/about` and `/projects/*` landings now suppress the intro overlay and route-scoped action-button physics on first paint, avoiding unnecessary background gating and Matter.js work before hydration.
 - [2026-03-13] The new `PERLIN` canvas background now precomputes circle lookup tables and adapts DPR under sustained FPS drops so the animated contour field stays lightweight on high-density screens.
 - [2026-03-13] The TRON `NeonTunnel` background now lazy-loads its Three.js/postprocessing stack, renders the square tunnel through instanced geometry, and adapts DPR under sustained FPS drops.
