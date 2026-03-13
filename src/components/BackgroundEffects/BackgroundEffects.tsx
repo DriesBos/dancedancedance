@@ -23,8 +23,8 @@ const MOBILE_BREAKPOINT_PX = 770;
 const DEFAULT_LINE_GAP = 18;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
 const MAX_LINE_COUNT = 1440;
-// Intro test: start at a viewport-relative spoke length, then wait for the
-// next click or Tab key before growing beyond the viewport while rotating.
+// Intro: start at a viewport-relative spoke length, then grow beyond the
+// viewport while rotating once the explicit enter control is pressed.
 const INTRO_ROTATION_DEGREES = 45;
 const INTRO_START_LINE_LENGTH_VMIN = 25;
 const INTRO_START_LINE_LENGTH_VMIN_MOBILE = 33;
@@ -133,8 +133,30 @@ type IntroAnimationControllers = {
   introProgressRef: { current: number };
   introRotationOffsetRef: { current: number };
   lineGrowthMultiplierRef: { current: number };
-  introInteractionCleanupRef: { current: (() => void) | null };
   onComplete?: () => void;
+};
+
+const prepareRadiatingIntro = ({
+  applyLineGeometry,
+  introActiveRef,
+  introFrameRef,
+  introProgressRef,
+  introRotationOffsetRef,
+  lineGrowthMultiplierRef,
+}: IntroAnimationControllers) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (introFrameRef.current !== null) {
+    window.cancelAnimationFrame(introFrameRef.current);
+  }
+
+  lineGrowthMultiplierRef.current = INTRO_TARGET_LINE_SCALE;
+  introActiveRef.current = true;
+  introProgressRef.current = 0;
+  introRotationOffsetRef.current = 0;
+  applyLineGeometry();
 };
 
 const startRadiatingIntro = ({
@@ -143,8 +165,6 @@ const startRadiatingIntro = ({
   introFrameRef,
   introProgressRef,
   introRotationOffsetRef,
-  lineGrowthMultiplierRef,
-  introInteractionCleanupRef,
   onComplete,
 }: IntroAnimationControllers) => {
   if (typeof window === 'undefined') {
@@ -155,64 +175,32 @@ const startRadiatingIntro = ({
     window.cancelAnimationFrame(introFrameRef.current);
   }
 
-  introInteractionCleanupRef.current?.();
-  introInteractionCleanupRef.current = null;
+  const startTime = performance.now();
+  const startRotationOffset = introRotationOffsetRef.current;
+  const targetRotationOffset = startRotationOffset + INTRO_ROTATION_DEGREES;
 
-  lineGrowthMultiplierRef.current = INTRO_TARGET_LINE_SCALE;
-  introActiveRef.current = true;
-  introProgressRef.current = 0;
-  applyLineGeometry();
+  const animate = (now: number) => {
+    const progress = Math.min(1, (now - startTime) / INTRO_GROWTH_DURATION_MS);
+    const easedProgress = easeOutCubic(progress);
+    introProgressRef.current = easedProgress;
+    introRotationOffsetRef.current =
+      startRotationOffset +
+      (targetRotationOffset - startRotationOffset) * easedProgress;
+    applyLineGeometry();
 
-  const beginGrowthPhase = () => {
-    introInteractionCleanupRef.current?.();
-    introInteractionCleanupRef.current = null;
-
-    const startTime = performance.now();
-    const startRotationOffset = introRotationOffsetRef.current;
-    const targetRotationOffset = startRotationOffset + INTRO_ROTATION_DEGREES;
-
-    const animate = (now: number) => {
-      const progress = Math.min(1, (now - startTime) / INTRO_GROWTH_DURATION_MS);
-      const easedProgress = easeOutCubic(progress);
-      introProgressRef.current = easedProgress;
-      introRotationOffsetRef.current =
-        startRotationOffset +
-        (targetRotationOffset - startRotationOffset) * easedProgress;
-      applyLineGeometry();
-
-      if (progress < 1) {
-        introFrameRef.current = window.requestAnimationFrame(animate);
-        return;
-      }
-
-      introActiveRef.current = false;
-      introProgressRef.current = 1;
-      applyLineGeometry();
-      introFrameRef.current = null;
-      onComplete?.();
-    };
-
-    introFrameRef.current = window.requestAnimationFrame(animate);
-  };
-
-  const handlePointerDown = () => {
-    beginGrowthPhase();
-  };
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== 'Tab') {
+    if (progress < 1) {
+      introFrameRef.current = window.requestAnimationFrame(animate);
       return;
     }
 
-    beginGrowthPhase();
+    introActiveRef.current = false;
+    introProgressRef.current = 1;
+    applyLineGeometry();
+    introFrameRef.current = null;
+    onComplete?.();
   };
 
-  window.addEventListener('pointerdown', handlePointerDown, { passive: true });
-  window.addEventListener('keydown', handleKeyDown);
-  introInteractionCleanupRef.current = () => {
-    window.removeEventListener('pointerdown', handlePointerDown);
-    window.removeEventListener('keydown', handleKeyDown);
-  };
+  introFrameRef.current = window.requestAnimationFrame(animate);
 };
 
 const getRadiatingLineScale = (
@@ -253,11 +241,10 @@ function RadiatingBackground() {
   const spinLayerRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
   const dotRefs = useRef<(SVGCircleElement | null)[]>([]);
-  const lineGrowthMultiplierRef = useRef(1);
-  const introActiveRef = useRef(false);
+  const lineGrowthMultiplierRef = useRef(INTRO_TARGET_LINE_SCALE);
+  const introActiveRef = useRef(true);
   const introFrameRef = useRef<number | null>(null);
-  const introInteractionCleanupRef = useRef<(() => void) | null>(null);
-  const introProgressRef = useRef(1);
+  const introProgressRef = useRef(0);
   const introRotationOffsetRef = useRef(0);
   const dotLengthMorphFrameRef = useRef<number | null>(null);
   const dotLengthVariationMixRef = useRef(1);
@@ -267,6 +254,7 @@ function RadiatingBackground() {
   const showPageContent = useStore((state) => state.showPageContent);
   const revealPageContent = useStore((state) => state.revealPageContent);
   const [baseLineCount, setBaseLineCount] = useState(220);
+  const [showEnterButton, setShowEnterButton] = useState(true);
   const variant: RadiatingVariant = 'variable-dots';
 
   const lineCount = Math.min(MAX_LINE_COUNT, Math.max(48, baseLineCount));
@@ -420,18 +408,17 @@ function RadiatingBackground() {
     };
   }, []);
 
-  // Auto-run the intro whenever the radiating theme is entered.
+  // Prepare the intro pose whenever the radiating theme is entered.
   useEffect(() => {
     hidePageContent();
-    startRadiatingIntro({
+    setShowEnterButton(true);
+    prepareRadiatingIntro({
       applyLineGeometry,
       introActiveRef,
       introFrameRef,
       introProgressRef,
       introRotationOffsetRef,
       lineGrowthMultiplierRef,
-      introInteractionCleanupRef,
-      onComplete: revealPageContent,
     });
 
     return () => {
@@ -439,17 +426,27 @@ function RadiatingBackground() {
         window.cancelAnimationFrame(introFrameRef.current);
         introFrameRef.current = null;
       }
-      introInteractionCleanupRef.current?.();
-      introInteractionCleanupRef.current = null;
 
       showPageContent();
     };
   }, [
     applyLineGeometry,
     hidePageContent,
-    revealPageContent,
     showPageContent,
   ]);
+
+  const handleEnter = useCallback(() => {
+    setShowEnterButton(false);
+    startRadiatingIntro({
+      applyLineGeometry,
+      introActiveRef,
+      introFrameRef,
+      introProgressRef,
+      introRotationOffsetRef,
+      lineGrowthMultiplierRef,
+      onComplete: revealPageContent,
+    });
+  }, [applyLineGeometry, revealPageContent]);
 
   const animateDotLengthsTo = (targetMix: number, targetOffset: number) => {
     if (dotLengthMorphFrameRef.current !== null) {
@@ -505,69 +502,82 @@ function RadiatingBackground() {
   const renderIntroStartLineLength = getIntroStartLineLength();
 
   return (
-    <div
-      ref={rootRef}
-      className={styles.root}
-      data-version="radiating"
-      aria-hidden="true"
-    >
-      <div ref={spinLayerRef} className={styles.radiatingSpinLayer}>
-        <svg
-          className={styles.svg}
-          viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
-          preserveAspectRatio="xMidYMid slice"
-          role="presentation"
-        >
-          <rect
-            className={styles.background}
-            width={VIEWBOX_SIZE}
-            height={VIEWBOX_SIZE}
-          />
-          <g className={styles.lines}>
-            {lineDescriptors.map((descriptor, index) => {
-              const scale = getRadiatingLineScale(
-                descriptor,
-                variant,
-                dotLengthVariationMixRef.current,
-                dotLengthPatternOffsetRef.current,
-                lineGrowthMultiplierRef.current,
-                renderIntroStartLineLength,
-                introActiveRef.current,
-                introProgressRef.current,
-              );
-              const x2 = CENTER + descriptor.dx * scale;
-              const y2 = CENTER + descriptor.dy * scale;
+    <>
+      <div
+        ref={rootRef}
+        className={styles.root}
+        data-version="radiating"
+        aria-hidden="true"
+      >
+        <div ref={spinLayerRef} className={styles.radiatingSpinLayer}>
+          <svg
+            className={styles.svg}
+            viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
+            preserveAspectRatio="xMidYMid slice"
+            role="presentation"
+          >
+            <rect
+              className={styles.background}
+              width={VIEWBOX_SIZE}
+              height={VIEWBOX_SIZE}
+            />
+            <g className={styles.lines}>
+              {lineDescriptors.map((descriptor, index) => {
+                const scale = getRadiatingLineScale(
+                  descriptor,
+                  variant,
+                  dotLengthVariationMixRef.current,
+                  dotLengthPatternOffsetRef.current,
+                  lineGrowthMultiplierRef.current,
+                  renderIntroStartLineLength,
+                  introActiveRef.current,
+                  introProgressRef.current,
+                );
+                const x2 = CENTER + descriptor.dx * scale;
+                const y2 = CENTER + descriptor.dy * scale;
 
-              return (
-                <g key={index}>
-                  <line
-                    ref={(node) => {
-                      lineRefs.current[index] = node;
-                    }}
-                    className={styles.line}
-                    x1={CENTER}
-                    y1={CENTER}
-                    x2={x2}
-                    y2={y2}
-                    opacity={descriptor.opacity}
-                  />
-                  <circle
-                    ref={(node) => {
-                      dotRefs.current[index] = node;
-                    }}
-                    className={styles.lineDot}
-                    cx={x2}
-                    cy={y2}
-                    opacity={descriptor.opacity}
-                    r={LINE_DOT_RADIUS}
-                  />
-                </g>
-              );
-            })}
-          </g>
-        </svg>
+                return (
+                  <g key={index}>
+                    <line
+                      ref={(node) => {
+                        lineRefs.current[index] = node;
+                      }}
+                      className={styles.line}
+                      x1={CENTER}
+                      y1={CENTER}
+                      x2={x2}
+                      y2={y2}
+                      opacity={descriptor.opacity}
+                    />
+                    <circle
+                      ref={(node) => {
+                        dotRefs.current[index] = node;
+                      }}
+                      className={styles.lineDot}
+                      cx={x2}
+                      cy={y2}
+                      opacity={descriptor.opacity}
+                      r={LINE_DOT_RADIUS}
+                    />
+                  </g>
+                );
+              })}
+            </g>
+          </svg>
+        </div>
       </div>
-    </div>
+      {showEnterButton && (
+        <div className={`${styles.enterButtonLayer} cursorInteract`}>
+          <button
+            type="button"
+            className={styles.enterButton}
+            onClick={handleEnter}
+          >
+            Enter
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 

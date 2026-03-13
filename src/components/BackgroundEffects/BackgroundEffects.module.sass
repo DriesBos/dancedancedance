@@ -51,6 +51,31 @@
   will-change: transform
   backface-visibility: hidden
 
+.enterButtonLayer
+  position: fixed
+  inset: 0
+  z-index: 20
+  pointer-events: none
+
+.enterButton
+  position: absolute
+  left: 50%
+  bottom: 10vh
+  transform: translateX(-50%)
+  pointer-events: auto
+  background: var(--theme-type)
+  color: var(--theme-type-contrast) !important
+  padding: 7px 3rem 8px
+  display: flex
+  align-items: center
+  justify-content: center
+  border-radius: 10000px
+  line-height: 1
+  white-space: nowrap
+  width: auto
+  @media (orientation: portrait)
+    bottom: 12.5vh
+
 .svg
   width: 100%
   height: 100%
