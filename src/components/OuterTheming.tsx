@@ -7,15 +7,19 @@ import {
   getReducedMotionMediaQuery,
   shouldApplyReducedMotion,
 } from '@/lib/reduced-motion';
+import { useShallow } from 'zustand/react/shallow';
 import styles from './OuterTheming.module.sass';
 
 const OuterTheming = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const theme = useStore((state) => state.theme);
-  const fullscreen = useStore((state) => state.fullscreen);
-  const cycleTheme = useStore((state) => state.cycleTheme);
-  const setFullscreenOn = useStore((state) => state.setFullscreenOn);
-  const setFullscreenOff = useStore((state) => state.setFullscreenOff);
+  const { theme, fullscreen, cycleTheme, setFullscreen } = useStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      fullscreen: state.fullscreen,
+      cycleTheme: state.cycleTheme,
+      setFullscreen: state.setFullscreen,
+    })),
+  );
   const themeLabel = theme.toUpperCase();
   const fullscreenLabel = fullscreen ? 'ON' : 'OFF';
 
@@ -24,11 +28,7 @@ const OuterTheming = () => {
   };
 
   const handleFullscreenToggle = () => {
-    if (fullscreen) {
-      setFullscreenOff();
-      return;
-    }
-    setFullscreenOn();
+    setFullscreen(!fullscreen);
   };
 
   useEffect(() => {

@@ -44,8 +44,7 @@ const BlokHead = ({ projects }: Props) => {
     theme,
     cycleTheme,
     fullscreen,
-    setFullscreenOn,
-    setFullscreenOff,
+    setFullscreen,
     topPanel,
     setTopPanelTrue,
     setTopPanelFalse,
@@ -54,8 +53,7 @@ const BlokHead = ({ projects }: Props) => {
       theme: state.theme,
       cycleTheme: state.cycleTheme,
       fullscreen: state.fullscreen,
-      setFullscreenOn: state.setFullscreenOn,
-      setFullscreenOff: state.setFullscreenOff,
+      setFullscreen: state.setFullscreen,
       topPanel: state.topPanel,
       setTopPanelTrue: state.setTopPanelTrue,
       setTopPanelFalse: state.setTopPanelFalse,
@@ -155,13 +153,8 @@ const BlokHead = ({ projects }: Props) => {
   }, [pathName, projects, currentSlug]);
 
   const toggleFullscreen = useCallback(() => {
-    const applyNextMode = () => {
-      if (fullscreen) {
-        setFullscreenOff();
-        return;
-      }
-      setFullscreenOn();
-    };
+    const nextFullscreen = !fullscreen;
+    const applyNextMode = () => setFullscreen(nextFullscreen);
 
     if (layoutToggleRafRef.current !== null) {
       window.cancelAnimationFrame(layoutToggleRafRef.current);
@@ -206,7 +199,7 @@ const BlokHead = ({ projects }: Props) => {
 
     layoutToggleRafRef.current = window.requestAnimationFrame(checkTop);
     layoutToggleTimeoutRef.current = window.setTimeout(settle, 1200);
-  }, [fullscreen, setFullscreenOff, setFullscreenOn]);
+  }, [fullscreen, setFullscreen]);
 
   const handleCycleTheme = useCallback(() => {
     cycleTheme();

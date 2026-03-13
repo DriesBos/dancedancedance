@@ -16,11 +16,9 @@ export {
   getInitialThemeForHour,
 } from '@/lib/theme';
 
-export type Fullscreen = boolean;
-
 export type Props = {
   theme: Theme;
-  fullscreen: Fullscreen;
+  fullscreen: boolean;
   topPanel: boolean;
   pageContentVisible: boolean;
   pageContentRevealKey: number;
@@ -31,8 +29,7 @@ export type Actions = {
   setDefault: () => void;
   setTheme: (theme: Theme) => void;
   cycleTheme: () => void;
-  setFullscreenOn: () => void;
-  setFullscreenOff: () => void;
+  setFullscreen: (fullscreen: boolean) => void;
   setTopPanelTrue: () => void;
   setTopPanelFalse: () => void;
   hidePageContent: () => void;
@@ -73,8 +70,7 @@ export const useStore = create<Props & Actions>()((set) => ({
         pageContentVisible: shouldShowPageContentForTheme(nextTheme),
       };
     }),
-  setFullscreenOn: () => set({ fullscreen: true }),
-  setFullscreenOff: () => set({ fullscreen: false }),
+  setFullscreen: (fullscreen) => set({ fullscreen }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
   hidePageContent: () => set({ pageContentVisible: false }),

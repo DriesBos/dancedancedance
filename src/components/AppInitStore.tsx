@@ -3,13 +3,13 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { getInitialThemeForHour, type Theme } from '@/lib/theme';
-import { type Fullscreen, useStore } from '@/store/store';
+import { useStore } from '@/store/store';
 import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 type InitialUIState = {
   theme: Theme;
-  fullscreen: Fullscreen;
+  fullscreen: boolean;
 };
 
 const getFallbackInitialUIState = (): InitialUIState => {
@@ -29,7 +29,7 @@ const getInitialUIState = (): InitialUIState => {
   return getFallbackInitialUIState();
 };
 
-const applyBodyState = (theme: Theme, fullscreen: Fullscreen, slug: string) => {
+const applyBodyState = (theme: Theme, fullscreen: boolean, slug: string) => {
   const body = document.body;
   if (!body) return;
 
@@ -43,16 +43,14 @@ const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const readyFrameRef = useRef<number | null>(null);
   const readyTimeoutRef = useRef<number | null>(null);
-  const { setFullscreenOn, setFullscreenOff, setTheme, theme, fullscreen } =
-    useStore(
-      useShallow((state) => ({
-        setFullscreenOn: state.setFullscreenOn,
-        setFullscreenOff: state.setFullscreenOff,
-        setTheme: state.setTheme,
-        theme: state.theme,
-        fullscreen: state.fullscreen,
-      })),
-    );
+  const { setFullscreen, setTheme, theme, fullscreen } = useStore(
+    useShallow((state) => ({
+      setFullscreen: state.setFullscreen,
+      setTheme: state.setTheme,
+      theme: state.theme,
+      fullscreen: state.fullscreen,
+    })),
+  );
   const path = usePathname();
   const slug = (path || '/').split('/')[1] || 'home';
   const pathname = path || '/';
@@ -72,11 +70,7 @@ const AppInitializer = () => {
       }
 
       if (fullscreen !== initialState.fullscreen) {
-        if (initialState.fullscreen) {
-          setFullscreenOn();
-        } else {
-          setFullscreenOff();
-        }
+        setFullscreen(initialState.fullscreen);
       }
 
       if (readyFrameRef.current === null) {
@@ -106,9 +100,8 @@ const AppInitializer = () => {
     applyBodyState(theme, fullscreen, slug);
   }, [
     pathname,
+    setFullscreen,
     setTheme,
-    setFullscreenOff,
-    setFullscreenOn,
     slug,
     fullscreen,
     theme,
