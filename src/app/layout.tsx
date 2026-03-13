@@ -211,17 +211,17 @@ export default async function RootLayout({
                 link="info@driesbos.com?subject=Let's Make Internet"
                 linkType="email"
                 className="cursorInteract"
-                dropLeftPx={10}
+                dropLeftPx={20}
                 dropOnPage="projects"
               />
-              <ActionButton
+              {/* <ActionButton
                 copy="Let's talk"
                 link="info@driesbos.com?subject=Let's Make Internet"
                 linkType="email"
                 className="cursorInteract"
                 dropLeftPx={20}
                 dropOnPage="about"
-              />
+              /> */}
               <ActionButton
                 copy="Schedule a discovery call"
                 link="https://calendly.com/info-b9c/30min"
