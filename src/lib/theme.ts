@@ -11,11 +11,13 @@ export type Theme =
   | 'KUSAMA';
 
 const FALLBACK_THEME: Theme = 'TRON';
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
 const WIDE_THEME_ORDER_BREAKPOINT_PX = 1500;
 export const INITIAL_THEME_MOBILE_BREAKPOINT_PX = 770;
 
 export const NIGHT_THEME: Theme = 'NIGHT';
 export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT', 'TRON', 'PERLIN'];
+export const DEVELOPMENT_THEME_ORDER: Theme[] = ['CYPHER', 'PERLIN'];
 
 export const THEME_ORDER: Theme[] = [
   'RADIANT',
@@ -43,17 +45,21 @@ const WIDE_THEME_ORDER: Theme[] = [
   'KERMIT',
 ];
 
-const NON_SELECTABLE_THEMES: Theme[] = ['KERMIT', 'CYPHER', 'PERLIN'];
+const NON_SELECTABLE_THEMES: Theme[] = ['KERMIT'];
 
 // Keep some themes available in the codebase, but hide them from user theme cycling for now.
 export const THEME_BUTTON_ORDER: Theme[] = THEME_ORDER.filter(
-  (theme) => !NON_SELECTABLE_THEMES.includes(theme),
+  (theme) =>
+    !NON_SELECTABLE_THEMES.includes(theme) &&
+    (IS_DEVELOPMENT || !DEVELOPMENT_THEME_ORDER.includes(theme)),
 );
 const WIDE_THEME_BUTTON_ORDER: Theme[] = WIDE_THEME_ORDER.filter(
-  (theme) => !NON_SELECTABLE_THEMES.includes(theme),
+  (theme) =>
+    !NON_SELECTABLE_THEMES.includes(theme) &&
+    (IS_DEVELOPMENT || !DEVELOPMENT_THEME_ORDER.includes(theme)),
 );
 
-export const DEFAULT_THEME: Theme = 'RADIANT';
+export const DEFAULT_THEME: Theme = IS_DEVELOPMENT ? 'PERLIN' : 'RADIANT';
 
 const getViewportWidth = (): number | null => {
   if (typeof window === 'undefined') {
@@ -88,6 +94,10 @@ export const getInitialThemeForHour = (
   hour: number,
   viewportWidth = getViewportWidth(),
 ): Theme => {
+  if (IS_DEVELOPMENT) {
+    return DEFAULT_THEME;
+  }
+
   if (hour >= 0 && hour < 5) {
     return NIGHT_THEME;
   }
