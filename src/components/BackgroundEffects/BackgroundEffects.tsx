@@ -247,6 +247,7 @@ function RadiatingBackground() {
   const introFrameRef = useRef<number | null>(null);
   const introProgressRef = useRef(0);
   const introRotationOffsetRef = useRef(0);
+  const hasCompletedIntroRef = useRef(false);
   const dotLengthMorphFrameRef = useRef<number | null>(null);
   const dotLengthVariationMixRef = useRef(1);
   const dotLengthPatternOffsetRef = useRef(0);
@@ -416,6 +417,7 @@ function RadiatingBackground() {
   // behind the intro. Later theme switches should show the background directly.
   useEffect(() => {
     if (initialThemeIntroPending) {
+      hasCompletedIntroRef.current = false;
       hidePageContent();
       setShowEnterButton(true);
       prepareRadiatingIntro({
@@ -430,7 +432,9 @@ function RadiatingBackground() {
       setShowEnterButton(false);
       introActiveRef.current = false;
       introProgressRef.current = 1;
-      introRotationOffsetRef.current = 0;
+      if (!hasCompletedIntroRef.current) {
+        introRotationOffsetRef.current = 0;
+      }
       lineGrowthMultiplierRef.current = INTRO_TARGET_LINE_SCALE;
       applyLineGeometry();
     }
@@ -459,7 +463,10 @@ function RadiatingBackground() {
       introProgressRef,
       introRotationOffsetRef,
       lineGrowthMultiplierRef,
-      onComplete: revealPageContent,
+      onComplete: () => {
+        hasCompletedIntroRef.current = true;
+        revealPageContent();
+      },
     });
   }, [applyLineGeometry, revealPageContent]);
 
