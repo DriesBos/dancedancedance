@@ -128,20 +128,24 @@ const resolveTunnelPalette = (host: HTMLElement, THREE: any) => {
 
 export default function NeonTunnel() {
   const pathname = usePathname();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const runtimeRef = useRef<RuntimeState | null>(null);
-  const hasSeenPathnameRef = useRef(false);
-  const revealTriggeredRef = useRef(false);
-  const introStateRef = useRef<'idle' | 'playing' | 'complete'>('idle');
-  const introStartRef = useRef<number | null>(null);
-  const activeSquareCountRef = useRef(SQUARE_COUNT);
   const initialThemeIntroPending = useStore(
     (state) => state.initialThemeIntroPending,
   );
   const hidePageContent = useStore((state) => state.hidePageContent);
   const revealPageContent = useStore((state) => state.revealPageContent);
-  const [showEnterButton, setShowEnterButton] = useState(true);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const runtimeRef = useRef<RuntimeState | null>(null);
+  const hasSeenPathnameRef = useRef(false);
+  const revealTriggeredRef = useRef(!initialThemeIntroPending);
+  const introStateRef = useRef<'idle' | 'playing' | 'complete'>(
+    initialThemeIntroPending ? 'idle' : 'complete',
+  );
+  const introStartRef = useRef<number | null>(null);
+  const activeSquareCountRef = useRef(SQUARE_COUNT);
+  const [showEnterButton, setShowEnterButton] = useState(
+    initialThemeIntroPending,
+  );
 
   const syncIntroWithInitialLoadState = useCallback(() => {
     if (initialThemeIntroPending) {

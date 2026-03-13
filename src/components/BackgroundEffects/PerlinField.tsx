@@ -574,20 +574,26 @@ const renderPerlinField = (
 };
 
 export default function PerlinField() {
+  const initialThemeIntroPending = useStore(
+    (state) => state.initialThemeIntroPending,
+  );
+  const hidePageContent = useStore((state) => state.hidePageContent);
+  const revealPageContent = useStore((state) => state.revealPageContent);
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const resizeFrameRef = useRef<number | null>(null);
   const revealTimeoutRef = useRef<number | null>(null);
   const completeTimeoutRef = useRef<number | null>(null);
-  const introStateRef = useRef<IntroState>('complete');
-  const initialThemeIntroPending = useStore(
-    (state) => state.initialThemeIntroPending,
+  const introStateRef = useRef<IntroState>(
+    initialThemeIntroPending ? 'idle' : 'complete',
   );
-  const hidePageContent = useStore((state) => state.hidePageContent);
-  const revealPageContent = useStore((state) => state.revealPageContent);
-  const [introState, setIntroState] = useState<IntroState>('complete');
-  const [showEnterButton, setShowEnterButton] = useState(false);
+  const [introState, setIntroState] = useState<IntroState>(
+    initialThemeIntroPending ? 'idle' : 'complete',
+  );
+  const [showEnterButton, setShowEnterButton] = useState(
+    initialThemeIntroPending,
+  );
 
   const clearIntroTimers = useCallback(() => {
     if (revealTimeoutRef.current !== null) {

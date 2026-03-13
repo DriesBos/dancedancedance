@@ -24,6 +24,7 @@ export type Props = {
   pageContentVisible: boolean;
   pageContentRevealKey: number;
   initialThemeIntroPending: boolean;
+  initialRouteEffectsSuppressedPathname: string | null;
 };
 
 export type Actions = {
@@ -31,7 +32,9 @@ export type Actions = {
     theme: Theme,
     fullscreen: boolean,
     initialThemeIntroPending: boolean,
+    initialRouteEffectsSuppressedPathname: string | null,
   ) => void;
+  clearInitialRouteEffectsSuppression: () => void;
   setNightmode: () => void;
   setDefault: () => void;
   setTheme: (theme: Theme) => void;
@@ -44,21 +47,58 @@ export type Actions = {
   revealPageContent: () => void;
 };
 
+type BootstrapInitialUiState = {
+  theme: Theme;
+  fullscreen: boolean;
+  initialThemeIntroPending: boolean;
+  initialRouteEffectsSuppressedPathname?: string | null;
+};
+
+const getBootstrapInitialUiState = (): BootstrapInitialUiState | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const win = window as Window & {
+    __DDD_INITIAL_STATE__?: BootstrapInitialUiState;
+  };
+
+  return win.__DDD_INITIAL_STATE__ ?? null;
+};
+
+const bootstrapInitialUiState = getBootstrapInitialUiState();
+const initialTheme = bootstrapInitialUiState?.theme ?? DEFAULT_THEME;
+const initialFullscreen = bootstrapInitialUiState?.fullscreen ?? false;
+const initialThemeIntroPending =
+  bootstrapInitialUiState?.initialThemeIntroPending ??
+  shouldRunInitialIntroForTheme(initialTheme);
+const initialRouteEffectsSuppressedPathname =
+  bootstrapInitialUiState?.initialRouteEffectsSuppressedPathname ?? null;
+
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
-  theme: DEFAULT_THEME,
-  fullscreen: false,
+  theme: initialTheme,
+  fullscreen: initialFullscreen,
   topPanel: true,
-  pageContentVisible: !shouldRunInitialIntroForTheme(DEFAULT_THEME),
+  pageContentVisible: !initialThemeIntroPending,
   pageContentRevealKey: 0,
-  initialThemeIntroPending: shouldRunInitialIntroForTheme(DEFAULT_THEME),
-  initializeUiState: (theme, fullscreen, initialThemeIntroPending) =>
+  initialThemeIntroPending,
+  initialRouteEffectsSuppressedPathname,
+  initializeUiState: (
+    theme,
+    fullscreen,
+    initialThemeIntroPending,
+    initialRouteEffectsSuppressedPathname,
+  ) =>
     set({
       theme,
       fullscreen,
       pageContentVisible: !initialThemeIntroPending,
       initialThemeIntroPending,
+      initialRouteEffectsSuppressedPathname,
     }),
+  clearInitialRouteEffectsSuppression: () =>
+    set({ initialRouteEffectsSuppressedPathname: null }),
   setNightmode: () =>
     set({
       theme: 'NIGHT',

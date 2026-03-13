@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-13] Initial `/about` and `/projects/*` landings now suppress the intro overlay and route-scoped action-button physics on first paint, avoiding unnecessary background gating and Matter.js work before hydration.
 - [2026-03-13] The new `PERLIN` canvas background now precomputes circle lookup tables and adapts DPR under sustained FPS drops so the animated contour field stays lightweight on high-density screens.
 - [2026-03-13] The TRON `NeonTunnel` background now lazy-loads its Three.js/postprocessing stack, renders the square tunnel through instanced geometry, and adapts DPR under sustained FPS drops.
 - [2026-03-12] The RADIANT intro start-length calculation now derives directly from viewport units instead of reading `getBoundingClientRect()` during line-geometry updates.

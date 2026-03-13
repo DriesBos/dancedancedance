@@ -238,28 +238,30 @@ const getRadiatingLineScale = (
 
 function RadiatingBackground() {
   const pathname = usePathname();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const spinLayerRef = useRef<HTMLDivElement>(null);
-  const lineRefs = useRef<(SVGLineElement | null)[]>([]);
-  const dotRefs = useRef<(SVGCircleElement | null)[]>([]);
-  const lineGrowthMultiplierRef = useRef(INTRO_TARGET_LINE_SCALE);
-  const introActiveRef = useRef(true);
-  const introFrameRef = useRef<number | null>(null);
-  const introProgressRef = useRef(0);
-  const introRotationOffsetRef = useRef(0);
-  const hasCompletedIntroRef = useRef(false);
-  const dotLengthMorphFrameRef = useRef<number | null>(null);
-  const dotLengthVariationMixRef = useRef(1);
-  const dotLengthPatternOffsetRef = useRef(0);
-  const hasSeenPathnameRef = useRef(false);
   const initialThemeIntroPending = useStore(
     (state) => state.initialThemeIntroPending,
   );
   const hidePageContent = useStore((state) => state.hidePageContent);
   const showPageContent = useStore((state) => state.showPageContent);
   const revealPageContent = useStore((state) => state.revealPageContent);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const spinLayerRef = useRef<HTMLDivElement>(null);
+  const lineRefs = useRef<(SVGLineElement | null)[]>([]);
+  const dotRefs = useRef<(SVGCircleElement | null)[]>([]);
+  const lineGrowthMultiplierRef = useRef(INTRO_TARGET_LINE_SCALE);
+  const introActiveRef = useRef(initialThemeIntroPending);
+  const introFrameRef = useRef<number | null>(null);
+  const introProgressRef = useRef(initialThemeIntroPending ? 0 : 1);
+  const introRotationOffsetRef = useRef(0);
+  const hasCompletedIntroRef = useRef(!initialThemeIntroPending);
+  const dotLengthMorphFrameRef = useRef<number | null>(null);
+  const dotLengthVariationMixRef = useRef(1);
+  const dotLengthPatternOffsetRef = useRef(0);
+  const hasSeenPathnameRef = useRef(false);
   const [baseLineCount, setBaseLineCount] = useState(220);
-  const [showEnterButton, setShowEnterButton] = useState(true);
+  const [showEnterButton, setShowEnterButton] = useState(
+    initialThemeIntroPending,
+  );
   const variant: RadiatingVariant = 'variable-dots';
 
   const lineCount = Math.min(MAX_LINE_COUNT, Math.max(48, baseLineCount));

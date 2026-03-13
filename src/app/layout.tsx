@@ -33,6 +33,10 @@ import { THEME_META_COLORS } from '@/lib/theme-meta-color';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
+    var pathname = window.location.pathname || '/';
+    var routeSlug = pathname.split('/')[1] || 'home';
+    var suppressInitialLandingEffects =
+      routeSlug === 'about' || routeSlug === 'projects';
     var hour = new Date().getHours();
     var viewportWidth =
       window.innerWidth ||
@@ -46,6 +50,7 @@ const INITIAL_UI_STATE_SCRIPT = `
           : ${JSON.stringify(DEFAULT_THEME)};
     var fullscreen = false;
     var initialThemeIntroPending =
+      !suppressInitialLandingEffects &&
       ${JSON.stringify(THEMES_WITH_INITIAL_INTRO)}.indexOf(theme) !== -1;
     var pageContentVisible = !initialThemeIntroPending;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
@@ -54,12 +59,16 @@ const INITIAL_UI_STATE_SCRIPT = `
     window.__DDD_INITIAL_STATE__ = {
       theme: theme,
       fullscreen: fullscreen,
-      initialThemeIntroPending: initialThemeIntroPending
+      initialThemeIntroPending: initialThemeIntroPending,
+      initialRouteEffectsSuppressedPathname: suppressInitialLandingEffects
+        ? pathname
+        : null
     };
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
       document.body.setAttribute('data-fullscreen', String(fullscreen));
+      document.body.setAttribute('data-page', routeSlug);
       document.body.setAttribute('data-page-content-visible', pageContentVisible ? 'true' : 'false');
     }
 

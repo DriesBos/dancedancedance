@@ -10,6 +10,7 @@ import {
   useState,
 } from 'react';
 import { usePathname } from 'next/navigation';
+import { useStore } from '@/store/store';
 import type { Body, Engine, Runner } from 'matter-js';
 import styles from './ActionButtonContainer.module.sass';
 
@@ -71,11 +72,19 @@ const ActionButtonContainer = ({
     null,
   );
   const pathname = usePathname() || '/';
+  const initialRouteEffectsSuppressedPathname = useStore(
+    (state) => state.initialRouteEffectsSuppressedPathname,
+  );
   const pageSlug = pathname.split('/')[1] || 'home';
   const shouldRenderOnRoute =
     pageSlug === 'home' || pageSlug === 'about' || pageSlug === 'projects';
+  const suppressInitialLandingEffects =
+    initialRouteEffectsSuppressedPathname === pathname;
   const shouldActivatePhysics =
-    shouldRenderOnRoute && isNearViewport && !hasCompletedDrops;
+    shouldRenderOnRoute &&
+    isNearViewport &&
+    !hasCompletedDrops &&
+    !suppressInitialLandingEffects;
   const childItems = useMemo(() => Children.toArray(children), [children]);
   const childCount = childItems.length;
 

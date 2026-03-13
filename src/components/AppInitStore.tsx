@@ -15,16 +15,29 @@ type InitialUIState = {
   theme: Theme;
   fullscreen: boolean;
   initialThemeIntroPending: boolean;
+  initialRouteEffectsSuppressedPathname: string | null;
+};
+
+const shouldSuppressInitialLandingEffects = (pathname: string) => {
+  const slug = pathname.split('/')[1] || 'home';
+  return slug === 'about' || slug === 'projects';
 };
 
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
   const theme = getInitialThemeForHour(hour);
+  const pathname = window.location.pathname || '/';
+  const suppressInitialLandingEffects =
+    shouldSuppressInitialLandingEffects(pathname);
 
   return {
     theme,
     fullscreen: false,
-    initialThemeIntroPending: shouldRunInitialIntroForTheme(theme),
+    initialThemeIntroPending:
+      !suppressInitialLandingEffects && shouldRunInitialIntroForTheme(theme),
+    initialRouteEffectsSuppressedPathname: suppressInitialLandingEffects
+      ? pathname
+      : null,
   };
 };
 
@@ -51,9 +64,19 @@ const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const readyFrameRef = useRef<number | null>(null);
   const readyTimeoutRef = useRef<number | null>(null);
-  const { initializeUiState, theme, fullscreen } = useStore(
+  const {
+    initializeUiState,
+    clearInitialRouteEffectsSuppression,
+    initialRouteEffectsSuppressedPathname,
+    theme,
+    fullscreen,
+  } = useStore(
     useShallow((state) => ({
       initializeUiState: state.initializeUiState,
+      clearInitialRouteEffectsSuppression:
+        state.clearInitialRouteEffectsSuppression,
+      initialRouteEffectsSuppressedPathname:
+        state.initialRouteEffectsSuppressedPathname,
       theme: state.theme,
       fullscreen: state.fullscreen,
     })),
@@ -76,6 +99,7 @@ const AppInitializer = () => {
         initialState.theme,
         initialState.fullscreen,
         initialState.initialThemeIntroPending,
+        initialState.initialRouteEffectsSuppressedPathname,
       );
 
       if (readyFrameRef.current === null) {
@@ -109,6 +133,17 @@ const AppInitializer = () => {
     slug,
     fullscreen,
     theme,
+  ]);
+
+  useEffect(() => {
+    if (!initialRouteEffectsSuppressedPathname) return;
+    if (pathname === initialRouteEffectsSuppressedPathname) return;
+
+    clearInitialRouteEffectsSuppression();
+  }, [
+    clearInitialRouteEffectsSuppression,
+    initialRouteEffectsSuppressedPathname,
+    pathname,
   ]);
 
   useEffect(() => {
