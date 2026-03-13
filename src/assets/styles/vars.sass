@@ -82,10 +82,10 @@
     --transition-theme: 0s
 
 // LAYOUTS
-body[data-layout='DESKTOP']
+body[data-fullscreen='true']
   --panel-perspective-origin: 50% 0vh
 
-body[data-layout='3D']
+body[data-fullscreen='false']
   --spacing-containerTopDistance: calc(124px + var(--blok-height) + 27vh)
   --panel-perspective-origin: 50% -70rem
   @media (orientation: portrait)
@@ -166,7 +166,7 @@ body[data-theme='KERMIT']
   --border-fatwidth: 2px
   --border-gap: 1rem
   --spacing-containerTopDistance: 4vh
-  &[data-layout='3D']
+  &[data-fullscreen='false']
     --panel-perspective-origin: 50% 0vh
   @media (max-width: 770px)
     --border-gap: 0.5rem

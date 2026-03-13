@@ -43,9 +43,9 @@ const BlokHead = ({ projects }: Props) => {
   const {
     theme,
     cycleTheme,
-    layout,
-    setTwoD,
-    setThreeD,
+    fullscreen,
+    setFullscreenOn,
+    setFullscreenOff,
     topPanel,
     setTopPanelTrue,
     setTopPanelFalse,
@@ -53,21 +53,21 @@ const BlokHead = ({ projects }: Props) => {
     useShallow((state) => ({
       theme: state.theme,
       cycleTheme: state.cycleTheme,
-      layout: state.layout,
-      setTwoD: state.setTwoD,
-      setThreeD: state.setThreeD,
+      fullscreen: state.fullscreen,
+      setFullscreenOn: state.setFullscreenOn,
+      setFullscreenOff: state.setFullscreenOff,
       topPanel: state.topPanel,
       setTopPanelTrue: state.setTopPanelTrue,
       setTopPanelFalse: state.setTopPanelFalse,
     })),
   );
-  const isThreeDLayout = layout === '3D';
+  const isThreeDLayout = !fullscreen;
   const themeLabel = theme
     .toUpperCase()
     .split(' ')
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
-  const layoutLabel = layout === 'DESKTOP' ? 'Desktop' : '3D';
+  const fullscreenLabel = fullscreen ? 'ON' : 'OFF';
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isTitleOverflowing, setIsTitleOverflowing] = useState(false);
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
@@ -154,13 +154,13 @@ const BlokHead = ({ projects }: Props) => {
       ?.external_link;
   }, [pathName, projects, currentSlug]);
 
-  const toggleLayout = useCallback(() => {
-    const applyNextLayout = () => {
-      if (layout === '3D') {
-        setTwoD();
+  const toggleFullscreen = useCallback(() => {
+    const applyNextMode = () => {
+      if (fullscreen) {
+        setFullscreenOff();
         return;
       }
-      setThreeD();
+      setFullscreenOn();
     };
 
     if (layoutToggleRafRef.current !== null) {
@@ -173,7 +173,7 @@ const BlokHead = ({ projects }: Props) => {
     }
 
     if (window.scrollY <= 1) {
-      applyNextLayout();
+      applyNextMode();
       return;
     }
 
@@ -193,7 +193,7 @@ const BlokHead = ({ projects }: Props) => {
         layoutToggleTimeoutRef.current = null;
       }
 
-      applyNextLayout();
+      applyNextMode();
     };
 
     const checkTop = () => {
@@ -206,7 +206,7 @@ const BlokHead = ({ projects }: Props) => {
 
     layoutToggleRafRef.current = window.requestAnimationFrame(checkTop);
     layoutToggleTimeoutRef.current = window.setTimeout(settle, 1200);
-  }, [layout, setTwoD, setThreeD]);
+  }, [fullscreen, setFullscreenOff, setFullscreenOn]);
 
   const handleCycleTheme = useCallback(() => {
     cycleTheme();
@@ -885,7 +885,7 @@ const BlokHead = ({ projects }: Props) => {
                 className={`icon cursorMagnetic ${styles.themeButton}`}
                 onClick={handleCycleTheme}
                 aria-label={`Cycle theme. Current theme: ${themeLabel}`}
-                title={`${themeLabel} theme`}
+                title={`Theme: ${themeLabel}`}
               >
                 <span
                   className={`${styles.themeCycle} ${
@@ -896,16 +896,16 @@ const BlokHead = ({ projects }: Props) => {
               <button
                 type="button"
                 className={`icon cursorMagnetic ${styles.layoutButton}`}
-                onClick={toggleLayout}
-                title={`${layoutLabel} layout`}
+                onClick={toggleFullscreen}
+                aria-label={`Toggle fullscreen. Fullscreen is ${fullscreenLabel.toLowerCase()}`}
+                title={`Fullscreen: ${fullscreenLabel.toUpperCase()}`}
               >
                 <span className={styles.layoutIconWrap}>
-
                   <span
                     className={styles.layoutIcon}
-                    data-active={layout !== 'DESKTOP'}
+                    data-active={fullscreen}
                   >
-                    <IconFullscreen active={layout !== 'DESKTOP'} />
+                    <IconFullscreen active={fullscreen} />
                   </span>
                 </span>
               </button>

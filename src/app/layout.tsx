@@ -30,16 +30,16 @@ const INITIAL_UI_STATE_SCRIPT = `
   (function () {
     var hour = new Date().getHours();
     var theme = hour >= 0 && hour < 5 ? ${JSON.stringify(NIGHT_THEME)} : ${JSON.stringify(DEFAULT_THEME)};
-    var layout = '3D';
+    var fullscreen = false;
     var pageContentVisible = theme !== 'RADIANT';
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = themeMetaColors[theme] || '#FFFFFF';
 
-    window.__DDD_INITIAL_STATE__ = { theme: theme, layout: layout };
+    window.__DDD_INITIAL_STATE__ = { theme: theme, fullscreen: fullscreen };
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
-      document.body.setAttribute('data-layout', layout);
+      document.body.setAttribute('data-fullscreen', String(fullscreen));
       document.body.setAttribute('data-page-content-visible', pageContentVisible ? 'true' : 'false');
     }
 

@@ -699,7 +699,7 @@ body
             opacity: 1
       // & > :first-child + .blok .side_Top
       //   opacity: 1
-  &[data-layout="DESKTOP"]
+  &[data-fullscreen="true"]
     padding-left: 0
     padding-right: 0
     padding-bottom: 0
@@ -720,7 +720,7 @@ body
       &-Footer
         padding-top: var(--blok-padding-extraTop)
         padding-bottom: var(--blok-padding-extraTop)
-  &[data-layout="3D"]
+  &[data-fullscreen="false"]
     padding-bottom: 10rem
     .currentTheme
       opacity: 1
@@ -773,8 +773,8 @@ body
     .page-Project
       & > div:nth-child(2)
         padding-top: 0
-    // KERMIT => desktop
-    &[data-layout="DESKTOP"]
+    // KERMIT => fullscreen on
+    &[data-fullscreen="true"]
       padding-bottom: calc(var(--border-gap) * 2)
       main
         width: 96vw
@@ -793,8 +793,8 @@ body
         &-Filter
           border-left-width: 0
           border-right-width: 0
-    // Kermit => 3D
-    &[data-layout="3D"]
+    // KERMIT => fullscreen off
+    &[data-fullscreen="false"]
       padding-bottom: calc(var(--border-gap) * 2)
       main
         @media (max-width: 770px)
@@ -820,7 +820,7 @@ body
             transform: translateY(-1.35rem) !important
         .row
           background: transparent !important
-      &[data-layout="3D"]
+      &[data-fullscreen="false"]
         .blok-Action
           background: transparent !important
   &[data-theme='NIGHT']

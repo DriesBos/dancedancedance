@@ -16,11 +16,11 @@ export {
   getInitialThemeForHour,
 } from '@/lib/theme';
 
-export type Layout = 'DESKTOP' | '3D';
+export type Fullscreen = boolean;
 
 export type Props = {
   theme: Theme;
-  layout: Layout;
+  fullscreen: Fullscreen;
   topPanel: boolean;
   pageContentVisible: boolean;
   pageContentRevealKey: number;
@@ -31,8 +31,8 @@ export type Actions = {
   setDefault: () => void;
   setTheme: (theme: Theme) => void;
   cycleTheme: () => void;
-  setTwoD: () => void;
-  setThreeD: () => void;
+  setFullscreenOn: () => void;
+  setFullscreenOff: () => void;
   setTopPanelTrue: () => void;
   setTopPanelFalse: () => void;
   hidePageContent: () => void;
@@ -45,7 +45,7 @@ const shouldShowPageContentForTheme = (theme: Theme) => theme !== 'RADIANT';
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
   theme: DEFAULT_THEME,
-  layout: '3D',
+  fullscreen: false,
   topPanel: true,
   pageContentVisible: true,
   pageContentRevealKey: 0,
@@ -73,8 +73,8 @@ export const useStore = create<Props & Actions>()((set) => ({
         pageContentVisible: shouldShowPageContentForTheme(nextTheme),
       };
     }),
-  setTwoD: () => set({ layout: 'DESKTOP' }),
-  setThreeD: () => set({ layout: '3D' }),
+  setFullscreenOn: () => set({ fullscreen: true }),
+  setFullscreenOff: () => set({ fullscreen: false }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
   hidePageContent: () => set({ pageContentVisible: false }),

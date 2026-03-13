@@ -3,20 +3,20 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { getInitialThemeForHour, type Theme } from '@/lib/theme';
-import { Layout, useStore } from '@/store/store';
+import { type Fullscreen, useStore } from '@/store/store';
 import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 type InitialUIState = {
   theme: Theme;
-  layout: Layout;
+  fullscreen: Fullscreen;
 };
 
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
   return {
     theme: getInitialThemeForHour(hour),
-    layout: '3D',
+    fullscreen: false,
   };
 };
 
@@ -29,12 +29,12 @@ const getInitialUIState = (): InitialUIState => {
   return getFallbackInitialUIState();
 };
 
-const applyBodyState = (theme: Theme, layout: Layout, slug: string) => {
+const applyBodyState = (theme: Theme, fullscreen: Fullscreen, slug: string) => {
   const body = document.body;
   if (!body) return;
 
   body.setAttribute('data-theme', theme);
-  body.setAttribute('data-layout', layout);
+  body.setAttribute('data-fullscreen', String(fullscreen));
   body.setAttribute('data-page', slug);
   body.setAttribute('data-border', 'minimal');
 };
@@ -43,15 +43,16 @@ const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const readyFrameRef = useRef<number | null>(null);
   const readyTimeoutRef = useRef<number | null>(null);
-  const { setTwoD, setThreeD, setTheme, theme, layout } = useStore(
-    useShallow((state) => ({
-      setTwoD: state.setTwoD,
-      setThreeD: state.setThreeD,
-      setTheme: state.setTheme,
-      theme: state.theme,
-      layout: state.layout,
-    })),
-  );
+  const { setFullscreenOn, setFullscreenOff, setTheme, theme, fullscreen } =
+    useStore(
+      useShallow((state) => ({
+        setFullscreenOn: state.setFullscreenOn,
+        setFullscreenOff: state.setFullscreenOff,
+        setTheme: state.setTheme,
+        theme: state.theme,
+        fullscreen: state.fullscreen,
+      })),
+    );
   const path = usePathname();
   const slug = (path || '/').split('/')[1] || 'home';
   const pathname = path || '/';
@@ -64,17 +65,17 @@ const AppInitializer = () => {
       hasInitializedUIRef.current = true;
 
       const initialState = getInitialUIState();
-      applyBodyState(initialState.theme, initialState.layout, slug);
+      applyBodyState(initialState.theme, initialState.fullscreen, slug);
 
       if (theme !== initialState.theme) {
         setTheme(initialState.theme);
       }
 
-      if (layout !== initialState.layout) {
-        if (initialState.layout === 'DESKTOP') {
-          setTwoD();
+      if (fullscreen !== initialState.fullscreen) {
+        if (initialState.fullscreen) {
+          setFullscreenOn();
         } else {
-          setThreeD();
+          setFullscreenOff();
         }
       }
 
@@ -102,8 +103,16 @@ const AppInitializer = () => {
       return;
     }
 
-    applyBodyState(theme, layout, slug);
-  }, [pathname, setTheme, setThreeD, setTwoD, slug, layout, theme]);
+    applyBodyState(theme, fullscreen, slug);
+  }, [
+    pathname,
+    setTheme,
+    setFullscreenOff,
+    setFullscreenOn,
+    slug,
+    fullscreen,
+    theme,
+  ]);
 
   useEffect(() => {
     return () => {

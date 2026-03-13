@@ -12,23 +12,23 @@ import styles from './OuterTheming.module.sass';
 const OuterTheming = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const theme = useStore((state) => state.theme);
-  const layout = useStore((state) => state.layout);
+  const fullscreen = useStore((state) => state.fullscreen);
   const cycleTheme = useStore((state) => state.cycleTheme);
-  const setTwoD = useStore((state) => state.setTwoD);
-  const setThreeD = useStore((state) => state.setThreeD);
+  const setFullscreenOn = useStore((state) => state.setFullscreenOn);
+  const setFullscreenOff = useStore((state) => state.setFullscreenOff);
   const themeLabel = theme.toUpperCase();
-  const layoutLabel = layout.toUpperCase();
+  const fullscreenLabel = fullscreen ? 'ON' : 'OFF';
 
   const handleThemeCycle = () => {
     cycleTheme();
   };
 
-  const handleLayoutToggle = () => {
-    if (layout === 'DESKTOP') {
-      setThreeD();
+  const handleFullscreenToggle = () => {
+    if (fullscreen) {
+      setFullscreenOff();
       return;
     }
-    setTwoD();
+    setFullscreenOn();
   };
 
   useEffect(() => {
@@ -95,12 +95,12 @@ const OuterTheming = () => {
         <button
           type="button"
           className={`${styles.outerThemingButton} cursorInteract`}
-          onClick={handleLayoutToggle}
-          aria-label={`Toggle layout. Current layout: ${layoutLabel}`}
-          title={`${layoutLabel} layout`}
+          onClick={handleFullscreenToggle}
+          aria-label={`Toggle fullscreen. Fullscreen is ${fullscreenLabel.toLowerCase()}`}
+          title={`Fullscreen ${fullscreenLabel.toUpperCase()}`}
         >
           <span className={`${styles.outerThemingButtonInner} linkAnimation`}>
-            {layoutLabel} LAYOUT
+            FULLSCREEN: {fullscreenLabel}
           </span>
         </button>
         <button
@@ -111,7 +111,7 @@ const OuterTheming = () => {
           title={`${themeLabel} mode`}
         >
           <span className={`${styles.outerThemingButtonInner} linkAnimation`}>
-            {themeLabel} THEME
+            THEME: {themeLabel}
           </span>
         </button>
       </div>
