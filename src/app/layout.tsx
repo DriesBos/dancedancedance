@@ -25,8 +25,8 @@ import PageContentGate from '@/components/PageContentGate';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 import {
   DEFAULT_THEME,
-  INITIAL_THEME_MOBILE_BREAKPOINT_PX,
   NIGHT_THEME,
+  NIGHT_THEME_HOUR_END,
   THEMES_WITH_INITIAL_INTRO,
 } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
@@ -38,16 +38,10 @@ const INITIAL_UI_STATE_SCRIPT = `
     var suppressInitialLandingEffects =
       routeSlug === 'about' || routeSlug === 'projects';
     var hour = new Date().getHours();
-    var viewportWidth =
-      window.innerWidth ||
-      document.documentElement.clientWidth ||
-      0;
     var theme =
-      hour >= 0 && hour < 5
+      hour >= 0 && hour < ${NIGHT_THEME_HOUR_END}
         ? ${JSON.stringify(NIGHT_THEME)}
-        : viewportWidth <= ${INITIAL_THEME_MOBILE_BREAKPOINT_PX}
-          ? ${JSON.stringify(DEFAULT_THEME)}
-          : ${JSON.stringify(DEFAULT_THEME)};
+        : ${JSON.stringify(DEFAULT_THEME)};
     var fullscreen = false;
     var initialThemeIntroPending =
       !suppressInitialLandingEffects &&
