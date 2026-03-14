@@ -1,6 +1,8 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-14] `BlokHead` now keeps its outer shell persistent across App Router navigations by moving pathname-driven title, icon, and side-panel updates into smaller child components, so route changes no longer rerender the full header chrome.
+- [2026-03-14] `TRON` now uses a lightweight GSAP-driven route-change pulse built from a centered HTML/CSS border frame instead of a continuous tunnel renderer, keeping the theme motion cue while minimizing background runtime work.
 - [2026-03-14] The `TRON` `NeonTunnel` background was fully removed, eliminating its background loader path and bundled Three.js/postprocessing tunnel implementation from theme-driven background code.
 - [2026-03-14] The `CYPHER` and `PERLIN` themes were fully removed, including theme selection paths, background loaders, favicon/meta-color branches, and theme CSS tokens, reducing background-related JS and theme-state surface area.
 - [2026-03-14] Background themes now ship as per-theme client modules with colocated Sass, so `RADIANT`, `SKY`, `SEGMENTS`, and `KUSAMA` no longer share one monolithic client bundle and inactive backgrounds avoid upfront JS parse/eval cost.

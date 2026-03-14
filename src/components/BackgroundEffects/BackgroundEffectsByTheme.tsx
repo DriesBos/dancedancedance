@@ -19,9 +19,17 @@ const KusamaBackground = dynamic(
   () => import('@/components/BackgroundEffects/KusamaBackground'),
   { ssr: false },
 );
+const TronPulse = dynamic(
+  () => import('@/components/BackgroundEffects/TronPulse'),
+  { ssr: false },
+);
 
 export default function BackgroundEffectsByTheme() {
   const theme = useStore((state) => state.theme);
+
+  if (theme === 'TRON') {
+    return <TronPulse />;
+  }
 
   if (theme === 'SKY') {
     return <BirdsBackground />;

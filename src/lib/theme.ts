@@ -14,7 +14,7 @@ const WIDE_THEME_ORDER_BREAKPOINT_PX = 1500;
 export const INITIAL_THEME_MOBILE_BREAKPOINT_PX = 770;
 
 export const NIGHT_THEME: Theme = 'NIGHT';
-export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT', 'TRON'];
+export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT'];
 
 export const THEME_ORDER: Theme[] = [
   'TRON',
