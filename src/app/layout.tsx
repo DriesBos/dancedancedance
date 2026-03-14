@@ -46,7 +46,7 @@ const INITIAL_UI_STATE_SCRIPT = `
       hour >= 0 && hour < 5
         ? ${JSON.stringify(NIGHT_THEME)}
         : viewportWidth <= ${INITIAL_THEME_MOBILE_BREAKPOINT_PX}
-          ? 'TRON'
+          ? ${JSON.stringify(DEFAULT_THEME)}
           : ${JSON.stringify(DEFAULT_THEME)};
     var fullscreen = false;
     var initialThemeIntroPending =

@@ -48,7 +48,7 @@ const WIDE_THEME_BUTTON_ORDER: Theme[] = WIDE_THEME_ORDER.filter(
   (theme) => !NON_SELECTABLE_THEMES.includes(theme),
 );
 
-export const DEFAULT_THEME: Theme = 'TRON';
+export const DEFAULT_THEME: Theme = IS_DEVELOPMENT ? 'TRON' : 'RADIANT';
 
 const getViewportWidth = (): number | null => {
   if (typeof window === 'undefined') {
@@ -89,13 +89,6 @@ export const getInitialThemeForHour = (
 
   if (hour >= 0 && hour < 5) {
     return NIGHT_THEME;
-  }
-
-  if (
-    viewportWidth !== null &&
-    viewportWidth <= INITIAL_THEME_MOBILE_BREAKPOINT_PX
-  ) {
-    return 'TRON';
   }
 
   return DEFAULT_THEME;

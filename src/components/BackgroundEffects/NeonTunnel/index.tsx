@@ -7,32 +7,45 @@ import { createAdaptiveDprController } from '../adaptiveDpr';
 import IntroEnterButton from '../IntroEnterButton';
 import styles from './NeonTunnel.module.sass';
 
-// Length of the intro ride after pressing ENTER before page content is revealed.
-// Practical tuning range: 1800ms to 4500ms.
-const TUNNEL_TRAVEL_DURATION_MS = 3000;
-// Camera spawn distance from the first square while the intro is waiting to start.
-// Practical tuning range: 12 to 36.
-const CAMERA_START_Z = 33;
+// Time spent easing the tunnel framing back to center while the forward tunnel
+// ride is already in progress.
+const CAMERA_RECENTER_DURATION_MS = 2000;
+// Length of the intro ride after ENTER. This now starts at the same time as
+// the recenter animation. Practical tuning range: 1800ms to 4500ms.
+const TUNNEL_TRAVEL_DURATION_MS = 2000;
+const CAMERA_FOV_DEGREES = 48;
+// Reference distance used to size the tunnel mouth so the lead frame would
+// read as 60vh when the camera is sitting at this depth.
+const FRAME_REFERENCE_CAMERA_Z = 33;
+// Camera spawn distance from the first square while the intro is waiting to
+// start. Starting farther back than the sizing reference makes the lead frame
+// feel smaller so the motion reads as approaching the tunnel first.
+const CAMERA_START_Z = 66;
 // Depth gap between each square frame in the tunnel; larger values feel airier, smaller values feel denser.
 // Practical tuning range: 3.5 to 7.5.
-const TUNNEL_SPACING = 14;
+const TUNNEL_SPACING = 3;
 // Extra world-space distance the camera travels past the last square so the end state lands on a clean background.
 // Practical tuning range: 0 to 18.
 const TUNNEL_EXIT_CLEARANCE = 0;
-// Outer width/height of each square portal before glow and scaling are applied.
-// Practical tuning range: 8 to 14.
-const SQUARE_OUTER_SIZE = 14;
+const OUTER_FRAME_VIEWPORT_HEIGHT = 0.6;
+const FRAME_REFERENCE_HEIGHT = 10;
+// Shift the tunnel stack upward while keeping the camera physically centered so
+// the frames stay perfectly square but the composition still feels low/framed.
+const TUNNEL_IDLE_VERTICAL_OFFSET_RATIO = 0;
+// Push deeper frames downward to fake a low-camera floor perspective without
+// tilting the camera; this gets eased back to zero during the intro.
+const TUNNEL_DEPTH_PERSPECTIVE_OFFSET_RATIO = 0.7;
 // Thickness of the square outline; this controls how graphic versus delicate the tunnel reads.
 // Practical tuning range: 0.004 to 0.12.
-const SQUARE_BORDER_THICKNESS = 0.01;
+const SQUARE_BORDER_THICKNESS = 0.005;
 // Resting bloom level used during the idle background state.
 // Practical tuning range: 0 to 0.5.
-const BASE_BLOOM_STRENGTH = 0.5;
+const BASE_BLOOM_STRENGTH = 0.25;
 // Upper bloom cap used during pulses so the glow stays vivid without blowing out the whole frame.
 // Practical tuning range: 0.15 to 1.2.
 const MAX_BLOOM_STRENGTH = 0.28;
 // Fixed tunnel density after removing the square-count control.
-const SQUARE_COUNT = 10;
+const SQUARE_COUNT = 50;
 const MAX_SQUARE_COUNT = SQUARE_COUNT;
 
 type RuntimeState = {
@@ -71,40 +84,44 @@ const getAdaptiveDprBounds = () => {
 };
 
 const createSquareFrameGeometry = (THREE: any) =>
-  new THREE.PlaneGeometry(SQUARE_OUTER_SIZE, SQUARE_OUTER_SIZE);
+  new THREE.PlaneGeometry(1, 1);
 
 const createSquareOutlineTexture = (THREE: any) => {
-  const textureSizePx = 512;
+  const textureHeightPx = 512;
+  const textureWidthPx = textureHeightPx;
   const canvas = document.createElement('canvas');
-  canvas.width = textureSizePx;
-  canvas.height = textureSizePx;
+  canvas.width = textureWidthPx;
+  canvas.height = textureHeightPx;
 
   const context = canvas.getContext('2d');
   if (!context) {
     return null;
   }
 
-  context.clearRect(0, 0, textureSizePx, textureSizePx);
+  context.clearRect(0, 0, textureWidthPx, textureHeightPx);
   context.strokeStyle = '#ffffff';
   context.lineJoin = 'miter';
   context.lineCap = 'square';
 
   // Map the world-space border tuning value to a readable texture stroke width.
   const normalizedThickness = clamp(
-    SQUARE_BORDER_THICKNESS / Math.max(SQUARE_OUTER_SIZE, 0.001),
+    SQUARE_BORDER_THICKNESS / Math.max(FRAME_REFERENCE_HEIGHT, 0.001),
     0.0015,
     0.02,
   );
   const strokeWidthPx = clamp(
-    Math.round(textureSizePx * normalizedThickness * 2.4),
+    Math.round(
+      Math.max(textureWidthPx, textureHeightPx) * normalizedThickness * 2.4,
+    ),
     2,
     12,
   );
   const insetPx = strokeWidthPx;
-  const rectSizePx = textureSizePx - insetPx * 2;
+  const rectWidthPx = textureWidthPx - insetPx * 2;
+  const rectHeightPx = textureHeightPx - insetPx * 2;
 
   context.lineWidth = strokeWidthPx;
-  context.strokeRect(insetPx, insetPx, rectSizePx, rectSizePx);
+  context.strokeRect(insetPx, insetPx, rectWidthPx, rectHeightPx);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -138,7 +155,7 @@ export default function NeonTunnel() {
   const runtimeRef = useRef<RuntimeState | null>(null);
   const hasSeenPathnameRef = useRef(false);
   const revealTriggeredRef = useRef(!initialThemeIntroPending);
-  const introStateRef = useRef<'idle' | 'playing' | 'complete'>(
+  const introStateRef = useRef<'idle' | 'recentering' | 'travelling' | 'complete'>(
     initialThemeIntroPending ? 'idle' : 'complete',
   );
   const introStartRef = useRef<number | null>(null);
@@ -164,12 +181,15 @@ export default function NeonTunnel() {
   }, [hidePageContent, initialThemeIntroPending]);
 
   const handleEnter = useCallback(() => {
-    if (introStateRef.current === 'playing') {
+    if (
+      introStateRef.current === 'recentering' ||
+      introStateRef.current === 'travelling'
+    ) {
       return;
     }
 
     setShowEnterButton(false);
-    introStateRef.current = 'playing';
+    introStateRef.current = 'recentering';
     introStartRef.current = performance.now();
   }, []);
 
@@ -214,7 +234,12 @@ export default function NeonTunnel() {
 
       const scene = new THREE.Scene();
       scene.background = palette.background;
-      const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 260);
+      const camera = new THREE.PerspectiveCamera(
+        CAMERA_FOV_DEGREES,
+        1,
+        0.1,
+        500,
+      );
       scene.add(camera);
 
       const composer = new EffectComposer(renderer);
@@ -266,6 +291,9 @@ export default function NeonTunnel() {
 
       let viewportWidth = 0;
       let viewportHeight = 0;
+      let frameOuterWidth = 1;
+      let frameOuterHeight = 1;
+      let tunnelVerticalOffset = 0.3;
       const applyRendererDpr = (dpr: number) => {
         renderer.setPixelRatio(dpr);
         if (typeof composer.setPixelRatio === 'function') {
@@ -282,23 +310,44 @@ export default function NeonTunnel() {
         viewportHeight = rootRef.current.clientHeight || window.innerHeight;
         camera.aspect = viewportWidth / Math.max(viewportHeight, 1);
         camera.updateProjectionMatrix();
+        const visibleHeightAtReference =
+          2 *
+          FRAME_REFERENCE_CAMERA_Z *
+          Math.tan((CAMERA_FOV_DEGREES * Math.PI) / 360);
+
+        frameOuterHeight =
+          visibleHeightAtReference * OUTER_FRAME_VIEWPORT_HEIGHT;
+        frameOuterWidth = frameOuterHeight;
+        tunnelVerticalOffset =
+          (frameOuterHeight / 2) * TUNNEL_IDLE_VERTICAL_OFFSET_RATIO;
+        camera.updateProjectionMatrix();
         applyRendererDpr(dprController.getCurrentDpr());
         renderer.setSize(viewportWidth, viewportHeight, false);
         composer.setSize(viewportWidth, viewportHeight);
         bloomPass.setSize(viewportWidth, viewportHeight);
       };
 
-      const updateInstanceTransforms = () => {
+      const updateInstanceTransforms = (
+        verticalOffset: number,
+        depthPerspectiveMix: number,
+      ) => {
         const activeCount = activeSquareCountRef.current;
 
         tunnelMesh.count = activeCount;
 
         for (let index = 0; index < activeCount; index += 1) {
           const z = -index * TUNNEL_SPACING;
+          const depthProgress =
+            activeCount > 1 ? index / (activeCount - 1) : 0;
+          const depthOffset =
+            frameOuterHeight *
+            TUNNEL_DEPTH_PERSPECTIVE_OFFSET_RATIO *
+            depthProgress ** 1.35 *
+            depthPerspectiveMix;
 
-          dummy.position.set(0, 0, z);
+          dummy.position.set(0, verticalOffset - depthOffset, z);
           dummy.rotation.set(0, 0, 0);
-          dummy.scale.setScalar(1);
+          dummy.scale.set(frameOuterWidth, frameOuterHeight, 1);
           dummy.updateMatrix();
           tunnelMesh.setMatrixAt(index, dummy.matrix);
         }
@@ -346,38 +395,62 @@ export default function NeonTunnel() {
           routePulseRef.current - deltaSeconds * 0.55,
         );
 
-        let introProgress = 0;
-        if (introStateRef.current === 'playing' && introStartRef.current !== null) {
-          const rawProgress = clamp(
-            (now - introStartRef.current) / TUNNEL_TRAVEL_DURATION_MS,
+        let tunnelY = tunnelVerticalOffset;
+        let depthPerspectiveMix = 1;
+        let cameraProgress = 0;
+
+        if (introStartRef.current !== null) {
+          const elapsedMs = now - introStartRef.current;
+          const rawTravelProgress = clamp(
+            elapsedMs / TUNNEL_TRAVEL_DURATION_MS,
             0,
             1,
           );
-          introProgress = easeInOutCubic(rawProgress);
+          cameraProgress = easeInOutCubic(rawTravelProgress);
 
-          if (rawProgress >= 1) {
-            introStateRef.current = 'complete';
+          if (introStateRef.current === 'recentering') {
+            const rawRecenterProgress = clamp(
+              elapsedMs / CAMERA_RECENTER_DURATION_MS,
+              0,
+              1,
+            );
+            const recenterProgress = easeInOutCubic(rawRecenterProgress);
 
-            if (!revealTriggeredRef.current) {
-              revealTriggeredRef.current = true;
-              revealPageContent();
+            tunnelY = tunnelVerticalOffset * (1 - recenterProgress);
+            depthPerspectiveMix = 1 - recenterProgress;
+
+            if (rawRecenterProgress >= 1) {
+              introStateRef.current = 'travelling';
             }
+          } else if (introStateRef.current === 'travelling') {
+            tunnelY = 0;
+            depthPerspectiveMix = 0;
+
+            if (rawTravelProgress >= 1) {
+              introStateRef.current = 'complete';
+
+              if (!revealTriggeredRef.current) {
+                revealTriggeredRef.current = true;
+                revealPageContent();
+              }
+            }
+          } else if (introStateRef.current === 'complete') {
+            tunnelY = 0;
+            depthPerspectiveMix = 0;
+            cameraProgress = 1;
           }
         } else if (introStateRef.current === 'complete') {
-          introProgress = 1;
+          tunnelY = 0;
+          depthPerspectiveMix = 0;
+          cameraProgress = 1;
         }
 
-        const cameraProgress = introStateRef.current === 'idle' ? 0 : introProgress;
         const baseCameraZ =
           CAMERA_START_Z + (getTunnelEndZ() - CAMERA_START_Z) * cameraProgress;
         const idleTime = now * 0.001;
 
         camera.position.set(0, 0, baseCameraZ);
-        camera.lookAt(
-          0,
-          0,
-          camera.position.z - 40,
-        );
+        camera.lookAt(0, 0, camera.position.z - 40);
 
         bloomPass.strength = clamp(
           BASE_BLOOM_STRENGTH +
@@ -387,7 +460,7 @@ export default function NeonTunnel() {
           MAX_BLOOM_STRENGTH,
         );
         bloomPass.radius = 0.42 + routePulseRef.current * 0.06;
-        updateInstanceTransforms();
+        updateInstanceTransforms(tunnelY, depthPerspectiveMix);
         composer.render();
       };
 
