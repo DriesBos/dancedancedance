@@ -19,10 +19,6 @@ const KusamaBackground = dynamic(
   () => import('@/components/BackgroundEffects/KusamaBackground'),
   { ssr: false },
 );
-const NeonTunnel = dynamic(
-  () => import('@/components/BackgroundEffects/NeonTunnel'),
-  { ssr: false },
-);
 
 export default function BackgroundEffectsByTheme() {
   const theme = useStore((state) => state.theme);
@@ -33,10 +29,6 @@ export default function BackgroundEffectsByTheme() {
 
   if (theme === 'RADIANT') {
     return <RadiatingBackground />;
-  }
-
-  if (theme === 'TRON') {
-    return <NeonTunnel />;
   }
 
   if (theme === 'SEGMENTS') {

@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-14] The `TRON` `NeonTunnel` background was fully removed, eliminating its background loader path and bundled Three.js/postprocessing tunnel implementation from theme-driven background code.
 - [2026-03-14] The `CYPHER` and `PERLIN` themes were fully removed, including theme selection paths, background loaders, favicon/meta-color branches, and theme CSS tokens, reducing background-related JS and theme-state surface area.
 - [2026-03-14] Background themes now ship as per-theme client modules with colocated Sass, so `RADIANT`, `SKY`, `SEGMENTS`, and `KUSAMA` no longer share one monolithic client bundle and inactive backgrounds avoid upfront JS parse/eval cost.
 - [2026-03-13] `ColumnSlider` now keeps all slides mounted in a stacked grid, swaps active state via `visibility`/`z-index` instead of opacity resets, and pre-decodes the upcoming Storyblok image to avoid flashes between slides.
