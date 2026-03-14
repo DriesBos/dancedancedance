@@ -20,6 +20,7 @@ type ResolvedThemeConfig = {
 
 export interface DitheringVideoPortraitProps {
   src: string;
+  posterSrc?: string;
   alt?: string;
   variant?: 'blok' | 'panel';
   showControls?: boolean;
@@ -110,6 +111,7 @@ const resolveCanvasColor = (
 // Inspired by https://editor.p5js.org/brain/sketches/hU0ANATF- and https://editor.p5js.org/codingtrain/sketches/-YkMaf9Ea
 const DitheringVideoPortrait = ({
   src,
+  posterSrc,
   alt = 'Dithered video portrait',
   variant = 'blok',
   showControls = true,
@@ -576,17 +578,31 @@ const DitheringVideoPortrait = ({
 
   const frameClassName =
     variant === 'panel' ? styles.panelFrame : `${styles.frame} imageItem`;
+  const isPosterVisible = Boolean(posterSrc) && (isLoading || didFail);
 
   const frameNode = (
     <div ref={containerRef} className={frameClassName}>
+      {posterSrc ? (
+        <img
+          src={posterSrc}
+          alt=""
+          aria-hidden="true"
+          className={styles.posterImage}
+          fetchPriority="high"
+          style={{ opacity: isPosterVisible ? 1 : 0 }}
+        />
+      ) : null}
+
       <video
         ref={videoRef}
         className={styles.hiddenVideo}
         src={src}
+        poster={posterSrc}
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
+        aria-hidden="true"
       />
 
       <canvas
