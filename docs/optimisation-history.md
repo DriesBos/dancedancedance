@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-14] Background themes now ship as per-theme client modules with colocated Sass, so `RADIANT`, `SKY`, `SEGMENTS`, and `KUSAMA` no longer share one monolithic client bundle and inactive backgrounds avoid upfront JS parse/eval cost.
 - [2026-03-13] `ColumnSlider` now keeps all slides mounted in a stacked grid, swaps active state via `visibility`/`z-index` instead of opacity resets, and pre-decodes the upcoming Storyblok image to avoid flashes between slides.
 - [2026-03-13] The RADIANT rotating SVG background now pauses its RAF loop while the document is hidden and resumes cleanly on visibility restore, cutting idle tab animation work.
 - [2026-03-13] The RADIANT spoke field now uses a fixed precomputed 48-line descriptor set, removing redundant resize and theme-observer bookkeeping tied to a line-gap setting that no longer changes.

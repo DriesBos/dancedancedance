@@ -7,14 +7,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import type p5 from 'p5';
-import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/store/store';
-import IntroEnterButton from './IntroEnterButton';
-import styles from './BackgroundEffects.module.sass';
-
-const BirdsScene = dynamic(() => import('./birdsScene'), { ssr: false });
+import IntroEnterButton from '../IntroEnterButton';
+import { useIosImmersiveViewport } from '../shared/useIosImmersiveViewport';
+import styles from './RadiatingBackground.module.sass';
 
 const VIEWBOX_SIZE = 1200;
 const CENTER = VIEWBOX_SIZE / 2;
@@ -22,8 +19,6 @@ const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
 const MOBILE_BREAKPOINT_PX = 770;
 const DEFAULT_ROTATION_DURATION_MS = 72000;
 const RADIANT_LINE_COUNT = 48;
-// Intro: start at a viewport-relative spoke length, then grow beyond the
-// viewport while rotating once the explicit enter control is pressed.
 const INTRO_ROTATION_DEGREES = 45;
 const INTRO_START_LINE_LENGTH_VMIN = 25;
 const INTRO_START_LINE_LENGTH_VMIN_MOBILE = 33;
@@ -32,29 +27,6 @@ const INTRO_GROWTH_DURATION_MS = 2000;
 const INTRO_TARGET_LINE_SCALE = 1.15;
 const DOT_LENGTH_MORPH_DURATION_MS = 420;
 const LINE_DOT_RADIUS = 1.5;
-const SEGMENTS_SCALE_DURATION_MS = 60000;
-const SEGMENTS_SCALE_DURATION_PORTRAIT_MS = 30000;
-const IOS_IMMERSIVE_HEIGHT_VAR = '--be-ios-immersive-height';
-const IOS_IMMERSIVE_WIDTH_VAR = '--be-ios-immersive-width';
-
-const isIosSafari = () => {
-  if (typeof navigator === 'undefined') return false;
-
-  const ua = navigator.userAgent;
-  const isIosDevice =
-    /iP(hone|ad|od)/.test(ua) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const isWebKit = /WebKit/i.test(ua);
-  const isNonSafariBrowser =
-    /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|YaBrowser/i.test(ua);
-
-  return isIosDevice && isWebKit && !isNonSafariBrowser;
-};
-
-type BackgroundEffectsProps = {
-  version: 'radiating' | 'segments' | 'kusama' | 'birds';
-  densityScale?: number;
-};
 
 type RadiatingVariant = 'standard' | 'variable-dots' | 'all-dots';
 type RadiatingLineDescriptor = {
@@ -77,7 +49,6 @@ const RADIATING_LINE_DESCRIPTORS: RadiatingLineDescriptor[] = Array.from(
     return {
       dx,
       dy,
-      // Subtle angular asymmetry makes rotation perceptible on iOS Safari.
       fullScale: baseToScale * (1 + 0.025 * Math.sin(index * 0.39)),
       index,
       opacity: 0.82 + 0.18 * (0.5 + 0.5 * Math.sin(index * 0.61)),
@@ -134,8 +105,6 @@ const useStableEvent = <Args extends unknown[], Return>(
   return useCallback((...args: Args) => handlerRef.current(...args), []);
 };
 
-// Returns the variable-length profile used by dotted variants. The offset lets
-// CHANGE LENGTHS re-roll the composition without changing the overall pattern range.
 const getDotLengthFactor = (index: number, offset: number) =>
   0.18 +
   0.72 *
@@ -242,8 +211,6 @@ const getRadiatingLineScale = (
       : 1;
   const targetScale = descriptor.fullScale * lengthFactor * lineGrowthMultiplier;
 
-  // During the intro test, lines start at a fixed viewport-relative length
-  // before growing toward their normal target scale.
   if (introActive) {
     return (
       introStartLineLength +
@@ -254,7 +221,7 @@ const getRadiatingLineScale = (
   return targetScale;
 };
 
-function RadiatingBackground() {
+export default function RadiatingBackground() {
   const pathname = usePathname();
   const initialThemeIntroPending = useStore(
     (state) => state.initialThemeIntroPending,
@@ -282,6 +249,8 @@ function RadiatingBackground() {
   const variant: RadiatingVariant = 'variable-dots';
   const lineDescriptors = RADIATING_LINE_DESCRIPTORS;
 
+  useIosImmersiveViewport();
+
   const applyLineGeometry = useStableEvent(() => {
     const introStartLineLength = getIntroStartLineLength();
 
@@ -289,8 +258,6 @@ function RadiatingBackground() {
       const descriptor = lineDescriptors[index];
       if (!descriptor) continue;
 
-      // Standard keeps full-length spokes; the dotted presets blend into the
-      // variable-length pattern and can be re-shaped by CHANGE LENGTHS.
       const scale = getRadiatingLineScale(
         descriptor,
         variant,
@@ -405,8 +372,6 @@ function RadiatingBackground() {
     };
   }, []);
 
-  // Only the first matching theme on initial site load should gate content
-  // behind the intro. Later theme switches should show the background directly.
   useEffect(() => {
     if (initialThemeIntroPending) {
       hasCompletedIntroRef.current = false;
@@ -502,8 +467,6 @@ function RadiatingBackground() {
     animateDotLengthsTo(1, nextOffset);
   });
 
-  // Route changes reshuffle the dotted spoke lengths so each page lands on a
-  // slightly different composition without restarting the background.
   useEffect(() => {
     if (!hasSeenPathnameRef.current) {
       hasSeenPathnameRef.current = true;
@@ -580,274 +543,7 @@ function RadiatingBackground() {
           </svg>
         </div>
       </div>
-      {showEnterButton && (
-        <IntroEnterButton onClick={handleEnter} />
-      )}
+      {showEnterButton && <IntroEnterButton onClick={handleEnter} />}
     </>
   );
-}
-
-function SegmentsBackground() {
-  const hostRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let instance: p5 | null = null;
-    let isDisposed = false;
-
-    const init = async () => {
-      const host = hostRef.current;
-      if (!host) return;
-
-      const [{ default: P5 }, { createSegmentsSketch, SEGMENTS_DEFAULT_PARAMS }] =
-        await Promise.all([import('p5'), import('./segmentsSketch')]);
-      if (isDisposed || !hostRef.current) return;
-
-      instance = new P5(
-        createSegmentsSketch({
-          host,
-          canvasClassName: styles.segmentsCanvas,
-          params: SEGMENTS_DEFAULT_PARAMS,
-        }),
-      );
-    };
-
-    init();
-
-    return () => {
-      isDisposed = true;
-      instance?.remove();
-      instance = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
-
-    const fromScale = 1;
-    const toScale = 0.5;
-    const isPortrait =
-      window.matchMedia?.('(orientation: portrait)').matches ??
-      window.innerHeight > window.innerWidth;
-    const durationMs = isPortrait
-      ? SEGMENTS_SCALE_DURATION_PORTRAIT_MS
-      : SEGMENTS_SCALE_DURATION_MS;
-    let frameId = 0;
-    let startTime = 0;
-
-    const applyScale = (scale: number) => {
-      host.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
-    };
-
-    applyScale(fromScale);
-
-    const animate = (timestamp: number) => {
-      if (!startTime) {
-        startTime = timestamp;
-      }
-
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(1, elapsed / durationMs);
-      const scale = fromScale + (toScale - fromScale) * progress;
-
-      applyScale(scale);
-
-      if (progress < 1) {
-        frameId = window.requestAnimationFrame(animate);
-      }
-    };
-
-    frameId = window.requestAnimationFrame(animate);
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      host.style.transform = `translate3d(-50%, -50%, 0) scale(${fromScale})`;
-    };
-  }, []);
-
-  return (
-    <div
-      className={`${styles.root} ${styles.segmentsViewport}`}
-      data-version="segments"
-      aria-hidden="true"
-    >
-      <div ref={hostRef} className={styles.segmentsRoot} />
-    </div>
-  );
-}
-
-function KusamaBackground() {
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let instance: p5 | null = null;
-    let isDisposed = false;
-
-    const init = async () => {
-      const host = rootRef.current;
-      if (!host) return;
-
-      const [{ default: P5 }, { createKusamaSketch, KUSAMA_DEFAULT_PARAMS }] =
-        await Promise.all([import('p5'), import('./kusamaSketch')]);
-      if (isDisposed || !rootRef.current) return;
-
-      instance = new P5(
-        createKusamaSketch({
-          host,
-          canvasClassName: styles.kusamaCanvas,
-          params: KUSAMA_DEFAULT_PARAMS,
-        }),
-      );
-    };
-
-    init();
-
-    return () => {
-      isDisposed = true;
-      instance?.remove();
-      instance = null;
-    };
-  }, []);
-
-  return (
-    <div
-      ref={rootRef}
-      className={`${styles.root} ${styles.kusamaRoot}`}
-      data-version="kusama"
-      aria-hidden="true"
-    />
-  );
-}
-
-function BirdsBackground({ densityScale = 1 }: { densityScale?: number }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [sceneColors, setSceneColors] = useState({
-    background: '#FFFFFF',
-    bird: '#000000',
-  });
-
-  useEffect(() => {
-    const host = rootRef.current;
-    if (!host) return;
-
-    const updateColors = () => {
-      const styles = getComputedStyle(host);
-      const background =
-        styles.getPropertyValue('--be-birds-bg-color').trim() ||
-        styles.getPropertyValue('--theme-bg').trim() ||
-        '#FFFFFF';
-      const bird =
-        styles.getPropertyValue('--be-birds-color').trim() ||
-        styles.getPropertyValue('--theme-type').trim() ||
-        '#000000';
-
-      setSceneColors((previous) => {
-        if (previous.background === background && previous.bird === bird) {
-          return previous;
-        }
-
-        return {
-          background,
-          bird,
-        };
-      });
-    };
-
-    updateColors();
-    window.addEventListener('resize', updateColors, { passive: true });
-
-    const observer = new MutationObserver(updateColors);
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-
-    return () => {
-      window.removeEventListener('resize', updateColors);
-      observer.disconnect();
-    };
-  }, []);
-
-  return (
-    <>
-      <div
-        ref={rootRef}
-        className={`${styles.root} ${styles.birdsRoot}`}
-        data-version="birds"
-        aria-hidden="true"
-      >
-        <BirdsScene
-          className={styles.birdsCanvas}
-          backgroundColor={sceneColors.background}
-          birdColor={sceneColors.bird}
-          densityScale={densityScale}
-        />
-      </div>
-    </>
-  );
-}
-
-export default function BackgroundEffects({
-  version,
-  densityScale,
-}: BackgroundEffectsProps) {
-  useEffect(() => {
-    if (!isIosSafari()) return;
-
-    const root = document.documentElement;
-    const viewport = window.visualViewport;
-    let maxHeight = 0;
-    let maxWidth = 0;
-    let lastOrientation: 'portrait' | 'landscape' | null = null;
-
-    const update = () => {
-      const width = Math.round(viewport?.width ?? window.innerWidth);
-      const height = Math.round(viewport?.height ?? window.innerHeight);
-      const offsetTop = Math.round(viewport?.offsetTop ?? 0);
-      const orientation: 'portrait' | 'landscape' =
-        width >= height ? 'landscape' : 'portrait';
-
-      if (lastOrientation && orientation !== lastOrientation) {
-        maxHeight = 0;
-        maxWidth = 0;
-      }
-      lastOrientation = orientation;
-
-      maxHeight = Math.max(maxHeight, height + offsetTop);
-      maxWidth = Math.max(maxWidth, width);
-
-      root.style.setProperty(IOS_IMMERSIVE_HEIGHT_VAR, `${maxHeight}px`);
-      root.style.setProperty(IOS_IMMERSIVE_WIDTH_VAR, `${maxWidth}px`);
-    };
-
-    update();
-
-    viewport?.addEventListener('resize', update);
-    viewport?.addEventListener('scroll', update);
-    window.addEventListener('resize', update, { passive: true });
-    window.addEventListener('orientationchange', update, { passive: true });
-    window.addEventListener('pageshow', update);
-
-    return () => {
-      viewport?.removeEventListener('resize', update);
-      viewport?.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-      window.removeEventListener('orientationchange', update);
-      window.removeEventListener('pageshow', update);
-    };
-  }, []);
-
-  if (version === 'birds') {
-    return <BirdsBackground densityScale={densityScale} />;
-  }
-
-  if (version === 'kusama') {
-    return <KusamaBackground />;
-  }
-
-  if (version === 'segments') {
-    return <SegmentsBackground />;
-  }
-
-  return <RadiatingBackground />;
 }

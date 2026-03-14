@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '@/store/store';
-import { createAdaptiveDprController } from './adaptiveDpr';
-import IntroEnterButton from './IntroEnterButton';
+import { createAdaptiveDprController } from '../adaptiveDpr';
+import IntroEnterButton from '../IntroEnterButton';
 import styles from './PerlinField.module.sass';
 
 const MOBILE_BREAKPOINT_PX = 770;

@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/store/store';
-import { createAdaptiveDprController } from './adaptiveDpr';
-import IntroEnterButton from './IntroEnterButton';
+import { createAdaptiveDprController } from '../adaptiveDpr';
+import IntroEnterButton from '../IntroEnterButton';
 import styles from './NeonTunnel.module.sass';
 
 // Length of the intro ride after pressing ENTER before page content is revealed.

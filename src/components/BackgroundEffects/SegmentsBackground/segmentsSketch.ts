@@ -1,5 +1,5 @@
 import type p5 from 'p5';
-import { resolveAdaptiveP5FrameRate } from './p5AdaptiveFrameRate';
+import { resolveAdaptiveP5FrameRate } from '../p5AdaptiveFrameRate';
 
 const EPSILON = 1e-9;
 const POINT_EPSILON = 1e-6;

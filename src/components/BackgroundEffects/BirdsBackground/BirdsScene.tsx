@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { createAdaptiveDprController } from './adaptiveDpr';
+import { createAdaptiveDprController } from '../adaptiveDpr';
 
 type BirdsSceneProps = {
   backgroundColor: string;

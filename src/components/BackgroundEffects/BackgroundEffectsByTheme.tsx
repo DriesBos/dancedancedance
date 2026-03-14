@@ -1,9 +1,24 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import BackgroundEffects from '@/components/BackgroundEffects/BackgroundEffects';
 import { useStore } from '@/store/store';
 
+const BirdsBackground = dynamic(
+  () => import('@/components/BackgroundEffects/BirdsBackground'),
+  { ssr: false },
+);
+const RadiatingBackground = dynamic(
+  () => import('@/components/BackgroundEffects/RadiatingBackground'),
+  { ssr: false },
+);
+const SegmentsBackground = dynamic(
+  () => import('@/components/BackgroundEffects/SegmentsBackground'),
+  { ssr: false },
+);
+const KusamaBackground = dynamic(
+  () => import('@/components/BackgroundEffects/KusamaBackground'),
+  { ssr: false },
+);
 const NeonTunnel = dynamic(
   () => import('@/components/BackgroundEffects/NeonTunnel'),
   { ssr: false },
@@ -21,11 +36,11 @@ export default function BackgroundEffectsByTheme() {
   const theme = useStore((state) => state.theme);
 
   if (theme === 'SKY') {
-    return <BackgroundEffects version="birds" />;
+    return <BirdsBackground />;
   }
 
   if (theme === 'RADIANT') {
-    return <BackgroundEffects version="radiating" />;
+    return <RadiatingBackground />;
   }
 
   if (theme === 'TRON') {
@@ -41,11 +56,11 @@ export default function BackgroundEffectsByTheme() {
   }
 
   if (theme === 'SEGMENTS') {
-    return <BackgroundEffects version="segments" />;
+    return <SegmentsBackground />;
   }
 
   if (theme === 'KUSAMA') {
-    return <BackgroundEffects version="kusama" />;
+    return <KusamaBackground />;
   }
 
   return null;

@@ -9,8 +9,8 @@ import {
   retargetParallaxTween,
   sampleParallaxTween,
   snapParallaxTween,
-} from './parallaxEasing';
-import { resolveAdaptiveP5FrameRate } from './p5AdaptiveFrameRate';
+} from '../parallaxEasing';
+import { resolveAdaptiveP5FrameRate } from '../p5AdaptiveFrameRate';
 
 export type KusamaParams = {
   cellSize: number;

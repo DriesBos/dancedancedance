@@ -1,0 +1,26 @@
+.root
+  --be-birds-bg-color: #FFFFFF
+  --be-birds-color: #000000
+  --be-birds-opacity: 1
+  position: fixed
+  top: 50%
+  left: 50%
+  width: 100vw
+  height: 100vh
+  width: max(100lvw, var(--be-ios-immersive-width, 0px))
+  height: max(100lvh, var(--be-ios-immersive-height, 0px))
+  transform: translate3d(-50%, -50%, 0)
+  pointer-events: none
+  z-index: -1
+  overflow: hidden
+  opacity: var(--theme-rotatingLines-bg)
+
+.birdsRoot
+  opacity: var(--be-birds-opacity)
+  min-height: 100lvh
+
+.birdsCanvas
+  width: 100% !important
+  height: 100% !important
+  display: block
+  contain: strict
