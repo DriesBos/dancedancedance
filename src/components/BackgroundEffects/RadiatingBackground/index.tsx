@@ -42,13 +42,6 @@ const DOT_LENGTH_MORPH_DURATION_MS = 420;
 // Radius of the dot rendered at the end of each ray.
 const LINE_DOT_RADIUS = 1.5;
 
-type RadiatingVariant =
-  // Every ray keeps its full descriptor length.
-  | 'standard'
-  // Ray lengths follow the dotted pattern and can be re-phased on navigation.
-  | 'variable-dots'
-  // Named separately so the dotted treatment can diverge later if needed.
-  | 'all-dots';
 type RadiatingLineDescriptor = {
   dx: number;
   dy: number;
@@ -213,7 +206,6 @@ const startRadiatingIntro = ({
 
 const getRadiatingLineScale = (
   descriptor: RadiatingLineDescriptor,
-  variant: RadiatingVariant,
   dotLengthVariationMix: number,
   dotLengthPatternOffset: number,
   lineGrowthMultiplier: number,
@@ -226,9 +218,7 @@ const getRadiatingLineScale = (
     dotLengthPatternOffset,
   );
   const lengthFactor =
-    variant !== 'standard'
-      ? 1 - dotLengthVariationMix + dotLengthVariationMix * dottedLengthFactor
-      : 1;
+    1 - dotLengthVariationMix + dotLengthVariationMix * dottedLengthFactor;
   const targetScale = descriptor.fullScale * lengthFactor * lineGrowthMultiplier;
 
   if (introActive) {
@@ -268,8 +258,6 @@ export default function RadiatingBackground() {
   const [showEnterButton, setShowEnterButton] = useState(
     initialThemeIntroPending,
   );
-  // Switch this to compare the available line-length treatments.
-  const variant: RadiatingVariant = 'variable-dots';
   const lineDescriptors = RADIATING_LINE_DESCRIPTORS;
 
   useIosImmersiveViewport();
@@ -283,7 +271,6 @@ export default function RadiatingBackground() {
 
       const scale = getRadiatingLineScale(
         descriptor,
-        variant,
         dotLengthVariationMixRef.current,
         dotLengthPatternOffsetRef.current,
         lineGrowthMultiplierRef.current,
@@ -312,7 +299,7 @@ export default function RadiatingBackground() {
     lineRefs.current.length = RADIANT_LINE_COUNT;
     dotRefs.current.length = RADIANT_LINE_COUNT;
     applyLineGeometry();
-  }, [applyLineGeometry, variant]);
+  }, [applyLineGeometry]);
 
   useEffect(() => {
     const root = rootRef.current;
