@@ -2,6 +2,7 @@
 
 import { FormEvent, useState, useEffect, useRef } from 'react';
 import { useGSAP } from '@/lib/gsap';
+import { vibrate } from '@/lib/vibration';
 import styles from './Newsletter.module.sass';
 
 interface NewsletterProps {
@@ -171,6 +172,7 @@ export default function Newsletter({ className }: NewsletterProps) {
       return;
     }
 
+    vibrate();
     setMessage('thank you!');
     setIsLoading(false);
     // Reset form and input value

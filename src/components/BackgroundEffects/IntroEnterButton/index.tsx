@@ -1,5 +1,6 @@
 'use client';
 
+import { vibrate } from '@/lib/vibration';
 import styles from './IntroEnterButton.module.sass';
 
 type IntroEnterButtonProps = {
@@ -11,12 +12,17 @@ export default function IntroEnterButton({
   onClick,
   label = 'Enter',
 }: IntroEnterButtonProps) {
+  const handleClick = () => {
+    vibrate();
+    onClick();
+  };
+
   return (
     <div className={styles.layer}>
       <button
         type="button"
         className={`${styles.button} cursorInteract`}
-        onClick={onClick}
+        onClick={handleClick}
       >
         {label}
       </button>

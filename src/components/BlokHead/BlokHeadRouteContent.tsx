@@ -12,6 +12,7 @@ import IconClose from '@/components/Icons/IconClose';
 import IconFullscreen from '@/components/Icons/IconFullscreen';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import IconMail from '@/components/Icons/IconMail';
+import { vibrate } from '@/lib/vibration';
 import styles from './BlokHead.module.sass';
 
 interface Props {
@@ -123,13 +124,15 @@ const BlokHeadRouteContent = ({
   }, [pathName, projects, currentSlug]);
 
   const clickNext = useCallback(() => {
-    if (!nextProjectHref) return;
+    if (!nextProjectHref) return false;
     router.push(nextProjectHref);
+    return true;
   }, [router, nextProjectHref]);
 
   const clickPrev = useCallback(() => {
-    if (!prevProjectHref) return;
+    if (!prevProjectHref) return false;
     router.push(prevProjectHref);
+    return true;
   }, [router, prevProjectHref]);
 
   useEffect(() => {
@@ -201,10 +204,14 @@ const BlokHeadRouteContent = ({
       if (Math.abs(deltaX) <= Math.abs(deltaY)) return;
 
       if (deltaX < 0) {
-        clickNext();
+        if (clickNext()) {
+          vibrate();
+        }
         return;
       }
-      clickPrev();
+      if (clickPrev()) {
+        vibrate();
+      }
     };
 
     if (typeof window.PointerEvent === 'function') {

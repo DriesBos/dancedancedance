@@ -10,6 +10,7 @@ import MuxPlayer from '@/components/MuxPlayer';
 import SliderIndicators from '@/components/SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
+import { vibrate } from '@/lib/vibration';
 import {
   storyblokImageLoader,
   storyblokVideoPosterUrl,
@@ -261,15 +262,17 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   };
 
   const swipeToPrevSlide = () => {
-    if (!blok.body || blok.body.length <= 1) return;
+    if (!blok.body || blok.body.length <= 1) return false;
     setActiveIndex(
       (prevIndex) => (prevIndex - 1 + blok.body.length) % blok.body.length,
     );
+    return true;
   };
 
   const swipeToNextSlide = () => {
-    if (!blok.body || blok.body.length <= 1) return;
+    if (!blok.body || blok.body.length <= 1) return false;
     setActiveIndex((prevIndex) => (prevIndex + 1) % blok.body.length);
+    return true;
   };
 
   const swipeHandlers = useSwipeable({
@@ -279,11 +282,15 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     preventScrollOnSwipe: false,
     onSwipedLeft: () => {
       suppressTapUntilRef.current = Date.now() + 400;
-      swipeToNextSlide();
+      if (swipeToNextSlide()) {
+        vibrate();
+      }
     },
     onSwipedRight: () => {
       suppressTapUntilRef.current = Date.now() + 400;
-      swipeToPrevSlide();
+      if (swipeToPrevSlide()) {
+        vibrate();
+      }
     },
   });
 
