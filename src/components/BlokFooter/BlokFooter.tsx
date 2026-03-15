@@ -27,14 +27,14 @@ const BlokFooter = () => {
         <div className={styles.footerColumnRight}>
         <div className={`column column-FooterColumn ${styles.footerColumn} ${styles.rightside}`}>
           <a
-            href="mailto:info@driesbos.com?subject=Let's Make Internet"
+            href="mailto:hello@driesbos.com?subject=Let's Make Internet"
             target="_blank"
             className="linkAnimation cursorMessage"
             data-cursor-message="Let's talk"
           >
             <div className="hasExternalIcon">
               <span className="mailMobile">Email</span>
-              <span className="mailDesktop">Info@driesbos.com</span>
+              <span className="mailDesktop">hello@driesbos.com</span>
               <IconExternal />
             </div>
           </a>

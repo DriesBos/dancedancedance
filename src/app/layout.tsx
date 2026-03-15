@@ -211,7 +211,7 @@ export default async function RootLayout({
             <ActionButtonContainer>
               <ActionButton
                 copy="Start your project"
-                link="info@driesbos.com?subject=Let's Make Internet"
+                link="hello@driesbos.com?subject=Let's Make Internet"
                 linkType="email"
                 className="cursorInteract"
                 dropLeftPx={20}
@@ -219,7 +219,7 @@ export default async function RootLayout({
               />
               {/* <ActionButton
                 copy="Let's talk"
-                link="info@driesbos.com?subject=Let's Make Internet"
+                link="hello@driesbos.com?subject=Let's Make Internet"
                 linkType="email"
                 className="cursorInteract"
                 dropLeftPx={20}

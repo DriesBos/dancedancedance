@@ -8,7 +8,7 @@ const MARQUEE_REPEATS_PER_GROUP = 50;
 export default function BlokAction() {
   return (
     <a
-      href="mailto:info@driesbos.com?subject=Let's Make Internet"
+      href="mailto:hello@driesbos.com?subject=Let's Make Internet"
       target="_blank"
       rel="noopener noreferrer"
       className="blok blok-Action blok-Animate cursorMessage"

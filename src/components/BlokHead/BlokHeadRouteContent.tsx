@@ -374,7 +374,7 @@ const BlokHeadRouteContent = ({
               className="icon cursorMessage desktop"
               data-cursor-message="Let's talk"
             >
-              <Link href="mailto:info@driesbos.com?subject=Let's Make Internet">
+              <Link href="mailto:hello@driesbos.com?subject=Let's Make Internet">
                 <IconMail />
               </Link>
             </div>
