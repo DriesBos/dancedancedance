@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import GrainyGradient from '../GrainyGradient/GrainyGradient';
 import LazyDitheringVideoPortrait from '@/components/LazyDitheringVideoPortrait';
 import IconFullscreen from '@/components/Icons/IconFullscreen';
@@ -7,7 +8,7 @@ interface TopPanelProps {
   showPortrait?: boolean;
 }
 
-const TopPanel = ({ showPortrait = false }: TopPanelProps) => {
+const TopPanelComponent = ({ showPortrait = false }: TopPanelProps) => {
   const className = `${styles.side} ${styles.side_Top} ${
     showPortrait ? 'cursorMessage' : ''
   } side side_Top`;
@@ -69,5 +70,12 @@ const TopPanel = ({ showPortrait = false }: TopPanelProps) => {
     </div>
   );
 };
+
+const TopPanel = memo(
+  TopPanelComponent,
+  (prevProps, nextProps) => prevProps.showPortrait === nextProps.showPortrait,
+);
+
+TopPanel.displayName = 'TopPanel';
 
 export default TopPanel;

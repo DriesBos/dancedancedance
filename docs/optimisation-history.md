@@ -1,6 +1,8 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-15] `BlokSidePanels` and its panel children now use `React.memo`, so the about-route portrait and its dithering video stay mounted across navigations whenever the top-panel portrait visibility flag does not change.
+- [2026-03-15] `BlokHead` now uses a structural `React.memo` guard for its project-list prop, so App Router navigations can update pathname-driven header content without re-rendering the persistent header shell when project data is unchanged.
 - [2026-03-14] `BlokHead` now keeps its outer shell persistent across App Router navigations by moving pathname-driven title, icon, and side-panel updates into smaller child components, so route changes no longer rerender the full header chrome.
 - [2026-03-14] `TRON` now uses a lightweight GSAP-driven route-change pulse built from a centered HTML/CSS border frame instead of a continuous tunnel renderer, keeping the theme motion cue while minimizing background runtime work.
 - [2026-03-14] The `TRON` `NeonTunnel` background was fully removed, eliminating its background loader path and bundled Three.js/postprocessing tunnel implementation from theme-driven background code.

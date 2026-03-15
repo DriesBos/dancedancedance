@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import TopPanel from './TopPanel';
 import BottomPanel from './BottomPanel';
 import BackPanel from './BackPanel';
@@ -6,7 +7,9 @@ interface BlokSidePanelsProps {
   showTopPanelPortrait?: boolean;
 }
 
-const BlokSidePanels = ({ showTopPanelPortrait = false }: BlokSidePanelsProps) => {
+const BlokSidePanelsComponent = ({
+  showTopPanelPortrait = false,
+}: BlokSidePanelsProps) => {
   return (
     <>
       <TopPanel showPortrait={showTopPanelPortrait} />
@@ -15,5 +18,13 @@ const BlokSidePanels = ({ showTopPanelPortrait = false }: BlokSidePanelsProps) =
     </>
   );
 };
+
+const BlokSidePanels = memo(
+  BlokSidePanelsComponent,
+  (prevProps, nextProps) =>
+    prevProps.showTopPanelPortrait === nextProps.showTopPanelPortrait,
+);
+
+BlokSidePanels.displayName = 'BlokSidePanels';
 
 export default BlokSidePanels;

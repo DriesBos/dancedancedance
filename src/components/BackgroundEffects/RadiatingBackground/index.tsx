@@ -28,7 +28,13 @@ const INTRO_TARGET_LINE_SCALE = 1.15;
 const DOT_LENGTH_MORPH_DURATION_MS = 420;
 const LINE_DOT_RADIUS = 1.5;
 
-type RadiatingVariant = 'standard' | 'variable-dots' | 'all-dots';
+type RadiatingVariant =
+  // Every ray keeps its full descriptor length.
+  | 'standard'
+  // Ray lengths follow the dotted pattern and can be re-phased on navigation.
+  | 'variable-dots'
+  // Named separately so the dotted treatment can diverge later if needed.
+  | 'all-dots';
 type RadiatingLineDescriptor = {
   dx: number;
   dy: number;
@@ -240,12 +246,15 @@ export default function RadiatingBackground() {
   const introRotationOffsetRef = useRef(0);
   const hasCompletedIntroRef = useRef(!initialThemeIntroPending);
   const dotLengthMorphFrameRef = useRef<number | null>(null);
+  // `0` keeps full-length lines, `1` fully applies the patterned dotted lengths.
   const dotLengthVariationMixRef = useRef(1);
+  // Offsets the sine-based dot pattern so route changes subtly reshuffle the composition.
   const dotLengthPatternOffsetRef = useRef(0);
   const hasSeenPathnameRef = useRef(false);
   const [showEnterButton, setShowEnterButton] = useState(
     initialThemeIntroPending,
   );
+  // Switch this to compare the available line-length treatments.
   const variant: RadiatingVariant = 'variable-dots';
   const lineDescriptors = RADIATING_LINE_DESCRIPTORS;
 

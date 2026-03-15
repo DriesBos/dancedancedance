@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore } from '@/store/store';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { memo, useState, useEffect, useCallback, useRef } from 'react';
 import { gsap } from '@/lib/gsap';
 import GrainyGradient from '@/components/GrainyGradient';
 import { useShallow } from 'zustand/react/shallow';
@@ -18,7 +18,27 @@ interface Props {
 
 type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
 
-const BlokHead = ({ projects }: Props) => {
+const haveProjectsChanged = (prevProjects: Props['projects'], nextProjects: Props['projects']) => {
+  if (prevProjects === nextProjects) return false;
+  if (prevProjects.length !== nextProjects.length) return true;
+
+  for (let index = 0; index < prevProjects.length; index += 1) {
+    const previousProject = prevProjects[index];
+    const nextProject = nextProjects[index];
+
+    if (!previousProject || !nextProject) return true;
+    if (previousProject.slug !== nextProject.slug) return true;
+
+    const previousExternalLink = previousProject.external_link?.cached_url ?? '';
+    const nextExternalLink = nextProject.external_link?.cached_url ?? '';
+
+    if (previousExternalLink !== nextExternalLink) return true;
+  }
+
+  return false;
+};
+
+const BlokHeadComponent = ({ projects }: Props) => {
   const headRef = useRef<HTMLDivElement>(null);
   const {
     theme,
@@ -584,5 +604,13 @@ const BlokHead = ({ projects }: Props) => {
     </div>
   );
 };
+
+const BlokHead = memo(
+  BlokHeadComponent,
+  (prevProps, nextProps) =>
+    !haveProjectsChanged(prevProps.projects, nextProps.projects),
+);
+
+BlokHead.displayName = 'BlokHead';
 
 export default BlokHead;
