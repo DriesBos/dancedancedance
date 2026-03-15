@@ -1,4 +1,4 @@
-export const DEFAULT_VIBRATION_DURATION_MS = 200;
+export const DEFAULT_VIBRATION_DURATION_MS = 300;
 
 type VibrationNavigator = Navigator & {
   vibrate?: (pattern: number | number[]) => boolean;
