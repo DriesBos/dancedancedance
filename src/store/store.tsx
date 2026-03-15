@@ -43,6 +43,7 @@ export type Actions = {
   setTopPanelTrue: () => void;
   setTopPanelFalse: () => void;
   hidePageContent: () => void;
+  restorePageContentVisibility: () => void;
   showPageContent: () => void;
   revealPageContent: () => void;
 };
@@ -131,6 +132,7 @@ export const useStore = create<Props & Actions>()((set) => ({
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),
   hidePageContent: () => set({ pageContentVisible: false }),
+  restorePageContentVisibility: () => set({ pageContentVisible: true }),
   showPageContent: () =>
     set({ pageContentVisible: true, initialThemeIntroPending: false }),
   revealPageContent: () =>
