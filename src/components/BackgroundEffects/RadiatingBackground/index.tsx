@@ -13,19 +13,33 @@ import IntroEnterButton from '../IntroEnterButton';
 import { useIosImmersiveViewport } from '../shared/useIosImmersiveViewport';
 import styles from './RadiatingBackground.module.sass';
 
+// Square SVG coordinate system used for all line geometry calculations.
 const VIEWBOX_SIZE = 1200;
+// Shared origin point for every ray.
 const CENTER = VIEWBOX_SIZE / 2;
+// Maximum distance from the center to the viewBox edge along a cardinal axis.
 const EDGE_DISTANCE = VIEWBOX_SIZE / 2;
+// Matches the layout breakpoint where the intro line seed length needs more coverage.
 const MOBILE_BREAKPOINT_PX = 770;
+// Fallback spin duration if the CSS custom property is missing or invalid.
 const DEFAULT_ROTATION_DURATION_MS = 72000;
+// Total number of evenly spaced rays in the circle.
 const RADIANT_LINE_COUNT = 48;
+// Extra rotation applied during the enter intro.
 const INTRO_ROTATION_DEGREES = 45;
+// Desktop seed length for the intro, expressed relative to the viewport minimum dimension.
 const INTRO_START_LINE_LENGTH_VMIN = 25;
+// Mobile seed length for the intro to better fill narrow screens.
 const INTRO_START_LINE_LENGTH_VMIN_MOBILE = 33;
+// Server-safe fallback for intro seed length before viewport measurements are available.
 const INTRO_START_LINE_LENGTH_VIEWBOX_FALLBACK = 33;
+// Duration of the enter intro line-growth animation.
 const INTRO_GROWTH_DURATION_MS = 2000;
+// Final multiplier applied to the descriptor-based line length after the intro settles.
 const INTRO_TARGET_LINE_SCALE = 1.15;
+// Duration used when morphing the dotted-length pattern between offsets.
 const DOT_LENGTH_MORPH_DURATION_MS = 420;
+// Radius of the dot rendered at the end of each ray.
 const LINE_DOT_RADIUS = 1.5;
 
 type RadiatingVariant =
