@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { useStore } from '@/store/store';
@@ -16,9 +16,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const pageContentVisible = useStore((state) => state.pageContentVisible);
   const pageContentRevealKey = useStore((state) => state.pageContentRevealKey);
-  const hasAnimatedHeader = useRef(false);
-  const getHeaderTargets = () =>
-    Array.from(document.querySelectorAll<HTMLElement>('.blok-AnimateHead'));
   const getBlockTargets = () =>
     Array.from(document.querySelectorAll<HTMLElement>('.blok-Animate'));
 
@@ -30,30 +27,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
       window.scrollTo(0, 0);
     }
   }, [pathname]);
-
-  // Animate header only on initial load
-  useGSAP(() => {
-    if (!pageContentVisible || hasAnimatedHeader.current) return;
-
-    const headerTargets = getHeaderTargets();
-    if (headerTargets.length === 0) {
-      hasAnimatedHeader.current = true;
-      return;
-    }
-
-    gsap.set(headerTargets, {
-      opacity: 0,
-    });
-
-    gsap.to(headerTargets, {
-      opacity: 1,
-      duration: 0.33,
-      ease: 'power1.inOut',
-      overwrite: 'auto',
-    });
-
-    hasAnimatedHeader.current = true;
-  }, [pageContentVisible]);
 
   useGSAP(
     () => {

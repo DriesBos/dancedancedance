@@ -21,6 +21,7 @@ import GrainyGradient from '@/components/GrainyGradient';
 import OuterTheming from '@/components/OuterTheming';
 import OuterNavigation from '@/components/OuterNavigation';
 import ClientEnhancements from '@/components/ClientEnhancements';
+import HeaderInitAnimation from '@/components/HeaderInitAnimation';
 import PageContentGate from '@/components/PageContentGate';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 import {
@@ -200,6 +201,7 @@ export default async function RootLayout({
         )}
         <PerformanceTelemetry>
           <PageContentGate>
+            <HeaderInitAnimation />
             <OuterNavigation />
             <OuterTheming />
             <main className="main">
