@@ -16,8 +16,8 @@ export const NIGHT_THEME: Theme = 'NIGHT';
 export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT'];
 
 export const THEME_ORDER: Theme[] = [
-  'RADIANT',
   'TRON',
+  'RADIANT',
   'SKY',
   'LIGHT',
   'KUSAMA',
