@@ -1,19 +1,20 @@
 import { create } from 'zustand';
 import {
-  DEFAULT_THEME,
-  THEME_ORDER,
-  THEME_BUTTON_ORDER,
-  getInitialThemeForHour,
+  getDefaultTheme,
   getNextThemeForButtonCycle,
   shouldRunInitialIntroForTheme,
   type Theme,
 } from '@/lib/theme';
 
-export type { Theme } from '@/lib/theme';
+export type { Theme, ThemeOrientation } from '@/lib/theme';
 export {
-  DEFAULT_THEME,
-  THEME_ORDER,
-  THEME_BUTTON_ORDER,
+  LANDSCAPE_DEFAULT_THEME,
+  LANDSCAPE_THEME_BUTTON_ORDER,
+  LANDSCAPE_THEME_ORDER,
+  PORTRAIT_DEFAULT_THEME,
+  PORTRAIT_THEME_BUTTON_ORDER,
+  PORTRAIT_THEME_ORDER,
+  getDefaultTheme,
   getInitialThemeForHour,
 } from '@/lib/theme';
 
@@ -68,7 +69,7 @@ const getBootstrapInitialUiState = (): BootstrapInitialUiState | null => {
 };
 
 const bootstrapInitialUiState = getBootstrapInitialUiState();
-const initialTheme = bootstrapInitialUiState?.theme ?? DEFAULT_THEME;
+const initialTheme = bootstrapInitialUiState?.theme ?? getDefaultTheme();
 const initialFullscreen = bootstrapInitialUiState?.fullscreen ?? false;
 const initialThemeIntroPending =
   bootstrapInitialUiState?.initialThemeIntroPending ??
@@ -108,7 +109,7 @@ export const useStore = create<Props & Actions>()((set) => ({
     }),
   setDefault: () =>
     set({
-      theme: DEFAULT_THEME,
+      theme: getDefaultTheme(),
       pageContentVisible: true,
       initialThemeIntroPending: false,
     }),

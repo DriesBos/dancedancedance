@@ -25,9 +25,10 @@ import HeaderInitAnimation from '@/components/HeaderInitAnimation';
 import PageContentGate from '@/components/PageContentGate';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 import {
-  DEFAULT_THEME,
+  LANDSCAPE_DEFAULT_THEME,
   NIGHT_THEME,
   NIGHT_THEME_HOUR_END,
+  PORTRAIT_DEFAULT_THEME,
   THEMES_WITH_INITIAL_INTRO,
 } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
@@ -39,10 +40,20 @@ const INITIAL_UI_STATE_SCRIPT = `
     var suppressInitialLandingEffects =
       routeSlug === 'about' || routeSlug === 'projects';
     var hour = new Date().getHours();
+    var isPortrait =
+      typeof window.matchMedia === 'function'
+        ? window.matchMedia('(orientation: portrait)').matches
+        : window.innerHeight > window.innerWidth;
+    var orientation =
+      isPortrait ? 'portrait' : 'landscape';
+    var defaultTheme =
+      orientation === 'portrait'
+        ? ${JSON.stringify(PORTRAIT_DEFAULT_THEME)}
+        : ${JSON.stringify(LANDSCAPE_DEFAULT_THEME)};
     var theme =
       hour >= 0 && hour < ${NIGHT_THEME_HOUR_END}
         ? ${JSON.stringify(NIGHT_THEME)}
-        : ${JSON.stringify(DEFAULT_THEME)};
+        : defaultTheme;
     var fullscreen = false;
     var initialThemeIntroPending =
       ${JSON.stringify(THEMES_WITH_INITIAL_INTRO)}.indexOf(theme) !== -1;
