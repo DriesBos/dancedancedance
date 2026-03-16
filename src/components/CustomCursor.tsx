@@ -362,6 +362,14 @@ export default function CustomCursor() {
       return { x, y };
     };
 
+    const setMessageToPointerInstant = (clientX: number, clientY: number) => {
+      const { x, y } = clampMessagePosition(
+        clientX + messageOffsetX,
+        clientY + messageOffsetY,
+      );
+      gsap.set(messageContainer, { x, y });
+    };
+
     const showPreview = () => {
       if (isPreviewVisible.current) return;
       isPreviewVisible.current = true;
@@ -423,6 +431,8 @@ export default function CustomCursor() {
 
       const messageText = resolvedTarget.getAttribute('data-cursor-message');
       if (messageText) {
+        setMessageToPointerInstant(latestPointerX, latestPointerY);
+        rotateMessageTo(0);
         setMessage(messageText);
         messageFadeAnim.restart();
       } else {

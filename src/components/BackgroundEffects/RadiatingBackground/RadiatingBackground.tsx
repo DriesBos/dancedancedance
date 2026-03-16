@@ -339,6 +339,7 @@ export default function RadiatingBackground() {
   const hidePageContent = useStore((state) => state.hidePageContent);
   const showPageContent = useStore((state) => state.showPageContent);
   const revealPageContent = useStore((state) => state.revealPageContent);
+  const [hasFinePointer, setHasFinePointer] = useState<boolean | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const spinLayerRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
@@ -352,6 +353,7 @@ export default function RadiatingBackground() {
   const introFrameRef = useRef<number | null>(null);
   const introProgressRef = useRef(initialThemeIntroPending ? 0 : 1);
   const rotationOffsetRef = useRef(0);
+  const hasStartedEnterRef = useRef(!initialThemeIntroPending);
   const hasCompletedIntroRef = useRef(!initialThemeIntroPending);
   const dotLengthMorphFrameRef = useRef<number | null>(null);
   // `0` keeps full-length lines, `1` fully applies the patterned dotted lengths.
@@ -407,6 +409,34 @@ export default function RadiatingBackground() {
     dotRefs.current.length = RADIANT_LINE_COUNT;
     applyLineGeometry();
   }, [applyLineGeometry]);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') {
+      setHasFinePointer(false);
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(pointer: fine)');
+    setHasFinePointer(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setHasFinePointer(event.matches);
+    };
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleChange);
+    } else {
+      mediaQuery.addListener(handleChange);
+    }
+
+    return () => {
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', handleChange);
+      } else {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -495,6 +525,7 @@ export default function RadiatingBackground() {
 
   useEffect(() => {
     if (initialThemeIntroPending) {
+      hasStartedEnterRef.current = false;
       hasCompletedIntroRef.current = false;
       hidePageContent();
       setShowEnterButton(true);
@@ -511,6 +542,7 @@ export default function RadiatingBackground() {
         options: DEFAULT_INIT_RADIATING_OPTIONS,
       });
     } else {
+      hasStartedEnterRef.current = true;
       if (initFrameRef.current !== null) {
         window.cancelAnimationFrame(initFrameRef.current);
         initFrameRef.current = null;
@@ -545,6 +577,11 @@ export default function RadiatingBackground() {
   ]);
 
   const handleEnter = useCallback(() => {
+    if (hasStartedEnterRef.current) {
+      return;
+    }
+
+    hasStartedEnterRef.current = true;
     setShowEnterButton(false);
 
     if (initFrameRef.current !== null) {
@@ -569,6 +606,35 @@ export default function RadiatingBackground() {
       },
     });
   }, [applyLineGeometry, revealPageContent]);
+
+  useEffect(() => {
+    if (!showEnterButton) {
+      return;
+    }
+
+    const handleDocumentClick = () => {
+      handleEnter();
+    };
+
+    const handleDocumentKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.key === 'Tab' &&
+        !event.altKey &&
+        !event.ctrlKey &&
+        !event.metaKey
+      ) {
+        handleEnter();
+      }
+    };
+
+    document.addEventListener('click', handleDocumentClick);
+    document.addEventListener('keydown', handleDocumentKeyDown);
+
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener('keydown', handleDocumentKeyDown);
+    };
+  }, [handleEnter, showEnterButton]);
 
   const animateDotLengthsTo = (targetMix: number, targetOffset: number) => {
     if (dotLengthMorphFrameRef.current !== null) {
@@ -688,7 +754,16 @@ export default function RadiatingBackground() {
           </svg>
         </div>
       </div>
-      {showEnterButton && <IntroEnterButton onClick={handleEnter} />}
+      {showEnterButton && hasFinePointer === false && (
+        <IntroEnterButton onClick={handleEnter} />
+      )}
+      {showEnterButton && hasFinePointer === true && (
+        <div
+          className={`${styles.enterCursorLayer} cursorMessage`}
+          data-cursor-message="Enter"
+          aria-hidden="true"
+        />
+      )}
     </>
   );
 }

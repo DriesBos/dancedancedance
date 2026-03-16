@@ -33,8 +33,7 @@ const getFallbackInitialUIState = (): InitialUIState => {
   return {
     theme,
     fullscreen: false,
-    initialThemeIntroPending:
-      !suppressInitialLandingEffects && shouldRunInitialIntroForTheme(theme),
+    initialThemeIntroPending: shouldRunInitialIntroForTheme(theme),
     initialRouteEffectsSuppressedPathname: suppressInitialLandingEffects
       ? pathname
       : null,

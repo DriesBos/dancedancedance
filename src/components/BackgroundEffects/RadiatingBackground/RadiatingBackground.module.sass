@@ -47,6 +47,12 @@
 .background
   fill: var(--rb-bg-color)
 
+.enterCursorLayer
+  position: fixed
+  inset: 0
+  z-index: 20
+  pointer-events: auto
+
 @media (prefers-reduced-motion: reduce) and (orientation: landscape)
   .root[data-version='radiating']
     --rb-rotation-duration: 120s

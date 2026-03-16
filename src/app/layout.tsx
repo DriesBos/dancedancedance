@@ -45,7 +45,6 @@ const INITIAL_UI_STATE_SCRIPT = `
         : ${JSON.stringify(DEFAULT_THEME)};
     var fullscreen = false;
     var initialThemeIntroPending =
-      !suppressInitialLandingEffects &&
       ${JSON.stringify(THEMES_WITH_INITIAL_INTRO)}.indexOf(theme) !== -1;
     var pageContentVisible = !initialThemeIntroPending;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
