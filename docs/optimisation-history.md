@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-16] The one-time `.blok-AnimateHead` fade now runs from a layout-mounted client initializer instead of `PageTransition`, so App Router page remounts no longer restart header opacity animation on navigation.
 - [2026-03-16] `BlokHead` now renders as a static shell with separate behavior and route-content controllers, so pathname, scroll, and top-panel state changes no longer force the outer header chrome to re-render on navigation.
 - [2026-03-15] `BlokSidePanels` and its panel children now use `React.memo`, so the about-route portrait and its dithering video stay mounted across navigations whenever the top-panel portrait visibility flag does not change.
 - [2026-03-15] `BlokHead` now uses a structural `React.memo` guard for its project-list prop, so App Router navigations can update pathname-driven header content without re-rendering the persistent header shell when project data is unchanged.

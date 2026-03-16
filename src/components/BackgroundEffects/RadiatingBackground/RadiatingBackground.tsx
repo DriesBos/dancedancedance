@@ -82,6 +82,8 @@ const parseDurationMs = (
   return normalized.endsWith('ms') ? parsedDuration : parsedDuration * 1000;
 };
 
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+
 const easeOutCubic = (progress: number) => 1 - (1 - progress) ** 3;
 
 const getIntroStartLineLength = () => {
@@ -127,37 +129,123 @@ const getDotLengthFactor = (index: number, offset: number) =>
           index * 0.47 + offset * 1.31 + 0.9 * Math.cos(index * 0.13 + offset),
         ));
 
+type InitRadiatingOptions = {
+  lineDurationMs?: number;
+  lineStaggerMs?: number;
+};
+
+const DEFAULT_INIT_RADIATING_OPTIONS: Required<InitRadiatingOptions> = {
+  // initRadiating option: `lineDurationMs` controls how long each individual ray takes to grow from `0` to the init target length.
+  lineDurationMs: 1000,
+  // initRadiating option: `lineStaggerMs` delays each subsequent ray so the init reveal cascades around the circle instead of expanding all at once.
+  lineStaggerMs: 12,
+};
+
+const resolveInitRadiatingOptions = (
+  options?: InitRadiatingOptions,
+): Required<InitRadiatingOptions> => ({
+  ...DEFAULT_INIT_RADIATING_OPTIONS,
+  ...options,
+});
+
+const getInitRadiatingLineScale = (
+  descriptor: RadiatingLineDescriptor,
+  elapsedMs: number,
+  introStartLineLength: number,
+  options: Required<InitRadiatingOptions>,
+) => {
+  const lineDelayMs = descriptor.index * options.lineStaggerMs;
+  const lineProgress = clamp01(
+    (elapsedMs - lineDelayMs) / Math.max(1, options.lineDurationMs),
+  );
+
+  return introStartLineLength * easeOutCubic(lineProgress);
+};
+
 type IntroAnimationControllers = {
   applyLineGeometry: () => void;
   introActiveRef: { current: boolean };
   introFrameRef: { current: number | null };
   introProgressRef: { current: number };
-  introRotationOffsetRef: { current: number };
+  rotationOffsetRef: { current: number };
   lineGrowthMultiplierRef: { current: number };
   onComplete?: () => void;
 };
 
-const prepareRadiatingIntro = ({
+type InitRadiatingControllers = {
+  applyLineGeometry: () => void;
+  initActiveRef: { current: boolean };
+  initElapsedMsRef: { current: number };
+  initFrameRef: { current: number | null };
+  initOptionsRef: { current: Required<InitRadiatingOptions> };
+  introActiveRef: { current: boolean };
+  introProgressRef: { current: number };
+  rotationOffsetRef: { current: number };
+  lineGrowthMultiplierRef: { current: number };
+  options?: InitRadiatingOptions;
+};
+
+const initRadiating = ({
   applyLineGeometry,
+  initActiveRef,
+  initElapsedMsRef,
+  initFrameRef,
+  initOptionsRef,
   introActiveRef,
-  introFrameRef,
   introProgressRef,
-  introRotationOffsetRef,
+  rotationOffsetRef,
   lineGrowthMultiplierRef,
-}: IntroAnimationControllers) => {
+  options,
+}: InitRadiatingControllers) => {
   if (typeof window === 'undefined') {
     return;
   }
 
-  if (introFrameRef.current !== null) {
-    window.cancelAnimationFrame(introFrameRef.current);
+  if (initFrameRef.current !== null) {
+    window.cancelAnimationFrame(initFrameRef.current);
   }
 
+  const resolvedOptions = resolveInitRadiatingOptions(options);
+  const totalLineDurationMs =
+    resolvedOptions.lineDurationMs +
+    resolvedOptions.lineStaggerMs * Math.max(0, RADIANT_LINE_COUNT - 1);
+
+  initOptionsRef.current = resolvedOptions;
   lineGrowthMultiplierRef.current = INTRO_TARGET_LINE_SCALE;
   introActiveRef.current = true;
   introProgressRef.current = 0;
-  introRotationOffsetRef.current = 0;
+  initActiveRef.current = true;
+  initElapsedMsRef.current = 0;
   applyLineGeometry();
+
+  const startTime = performance.now();
+  const startRotationOffset = rotationOffsetRef.current;
+  const targetRotationOffset = startRotationOffset + INTRO_ROTATION_DEGREES;
+
+  const animate = (now: number) => {
+    const elapsedMs = now - startTime;
+    const clampedElapsedMs = Math.min(totalLineDurationMs, elapsedMs);
+    const progress = clamp01(elapsedMs / Math.max(1, totalLineDurationMs));
+    const easedProgress = easeOutCubic(progress);
+
+    initElapsedMsRef.current = clampedElapsedMs;
+    rotationOffsetRef.current =
+      startRotationOffset +
+      (targetRotationOffset - startRotationOffset) * easedProgress;
+    applyLineGeometry();
+
+    if (elapsedMs < totalLineDurationMs) {
+      initFrameRef.current = window.requestAnimationFrame(animate);
+      return;
+    }
+
+    initActiveRef.current = false;
+    initElapsedMsRef.current = totalLineDurationMs;
+    initFrameRef.current = null;
+    applyLineGeometry();
+  };
+
+  initFrameRef.current = window.requestAnimationFrame(animate);
 };
 
 const startRadiatingIntro = ({
@@ -165,7 +253,7 @@ const startRadiatingIntro = ({
   introActiveRef,
   introFrameRef,
   introProgressRef,
-  introRotationOffsetRef,
+  rotationOffsetRef,
   onComplete,
 }: IntroAnimationControllers) => {
   if (typeof window === 'undefined') {
@@ -177,14 +265,14 @@ const startRadiatingIntro = ({
   }
 
   const startTime = performance.now();
-  const startRotationOffset = introRotationOffsetRef.current;
+  const startRotationOffset = rotationOffsetRef.current;
   const targetRotationOffset = startRotationOffset + INTRO_ROTATION_DEGREES;
 
   const animate = (now: number) => {
     const progress = Math.min(1, (now - startTime) / INTRO_GROWTH_DURATION_MS);
     const easedProgress = easeOutCubic(progress);
     introProgressRef.current = easedProgress;
-    introRotationOffsetRef.current =
+    rotationOffsetRef.current =
       startRotationOffset +
       (targetRotationOffset - startRotationOffset) * easedProgress;
     applyLineGeometry();
@@ -210,9 +298,21 @@ const getRadiatingLineScale = (
   dotLengthPatternOffset: number,
   lineGrowthMultiplier: number,
   introStartLineLength: number,
+  initActive: boolean,
+  initElapsedMs: number,
+  initOptions: Required<InitRadiatingOptions>,
   introActive: boolean,
   introProgress: number,
 ) => {
+  if (initActive) {
+    return getInitRadiatingLineScale(
+      descriptor,
+      initElapsedMs,
+      introStartLineLength,
+      initOptions,
+    );
+  }
+
   const dottedLengthFactor = getDotLengthFactor(
     descriptor.index,
     dotLengthPatternOffset,
@@ -244,10 +344,14 @@ export default function RadiatingBackground() {
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
   const dotRefs = useRef<(SVGCircleElement | null)[]>([]);
   const lineGrowthMultiplierRef = useRef(INTRO_TARGET_LINE_SCALE);
+  const initActiveRef = useRef(initialThemeIntroPending);
+  const initElapsedMsRef = useRef(0);
+  const initFrameRef = useRef<number | null>(null);
+  const initOptionsRef = useRef(resolveInitRadiatingOptions());
   const introActiveRef = useRef(initialThemeIntroPending);
   const introFrameRef = useRef<number | null>(null);
   const introProgressRef = useRef(initialThemeIntroPending ? 0 : 1);
-  const introRotationOffsetRef = useRef(0);
+  const rotationOffsetRef = useRef(0);
   const hasCompletedIntroRef = useRef(!initialThemeIntroPending);
   const dotLengthMorphFrameRef = useRef<number | null>(null);
   // `0` keeps full-length lines, `1` fully applies the patterned dotted lengths.
@@ -275,6 +379,9 @@ export default function RadiatingBackground() {
         dotLengthPatternOffsetRef.current,
         lineGrowthMultiplierRef.current,
         introStartLineLength,
+        initActiveRef.current,
+        initElapsedMsRef.current,
+        initOptionsRef.current,
         introActiveRef.current,
         introProgressRef.current,
       );
@@ -325,7 +432,7 @@ export default function RadiatingBackground() {
       const deltaMs = now - lastTimestamp;
       lastTimestamp = now;
       rotation = (rotation + deltaMs * baseDegreesPerMs) % 360;
-      const degrees = rotation + introRotationOffsetRef.current;
+      const degrees = rotation + rotationOffsetRef.current;
 
       spinLayer.style.transform = `translate3d(-50%, -50%, 0) rotate(${degrees}deg)`;
       frameId = window.requestAnimationFrame(animate);
@@ -369,10 +476,14 @@ export default function RadiatingBackground() {
   }, []);
 
   useEffect(() => {
+    const initAnimationFrameRef = initFrameRef;
     const introAnimationFrameRef = introFrameRef;
     const dotLengthAnimationFrameRef = dotLengthMorphFrameRef;
 
     return () => {
+      if (initAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(initAnimationFrameRef.current);
+      }
       if (introAnimationFrameRef.current !== null) {
         window.cancelAnimationFrame(introAnimationFrameRef.current);
       }
@@ -387,27 +498,40 @@ export default function RadiatingBackground() {
       hasCompletedIntroRef.current = false;
       hidePageContent();
       setShowEnterButton(true);
-      prepareRadiatingIntro({
+      initRadiating({
         applyLineGeometry,
+        initActiveRef,
+        initElapsedMsRef,
+        initFrameRef,
+        initOptionsRef,
         introActiveRef,
-        introFrameRef,
         introProgressRef,
-        introRotationOffsetRef,
+        rotationOffsetRef,
         lineGrowthMultiplierRef,
+        options: DEFAULT_INIT_RADIATING_OPTIONS,
       });
     } else {
+      if (initFrameRef.current !== null) {
+        window.cancelAnimationFrame(initFrameRef.current);
+        initFrameRef.current = null;
+      }
+      initActiveRef.current = false;
       setShowEnterButton(false);
       showPageContent();
       introActiveRef.current = false;
       introProgressRef.current = 1;
       if (!hasCompletedIntroRef.current) {
-        introRotationOffsetRef.current = 0;
+        rotationOffsetRef.current = 0;
       }
       lineGrowthMultiplierRef.current = INTRO_TARGET_LINE_SCALE;
       applyLineGeometry();
     }
 
     return () => {
+      if (initFrameRef.current !== null) {
+        window.cancelAnimationFrame(initFrameRef.current);
+        initFrameRef.current = null;
+      }
       if (introFrameRef.current !== null) {
         window.cancelAnimationFrame(introFrameRef.current);
         introFrameRef.current = null;
@@ -422,12 +546,22 @@ export default function RadiatingBackground() {
 
   const handleEnter = useCallback(() => {
     setShowEnterButton(false);
+
+    if (initFrameRef.current !== null) {
+      window.cancelAnimationFrame(initFrameRef.current);
+      initFrameRef.current = null;
+    }
+
+    initActiveRef.current = false;
+    rotationOffsetRef.current = 0;
+    applyLineGeometry();
+
     startRadiatingIntro({
       applyLineGeometry,
       introActiveRef,
       introFrameRef,
       introProgressRef,
-      introRotationOffsetRef,
+      rotationOffsetRef,
       lineGrowthMultiplierRef,
       onComplete: () => {
         hasCompletedIntroRef.current = true;
@@ -515,6 +649,9 @@ export default function RadiatingBackground() {
                   dotLengthPatternOffsetRef.current,
                   lineGrowthMultiplierRef.current,
                   renderIntroStartLineLength,
+                  initActiveRef.current,
+                  initElapsedMsRef.current,
+                  initOptionsRef.current,
                   introActiveRef.current,
                   introProgressRef.current,
                 );
