@@ -397,6 +397,7 @@ export default function RadiatingBackground() {
       });
     } else {
       setShowEnterButton(false);
+      showPageContent();
       introActiveRef.current = false;
       introProgressRef.current = 1;
       if (!hasCompletedIntroRef.current) {
@@ -411,8 +412,6 @@ export default function RadiatingBackground() {
         window.cancelAnimationFrame(introFrameRef.current);
         introFrameRef.current = null;
       }
-
-      showPageContent();
     };
   }, [
     applyLineGeometry,
@@ -512,7 +511,6 @@ export default function RadiatingBackground() {
               {lineDescriptors.map((descriptor, index) => {
                 const scale = getRadiatingLineScale(
                   descriptor,
-                  variant,
                   dotLengthVariationMixRef.current,
                   dotLengthPatternOffsetRef.current,
                   lineGrowthMultiplierRef.current,
