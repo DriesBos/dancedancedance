@@ -4,23 +4,30 @@ import dynamic from 'next/dynamic';
 import { useStore } from '@/store/store';
 
 const BirdsBackground = dynamic(
-  () => import('@/components/BackgroundEffects/BirdsBackground'),
+  () =>
+    import('@/components/BackgroundEffects/BirdsBackground/BirdsBackground'),
   { ssr: false },
 );
 const RadiatingBackground = dynamic(
-  () => import('@/components/BackgroundEffects/RadiatingBackground'),
+  () => import('@/components/BackgroundEffects/RadiatingBackground/RadiatingBackground'),
   { ssr: false },
 );
 const SegmentsBackground = dynamic(
-  () => import('@/components/BackgroundEffects/SegmentsBackground'),
+  () =>
+    import(
+      '@/components/BackgroundEffects/SegmentsBackground/SegmentsBackground'
+    ),
   { ssr: false },
 );
 const KusamaBackground = dynamic(
-  () => import('@/components/BackgroundEffects/KusamaBackground'),
+  () =>
+    import(
+      '@/components/BackgroundEffects/KusamaBackground/KusamaBackground'
+    ),
   { ssr: false },
 );
 const TronPulse = dynamic(
-  () => import('@/components/BackgroundEffects/TronPulse'),
+  () => import('@/components/BackgroundEffects/TronPulse/TronPulse'),
   { ssr: false },
 );
 

@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/store/store';
-import IntroEnterButton from '../IntroEnterButton';
+import IntroEnterButton from '../IntroEnterButton/IntroEnterButton';
 import { useIosImmersiveViewport } from '../shared/useIosImmersiveViewport';
 import styles from './RadiatingBackground.module.sass';
 
