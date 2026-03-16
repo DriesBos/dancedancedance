@@ -170,6 +170,8 @@ export default function CustomCursor() {
     let activeMessageTarget: HTMLElement | null = null;
     let activePreviewTarget: HTMLElement | null = null;
     let activeMagneticTarget: HTMLElement | null = null;
+    const introMessageSelector =
+      '.enterCursorLayer.cursorMessage[data-cursor-message]';
 
     let pointerFrameId: number | null = null;
     let latestPointerX = 0;
@@ -368,6 +370,34 @@ export default function CustomCursor() {
         clientY + messageOffsetY,
       );
       gsap.set(messageContainer, { x, y });
+    };
+
+    const syncIntroMessageVisibility = () => {
+      const introTarget =
+        document.querySelector<HTMLElement>(introMessageSelector);
+
+      if (!introTarget) {
+        if (activeMessageTarget?.matches(introMessageSelector)) {
+          activeMessageTarget = null;
+          messageFadeAnim.reverse();
+        }
+        return;
+      }
+
+      if (isVisible.current) return;
+
+      const messageText = introTarget.getAttribute('data-cursor-message');
+      if (!messageText) return;
+
+      latestPointerX = window.innerWidth / 2;
+      latestPointerY = window.innerHeight / 2;
+      latestPointerTarget = introTarget;
+      prevMousePos.current = { x: latestPointerX, y: latestPointerY };
+      activeMessageTarget = introTarget;
+      setMessage(messageText);
+      setMessageToPointerInstant(latestPointerX, latestPointerY);
+      rotateMessageTo(0);
+      messageFadeAnim.progress(1).pause();
     };
 
     const showPreview = () => {
@@ -615,11 +645,17 @@ export default function CustomCursor() {
       rotateMessageTo(0);
       messageFadeAnim.reverse();
       hidePreview();
+      syncIntroMessageVisibility();
     };
 
     const handleClick = () => {
       setFollowerMode('default');
       hidePreview();
+
+      if (activeMessageTarget?.matches(introMessageSelector)) {
+        activeMessageTarget = null;
+        messageFadeAnim.reverse();
+      }
     };
 
     const showProjectNavigationHint = () => {
@@ -649,6 +685,15 @@ export default function CustomCursor() {
 
     showNavigationHintRef.current = showProjectNavigationHint;
     showProjectNavigationHint();
+    syncIntroMessageVisibility();
+
+    const introMessageObserver = new MutationObserver(() => {
+      syncIntroMessageVisibility();
+    });
+    introMessageObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
 
     window.addEventListener('resize', updateCursorMeasurements, {
       passive: true,
@@ -692,6 +737,7 @@ export default function CustomCursor() {
       hidePreview();
 
       showNavigationHintRef.current = null;
+      introMessageObserver.disconnect();
       document.body.removeAttribute('data-cursor-surface');
     };
   });
