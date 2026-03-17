@@ -17,8 +17,8 @@ export const DEVELOPMENT_DEFAULT_THEME: Theme = 'TRON';
 export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT', 'TRON'];
 
 export const LANDSCAPE_THEME_ORDER: Theme[] = [
-  'RADIANT',
   'TRON',
+  'RADIANT',
   'SKY',
   'LIGHT',
   'KUSAMA',
@@ -49,7 +49,7 @@ export const PORTRAIT_THEME_BUTTON_ORDER: Theme[] = PORTRAIT_THEME_ORDER.filter(
   (theme) => !NON_SELECTABLE_THEMES.includes(theme),
 );
 
-export const LANDSCAPE_DEFAULT_THEME: Theme = 'RADIANT';
+export const LANDSCAPE_DEFAULT_THEME: Theme = 'TRON';
 export const PORTRAIT_DEFAULT_THEME: Theme = 'TRON';
 export const IS_DEVELOPMENT =
   process.env.NODE_ENV === 'development';
