@@ -82,6 +82,18 @@ const INITIAL_UI_STATE_SCRIPT = `
       document.body.setAttribute('data-page', routeSlug);
       document.body.setAttribute('data-page-content-visible', pageContentVisible ? 'true' : 'false');
     }
+    document.documentElement.setAttribute(
+      'data-page-content-visible',
+      pageContentVisible ? 'true' : 'false'
+    );
+    if (!pageContentVisible) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body && (document.body.style.overflow = 'hidden');
+      window.scrollTo(0, 0);
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body && (document.body.style.overflow = '');
+    }
 
     var metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {

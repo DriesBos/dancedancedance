@@ -34,9 +34,10 @@ const DEFAULT_HORIZONTAL_LINES = 3;
 const DEFAULT_VERTICAL_LINES = 4;
 const DEFAULT_RING_COUNT = 4;
 const DEFAULT_BACK_PLANE_SCALE = 0.6;
-const DEFAULT_END_OPACITY = 0.66;
+const DEFAULT_END_OPACITY = 1;
 const DEPTH_ANIMATION_DURATION_SECONDS = 1;
 const MAX_HORIZONTAL_PERSPECTIVE_SHIFT_FACTOR = 0.01;
+const MAX_VERTICAL_PERSPECTIVE_SHIFT_FACTOR = 0.02;
 const PORTRAIT_DEFAULT_HORIZONTAL_LINES = 3;
 const PORTRAIT_DEFAULT_VERTICAL_LINES = 2;
 const PORTRAIT_DEFAULT_RING_COUNT = 3;
@@ -55,6 +56,7 @@ const getRingRects = (
   ringCount: number,
   backPlaneScale: number,
   horizontalPerspectiveOffset: number,
+  verticalPerspectiveOffset: number,
 ): RingRect[] =>
   Array.from({ length: ringCount }, (_, index) => {
     const progress = ringCount === 1 ? 0 : index / (ringCount - 1);
@@ -64,7 +66,8 @@ const getRingRects = (
     const ringHeight = height * scale;
     const left =
       (width - ringWidth) / 2 + horizontalPerspectiveOffset * progress;
-    const top = (height - ringHeight) / 2;
+    const top =
+      (height - ringHeight) / 2 + verticalPerspectiveOffset * progress;
 
     return {
       index,
@@ -95,6 +98,7 @@ export default function BackgridTunnel({
   const hasStartedEnterRef = useRef(!initialThemeIntroPending);
   const animatedBackPlaneScaleRef = useRef({ value: backPlaneScale });
   const horizontalPerspectiveRef = useRef({ value: 0 });
+  const verticalPerspectiveRef = useRef({ value: 0 });
   const ringRefs = useRef<(HTMLDivElement | null)[]>([]);
   const verticalLineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const horizontalLineRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -104,6 +108,7 @@ export default function BackgridTunnel({
   });
   const [animatedBackPlaneScale, setAnimatedBackPlaneScale] = useState(1);
   const [horizontalPerspectiveOffset, setHorizontalPerspectiveOffset] = useState(0);
+  const [verticalPerspectiveOffset, setVerticalPerspectiveOffset] = useState(0);
   const [hasFinePointer, setHasFinePointer] = useState<boolean | null>(null);
   const [showEnterButton, setShowEnterButton] = useState(
     initialThemeIntroPending,
@@ -233,11 +238,13 @@ export default function BackgridTunnel({
   useEffect(() => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
     const horizontalPerspectiveState = horizontalPerspectiveRef.current;
+    const verticalPerspectiveState = verticalPerspectiveRef.current;
     const grid = gridRef.current;
 
     return () => {
       gsap.killTweensOf(animatedScaleState);
       gsap.killTweensOf(horizontalPerspectiveState);
+      gsap.killTweensOf(verticalPerspectiveState);
       if (grid) {
         gsap.killTweensOf(grid);
       }
@@ -298,6 +305,52 @@ export default function BackgridTunnel({
       gsap.killTweensOf(horizontalPerspectiveState);
     };
   }, [hasFinePointer, viewportSize.width]);
+
+  useEffect(() => {
+    const verticalPerspectiveState = verticalPerspectiveRef.current;
+
+    if (viewportSize.height <= 0) {
+      gsap.killTweensOf(verticalPerspectiveState);
+      verticalPerspectiveState.value = 0;
+      setVerticalPerspectiveOffset(0);
+      return;
+    }
+
+    const maxVerticalShift =
+      viewportSize.height * MAX_VERTICAL_PERSPECTIVE_SHIFT_FACTOR;
+
+    const updatePerspective = () => {
+      const scrollRoot = document.documentElement;
+      const totalScrollableHeight = Math.max(
+        1,
+        scrollRoot.scrollHeight - window.innerHeight,
+      );
+      const scrollProgress = clamp(
+        window.scrollY / totalScrollableHeight,
+        0,
+        1,
+      );
+      const targetOffset = -scrollProgress * maxVerticalShift;
+
+      gsap.to(verticalPerspectiveState, {
+        value: targetOffset,
+        duration: 0.1,
+        ease: 'power3.out',
+        overwrite: true,
+        onUpdate: () => {
+          setVerticalPerspectiveOffset(verticalPerspectiveState.value);
+        },
+      });
+    };
+
+    updatePerspective();
+    window.addEventListener('scroll', updatePerspective, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', updatePerspective);
+      gsap.killTweensOf(verticalPerspectiveState);
+    };
+  }, [viewportSize.height]);
 
   const runDepthAnimation = useCallback((onComplete?: () => void) => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
@@ -386,6 +439,7 @@ export default function BackgridTunnel({
           safeRingCount,
           safeBackPlaneScale,
           horizontalPerspectiveOffset,
+          verticalPerspectiveOffset,
         )
       : [];
   const connectors: ReactNode[] = [];

@@ -22,10 +22,26 @@ export default function PageContentGate({
   const pageContentVisible = useStore((state) => state.pageContentVisible);
 
   useEffect(() => {
-    document.body?.setAttribute(
-      'data-page-content-visible',
-      pageContentVisible ? 'true' : 'false',
-    );
+    const body = document.body;
+    const html = document.documentElement;
+    const visibilityValue = pageContentVisible ? 'true' : 'false';
+
+    body?.setAttribute('data-page-content-visible', visibilityValue);
+    html?.setAttribute('data-page-content-visible', visibilityValue);
+
+    if (!body || !html) {
+      return;
+    }
+
+    if (!pageContentVisible) {
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    html.style.overflow = '';
+    body.style.overflow = '';
   }, [pageContentVisible]);
 
   return (
