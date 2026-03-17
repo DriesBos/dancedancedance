@@ -36,6 +36,7 @@ const DEFAULT_RING_COUNT = 4;
 const DEFAULT_BACK_PLANE_SCALE = 0.6;
 const DEFAULT_END_OPACITY = 0.66;
 const DEPTH_ANIMATION_DURATION_SECONDS = 1;
+const MAX_HORIZONTAL_PERSPECTIVE_SHIFT_FACTOR = 0.01;
 const PORTRAIT_DEFAULT_HORIZONTAL_LINES = 3;
 const PORTRAIT_DEFAULT_VERTICAL_LINES = 2;
 const PORTRAIT_DEFAULT_RING_COUNT = 3;
@@ -53,6 +54,7 @@ const getRingRects = (
   height: number,
   ringCount: number,
   backPlaneScale: number,
+  horizontalPerspectiveOffset: number,
 ): RingRect[] =>
   Array.from({ length: ringCount }, (_, index) => {
     const progress = ringCount === 1 ? 0 : index / (ringCount - 1);
@@ -60,7 +62,8 @@ const getRingRects = (
       backPlaneScale <= 0 ? 1 : 1 - (1 - backPlaneScale) * progress;
     const ringWidth = width * scale;
     const ringHeight = height * scale;
-    const left = (width - ringWidth) / 2;
+    const left =
+      (width - ringWidth) / 2 + horizontalPerspectiveOffset * progress;
     const top = (height - ringHeight) / 2;
 
     return {
@@ -91,6 +94,7 @@ export default function BackgridTunnel({
   const gridRef = useRef<HTMLDivElement>(null);
   const hasStartedEnterRef = useRef(!initialThemeIntroPending);
   const animatedBackPlaneScaleRef = useRef({ value: backPlaneScale });
+  const horizontalPerspectiveRef = useRef({ value: 0 });
   const ringRefs = useRef<(HTMLDivElement | null)[]>([]);
   const verticalLineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const horizontalLineRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -99,6 +103,7 @@ export default function BackgridTunnel({
     height: 0,
   });
   const [animatedBackPlaneScale, setAnimatedBackPlaneScale] = useState(1);
+  const [horizontalPerspectiveOffset, setHorizontalPerspectiveOffset] = useState(0);
   const [hasFinePointer, setHasFinePointer] = useState<boolean | null>(null);
   const [showEnterButton, setShowEnterButton] = useState(
     initialThemeIntroPending,
@@ -227,15 +232,72 @@ export default function BackgridTunnel({
 
   useEffect(() => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
+    const horizontalPerspectiveState = horizontalPerspectiveRef.current;
     const grid = gridRef.current;
 
     return () => {
       gsap.killTweensOf(animatedScaleState);
+      gsap.killTweensOf(horizontalPerspectiveState);
       if (grid) {
         gsap.killTweensOf(grid);
       }
     };
   }, []);
+
+  useEffect(() => {
+    const horizontalPerspectiveState = horizontalPerspectiveRef.current;
+
+    if (!hasFinePointer || viewportSize.width <= 0) {
+      gsap.killTweensOf(horizontalPerspectiveState);
+      horizontalPerspectiveState.value = 0;
+      setHorizontalPerspectiveOffset(0);
+      return;
+    }
+
+    const maxHorizontalShift =
+      viewportSize.width * MAX_HORIZONTAL_PERSPECTIVE_SHIFT_FACTOR;
+
+    const updatePerspective = (clientX: number) => {
+      const progressAcrossViewport = clamp(clientX / viewportSize.width, 0, 1);
+      const normalizedOffset = (progressAcrossViewport - 0.5) * 2;
+      const targetOffset = -normalizedOffset * maxHorizontalShift;
+
+      gsap.to(horizontalPerspectiveState, {
+        value: targetOffset,
+        duration: 0.35,
+        ease: 'power3.out',
+        overwrite: true,
+        onUpdate: () => {
+          setHorizontalPerspectiveOffset(horizontalPerspectiveState.value);
+        },
+      });
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      updatePerspective(event.clientX);
+    };
+
+    const handleMouseLeave = () => {
+      gsap.to(horizontalPerspectiveState, {
+        value: 0,
+        duration: 0.45,
+        ease: 'power3.out',
+        overwrite: true,
+        onUpdate: () => {
+          setHorizontalPerspectiveOffset(horizontalPerspectiveState.value);
+        },
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseleave', handleMouseLeave);
+      gsap.killTweensOf(horizontalPerspectiveState);
+    };
+  }, [hasFinePointer, viewportSize.width]);
 
   const runDepthAnimation = useCallback((onComplete?: () => void) => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
@@ -323,6 +385,7 @@ export default function BackgridTunnel({
           viewportSize.height,
           safeRingCount,
           safeBackPlaneScale,
+          horizontalPerspectiveOffset,
         )
       : [];
   const connectors: ReactNode[] = [];
