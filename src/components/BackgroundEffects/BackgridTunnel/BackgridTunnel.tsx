@@ -414,14 +414,23 @@ export default function BackgridTunnel({
   ]);
 
   useEffect(() => {
-    animatedBackPlaneScaleRef.current.value = 1;
+    animatedBackPlaneScaleRef.current.value = initialThemeIntroPending
+      ? 1
+      : resolvedBackPlaneScale;
     applyGeometry();
 
     if (gridRef.current) {
       gsap.killTweensOf(gridRef.current);
-      gsap.set(gridRef.current, { opacity: 1 });
+      gsap.set(gridRef.current, {
+        opacity: initialThemeIntroPending ? 1 : resolvedEndOpacity,
+      });
     }
-  }, [applyGeometry, resolvedBackPlaneScale, resolvedEndOpacity]);
+  }, [
+    applyGeometry,
+    initialThemeIntroPending,
+    resolvedBackPlaneScale,
+    resolvedEndOpacity,
+  ]);
 
   useEffect(() => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
