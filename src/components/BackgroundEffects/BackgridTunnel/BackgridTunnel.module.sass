@@ -17,7 +17,11 @@
   position: relative
   width: 100%
   height: 100%
-  opacity: 1
+  opacity: var(--bt-grid-target-opacity, 1)
+  transition: opacity var(--transition-theme)
+
+.root[data-theme-visible='false'] .grid
+  opacity: 0
 
 .routePulse
   position: absolute

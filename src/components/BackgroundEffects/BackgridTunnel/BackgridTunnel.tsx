@@ -145,6 +145,7 @@ export default function BackgridTunnel({
     height: 0,
   });
   const [hasFinePointer, setHasFinePointer] = useState<boolean | null>(null);
+  const [isThemeVisible, setIsThemeVisible] = useState(initialThemeIntroPending);
   const [showEnterButton, setShowEnterButton] = useState(
     initialThemeIntroPending,
   );
@@ -330,6 +331,21 @@ export default function BackgridTunnel({
   ]);
 
   useEffect(() => {
+    if (initialThemeIntroPending) {
+      setIsThemeVisible(true);
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setIsThemeVisible(true);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [initialThemeIntroPending]);
+
+  useEffect(() => {
     if (typeof window.matchMedia !== 'function') {
       setHasFinePointer(false);
       return;
@@ -421,9 +437,16 @@ export default function BackgridTunnel({
 
     if (gridRef.current) {
       gsap.killTweensOf(gridRef.current);
-      gsap.set(gridRef.current, {
-        opacity: initialThemeIntroPending ? 1 : resolvedEndOpacity,
-      });
+      gridRef.current.style.setProperty(
+        '--bt-grid-target-opacity',
+        String(resolvedEndOpacity),
+      );
+
+      if (initialThemeIntroPending) {
+        gsap.set(gridRef.current, { opacity: 1 });
+      } else {
+        gridRef.current.style.removeProperty('opacity');
+      }
     }
   }, [
     applyGeometry,
@@ -702,6 +725,7 @@ export default function BackgridTunnel({
         ref={rootRef}
         className={styles.root}
         data-version="backgrid"
+        data-theme-visible={isThemeVisible}
         aria-hidden="true"
       >
         <div ref={gridRef} className={styles.grid}>
