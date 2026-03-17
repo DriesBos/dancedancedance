@@ -25,6 +25,8 @@ import HeaderInitAnimation from '@/components/HeaderInitAnimation';
 import PageContentGate from '@/components/PageContentGate';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 import {
+  DEVELOPMENT_DEFAULT_THEME,
+  IS_DEVELOPMENT,
   LANDSCAPE_DEFAULT_THEME,
   NIGHT_THEME,
   NIGHT_THEME_HOUR_END,
@@ -47,11 +49,15 @@ const INITIAL_UI_STATE_SCRIPT = `
     var orientation =
       isPortrait ? 'portrait' : 'landscape';
     var defaultTheme =
-      orientation === 'portrait'
+      ${JSON.stringify(IS_DEVELOPMENT)}
+        ? ${JSON.stringify(DEVELOPMENT_DEFAULT_THEME)}
+        : orientation === 'portrait'
         ? ${JSON.stringify(PORTRAIT_DEFAULT_THEME)}
         : ${JSON.stringify(LANDSCAPE_DEFAULT_THEME)};
     var theme =
-      hour >= 0 && hour < ${NIGHT_THEME_HOUR_END}
+      ${JSON.stringify(IS_DEVELOPMENT)}
+        ? ${JSON.stringify(DEVELOPMENT_DEFAULT_THEME)}
+        : hour >= 0 && hour < ${NIGHT_THEME_HOUR_END}
         ? ${JSON.stringify(NIGHT_THEME)}
         : defaultTheme;
     var fullscreen = false;

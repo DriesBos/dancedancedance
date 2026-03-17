@@ -13,7 +13,8 @@ export type ThemeOrientation = 'landscape' | 'portrait';
 export const NIGHT_THEME_HOUR_END = 5;
 
 export const NIGHT_THEME: Theme = 'NIGHT';
-export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT'];
+export const DEVELOPMENT_DEFAULT_THEME: Theme = 'TRON';
+export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT', 'TRON'];
 
 export const LANDSCAPE_THEME_ORDER: Theme[] = [
   'RADIANT',
@@ -50,6 +51,8 @@ export const PORTRAIT_THEME_BUTTON_ORDER: Theme[] = PORTRAIT_THEME_ORDER.filter(
 
 export const LANDSCAPE_DEFAULT_THEME: Theme = 'RADIANT';
 export const PORTRAIT_DEFAULT_THEME: Theme = 'TRON';
+export const IS_DEVELOPMENT =
+  process.env.NODE_ENV === 'development';
 
 const getViewportOrientation = (): ThemeOrientation => {
   if (typeof window === 'undefined') {
@@ -91,6 +94,10 @@ export const getThemeButtonOrder = (
 export const getDefaultTheme = (
   orientation = getViewportOrientation(),
 ): Theme => {
+  if (IS_DEVELOPMENT) {
+    return DEVELOPMENT_DEFAULT_THEME;
+  }
+
   if (orientation === 'portrait') {
     return PORTRAIT_DEFAULT_THEME;
   }
@@ -102,6 +109,10 @@ export const getInitialThemeForHour = (
   hour: number,
   orientation = getViewportOrientation(),
 ): Theme => {
+  if (IS_DEVELOPMENT) {
+    return DEVELOPMENT_DEFAULT_THEME;
+  }
+
   if (hour >= 0 && hour < NIGHT_THEME_HOUR_END) {
     return NIGHT_THEME;
   }

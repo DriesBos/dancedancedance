@@ -1,0 +1,53 @@
+.root
+  --bt-line-color: var(--theme-type)
+  --bt-line-width: var(--border-width)
+  position: fixed
+  top: 50%
+  left: 50%
+  width: 100vw
+  height: 100vh
+  width: max(100lvw, var(--be-ios-immersive-width, 0px))
+  height: max(100lvh, var(--be-ios-immersive-height, 0px))
+  transform: translate3d(-50%, -50%, 0)
+  pointer-events: none
+  z-index: -1
+  overflow: hidden
+
+.grid
+  position: relative
+  width: 100%
+  height: 100%
+  opacity: 1
+
+.ring
+  position: absolute
+  border: var(--bt-line-width) solid var(--bt-line-color)
+  box-sizing: border-box
+
+.ringVertical
+  position: absolute
+  top: 0
+  bottom: 0
+  width: var(--bt-line-width)
+  background: var(--bt-line-color)
+  transform: translateX(-50%)
+
+.ringHorizontal
+  position: absolute
+  left: 0
+  right: 0
+  height: var(--bt-line-width)
+  background: var(--bt-line-color)
+  transform: translateY(-50%)
+
+.connector
+  position: absolute
+  height: 0
+  border-top: var(--bt-line-width) solid var(--bt-line-color)
+  transform-origin: 0 0
+
+.enterCursorLayer
+  position: fixed
+  inset: 0
+  z-index: 20
+  pointer-events: auto

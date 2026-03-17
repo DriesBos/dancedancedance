@@ -26,8 +26,8 @@ const KusamaBackground = dynamic(
     ),
   { ssr: false },
 );
-const TronPulse = dynamic(
-  () => import('@/components/BackgroundEffects/TronPulse/TronPulse'),
+const BackgridTunnel = dynamic(
+  () => import('@/components/BackgroundEffects/BackgridTunnel/BackgridTunnel'),
   { ssr: false },
 );
 
@@ -35,7 +35,7 @@ export default function BackgroundEffectsByTheme() {
   const theme = useStore((state) => state.theme);
 
   if (theme === 'TRON') {
-    return <TronPulse />;
+    return <BackgridTunnel />;
   }
 
   if (theme === 'SKY') {

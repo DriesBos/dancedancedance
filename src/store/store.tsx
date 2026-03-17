@@ -8,6 +8,8 @@ import {
 
 export type { Theme, ThemeOrientation } from '@/lib/theme';
 export {
+  DEVELOPMENT_DEFAULT_THEME,
+  IS_DEVELOPMENT,
   LANDSCAPE_DEFAULT_THEME,
   LANDSCAPE_THEME_BUTTON_ORDER,
   LANDSCAPE_THEME_ORDER,
