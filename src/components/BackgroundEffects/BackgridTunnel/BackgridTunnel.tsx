@@ -1,7 +1,14 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { gsap } from '@/lib/gsap';
 import { useStore } from '@/store/store';
 import IntroEnterButton from '../IntroEnterButton/IntroEnterButton';
@@ -31,11 +38,18 @@ type RingRect = {
   bottom: number;
 };
 
+type ConnectorDescriptor = {
+  key: string;
+  outerRingIndex: number;
+  fraction: number;
+  side: 'top' | 'bottom' | 'left' | 'right';
+};
+
 const DEFAULT_HORIZONTAL_LINES = 3;
 const DEFAULT_VERTICAL_LINES = 4;
 const DEFAULT_RING_COUNT = 4;
 const DEFAULT_BACK_PLANE_SCALE = 0.6;
-const DEFAULT_END_OPACITY = 1;
+const DEFAULT_END_OPACITY = 0.6;
 const DEPTH_ANIMATION_DURATION_SECONDS = 1;
 const MAX_HORIZONTAL_PERSPECTIVE_SHIFT_FACTOR = 0.01;
 const MAX_VERTICAL_PERSPECTIVE_SHIFT_FACTOR = 0.03;
@@ -45,7 +59,7 @@ const PORTRAIT_DEFAULT_HORIZONTAL_LINES = 3;
 const PORTRAIT_DEFAULT_VERTICAL_LINES = 2;
 const PORTRAIT_DEFAULT_RING_COUNT = 3;
 const PORTRAIT_DEFAULT_BACK_PLANE_SCALE = 0.75;
-const PORTRAIT_DEFAULT_END_OPACITY = 1;
+const PORTRAIT_DEFAULT_END_OPACITY = 0.33;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -83,6 +97,18 @@ const getRingRects = (
     };
   });
 
+const useStableEvent = <Args extends unknown[], Return>(
+  handler: (...args: Args) => Return,
+) => {
+  const handlerRef = useRef(handler);
+
+  useLayoutEffect(() => {
+    handlerRef.current = handler;
+  }, [handler]);
+
+  return useCallback((...args: Args) => handlerRef.current(...args), []);
+};
+
 export default function BackgridTunnel({
   horizontalLines,
   verticalLines,
@@ -109,19 +135,15 @@ export default function BackgridTunnel({
   });
   const hasSeenPathnameRef = useRef(false);
   const hasStartedEnterRef = useRef(!initialThemeIntroPending);
-  const animatedBackPlaneScaleRef = useRef({ value: backPlaneScale });
+  const animatedBackPlaneScaleRef = useRef({ value: backPlaneScale ?? 1 });
   const horizontalPerspectiveRef = useRef({ value: 0 });
   const verticalPerspectiveRef = useRef({ value: 0 });
   const ringRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const verticalLineRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const horizontalLineRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const connectorRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [viewportSize, setViewportSize] = useState<ViewportSize>({
     width: 0,
     height: 0,
   });
-  const [animatedBackPlaneScale, setAnimatedBackPlaneScale] = useState(1);
-  const [horizontalPerspectiveOffset, setHorizontalPerspectiveOffset] = useState(0);
-  const [verticalPerspectiveOffset, setVerticalPerspectiveOffset] = useState(0);
   const [hasFinePointer, setHasFinePointer] = useState<boolean | null>(null);
   const [showEnterButton, setShowEnterButton] = useState(
     initialThemeIntroPending,
@@ -153,7 +175,159 @@ export default function BackgridTunnel({
     ? PORTRAIT_DEFAULT_END_OPACITY
     : DEFAULT_END_OPACITY;
 
+  const safeHorizontalLines = Math.max(0, Math.floor(resolvedHorizontalLines));
+  const safeVerticalLines = Math.max(0, Math.floor(resolvedVerticalLines));
+  const safeRingCount = Math.max(2, Math.floor(resolvedRingCount));
+  const horizontalFractions = getInteriorFractions(safeHorizontalLines);
+  const verticalFractions = getInteriorFractions(safeVerticalLines);
+  const topBottomConnectorFractions = [0, ...verticalFractions, 1];
+  const connectorDescriptors: ConnectorDescriptor[] = [];
+
+  for (let index = 0; index < safeRingCount - 1; index += 1) {
+    for (const fraction of topBottomConnectorFractions) {
+      connectorDescriptors.push({
+        key: `top-${index}-${fraction}`,
+        outerRingIndex: index,
+        fraction,
+        side: 'top',
+      });
+      connectorDescriptors.push({
+        key: `bottom-${index}-${fraction}`,
+        outerRingIndex: index,
+        fraction,
+        side: 'bottom',
+      });
+    }
+
+    for (const fraction of horizontalFractions) {
+      connectorDescriptors.push({
+        key: `left-${index}-${fraction}`,
+        outerRingIndex: index,
+        fraction,
+        side: 'left',
+      });
+      connectorDescriptors.push({
+        key: `right-${index}-${fraction}`,
+        outerRingIndex: index,
+        fraction,
+        side: 'right',
+      });
+    }
+  }
+
+  ringRefs.current.length = safeRingCount;
+  connectorRefs.current.length = connectorDescriptors.length;
+
   useIosImmersiveViewport();
+
+  const applyGeometry = useStableEvent(() => {
+    const { width, height } = viewportSize;
+    if (width <= 0 || height <= 0) {
+      return;
+    }
+
+    const rings = getRingRects(
+      width,
+      height,
+      safeRingCount,
+      clamp(animatedBackPlaneScaleRef.current.value, 0, 0.96),
+      horizontalPerspectiveRef.current.value,
+      verticalPerspectiveRef.current.value,
+    );
+    const routePulseEndWidth = width * ROUTE_PULSE_OVERSCAN_FACTOR;
+    const routePulseEndHeight = height * ROUTE_PULSE_OVERSCAN_FACTOR;
+
+    routePulseRectsRef.current = {
+      start: rings[rings.length - 1] ?? null,
+      end: {
+        index: -1,
+        left: (width - routePulseEndWidth) / 2,
+        top: (height - routePulseEndHeight) / 2,
+        width: routePulseEndWidth,
+        height: routePulseEndHeight,
+        right: (width + routePulseEndWidth) / 2,
+        bottom: (height + routePulseEndHeight) / 2,
+      },
+    };
+
+    for (let index = 0; index < rings.length; index += 1) {
+      const ring = rings[index];
+      const ringElement = ringRefs.current[index];
+
+      if (!ring || !ringElement) {
+        continue;
+      }
+
+      ringElement.style.left = `${ring.left}px`;
+      ringElement.style.top = `${ring.top}px`;
+      ringElement.style.width = `${ring.width}px`;
+      ringElement.style.height = `${ring.height}px`;
+      ringElement.style.opacity = index === 0 ? '0' : '1';
+    }
+
+    for (let index = 0; index < connectorDescriptors.length; index += 1) {
+      const descriptor = connectorDescriptors[index];
+      const connectorElement = connectorRefs.current[index];
+
+      if (!descriptor || !connectorElement) {
+        continue;
+      }
+
+      const outerRing = rings[descriptor.outerRingIndex];
+      const innerRing = rings[descriptor.outerRingIndex + 1];
+      if (!outerRing || !innerRing) {
+        continue;
+      }
+
+      let left = 0;
+      let top = 0;
+      let deltaX = 0;
+      let deltaY = 0;
+
+      if (descriptor.side === 'top' || descriptor.side === 'bottom') {
+        const outerX = outerRing.left + outerRing.width * descriptor.fraction;
+        const innerX = innerRing.left + innerRing.width * descriptor.fraction;
+
+        left = outerX;
+        top = descriptor.side === 'top' ? outerRing.top : outerRing.bottom;
+        deltaX = innerX - outerX;
+        deltaY =
+          descriptor.side === 'top'
+            ? innerRing.top - outerRing.top
+            : innerRing.bottom - outerRing.bottom;
+      } else {
+        const outerY = outerRing.top + outerRing.height * descriptor.fraction;
+        const innerY = innerRing.top + innerRing.height * descriptor.fraction;
+
+        left = descriptor.side === 'left' ? outerRing.left : outerRing.right;
+        top = outerY;
+        deltaX =
+          descriptor.side === 'left'
+            ? innerRing.left - outerRing.left
+            : innerRing.right - outerRing.right;
+        deltaY = innerY - outerY;
+      }
+
+      const length = Math.hypot(deltaX, deltaY);
+      const angle = (Math.atan2(deltaY, deltaX) * 180) / Math.PI;
+
+      connectorElement.style.left = `${left}px`;
+      connectorElement.style.top = `${top}px`;
+      connectorElement.style.width = `${length}px`;
+      connectorElement.style.transform = `rotate(${angle}deg)`;
+    }
+  });
+
+  useLayoutEffect(() => {
+    applyGeometry();
+  }, [
+    applyGeometry,
+    viewportSize.width,
+    viewportSize.height,
+    safeRingCount,
+    safeHorizontalLines,
+    safeVerticalLines,
+  ]);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') {
@@ -241,18 +415,20 @@ export default function BackgridTunnel({
 
   useEffect(() => {
     animatedBackPlaneScaleRef.current.value = 1;
-    setAnimatedBackPlaneScale(1);
+    applyGeometry();
+
     if (gridRef.current) {
       gsap.killTweensOf(gridRef.current);
       gsap.set(gridRef.current, { opacity: 1 });
     }
-  }, [resolvedBackPlaneScale, resolvedEndOpacity]);
+  }, [applyGeometry, resolvedBackPlaneScale, resolvedEndOpacity]);
 
   useEffect(() => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
     const horizontalPerspectiveState = horizontalPerspectiveRef.current;
     const verticalPerspectiveState = verticalPerspectiveRef.current;
     const grid = gridRef.current;
+    const routePulse = routePulseRef.current;
 
     return () => {
       gsap.killTweensOf(animatedScaleState);
@@ -260,6 +436,9 @@ export default function BackgridTunnel({
       gsap.killTweensOf(verticalPerspectiveState);
       if (grid) {
         gsap.killTweensOf(grid);
+      }
+      if (routePulse) {
+        gsap.killTweensOf(routePulse);
       }
     };
   }, []);
@@ -270,43 +449,32 @@ export default function BackgridTunnel({
     if (!hasFinePointer || viewportSize.width <= 0) {
       gsap.killTweensOf(horizontalPerspectiveState);
       horizontalPerspectiveState.value = 0;
-      setHorizontalPerspectiveOffset(0);
+      applyGeometry();
       return;
     }
 
     const maxHorizontalShift =
       viewportSize.width * MAX_HORIZONTAL_PERSPECTIVE_SHIFT_FACTOR;
+    const setHorizontalPerspective = gsap.quickTo(
+      horizontalPerspectiveState,
+      'value',
+      {
+        duration: 0.35,
+        ease: 'power3.out',
+        onUpdate: applyGeometry,
+      },
+    );
 
-    const updatePerspective = (clientX: number) => {
-      const progressAcrossViewport = clamp(clientX / viewportSize.width, 0, 1);
+    const handleMouseMove = (event: MouseEvent) => {
+      const progressAcrossViewport = clamp(event.clientX / viewportSize.width, 0, 1);
       const normalizedOffset = (progressAcrossViewport - 0.5) * 2;
       const targetOffset = -normalizedOffset * maxHorizontalShift;
 
-      gsap.to(horizontalPerspectiveState, {
-        value: targetOffset,
-        duration: 0.35,
-        ease: 'power3.out',
-        overwrite: true,
-        onUpdate: () => {
-          setHorizontalPerspectiveOffset(horizontalPerspectiveState.value);
-        },
-      });
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      updatePerspective(event.clientX);
+      setHorizontalPerspective(targetOffset);
     };
 
     const handleMouseLeave = () => {
-      gsap.to(horizontalPerspectiveState, {
-        value: 0,
-        duration: 0.45,
-        ease: 'power3.out',
-        overwrite: true,
-        onUpdate: () => {
-          setHorizontalPerspectiveOffset(horizontalPerspectiveState.value);
-        },
-      });
+      setHorizontalPerspective(0);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -317,7 +485,7 @@ export default function BackgridTunnel({
       window.removeEventListener('mouseleave', handleMouseLeave);
       gsap.killTweensOf(horizontalPerspectiveState);
     };
-  }, [hasFinePointer, viewportSize.width]);
+  }, [applyGeometry, hasFinePointer, viewportSize.width]);
 
   useEffect(() => {
     const verticalPerspectiveState = verticalPerspectiveRef.current;
@@ -325,12 +493,21 @@ export default function BackgridTunnel({
     if (viewportSize.height <= 0) {
       gsap.killTweensOf(verticalPerspectiveState);
       verticalPerspectiveState.value = 0;
-      setVerticalPerspectiveOffset(0);
+      applyGeometry();
       return;
     }
 
     const maxVerticalShift =
       viewportSize.height * MAX_VERTICAL_PERSPECTIVE_SHIFT_FACTOR;
+    const setVerticalPerspective = gsap.quickTo(
+      verticalPerspectiveState,
+      'value',
+      {
+        duration: 0.1,
+        ease: 'power3.out',
+        onUpdate: applyGeometry,
+      },
+    );
 
     const updatePerspective = () => {
       const scrollRoot = document.documentElement;
@@ -338,22 +515,10 @@ export default function BackgridTunnel({
         1,
         scrollRoot.scrollHeight - window.innerHeight,
       );
-      const scrollProgress = clamp(
-        window.scrollY / totalScrollableHeight,
-        0,
-        1,
-      );
+      const scrollProgress = clamp(window.scrollY / totalScrollableHeight, 0, 1);
       const targetOffset = -scrollProgress * maxVerticalShift;
 
-      gsap.to(verticalPerspectiveState, {
-        value: targetOffset,
-        duration: 0.1,
-        ease: 'power3.out',
-        overwrite: true,
-        onUpdate: () => {
-          setVerticalPerspectiveOffset(verticalPerspectiveState.value);
-        },
-      });
+      setVerticalPerspective(targetOffset);
     };
 
     updatePerspective();
@@ -363,28 +528,27 @@ export default function BackgridTunnel({
       window.removeEventListener('scroll', updatePerspective);
       gsap.killTweensOf(verticalPerspectiveState);
     };
-  }, [viewportSize.height]);
+  }, [applyGeometry, viewportSize.height]);
 
   const runDepthAnimation = useCallback((onComplete?: () => void) => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
     const grid = gridRef.current;
 
     gsap.killTweensOf(animatedScaleState);
+    animatedScaleState.value = 1;
+    applyGeometry();
+
     if (grid) {
       gsap.killTweensOf(grid);
       gsap.set(grid, { opacity: 1 });
     }
-    animatedScaleState.value = 1;
-    setAnimatedBackPlaneScale(1);
 
     gsap.to(animatedScaleState, {
       value: resolvedBackPlaneScale,
       duration: DEPTH_ANIMATION_DURATION_SECONDS,
       ease: 'power3.out',
       onComplete,
-      onUpdate: () => {
-        setAnimatedBackPlaneScale(animatedScaleState.value);
-      },
+      onUpdate: applyGeometry,
     });
 
     if (grid) {
@@ -394,7 +558,7 @@ export default function BackgridTunnel({
         ease: 'power3.out',
       });
     }
-  }, [resolvedBackPlaneScale, resolvedEndOpacity]);
+  }, [applyGeometry, resolvedBackPlaneScale, resolvedEndOpacity]);
 
   const handleEnter = useCallback(() => {
     if (hasStartedEnterRef.current) {
@@ -436,136 +600,6 @@ export default function BackgridTunnel({
       document.removeEventListener('keydown', handleDocumentKeyDown);
     };
   }, [handleEnter, showEnterButton]);
-
-  const safeHorizontalLines = Math.max(0, Math.floor(resolvedHorizontalLines));
-  const safeVerticalLines = Math.max(0, Math.floor(resolvedVerticalLines));
-  const safeRingCount = Math.max(2, Math.floor(resolvedRingCount));
-  const safeBackPlaneScale = clamp(animatedBackPlaneScale, 0, 0.96);
-  const horizontalFractions = getInteriorFractions(safeHorizontalLines);
-  const verticalFractions = getInteriorFractions(safeVerticalLines);
-  const topBottomConnectorFractions = [0, ...verticalFractions, 1];
-  const rings =
-    viewportSize.width > 0 && viewportSize.height > 0
-      ? getRingRects(
-          viewportSize.width,
-          viewportSize.height,
-          safeRingCount,
-          safeBackPlaneScale,
-          horizontalPerspectiveOffset,
-          verticalPerspectiveOffset,
-        )
-      : [];
-  const routePulseEndWidth = viewportSize.width * ROUTE_PULSE_OVERSCAN_FACTOR;
-  const routePulseEndHeight = viewportSize.height * ROUTE_PULSE_OVERSCAN_FACTOR;
-  routePulseRectsRef.current = {
-    start: rings[rings.length - 1] ?? null,
-    end:
-      viewportSize.width > 0 && viewportSize.height > 0
-        ? {
-            index: -1,
-            left: (viewportSize.width - routePulseEndWidth) / 2,
-            top: (viewportSize.height - routePulseEndHeight) / 2,
-            width: routePulseEndWidth,
-            height: routePulseEndHeight,
-            right: (viewportSize.width + routePulseEndWidth) / 2,
-            bottom: (viewportSize.height + routePulseEndHeight) / 2,
-          }
-        : null,
-  };
-  const connectors: ReactNode[] = [];
-
-  ringRefs.current.length = rings.length;
-  verticalLineRefs.current.length = verticalFractions.length;
-  horizontalLineRefs.current.length = horizontalFractions.length;
-
-  for (let index = 0; index < rings.length - 1; index += 1) {
-    const outerRing = rings[index];
-    const innerRing = rings[index + 1];
-
-    if (!outerRing || !innerRing) {
-      continue;
-    }
-
-    for (const fraction of topBottomConnectorFractions) {
-      const outerX = outerRing.left + outerRing.width * fraction;
-      const innerX = innerRing.left + innerRing.width * fraction;
-      const topDx = innerX - outerX;
-      const topDy = innerRing.top - outerRing.top;
-      const topLength = Math.hypot(topDx, topDy);
-      const topAngle = (Math.atan2(topDy, topDx) * 180) / Math.PI;
-
-      connectors.push(
-        <div
-          key={`top-${index}-${fraction}`}
-          className={styles.connector}
-          style={{
-            left: outerX,
-            top: outerRing.top,
-            width: topLength,
-            transform: `rotate(${topAngle}deg)`,
-          }}
-        />,
-      );
-
-      const bottomDx = innerX - outerX;
-      const bottomDy = innerRing.bottom - outerRing.bottom;
-      const bottomLength = Math.hypot(bottomDx, bottomDy);
-      const bottomAngle = (Math.atan2(bottomDy, bottomDx) * 180) / Math.PI;
-
-      connectors.push(
-        <div
-          key={`bottom-${index}-${fraction}`}
-          className={styles.connector}
-          style={{
-            left: outerX,
-            top: outerRing.bottom,
-            width: bottomLength,
-            transform: `rotate(${bottomAngle}deg)`,
-          }}
-        />,
-      );
-    }
-
-    for (const fraction of horizontalFractions) {
-      const outerY = outerRing.top + outerRing.height * fraction;
-      const innerY = innerRing.top + innerRing.height * fraction;
-      const leftDx = innerRing.left - outerRing.left;
-      const leftDy = innerY - outerY;
-      const leftLength = Math.hypot(leftDx, leftDy);
-      const leftAngle = (Math.atan2(leftDy, leftDx) * 180) / Math.PI;
-
-      connectors.push(
-        <div
-          key={`left-${index}-${fraction}`}
-          className={styles.connector}
-          style={{
-            left: outerRing.left,
-            top: outerY,
-            width: leftLength,
-            transform: `rotate(${leftAngle}deg)`,
-          }}
-        />,
-      );
-
-      const rightDx = innerRing.right - outerRing.right;
-      const rightDy = innerY - outerY;
-      const rightLength = Math.hypot(rightDx, rightDy);
-      const rightAngle = (Math.atan2(rightDy, rightDx) * 180) / Math.PI;
-
-      connectors.push(
-        <div
-          key={`right-${index}-${fraction}`}
-          className={styles.connector}
-          style={{
-            left: outerRing.right,
-            top: outerY,
-            width: rightLength,
-            transform: `rotate(${rightAngle}deg)`,
-          }}
-        />,
-      );
-    }
-  }
 
   useEffect(() => {
     const routePulse = routePulseRef.current;
@@ -618,6 +652,41 @@ export default function BackgridTunnel({
     });
   }, [pathname, showEnterButton]);
 
+  const rings: ReactNode[] = Array.from({ length: safeRingCount }, (_, index) => {
+    const isBackPlane = index === safeRingCount - 1;
+    const isFrontRing = index === 0;
+
+    return (
+      <div
+        key={index}
+        ref={(node) => {
+          ringRefs.current[index] = node;
+        }}
+        className={styles.ring}
+        style={{ opacity: isFrontRing ? 0 : 1 }}
+      >
+        {!capAtBackPlane &&
+          isBackPlane &&
+          verticalFractions.map((fraction) => (
+            <div
+              key={`v-${index}-${fraction}`}
+              className={styles.ringVertical}
+              style={{ left: `${fraction * 100}%` }}
+            />
+          ))}
+        {!capAtBackPlane &&
+          isBackPlane &&
+          horizontalFractions.map((fraction) => (
+            <div
+              key={`h-${index}-${fraction}`}
+              className={styles.ringHorizontal}
+              style={{ top: `${fraction * 100}%` }}
+            />
+          ))}
+      </div>
+    );
+  });
+
   return (
     <>
       <div
@@ -628,56 +697,16 @@ export default function BackgridTunnel({
       >
         <div ref={gridRef} className={styles.grid}>
           <div ref={routePulseRef} className={styles.routePulse} />
-          {connectors}
-          {rings.map((ring) => {
-            const isBackPlane = ring.index === rings.length - 1;
-            const isFrontRing = ring.index === 0;
-
-            return (
-              <div
-                key={ring.index}
-                ref={(node) => {
-                  ringRefs.current[ring.index] = node;
-                }}
-                className={styles.ring}
-                style={{
-                  left: ring.left,
-                  opacity: isFrontRing ? 0 : 1,
-                  top: ring.top,
-                  width: ring.width,
-                  height: ring.height,
-                }}
-              >
-                {!capAtBackPlane &&
-                  isBackPlane &&
-                  verticalFractions.map((fraction) => (
-                    <div
-                      key={`v-${ring.index}-${fraction}`}
-                      ref={(node) => {
-                        verticalLineRefs.current[verticalFractions.indexOf(fraction)] =
-                          node;
-                      }}
-                      className={styles.ringVertical}
-                      style={{ left: `${fraction * 100}%` }}
-                    />
-                  ))}
-                {!capAtBackPlane &&
-                  isBackPlane &&
-                  horizontalFractions.map((fraction) => (
-                    <div
-                      key={`h-${ring.index}-${fraction}`}
-                      ref={(node) => {
-                        horizontalLineRefs.current[
-                          horizontalFractions.indexOf(fraction)
-                        ] = node;
-                      }}
-                      className={styles.ringHorizontal}
-                      style={{ top: `${fraction * 100}%` }}
-                    />
-                  ))}
-              </div>
-            );
-          })}
+          {connectorDescriptors.map((descriptor, index) => (
+            <div
+              key={descriptor.key}
+              ref={(node) => {
+                connectorRefs.current[index] = node;
+              }}
+              className={styles.connector}
+            />
+          ))}
+          {rings}
         </div>
       </div>
       {showEnterButton && hasFinePointer === false && (
