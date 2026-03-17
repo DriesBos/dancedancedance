@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { gsap } from '@/lib/gsap';
 import { useStore } from '@/store/store';
@@ -37,7 +38,9 @@ const DEFAULT_BACK_PLANE_SCALE = 0.6;
 const DEFAULT_END_OPACITY = 1;
 const DEPTH_ANIMATION_DURATION_SECONDS = 1;
 const MAX_HORIZONTAL_PERSPECTIVE_SHIFT_FACTOR = 0.01;
-const MAX_VERTICAL_PERSPECTIVE_SHIFT_FACTOR = 0.02;
+const MAX_VERTICAL_PERSPECTIVE_SHIFT_FACTOR = 0.03;
+const ROUTE_PULSE_DURATION_SECONDS = 0.5;
+const ROUTE_PULSE_OVERSCAN_FACTOR = 1.02;
 const PORTRAIT_DEFAULT_HORIZONTAL_LINES = 3;
 const PORTRAIT_DEFAULT_VERTICAL_LINES = 2;
 const PORTRAIT_DEFAULT_RING_COUNT = 3;
@@ -87,6 +90,7 @@ export default function BackgridTunnel({
   backPlaneScale,
   capAtBackPlane = false,
 }: BackgridTunnelProps) {
+  const pathname = usePathname();
   const initialThemeIntroPending = useStore(
     (state) => state.initialThemeIntroPending,
   );
@@ -95,6 +99,15 @@ export default function BackgridTunnel({
   const revealPageContent = useStore((state) => state.revealPageContent);
   const rootRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const routePulseRef = useRef<HTMLDivElement>(null);
+  const routePulseRectsRef = useRef<{
+    start: RingRect | null;
+    end: RingRect | null;
+  }>({
+    start: null,
+    end: null,
+  });
+  const hasSeenPathnameRef = useRef(false);
   const hasStartedEnterRef = useRef(!initialThemeIntroPending);
   const animatedBackPlaneScaleRef = useRef({ value: backPlaneScale });
   const horizontalPerspectiveRef = useRef({ value: 0 });
@@ -442,6 +455,23 @@ export default function BackgridTunnel({
           verticalPerspectiveOffset,
         )
       : [];
+  const routePulseEndWidth = viewportSize.width * ROUTE_PULSE_OVERSCAN_FACTOR;
+  const routePulseEndHeight = viewportSize.height * ROUTE_PULSE_OVERSCAN_FACTOR;
+  routePulseRectsRef.current = {
+    start: rings[rings.length - 1] ?? null,
+    end:
+      viewportSize.width > 0 && viewportSize.height > 0
+        ? {
+            index: -1,
+            left: (viewportSize.width - routePulseEndWidth) / 2,
+            top: (viewportSize.height - routePulseEndHeight) / 2,
+            width: routePulseEndWidth,
+            height: routePulseEndHeight,
+            right: (viewportSize.width + routePulseEndWidth) / 2,
+            bottom: (viewportSize.height + routePulseEndHeight) / 2,
+          }
+        : null,
+  };
   const connectors: ReactNode[] = [];
 
   ringRefs.current.length = rings.length;
@@ -537,6 +567,57 @@ export default function BackgridTunnel({
     }
   }
 
+  useEffect(() => {
+    const routePulse = routePulseRef.current;
+    if (!routePulse) {
+      return;
+    }
+
+    if (!hasSeenPathnameRef.current) {
+      hasSeenPathnameRef.current = true;
+      gsap.set(routePulse, {
+        autoAlpha: 0,
+        height: 0,
+        width: 0,
+      });
+      return;
+    }
+
+    if (showEnterButton) {
+      return;
+    }
+
+    const { start, end } = routePulseRectsRef.current;
+    if (!start || !end) {
+      return;
+    }
+
+    gsap.killTweensOf(routePulse);
+    gsap.set(routePulse, {
+      autoAlpha: 1,
+      height: start.height,
+      left: start.left,
+      top: start.top,
+      width: start.width,
+    });
+
+    gsap.to(routePulse, {
+      duration: ROUTE_PULSE_DURATION_SECONDS,
+      ease: 'sine.out',
+      height: end.height,
+      left: end.left,
+      top: end.top,
+      width: end.width,
+      onComplete: () => {
+        gsap.set(routePulse, {
+          autoAlpha: 0,
+          height: 0,
+          width: 0,
+        });
+      },
+    });
+  }, [pathname, showEnterButton]);
+
   return (
     <>
       <div
@@ -546,6 +627,7 @@ export default function BackgridTunnel({
         aria-hidden="true"
       >
         <div ref={gridRef} className={styles.grid}>
+          <div ref={routePulseRef} className={styles.routePulse} />
           {connectors}
           {rings.map((ring) => {
             const isBackPlane = ring.index === rings.length - 1;
