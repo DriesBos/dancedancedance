@@ -45,7 +45,7 @@ const PORTRAIT_DEFAULT_HORIZONTAL_LINES = 3;
 const PORTRAIT_DEFAULT_VERTICAL_LINES = 2;
 const PORTRAIT_DEFAULT_RING_COUNT = 3;
 const PORTRAIT_DEFAULT_BACK_PLANE_SCALE = 0.75;
-const PORTRAIT_DEFAULT_END_OPACITY = 0.33;
+const PORTRAIT_DEFAULT_END_OPACITY = 1;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
