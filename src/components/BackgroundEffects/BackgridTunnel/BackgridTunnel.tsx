@@ -11,7 +11,6 @@ import {
 } from 'react';
 import { gsap } from '@/lib/gsap';
 import { useStore } from '@/store/store';
-import IntroEnterButton from '../IntroEnterButton/IntroEnterButton';
 import { useIosImmersiveViewport } from '../shared/useIosImmersiveViewport';
 import styles from './BackgridTunnel.module.sass';
 
@@ -50,7 +49,8 @@ const DEFAULT_VERTICAL_LINES = 4;
 const DEFAULT_RING_COUNT = 4;
 const DEFAULT_BACK_PLANE_SCALE = 0.6;
 const DEFAULT_END_OPACITY = 0.6;
-const DEPTH_ANIMATION_DURATION_SECONDS = 1;
+const AUTO_ENTER_DELAY_MS = 1000;
+const DEPTH_ANIMATION_DURATION_SECONDS = 2;
 const MAX_HORIZONTAL_PERSPECTIVE_SHIFT_FACTOR = 0.01;
 const MAX_VERTICAL_PERSPECTIVE_SHIFT_FACTOR = 0.03;
 const ROUTE_PULSE_DURATION_SECONDS = 0.5;
@@ -612,33 +612,18 @@ export default function BackgridTunnel({
   }, [revealPageContent, runDepthAnimation]);
 
   useEffect(() => {
-    if (!showEnterButton) {
+    if (!initialThemeIntroPending) {
       return;
     }
 
-    const handleDocumentClick = () => {
+    const timeout = window.setTimeout(() => {
       handleEnter();
-    };
-
-    const handleDocumentKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === 'Tab' &&
-        !event.altKey &&
-        !event.ctrlKey &&
-        !event.metaKey
-      ) {
-        handleEnter();
-      }
-    };
-
-    document.addEventListener('click', handleDocumentClick);
-    document.addEventListener('keydown', handleDocumentKeyDown);
+    }, AUTO_ENTER_DELAY_MS);
 
     return () => {
-      document.removeEventListener('click', handleDocumentClick);
-      document.removeEventListener('keydown', handleDocumentKeyDown);
+      window.clearTimeout(timeout);
     };
-  }, [handleEnter, showEnterButton]);
+  }, [handleEnter, initialThemeIntroPending]);
 
   useEffect(() => {
     const routePulse = routePulseRef.current;
@@ -727,38 +712,26 @@ export default function BackgridTunnel({
   });
 
   return (
-    <>
-      <div
-        ref={rootRef}
-        className={styles.root}
-        data-version="backgrid"
-        data-theme-visible={isThemeVisible}
-        aria-hidden="true"
-      >
-        <div ref={gridRef} className={styles.grid}>
-          <div ref={routePulseRef} className={styles.routePulse} />
-          {connectorDescriptors.map((descriptor, index) => (
-            <div
-              key={descriptor.key}
-              ref={(node) => {
-                connectorRefs.current[index] = node;
-              }}
-              className={styles.connector}
-            />
-          ))}
-          {rings}
-        </div>
+    <div
+      ref={rootRef}
+      className={styles.root}
+      data-version="backgrid"
+      data-theme-visible={isThemeVisible}
+      aria-hidden="true"
+    >
+      <div ref={gridRef} className={styles.grid}>
+        <div ref={routePulseRef} className={styles.routePulse} />
+        {connectorDescriptors.map((descriptor, index) => (
+          <div
+            key={descriptor.key}
+            ref={(node) => {
+              connectorRefs.current[index] = node;
+            }}
+            className={styles.connector}
+          />
+        ))}
+        {rings}
       </div>
-      {showEnterButton && hasFinePointer === false && (
-        <IntroEnterButton onClick={handleEnter} />
-      )}
-      {showEnterButton && hasFinePointer === true && (
-        <div
-          className={`${styles.enterCursorLayer} cursorMessage`}
-          data-cursor-message="Enter"
-          aria-hidden="true"
-        />
-      )}
-    </>
+    </div>
   );
 }
