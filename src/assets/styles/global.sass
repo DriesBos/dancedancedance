@@ -279,6 +279,10 @@ mux-player, .muxPlayer
           width: 100%
           padding-left: var(--spacing-side) !important
           padding-right: var(--spacing-side) !important
+        & > .column-Image, & > .column-Thumbnail, & > .column-Video, & > .column-Slider
+          width: 100%
+          padding-left: var(--spacing-side-image) !important
+          padding-right: var(--spacing-side-image) !important
         & > div:first-child
           border-bottom: var(--border-width) solid var(--border-color)
     .column
@@ -400,7 +404,7 @@ mux-player, .muxPlayer
             display: none
       &-Image, &-Thumbnail, &-Video, &-Slider
         width: 100%
-        padding: var(--spacing-base) var(--spacing-side)
+        padding: var(--spacing-side-image)
         flex: 1
         img, video
           width: 100%
@@ -429,6 +433,10 @@ mux-player, .muxPlayer
               overflow-wrap: anywhere
               // min-width: 8rem
               // flex-shrink: 0
+        @media (max-width: 770px)
+          .column-Caption 
+            padding: var(--spacing-base)
+            padding-top: 0
       &-Slider
         &-Stack
           display: grid

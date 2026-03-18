@@ -27,6 +27,7 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
       className="column column-Image"
       {...storyblokEditable(blok)}
       data-caption-side={blok.side_caption}
+      data-caption={blok.caption ? true : false}
     >
       <Image
         src={imageSrc}

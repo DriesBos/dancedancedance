@@ -30,6 +30,7 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
       className="column column-Video"
       {...storyblokEditable(blok)}
       data-caption-side={blok.side_caption}
+      data-caption={blok.caption ? true : false}
     >
       {useMux ? (
         <MuxPlayer

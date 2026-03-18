@@ -2,7 +2,9 @@
   position: relative
   width: 100%
   height: 100%
-  padding: var(--spacing-base) var(--spacing-side)
+  padding: var(--spacing-base) var(--spacing-side-image)
+  @media (max-width: 770px)
+    padding-top: 0
 
 .slideStack
   position: relative
@@ -61,6 +63,11 @@
   transition: top var(--transition-theme)
   @media (orientation: portrait)
     aspect-ratio: 3 / 2
+  @media (max-width: 770px)
+    top: 0
+    left: 0
+    width: 100%
+    
 
 .tapTarget
   position: absolute
@@ -73,6 +80,8 @@
 .caption
   display: flex
   align-items: center
+  @media (max-width: 770px)
+    padding: 0 var(--spacing-side)
 
 .captionTitle
   flex-grow: 1

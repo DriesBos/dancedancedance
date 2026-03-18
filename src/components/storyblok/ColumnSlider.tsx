@@ -111,6 +111,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
       className="column column-Slider"
       {...storyblokEditable(blok)}
       data-caption-side={blok.caption_side}
+      data-caption={blok.caption ? true : false}
     >
       <div className="column-Slider-Stack">
         {activeImages.map((image, index) => {
