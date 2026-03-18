@@ -59,7 +59,7 @@ const PORTRAIT_DEFAULT_HORIZONTAL_LINES = 3;
 const PORTRAIT_DEFAULT_VERTICAL_LINES = 2;
 const PORTRAIT_DEFAULT_RING_COUNT = 3;
 const PORTRAIT_DEFAULT_BACK_PLANE_SCALE = 0.75;
-const PORTRAIT_DEFAULT_END_OPACITY = 0.33;
+const PORTRAIT_DEFAULT_END_OPACITY = 0.6;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -227,13 +227,20 @@ export default function BackgridTunnel({
       return;
     }
 
+    const horizontalPerspectiveOffset = showEnterButton
+      ? 0
+      : horizontalPerspectiveRef.current.value;
+    const verticalPerspectiveOffset = showEnterButton
+      ? 0
+      : verticalPerspectiveRef.current.value;
+
     const rings = getRingRects(
       width,
       height,
       safeRingCount,
-      clamp(animatedBackPlaneScaleRef.current.value, 0, 0.96),
-      horizontalPerspectiveRef.current.value,
-      verticalPerspectiveRef.current.value,
+      clamp(animatedBackPlaneScaleRef.current.value, 0, 1),
+      horizontalPerspectiveOffset,
+      verticalPerspectiveOffset,
     );
     const routePulseEndWidth = width * ROUTE_PULSE_OVERSCAN_FACTOR;
     const routePulseEndHeight = height * ROUTE_PULSE_OVERSCAN_FACTOR;
@@ -478,7 +485,7 @@ export default function BackgridTunnel({
   useEffect(() => {
     const horizontalPerspectiveState = horizontalPerspectiveRef.current;
 
-    if (!hasFinePointer || viewportSize.width <= 0) {
+    if (showEnterButton || !hasFinePointer || viewportSize.width <= 0) {
       gsap.killTweensOf(horizontalPerspectiveState);
       horizontalPerspectiveState.value = 0;
       applyGeometry();
@@ -517,12 +524,12 @@ export default function BackgridTunnel({
       window.removeEventListener('mouseleave', handleMouseLeave);
       gsap.killTweensOf(horizontalPerspectiveState);
     };
-  }, [applyGeometry, hasFinePointer, viewportSize.width]);
+  }, [applyGeometry, hasFinePointer, showEnterButton, viewportSize.width]);
 
   useEffect(() => {
     const verticalPerspectiveState = verticalPerspectiveRef.current;
 
-    if (viewportSize.height <= 0) {
+    if (showEnterButton || viewportSize.height <= 0) {
       gsap.killTweensOf(verticalPerspectiveState);
       verticalPerspectiveState.value = 0;
       applyGeometry();
@@ -560,7 +567,7 @@ export default function BackgridTunnel({
       window.removeEventListener('scroll', updatePerspective);
       gsap.killTweensOf(verticalPerspectiveState);
     };
-  }, [applyGeometry, viewportSize.height]);
+  }, [applyGeometry, showEnterButton, viewportSize.height]);
 
   const runDepthAnimation = useCallback((onComplete?: () => void) => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
