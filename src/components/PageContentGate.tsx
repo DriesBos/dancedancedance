@@ -23,11 +23,10 @@ export default function PageContentGate({
 
   useEffect(() => {
     const body = document.body;
-    const html = document.documentElement;
     const visibilityValue = pageContentVisible ? 'true' : 'false';
 
     body?.setAttribute('data-page-content-visible', visibilityValue);
-    html?.setAttribute('data-page-content-visible', visibilityValue);
+    const html = document.documentElement;
 
     if (!body || !html) {
       return;

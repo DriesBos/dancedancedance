@@ -82,10 +82,6 @@ const INITIAL_UI_STATE_SCRIPT = `
       document.body.setAttribute('data-page', routeSlug);
       document.body.setAttribute('data-page-content-visible', pageContentVisible ? 'true' : 'false');
     }
-    document.documentElement.setAttribute(
-      'data-page-content-visible',
-      pageContentVisible ? 'true' : 'false'
-    );
     if (!pageContentVisible) {
       document.documentElement.style.overflow = 'hidden';
       document.body && (document.body.style.overflow = 'hidden');
@@ -198,7 +194,7 @@ export default async function RootLayout({
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         id="page-top"
         className={`body ${myFont.className}`}

@@ -133,6 +133,7 @@ export default function BackgridTunnel({
     start: null,
     end: null,
   });
+  const revealFrameRef = useRef<number | null>(null);
   const hasSeenPathnameRef = useRef(false);
   const hasStartedEnterRef = useRef(!initialThemeIntroPending);
   const animatedBackPlaneScaleRef = useRef({ value: backPlaneScale ?? 1 });
@@ -146,9 +147,10 @@ export default function BackgridTunnel({
   });
   const [hasFinePointer, setHasFinePointer] = useState<boolean | null>(null);
   const [isThemeVisible, setIsThemeVisible] = useState(initialThemeIntroPending);
-  const [showEnterButton, setShowEnterButton] = useState(
+  const [isIntroInteractionLocked, setIsIntroInteractionLocked] = useState(
     initialThemeIntroPending,
   );
+  const isIntroInteractionLockedRef = useRef(isIntroInteractionLocked);
 
   const isPortraitViewport =
     viewportSize.width > 0 && viewportSize.height > 0
@@ -227,10 +229,10 @@ export default function BackgridTunnel({
       return;
     }
 
-    const horizontalPerspectiveOffset = showEnterButton
+    const horizontalPerspectiveOffset = isIntroInteractionLocked
       ? 0
       : horizontalPerspectiveRef.current.value;
-    const verticalPerspectiveOffset = showEnterButton
+    const verticalPerspectiveOffset = isIntroInteractionLocked
       ? 0
       : verticalPerspectiveRef.current.value;
 
@@ -325,6 +327,10 @@ export default function BackgridTunnel({
       connectorElement.style.transform = `rotate(${angle}deg)`;
     }
   });
+
+  useLayoutEffect(() => {
+    isIntroInteractionLockedRef.current = isIntroInteractionLocked;
+  }, [isIntroInteractionLocked]);
 
   useLayoutEffect(() => {
     applyGeometry();
@@ -423,12 +429,12 @@ export default function BackgridTunnel({
     if (initialThemeIntroPending) {
       hasStartedEnterRef.current = false;
       hidePageContent();
-      setShowEnterButton(true);
+      setIsIntroInteractionLocked(true);
       return;
     }
 
     hasStartedEnterRef.current = true;
-    setShowEnterButton(false);
+    setIsIntroInteractionLocked(false);
     showPageContent();
   }, [
     hidePageContent,
@@ -470,6 +476,10 @@ export default function BackgridTunnel({
     const routePulse = routePulseRef.current;
 
     return () => {
+      if (revealFrameRef.current !== null) {
+        window.cancelAnimationFrame(revealFrameRef.current);
+        revealFrameRef.current = null;
+      }
       gsap.killTweensOf(animatedScaleState);
       gsap.killTweensOf(horizontalPerspectiveState);
       gsap.killTweensOf(verticalPerspectiveState);
@@ -485,7 +495,7 @@ export default function BackgridTunnel({
   useEffect(() => {
     const horizontalPerspectiveState = horizontalPerspectiveRef.current;
 
-    if (showEnterButton || !hasFinePointer || viewportSize.width <= 0) {
+    if (isIntroInteractionLocked || !hasFinePointer || viewportSize.width <= 0) {
       gsap.killTweensOf(horizontalPerspectiveState);
       horizontalPerspectiveState.value = 0;
       applyGeometry();
@@ -524,12 +534,12 @@ export default function BackgridTunnel({
       window.removeEventListener('mouseleave', handleMouseLeave);
       gsap.killTweensOf(horizontalPerspectiveState);
     };
-  }, [applyGeometry, hasFinePointer, showEnterButton, viewportSize.width]);
+  }, [applyGeometry, hasFinePointer, isIntroInteractionLocked, viewportSize.width]);
 
   useEffect(() => {
     const verticalPerspectiveState = verticalPerspectiveRef.current;
 
-    if (showEnterButton || viewportSize.height <= 0) {
+    if (isIntroInteractionLocked || viewportSize.height <= 0) {
       gsap.killTweensOf(verticalPerspectiveState);
       verticalPerspectiveState.value = 0;
       applyGeometry();
@@ -567,7 +577,7 @@ export default function BackgridTunnel({
       window.removeEventListener('scroll', updatePerspective);
       gsap.killTweensOf(verticalPerspectiveState);
     };
-  }, [applyGeometry, showEnterButton, viewportSize.height]);
+  }, [applyGeometry, isIntroInteractionLocked, viewportSize.height]);
 
   const runDepthAnimation = useCallback((onComplete?: () => void) => {
     const animatedScaleState = animatedBackPlaneScaleRef.current;
@@ -605,9 +615,15 @@ export default function BackgridTunnel({
     }
 
     hasStartedEnterRef.current = true;
-    setShowEnterButton(false);
     runDepthAnimation(() => {
-      revealPageContent();
+      setIsIntroInteractionLocked(false);
+      if (revealFrameRef.current !== null) {
+        window.cancelAnimationFrame(revealFrameRef.current);
+      }
+      revealFrameRef.current = window.requestAnimationFrame(() => {
+        revealFrameRef.current = null;
+        revealPageContent();
+      });
     });
   }, [revealPageContent, runDepthAnimation]);
 
@@ -641,7 +657,7 @@ export default function BackgridTunnel({
       return;
     }
 
-    if (showEnterButton) {
+    if (isIntroInteractionLockedRef.current) {
       return;
     }
 
@@ -674,7 +690,7 @@ export default function BackgridTunnel({
         });
       },
     });
-  }, [pathname, showEnterButton]);
+  }, [pathname]);
 
   const rings: ReactNode[] = Array.from({ length: safeRingCount }, (_, index) => {
     const isBackPlane = index === safeRingCount - 1;

@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-03-18] The `TRON` backgrid intro now keeps mouse and scroll perspective locked until the depth animation completes, then reveals page content on the following animation frame, avoiding competing geometry updates and reducing end-of-intro hitching.
 - [2026-03-17] The `TRON` backgrid tunnel now keeps a stable DOM skeleton and applies mouse, scroll, depth, and route-pulse geometry through imperative GSAP/ref updates, so interactive perspective changes no longer force React re-renders or rebuild connector markup on every motion tick.
 - [2026-03-16] The one-time `.blok-AnimateHead` fade now runs from a layout-mounted client initializer instead of `PageTransition`, so App Router page remounts no longer restart header opacity animation on navigation.
 - [2026-03-16] `BlokHead` now renders as a static shell with separate behavior and route-content controllers, so pathname, scroll, and top-panel state changes no longer force the outer header chrome to re-render on navigation.
