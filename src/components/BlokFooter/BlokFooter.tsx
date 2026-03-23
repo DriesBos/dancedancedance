@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Row from '@/components/Row';
 import IconExternal from '@/components/Icons/IconExternal';
 import Newsletter from '@/components/Newsletter/Newsletter';
-import IconArrowHead from '@/components/Icons/IconArrowHead';
+import IconArrowLongUp from '@/components/Icons/IconArrowLongUp';
 import ScrollToTopLink from './ScrollToTopLink';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
@@ -62,8 +62,7 @@ const BlokFooter = () => {
           <ScrollToTopLink
             className={`icon icon-High icon-Footer cursorMagnetic ${styles.footerIcon}`}
           >
-            <div className="iconLine" />
-            <IconArrowHead />
+            <IconArrowLongUp />
           </ScrollToTopLink>
         </div>
         </div>
