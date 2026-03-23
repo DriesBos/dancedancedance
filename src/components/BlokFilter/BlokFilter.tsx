@@ -63,7 +63,7 @@ export default function BlokFilter({
             data-inactive={!isSortActive('category')}
             onClick={() => onSortChange('category')}
           >
-            category
+            type of work
           </button>
           <div className={`column column-Icons ${styles.iconWrapper}`}>
             <div className={`icon ${styles.icon}`}>

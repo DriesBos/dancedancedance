@@ -79,7 +79,7 @@ const BlokProject = ({
         </div>
         <div className="column column-Right">
           {category && (
-            <div className="column column-Category">{category.join(', ')}</div>
+            <div className="column column-Category">{category.map((c) => c.toLowerCase()).join(', ')}</div>
           )}
           <div className="column column-Icons">
             <a
