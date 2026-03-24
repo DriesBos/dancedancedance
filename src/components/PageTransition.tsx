@@ -11,6 +11,7 @@ interface PageTransitionProps {
 
 export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
+  const theme = useStore((state) => state.theme);
   const pageContentVisible = useStore((state) => state.pageContentVisible);
   const pageContentRevealKey = useStore((state) => state.pageContentRevealKey);
   const getBlockTargets = () =>
@@ -47,10 +48,10 @@ export default function PageTransition({ children }: PageTransitionProps) {
       });
     },
     {
-      dependencies: [pathname, pageContentRevealKey, pageContentVisible],
+      dependencies: [pathname, theme, pageContentRevealKey, pageContentVisible],
       revertOnUpdate: true,
     }
-  ); // Re-run animation on route change
+  ); // Re-run animation on route and theme change
 
   return <>{children}</>;
 }
