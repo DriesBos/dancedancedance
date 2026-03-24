@@ -46,6 +46,16 @@ body[data-initializing='true'] *::before,
 body[data-initializing='true'] *::after
   transition: none !important
 
+// Theme variables do not animate through inheritance on their own.
+// Keep a passive cascade on blok chrome, then temporarily force a broader
+// override during active theme swaps for elements with their own hover timings.
+body[data-theme-changing='true']
+  :where(.blok, .blok *, .imageItem, .imageItem *)
+    transition: var(--transition-theme-cascade) !important
+  :where(.blok, .blok *, .imageItem, .imageItem *)::before,
+  :where(.blok, .blok *, .imageItem, .imageItem *)::after
+    transition: var(--transition-theme-cascade) !important
+
 main
   position: relative
   display: flex
@@ -261,7 +271,13 @@ mux-player, .muxPlayer
   background: var(--theme-blok)
   perspective: 1000px
   perspective-origin: var(--panel-perspective-origin)
+  opacity: 0
   transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), border-radius var(--transition-theme), background var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
+  :where(.column, .column *, .mobile, .desktop, .side, .side *)
+    transition: var(--transition-theme-cascade)
+  :where(.column, .column *, .mobile, .desktop, .side, .side *)::before,
+  :where(.column, .column *, .mobile, .desktop, .side, .side *)::after
+    transition: var(--transition-theme-cascade)
   &.inactive
     display: none
   .row
@@ -571,13 +587,12 @@ mux-player, .muxPlayer
           transform: translateX(2px)
   &-Animate
     opacity: 0
+  // &-ProjectSlider
+  //   display: none
   &-ProjectList
     position: relative
-    padding-top: var(--blok-padding-extraTop)
-    overflow: hidden
-    // @media (max-width: 770px)
-      // padding-top: 0
-      // border-top: 0
+    overflow: visible
+    border-top: 0
     & > .blok
       border: 0
     @media (hover: hover)
@@ -585,8 +600,7 @@ mux-player, .muxPlayer
         transform: translateY(-1.8rem) !important
   &-Filter
     justify-content: flex-end
-    // @media (max-width: 770px)
-    //   display: none
+    padding-top: var(--blok-padding-extraTop)
     .column-Left, .column-Right
       width: 50%
       padding: 0 !important
@@ -604,7 +618,7 @@ mux-player, .muxPlayer
     padding-bottom: calc(3.95rem * 0.5)
     margin-bottom: calc(-3.95rem * 0.5)
     transform: translateY(0)
-    transition: transform 0.5s
+    transition: transform 0.7s cubic-bezier(0.77, 0, 0.28, 1)
     border-top: var(--border-width) solid var(--border-color) !important
     background: var(--theme-blok)
     .column-Left, .column-Right
@@ -639,6 +653,9 @@ mux-player, .muxPlayer
       .column-Right
         width: auto
         flex: 0 0 auto
+    @media (hover: hover)
+      &:hover
+        transition: transform 0.22s cubic-bezier(0.77, 0, 0.28, 1)
   &-Portrait
     background: var(--theme-blok)
     .grainyGradient
@@ -728,6 +745,7 @@ body
     padding-bottom: 0
     .page-Project, .page-General
       & > div:nth-child(1)
+        border-top-width: 0 !important
         padding-top: var(--blok-padding-extraTop)
     main
       max-width: 100%

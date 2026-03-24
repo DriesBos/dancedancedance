@@ -59,7 +59,7 @@ const BlokProject = ({
 
   return (
     <div
-      className={`blok blok-Project blok-Animate cursorInteract ${
+      className={`blok blok-Project cursorInteract ${
         cursorPreviewImage ? 'cursorPreview' : ''
       }`}
       onClick={handleClick}

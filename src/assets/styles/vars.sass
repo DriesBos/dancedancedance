@@ -78,8 +78,11 @@
   --transition-button: .33s ease
   --transition-layout: 0.66s ease-in-out
   --transition-layout-quick: 0.33s ease
-  --transition-theme: 0.66s ease-in-out
+  --transition-theme: 0.33s ease
   --transition-theme-quick: 0.33s ease
+  --transition-theme-color: color var(--transition-theme), fill var(--transition-theme), stroke var(--transition-theme), text-decoration-color var(--transition-theme), caret-color var(--transition-theme)
+  --transition-theme-surface: background var(--transition-theme), background-color var(--transition-theme), border-color var(--transition-theme), outline-color var(--transition-theme), box-shadow var(--transition-theme)
+  --transition-theme-cascade: var(--transition-theme-color), var(--transition-theme-surface)
   --transition-cursor: 0.25s ease-in-out
   @media (prefers-reduced-motion: reduce) and (orientation: landscape)
     --transition-layout: 0s
@@ -94,6 +97,7 @@ body[data-fullscreen='false']
   --panel-perspective-origin: 50% -70rem
   @media (orientation: portrait)
     --spacing-containerTopDistance: calc(124px + var(--blok-height) + 16vh)
+    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 10vh)
   @media (max-width: 770px)
     --panel-perspective-origin: 50% -38rem
     --blok-padding-extraTop: 1rem

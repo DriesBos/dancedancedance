@@ -9,11 +9,7 @@ interface BlokProjectListProps {
 
 export default async function BlokProjectList({ blok }: BlokProjectListProps) {
   const projects = await fetchProjectData();
+  const editableProps = storyblokEditable(blok);
 
-  return (
-    <div className="blok blok-ProjectList" {...storyblokEditable(blok)}>
-      <BlokProjectListClient projects={projects} />
-      {/* <BlokAction /> */}
-    </div>
-  );
+  return <BlokProjectListClient projects={projects} editableProps={editableProps} />;
 }

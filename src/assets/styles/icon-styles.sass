@@ -6,6 +6,12 @@
   width: var(--icon-size)
   height: var(--icon-size)
   box-sizing: content-box
+  transition: var(--transition-theme-color)
+
+.icon *,
+.icon *::before,
+.icon *::after
+  transition: var(--transition-theme-color)
 
 .icon > div, .icon > a
   width: var(--icon-size)
@@ -52,7 +58,6 @@
 .icon.disabled
   pointer-events: none
   color: var(--theme-type-inactive)
-  transition: color var(--transition-theme)
   will-change: color
 
 .hasExternalIcon
@@ -65,7 +70,7 @@
   width: calc(var(--icon-size) / 2)
   height: calc(var(--icon-size) / 2)
   transform: translate(75%, 50%)
-  transition: transform .165s ease-out
+  transition: transform .165s ease-out, var(--transition-theme-color)
 
 @media (hover: hover)
   .hasExternalIcon:hover > svg

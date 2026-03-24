@@ -1,5 +1,6 @@
 'use client';
 
+import type { HTMLAttributes } from 'react';
 import { useMemo, useState } from 'react';
 import BlokProject from '../BlokProject';
 import GrainyGradient from '../GrainyGradient';
@@ -13,6 +14,7 @@ import Row from '../Row';
 
 interface BlokProjectListClientProps {
   projects: ProjectData[];
+  editableProps?: HTMLAttributes<HTMLDivElement>;
 }
 
 const getTimeValue = (value?: string) => {
@@ -29,6 +31,7 @@ const getSearchableText = (project: ProjectData) =>
 
 export default function BlokProjectListClient({
   projects,
+  editableProps,
 }: BlokProjectListClientProps) {
   const [sortField, setSortField] = useState<ProjectSortField>('year');
   const [sortDirection, setSortDirection] =
@@ -80,8 +83,6 @@ export default function BlokProjectListClient({
 
   return (
     <>
-      <GrainyGradient variant="blok" />
-      <BlokSidePanels />
       <BlokFilter
         sortField={sortField}
         sortDirection={sortDirection}
@@ -89,32 +90,36 @@ export default function BlokProjectListClient({
         searchValue={searchValue}
         onSearchChange={setSearchValue}
       />
-      {hasNoSearchResults ? (
-        <div className="blok blok-Project">
-          <BlokSidePanels />
-          <GrainyGradient variant="blok" />
-          <Row>
-            <GrainyGradient variant="blok" className="grainyInRow" />
-            <div className="column column-Year"></div>
-            <div className="column column-Project">No work found..</div>
-            <div className="column column-Category"></div>
-            <div className="column column-Icons"></div>
-          </Row>
-        </div>
-      ) : (
-        visibleProjects.map((item, index) => (
-          <BlokProject
-            key={item.slug}
-            slug={item.slug}
-            year={item.year}
-            title={item.title}
-            category={item.category}
-            external_link={item.external_link}
-            thumbnail={item.thumbnail}
-            stackIndex={index}
-          />
-        ))
-      )}
+      <div className="blok blok-Animate blok-ProjectList" {...editableProps}>
+        <GrainyGradient variant="blok" />
+        <BlokSidePanels />
+        {hasNoSearchResults ? (
+          <div className="blok blok-Project">
+            <BlokSidePanels />
+            <GrainyGradient variant="blok" />
+            <Row>
+              <GrainyGradient variant="blok" className="grainyInRow" />
+              <div className="column column-Year"></div>
+              <div className="column column-Project">No work found..</div>
+              <div className="column column-Category"></div>
+              <div className="column column-Icons"></div>
+            </Row>
+          </div>
+        ) : (
+          visibleProjects.map((item, index) => (
+            <BlokProject
+              key={item.slug}
+              slug={item.slug}
+              year={item.year}
+              title={item.title}
+              category={item.category}
+              external_link={item.external_link}
+              thumbnail={item.thumbnail}
+              stackIndex={index}
+            />
+          ))
+        )}
+      </div>
     </>
   );
 }

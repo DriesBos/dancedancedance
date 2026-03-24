@@ -10,9 +10,6 @@ interface PageTransitionProps {
 }
 
 export default function PageTransition({ children }: PageTransitionProps) {
-  const BLOCK_DURATION = 0.33;
-  const BLOCK_STAGGER = 0.165;
-  const PROJECT_SPEED_MULTIPLIER = 2;
   const pathname = usePathname();
   const pageContentVisible = useStore((state) => state.pageContentVisible);
   const pageContentRevealKey = useStore((state) => state.pageContentRevealKey);
@@ -37,28 +34,16 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
       gsap.set(blockTargets, {
         opacity: 0,
-        y: 20,
+        y: '5vh',
       });
 
-      // Keep DOM-order sequence, but animate .blok-Project entries at 2x speed.
-      const timeline = gsap.timeline({
-        defaults: {
-          opacity: 1,
-          y: 0,
-          ease: 'power1.inOut',
-          overwrite: 'auto',
-        },
-      });
-
-      let offset = 0;
-      blockTargets.forEach((target) => {
-        const isProject = target.classList.contains('blok-Project');
-        const speed = isProject ? PROJECT_SPEED_MULTIPLIER : 1;
-        const duration = BLOCK_DURATION / speed;
-        const gap = BLOCK_STAGGER / speed;
-
-        timeline.to(target, { duration }, offset);
-        offset += gap;
+      gsap.to(blockTargets, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: 'expo.out',
+        overwrite: 'auto',
+        stagger: 0.15,
       });
     },
     {
