@@ -57,11 +57,13 @@ const KUSAMA_PARALLAX_TUNING = {
   baseScale: 1,
 };
 const KUSAMA_SCENE_DENSITY = 1.1;
+const KUSAMA_INTRO_DURATION_MS = 3500;
 
 type KusamaSketchOptions = {
   host: HTMLDivElement;
   canvasClassName?: string;
   params?: Partial<KusamaParams>;
+  introDurationMs?: number;
 };
 
 type KusamaSeed = {
@@ -72,6 +74,11 @@ type KusamaSeed = {
   freqX: number;
   freqY: number;
   ampScale: number;
+  waveBias: number;
+  bloomOriginX: number;
+  bloomOriginY: number;
+  introScatter: number;
+  bloomDelay: number;
 };
 
 type KusamaSeedGrid = {
@@ -107,6 +114,21 @@ type Edge = {
   by: number;
 };
 
+type KusamaAnimatedMesh = {
+  points: [number, number][];
+  reveals: number[];
+};
+
+type KusamaIntroFrame = {
+  progress: number;
+  driftMix: number;
+  pointerMix: number;
+  lineWidthScale: number;
+  opacity: number;
+  edgeCurvatureScale: number;
+  edgeRevealThreshold: number;
+};
+
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -125,6 +147,42 @@ function fract(value: number): number {
 
 function lerp(start: number, end: number, t: number): number {
   return start + (end - start) * t;
+}
+
+function inverseLerp(start: number, end: number, value: number): number {
+  if (start === end) {
+    return value >= end ? 1 : 0;
+  }
+
+  return clamp01((value - start) / (end - start));
+}
+
+function easeOutCubic(value: number): number {
+  const t = clamp01(value);
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function easeInOutCubic(value: number): number {
+  const t = clamp01(value);
+  return t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function easeOutExpo(value: number): number {
+  const t = clamp01(value);
+  if (t >= 1) {
+    return 1;
+  }
+
+  return 1 - Math.pow(2, -10 * t);
+}
+
+function easeOutBack(value: number): number {
+  const t = clamp01(value);
+  const c1 = 1.70158;
+  const c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
 }
 
 function hash2D(x: number, y: number): number {
@@ -185,6 +243,12 @@ function createSeeds(
   const microOffsetY2 = Math.random() * 1000;
   const twistStrength = spacing * 0.34;
   const microTwistStrength = spacing * 0.16;
+  const introScale = 1 / Math.max(180, spacing * 5.2);
+  const introOffsetX = Math.random() * 1000;
+  const introOffsetY = Math.random() * 1000;
+  const introOffsetX2 = Math.random() * 1000;
+  const introOffsetY2 = Math.random() * 1000;
+  const coarseSpacing = spacing * 3.2;
 
   for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
     const row = rowIndex - 1;
@@ -245,15 +309,41 @@ function createSeeds(
 
       const jitterAngle = Math.random() * Math.PI * 2;
       const jitterScale = Math.random() * jitterDistance;
+      const anchorX = x + Math.cos(jitterAngle) * jitterScale;
+      const anchorY = y + Math.sin(jitterAngle) * jitterScale;
+      const introNoise = smoothNoise2D(
+        (anchorX + introOffsetX) * introScale,
+        (anchorY + introOffsetY) * introScale,
+      );
+      const waveBias = smoothNoise2D(
+        (anchorX + introOffsetX2) * introScale * 1.7,
+        (anchorY + introOffsetY2) * introScale * 1.7,
+      );
+      const coarseX =
+        Math.floor(anchorX / coarseSpacing) * coarseSpacing +
+        coarseSpacing * 0.5;
+      const coarseY =
+        Math.floor(anchorY / coarseSpacing) * coarseSpacing +
+        coarseSpacing * 0.5;
+      const bloomOriginMix = 0.42 + introNoise * 0.26;
+      const bloomOriginX = lerp(coarseX, width * 0.5, bloomOriginMix);
+      const bloomOriginY = lerp(coarseY, height * 0.5, bloomOriginMix);
+      const introScatter = spacing * (0.35 + waveBias * 0.8);
+      const bloomDelay = clamp01(introNoise * 0.76 + waveBias * 0.16);
 
       seeds.push({
-        anchorX: x + Math.cos(jitterAngle) * jitterScale,
-        anchorY: y + Math.sin(jitterAngle) * jitterScale,
+        anchorX,
+        anchorY,
         phaseX: Math.random() * Math.PI * 2,
         phaseY: Math.random() * Math.PI * 2,
         freqX: 0.8 + Math.random() * 0.6,
         freqY: 0.8 + Math.random() * 0.6,
         ampScale: 0.7 + Math.random() * 0.6,
+        waveBias,
+        bloomOriginX,
+        bloomOriginY,
+        introScatter,
+        bloomDelay,
       });
     }
   }
@@ -298,14 +388,17 @@ function buildAnimatedPoints(
   seeds: KusamaSeed[],
   params: KusamaParams,
   pointer: PointerState,
+  introFrame: KusamaIntroFrame | null,
   timeMs: number,
   width: number,
   height: number,
-): [number, number][] {
+): KusamaAnimatedMesh {
   const points: [number, number][] = [];
+  const reveals: number[] = [];
   const radius = Math.max(24, params.rippleRadius);
   const radiusSq = radius * radius;
-  const driftAmount = Math.max(0, params.driftAmount);
+  const driftAmount =
+    Math.max(0, params.driftAmount) * (introFrame?.driftMix ?? 1);
   const driftTime = timeMs * Math.max(0, params.driftSpeed);
 
   for (const seed of seeds) {
@@ -339,18 +432,48 @@ function buildAnimatedPoints(
       }
     }
 
+    let reveal = 1;
+    if (introFrame && introFrame.progress < 1) {
+      const localStart = seed.bloomDelay * 0.58;
+      const localDuration = 0.26 + seed.waveBias * 0.18;
+      const localProgress = inverseLerp(
+        localStart,
+        localStart + localDuration,
+        introFrame.progress,
+      );
+      const eased = easeOutBack(localProgress);
+      const settle = 1 - easeOutCubic(localProgress);
+      const wobble = seed.introScatter * 0.18 * settle;
+      const originX =
+        seed.bloomOriginX +
+        Math.cos(seed.phaseX * 1.2 + introFrame.progress * 11) * wobble;
+      const originY =
+        seed.bloomOriginY +
+        Math.sin(seed.phaseY * 1.2 + introFrame.progress * 9) * wobble;
+
+      x = lerp(originX, x, eased);
+      y = lerp(originY, y, eased);
+      reveal = easeInOutCubic(localProgress);
+    }
+
     points.push([clamp(x, -18, width + 18), clamp(y, -18, height + 18)]);
+    reveals.push(clamp01(reveal));
   }
 
-  return points;
+  return {
+    points,
+    reveals,
+  };
 }
 
 function getQuadMeshEdges(
   points: [number, number][],
+  reveals: number[],
   columnCount: number,
   rowCount: number,
   width: number,
   height: number,
+  minimumReveal = 0,
 ): Edge[] {
   if (columnCount < 2 || rowCount < 2 || points.length < columnCount * rowCount) {
     return [];
@@ -375,6 +498,8 @@ function getQuadMeshEdges(
       if (column < columnCount - 1) {
         const [bx, by] = points[index + 1];
         if (
+          reveals[index] >= minimumReveal &&
+          reveals[index + 1] >= minimumReveal &&
           isVisible(ax, ay, bx, by) &&
           Math.hypot(bx - ax, by - ay) >= 1
         ) {
@@ -385,6 +510,8 @@ function getQuadMeshEdges(
       if (row < rowCount - 1) {
         const [bx, by] = points[index + columnCount];
         if (
+          reveals[index] >= minimumReveal &&
+          reveals[index + columnCount] >= minimumReveal &&
           isVisible(ax, ay, bx, by) &&
           Math.hypot(bx - ax, by - ay) >= 1
         ) {
@@ -446,11 +573,33 @@ function renderOrganicEdges(
   context.restore();
 }
 
+function resolveKusamaIntroFrame(progress: number): KusamaIntroFrame | null {
+  const clampedProgress = clamp01(progress);
+  if (clampedProgress >= 1) {
+    return null;
+  }
+
+  const easedProgress = easeOutCubic(clampedProgress);
+  return {
+    progress: clampedProgress,
+    driftMix: 0.18 + easedProgress * 0.82,
+    pointerMix: inverseLerp(0.68, 1, clampedProgress),
+    lineWidthScale: lerp(1.38, 1, easedProgress),
+    opacity: easeInOutCubic(inverseLerp(0.04, 0.42, clampedProgress)),
+    edgeCurvatureScale: 0.24 + easedProgress * 0.76,
+    edgeRevealThreshold: 0.16,
+  };
+}
+
 export function createKusamaSketch(options: KusamaSketchOptions) {
   const settings: KusamaParams = {
     ...KUSAMA_DEFAULT_PARAMS,
     ...options.params,
   };
+  const introDurationMs = Math.max(
+    1,
+    options.introDurationMs ?? KUSAMA_INTRO_DURATION_MS,
+  );
 
   return (instance: p5) => {
     let seeds: KusamaSeed[] = [];
@@ -475,6 +624,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
     let parallaxEnabled = false;
     let reducedMotionEnabled = false;
     let activeFrameRate = 0;
+    let introStartMs = 0;
 
     const isNarrowViewport = () => window.innerWidth < KUSAMA_MOBILE_BREAKPOINT_PX;
     const getOrientation = (width: number, height: number) =>
@@ -596,6 +746,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       instance.pixelDensity(1);
       updateAdaptiveFrameRate(instance.windowWidth, instance.windowHeight);
       setupSeeds(KUSAMA_SCENE_DENSITY);
+      introStartMs = performance.now();
       lastViewportWidth = instance.windowWidth;
       lastViewportHeight = instance.windowHeight;
       lastOrientation = getOrientation(lastViewportWidth, lastViewportHeight);
@@ -691,6 +842,9 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       instance.background(styles.backgroundColor);
 
       const nowMs = performance.now();
+      const introFrame = resolveKusamaIntroFrame(
+        (nowMs - introStartMs) / introDurationMs,
+      );
       const pointerX = parallaxEnabled
         ? sampleParallaxTween(parallax.tweenX, nowMs)
         : 0;
@@ -707,27 +861,41 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
       const meshScale = KUSAMA_PARALLAX_TUNING.baseScale;
       const ripplePointer: PointerState = {
         ...pointer,
+        intensity: pointer.intensity * (introFrame?.pointerMix ?? 1),
         // Keep pointer-centered ripple aligned after parallax translation.
         x: pointer.x - meshTranslateX,
         y: pointer.y - meshTranslateY,
       };
 
-      const points = buildAnimatedPoints(
+      const animatedMesh = buildAnimatedPoints(
         seeds,
         settings,
         ripplePointer,
+        introFrame,
         nowMs,
         instance.width,
         instance.height,
       );
+      const renderStyles: ResolvedStyles = {
+        ...styles,
+        lineWidth: styles.lineWidth * (introFrame?.lineWidthScale ?? 1),
+        opacity: styles.opacity * (introFrame?.opacity ?? 1),
+      };
+      const renderParams: KusamaParams = {
+        ...settings,
+        edgeCurvature:
+          settings.edgeCurvature * (introFrame?.edgeCurvatureScale ?? 1),
+      };
 
-      if (points.length >= 3) {
+      if (animatedMesh.points.length >= 3) {
         const edges = getQuadMeshEdges(
-          points,
+          animatedMesh.points,
+          animatedMesh.reveals,
           seedColumnCount,
           seedRowCount,
           instance.width,
           instance.height,
+          introFrame?.edgeRevealThreshold ?? 0,
         );
         const context = instance.drawingContext as CanvasRenderingContext2D;
         context.save();
@@ -738,7 +906,7 @@ export function createKusamaSketch(options: KusamaSketchOptions) {
         context.rotate(meshRotate);
         context.scale(meshScale, meshScale);
         context.translate(-instance.width * 0.5, -instance.height * 0.5);
-        renderOrganicEdges(context, edges, styles, settings);
+        renderOrganicEdges(context, edges, renderStyles, renderParams);
         context.restore();
       }
 
