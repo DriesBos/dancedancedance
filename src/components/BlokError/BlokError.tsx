@@ -13,7 +13,6 @@ const BlokError = () => {
         <Row>
           <div className="column column-Error">
             <span>404 — page not found</span>
-            <br />
             <Link href="/" className="cursorInteract linkHyperAnimation">
               take me home
             </Link>
