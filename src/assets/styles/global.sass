@@ -317,6 +317,13 @@ mux-player, .muxPlayer
         flex: 1 1 0
         width: 0
         user-select: none
+      &-Error
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+        height: 33vh
+        width: 100%
       &-AnimateSlideLeft
         min-width: 0
         overflow: hidden
@@ -550,7 +557,6 @@ mux-player, .muxPlayer
             @media (max-width: 450px)
               top: 0.5rem
               left: 4.3rem
-
         .icon
           padding: var(--spacing-base) var(--spacing-icons)
           &:first-child
@@ -728,15 +734,13 @@ body
       &:nth-child(2)
         z-index: -1
   .page
-    &-Project, &-General
+    &-Project, &-General, &-Error
       & > .blok
         .side_Top
           opacity: 0
         &:first-child
           .side_Top
             opacity: 1
-      // & > :first-child + .blok .side_Top
-      //   opacity: 1
   &[data-fullscreen="true"]
     padding-left: 0
     padding-right: 0

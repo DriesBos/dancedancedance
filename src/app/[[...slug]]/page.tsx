@@ -85,7 +85,12 @@ export async function generateMetadata({
 
     if (!pageData || !pageData.story) {
       return {
-        title: 'Dries Bos',
+        title: '404 — Page Not Found | Dries Bos',
+        description: 'The page you requested could not be found.',
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
