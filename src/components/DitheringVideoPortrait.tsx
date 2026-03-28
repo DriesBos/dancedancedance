@@ -137,7 +137,7 @@ const DitheringVideoPortrait = ({
   const themeColorsRef = useRef<ThemeColorMap | undefined>(themeColors);
   const resolvedThemeConfigRef = useRef<ResolvedThemeConfig>({
     foregroundColor: '#ffffff',
-    backgroundColor: '#000000',
+    backgroundColor: '#b49f82',
     threshold: 138,
   });
   const [currentMode, setCurrentMode] = useState<'cross' | 'pixel'>(mode);

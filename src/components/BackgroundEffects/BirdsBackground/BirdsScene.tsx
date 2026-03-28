@@ -34,10 +34,10 @@ type AppearanceState = {
 };
 
 const SKY_PALETTE: SkyPalette = {
-  top: '#375189',
-  horizon: '#6D79AF',
-  bottom: '#BFC4DE',
-  fog: '#6C79A8',
+  top: '#c8b59a',
+  horizon: '#b49f82',
+  bottom: '#a58d6d',
+  fog: '#b29a7c',
 };
 
 const resolveSkyPalette = (fallbackColor: string): SkyPalette => ({

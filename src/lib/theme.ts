@@ -13,7 +13,7 @@ export type ThemeOrientation = 'landscape' | 'portrait';
 export const NIGHT_THEME_HOUR_END = 5;
 
 export const NIGHT_THEME: Theme = 'NIGHT';
-export const DEVELOPMENT_DEFAULT_THEME: Theme = 'LIGHT';
+export const DEVELOPMENT_DEFAULT_THEME: Theme = 'SKY';
 export const THEMES_WITH_INITIAL_INTRO: Theme[] = ['RADIANT', 'TRON'];
 
 export const LANDSCAPE_THEME_ORDER: Theme[] = [

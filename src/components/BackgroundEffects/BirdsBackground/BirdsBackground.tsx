@@ -16,8 +16,8 @@ export default function BirdsBackground({
 }: BirdsBackgroundProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [sceneColors, setSceneColors] = useState({
-    background: '#FFFFFF',
-    bird: '#000000',
+    background: '#b49f82',
+    bird: '#fffdf8',
   });
 
   useIosImmersiveViewport();

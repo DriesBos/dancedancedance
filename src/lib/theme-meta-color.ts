@@ -4,7 +4,7 @@ export const THEME_META_COLORS: Record<Theme, string> = {
   NIGHT: '#000000',
   TRON: '#000000',
   RADIANT: '#DAD9E0',
-  SKY: 'transparent',
+  SKY: '#b49f82',
   KERMIT: '#FFFFFF',
   LIGHT: '#E8E7E3',
   SEGMENTS: '#1A1A1A',
