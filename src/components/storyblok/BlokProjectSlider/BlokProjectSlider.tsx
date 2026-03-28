@@ -11,6 +11,7 @@ import SliderIndicators from '@/components/SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import { vibrate } from '@/lib/vibration';
+import { useStore } from '@/store/store';
 import {
   storyblokImageLoader,
   storyblokVideoPosterUrl,
@@ -205,6 +206,7 @@ const SlideItem = ({ item, isActive, isNext, index }: SlideItemProps) => {
 
 const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
   const router = useRouter();
+  const theme = useStore((state) => state.theme);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [hasCursor, setHasCursor] = useState(false);
@@ -300,6 +302,7 @@ const BlokProjectSlider = ({ blok }: BlokProjectSliderProps) => {
     e.stopPropagation();
   };
 
+  if (theme === 'NIGHT') return null;
   if (!blok.body || blok.body.length === 0 || !currentItem) return null;
 
   return (

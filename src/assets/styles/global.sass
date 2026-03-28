@@ -867,8 +867,10 @@ body
         .blok-Action
           background: transparent !important
   &[data-theme='NIGHT']
-    .imageItem
-      filter: brightness(.78) contrast(1.04) saturate(.9)
+    @media (hover: hover)
+      :where(.blok-Project, .blok-ProjectSlider, .column-Image, a, button, .imageWrapper, .cursorPreview):hover .imageItem,
+      .imageItem:hover
+        filter: brightness(.78) contrast(1.04) saturate(.9)
 
 .clickable
   cursor: pointer
@@ -876,7 +878,7 @@ body
 
 .imageItem
   border-radius: calc(var(--border-radius) / 2)
-  filter: none
+  filter: var(--theme-media-filter)
   transition: border-radius var(--transition-theme), opacity var(--transition-theme), filter var(--transition-theme)
 
 @keyframes hyperLink
