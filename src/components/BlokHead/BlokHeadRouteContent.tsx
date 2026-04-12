@@ -13,6 +13,8 @@ import IconFullscreen from '@/components/Icons/IconFullscreen';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import IconMail from '@/components/Icons/IconMail';
 import { vibrate } from '@/lib/vibration';
+import { useStore } from '@/store/store';
+import { t } from '@/lib/locale';
 import styles from './BlokHead.module.sass';
 
 interface Props {
@@ -43,6 +45,7 @@ const BlokHeadRouteContent = ({
   onCycleTheme,
   onToggleFullscreen,
 }: Props) => {
+  const locale = useStore((state) => state.locale);
   const path = usePathname();
   const currentPath = path || '/';
   const router = useRouter();
@@ -105,8 +108,8 @@ const BlokHeadRouteContent = ({
     if (pathName === 'projects') {
       return projectName ? `Dries Bos & ${projectName}` : 'Dries Bos';
     }
-    return 'Dries Bos — Creative Developer';
-  }, [pathName, projectName]);
+    return `Dries Bos — ${t('head.subtitle', locale)}`;
+  }, [pathName, projectName, locale]);
 
   const titleTokenFormat = pathName === 'projects' ? 'ampersand' : 'emdash';
   const shouldSwapTitleText = isTitleOverflowing
@@ -379,7 +382,7 @@ const BlokHeadRouteContent = ({
           <>
             <div
               className="icon cursorMessage desktop"
-              data-cursor-message="Let's talk"
+              data-cursor-message={t('cursor.talk', locale)}
             >
               <Link href="mailto:hello@driesbos.com?subject=Let's Make Internet">
                 <IconMail />

@@ -1,6 +1,10 @@
+'use client';
+
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { renderWordSwapChildren } from '@/components/InlineWordSwapText/renderWordSwap';
+import { useStore } from '@/store/store';
+import { t } from '@/lib/locale';
 import styles from './TheMarkdown.module.sass';
 
 interface MarkdownProps {
@@ -9,6 +13,8 @@ interface MarkdownProps {
 }
 
 const Markdown = ({ content, className = '' }: MarkdownProps) => {
+  const locale = useStore((state) => state.locale);
+
   if (!content) {
     return null;
   }
@@ -68,7 +74,7 @@ const Markdown = ({ content, className = '' }: MarkdownProps) => {
               <a
                 href={href}
                 className={linkClassName || undefined}
-                data-cursor-message={isMailto ? "Let's talk" : undefined}
+                data-cursor-message={isMailto ? t('cursor.talk', locale) : undefined}
                 {...props}
               >
                 {renderWordSwapChildren(children, 'md-link')}

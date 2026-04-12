@@ -1,3 +1,5 @@
+'use client';
+
 import Row from '@/components/Row';
 import IconExternal from '@/components/Icons/IconExternal';
 import Newsletter from '@/components/Newsletter/Newsletter';
@@ -6,9 +8,13 @@ import ScrollToTopLink from './ScrollToTopLink';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import FooterNav from './FooterNav';
+import { useStore } from '@/store/store';
+import { t } from '@/lib/locale';
 import styles from './BlokFooter.module.sass';
 
 const BlokFooter = () => {
+  const locale = useStore((state) => state.locale);
+
   return (
     <div className={`blok blok-Footer blok-Animate ${styles.blokFooter}`}>
       <GrainyGradient variant="blok" />
@@ -25,7 +31,7 @@ const BlokFooter = () => {
             href="mailto:hello@driesbos.com?subject=Let's Make Internet"
             target="_blank"
             className="linkAnimation cursorMessage"
-            data-cursor-message="Let's talk"
+            data-cursor-message={t('cursor.talk', locale)}
           >
             <div className="hasExternalIcon">
               <span className="mailMobile">Email</span>

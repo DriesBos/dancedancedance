@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useStore } from '@/store/store';
+import { t } from '@/lib/locale';
 import styles from './OuterNavigation.module.sass';
 
 const OuterNavigation = () => {
+  const locale = useStore((state) => state.locale);
   const pathname = usePathname() || '/';
   const isAboutRoute = pathname === '/about' || pathname.startsWith('/about/');
   const isRouteActive = (href: string) => {
@@ -25,7 +28,7 @@ const OuterNavigation = () => {
             isRouteActive('/') ? 'linkHyperAnimation' : 'linkAnimation'
           }`}
         >
-          Work
+          {t('nav.work', locale)}
         </span>
       </Link>
       <Link
@@ -38,7 +41,7 @@ const OuterNavigation = () => {
             isRouteActive('/about') ? 'linkHyperAnimation' : 'linkAnimation'
           }`}
         >
-          About
+          {t('nav.about', locale)}
         </span>
       </Link>
     </nav>

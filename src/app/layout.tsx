@@ -13,9 +13,11 @@ import AppInitializer from '@/components/AppInitStore';
 import LocaleInitializer from '@/components/LocaleInitializer';
 import BlokHead from '@/components/BlokHead';
 import BlokAction from '@/components/BlokAction';
-import ActionButton, {
+import {
   ActionButtonContainer,
   LocaleActionButton,
+  ProjectActionButton,
+  ScheduleActionButton,
 } from '@/components/ActionButton';
 import BlokFooter from '@/components/BlokFooter';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
@@ -238,30 +240,8 @@ export default async function RootLayout({
               <BlokFooter />
             </main>
             <ActionButtonContainer>
-              <ActionButton
-                copy="Start your project"
-                link="hello@driesbos.com?subject=Let's Make Internet"
-                linkType="email"
-                className="cursorInteract"
-                dropLeftPx={20}
-                dropOnPage="projects"
-              />
-              {/* <ActionButton
-                copy="Let's talk"
-                link="hello@driesbos.com?subject=Let's Make Internet"
-                linkType="email"
-                className="cursorInteract"
-                dropLeftPx={20}
-                dropOnPage="about"
-              /> */}
-              <ActionButton
-                copy="Schedule a discovery call"
-                link="https://calendly.com/info-b9c/30min"
-                linkType="url"
-                className="cursorInteract"
-                dropLeftPx={50}
-                dropOnPage="about"
-              />
+              <ProjectActionButton />
+              <ScheduleActionButton />
               <LocaleActionButton />
             </ActionButtonContainer>
           </PageContentGate>

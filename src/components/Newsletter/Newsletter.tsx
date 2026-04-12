@@ -3,6 +3,8 @@
 import { FormEvent, useState, useEffect, useRef } from 'react';
 import { useGSAP } from '@/lib/gsap';
 import { vibrate } from '@/lib/vibration';
+import { useStore } from '@/store/store';
+import { t } from '@/lib/locale';
 import styles from './Newsletter.module.sass';
 
 interface NewsletterProps {
@@ -10,11 +12,12 @@ interface NewsletterProps {
 }
 
 export default function Newsletter({ className }: NewsletterProps) {
+  const locale = useStore((state) => state.locale);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isActive, setIsActive] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [buttonText, setButtonText] = useState('Newsletter');
+  const [buttonText, setButtonText] = useState(() => t('newsletter.label', locale));
   const inputRef = useRef<HTMLInputElement>(null);
   const buttonTextRef = useRef<HTMLSpanElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
@@ -25,6 +28,15 @@ export default function Newsletter({ className }: NewsletterProps) {
     () => {
       if (buttonTextRef.current) {
         const targetText = buttonText;
+
+        // Skip scramble for non-ASCII text (e.g. Japanese) — Latin random chars
+        // make no sense and the animation duration is calibrated for ASCII length.
+        const isAsciiOnly = /^[\x00-\x7F]*$/.test(targetText);
+        if (!isAsciiOnly) {
+          buttonTextRef.current.textContent = targetText;
+          return;
+        }
+
         const chars = 'abcdefghijklmnopqrstuvwxyz';
         const iterations = 8; // Number of scramble iterations per character
 
@@ -101,13 +113,13 @@ export default function Newsletter({ className }: NewsletterProps) {
   // Update button text based on state
   useEffect(() => {
     if (!isActive && !isLoading) {
-      setButtonText('Newsletter');
+      setButtonText(t('newsletter.label', locale));
     } else if (isLoading) {
-      setButtonText('Submitting..');
+      setButtonText(t('newsletter.submitting', locale));
     } else {
-      setButtonText('Submit');
+      setButtonText(t('newsletter.submit', locale));
     }
-  }, [isActive, isLoading]);
+  }, [isActive, isLoading, locale]);
 
   // Focus input when active becomes true
   useEffect(() => {
@@ -194,7 +206,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     <div
       className={`${styles.newsletter} ${className || ''} ${showCursorMessage ? 'cursorMessage' : ''}`}
       data-cursor-message={
-        showCursorMessage ? 'infrequent but spirited mail' : undefined
+        showCursorMessage ? t('cursor.mail', locale) : undefined
       }
       data-active={isActive}
     >

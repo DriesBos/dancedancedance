@@ -12,6 +12,7 @@ import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import { vibrate } from '@/lib/vibration';
 import { useStore } from '@/store/store';
+import { t } from '@/lib/locale';
 import {
   storyblokImageLoader,
   storyblokVideoPosterUrl,
@@ -66,6 +67,7 @@ interface SlideItemProps {
 const warmedSlideImageSrcs = new Set<string>();
 
 const SlideItem = ({ item, isActive, isNext, index }: SlideItemProps) => {
+  const locale = useStore((state) => state.locale);
   const videoRef = useRef<HTMLVideoElement>(null);
   const muxPlayerRef = useRef<any>(null);
   const optimizedPoster = storyblokVideoPosterUrl(item.media?.filename);
@@ -195,7 +197,7 @@ const SlideItem = ({ item, isActive, isNext, index }: SlideItemProps) => {
       <div className={styles.caption}>
         {/* <div className={styles.captionYear}>{item.year}</div> */}
         <div className={styles.captionTitle}>
-          <span>Featured work</span>
+          <span>{t('slider.featured', locale)}</span>
         </div>
         <div>{String(item.name)}</div>
         {/* <span>Featured</span> */}

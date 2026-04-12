@@ -12,12 +12,13 @@ const LocaleActionButton = () => {
     })),
   );
 
-  if (locale !== 'ja') return null;
+  const copy = locale === 'ja' ? 'English' : '日本語';
+  const nextLocale = locale === 'ja' ? 'en' : 'ja';
 
   return (
     <ActionButton
-      copy="Switch to English"
-      onClick={() => setLocale('en')}
+      copy={copy}
+      onClick={() => setLocale(nextLocale)}
       className="cursorInteract"
       dropLeftPx={80}
     />

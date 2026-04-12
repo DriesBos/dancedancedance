@@ -1,7 +1,11 @@
+'use client';
+
 import { memo } from 'react';
 import GrainyGradient from '../GrainyGradient/GrainyGradient';
 import LazyDitheringVideoPortrait from '@/components/LazyDitheringVideoPortrait';
 import IconFullscreen from '@/components/Icons/IconFullscreen';
+import { useStore } from '@/store/store';
+import { t } from '@/lib/locale';
 import styles from './BlokSidePanels.module.sass';
 
 interface TopPanelProps {
@@ -9,6 +13,7 @@ interface TopPanelProps {
 }
 
 const TopPanelComponent = ({ showPortrait = false }: TopPanelProps) => {
+  const locale = useStore((state) => state.locale);
   const className = `${styles.side} ${styles.side_Top} ${
     showPortrait ? 'cursorMessage' : ''
   } side side_Top`;
@@ -16,7 +21,7 @@ const TopPanelComponent = ({ showPortrait = false }: TopPanelProps) => {
   const sharedProps = {
     className,
     'data-cursor-message': showPortrait
-      ? 'Schedule a discovery call'
+      ? t('cursor.schedule', locale)
       : undefined,
   } as const;
 

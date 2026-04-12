@@ -8,13 +8,15 @@ import {
   shouldApplyReducedMotion,
 } from '@/lib/reduced-motion';
 import { useShallow } from 'zustand/react/shallow';
+import { t } from '@/lib/locale';
 import styles from './OuterTheming.module.sass';
 
 const OuterTheming = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const { theme, fullscreen, cycleTheme, setFullscreen } = useStore(
+  const { theme, locale, fullscreen, cycleTheme, setFullscreen } = useStore(
     useShallow((state) => ({
       theme: state.theme,
+      locale: state.locale,
       fullscreen: state.fullscreen,
       cycleTheme: state.cycleTheme,
       setFullscreen: state.setFullscreen,
@@ -22,6 +24,22 @@ const OuterTheming = () => {
   );
   const themeLabel = theme.toUpperCase();
   const fullscreenLabel = fullscreen ? 'ON' : 'OFF';
+
+  const isJapanese = (char: string) =>
+    /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fff\uff00-\uffef]/.test(char);
+
+  const renderLabel = (text: string) => {
+    if (locale !== 'ja') return text;
+    return [...text].map((char, i) =>
+      isJapanese(char) ? (
+        <span key={i} className={styles.rotatedChar}>
+          {char}
+        </span>
+      ) : (
+        char
+      ),
+    );
+  };
 
   const handleThemeCycle = () => {
     cycleTheme();
@@ -100,7 +118,7 @@ const OuterTheming = () => {
           title={`Fullscreen ${fullscreenLabel.toUpperCase()}`}
         >
           <span className={`${styles.outerThemingButtonInner} linkAnimation`}>
-            FULLSCREEN: {fullscreenLabel}
+            {renderLabel(`${t('theming.layout', locale)} ${fullscreenLabel}`)}
           </span>
         </button>
         <button
@@ -111,7 +129,7 @@ const OuterTheming = () => {
           title={`${themeLabel} mode`}
         >
           <span className={`${styles.outerThemingButtonInner} linkAnimation`}>
-            THEME: {themeLabel}
+            {renderLabel(`${t('theming.theme', locale)} ${themeLabel}`)}
           </span>
         </button>
       </div>
