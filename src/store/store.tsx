@@ -5,6 +5,7 @@ import {
   shouldRunInitialIntroForTheme,
   type Theme,
 } from '@/lib/theme';
+import { type Locale } from '@/lib/locale';
 
 export type { Theme, ThemeOrientation } from '@/lib/theme';
 export {
@@ -22,6 +23,7 @@ export {
 
 export type Props = {
   theme: Theme;
+  locale: Locale;
   fullscreen: boolean;
   topPanel: boolean;
   pageContentVisible: boolean;
@@ -42,6 +44,7 @@ export type Actions = {
   setDefault: () => void;
   setTheme: (theme: Theme) => void;
   cycleTheme: () => void;
+  setLocale: (locale: Locale) => void;
   setFullscreen: (fullscreen: boolean) => void;
   setTopPanelTrue: () => void;
   setTopPanelFalse: () => void;
@@ -82,6 +85,7 @@ const initialRouteEffectsSuppressedPathname =
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
   theme: initialTheme,
+  locale: 'en',
   fullscreen: initialFullscreen,
   topPanel: true,
   pageContentVisible: !initialThemeIntroPending,
@@ -131,6 +135,7 @@ export const useStore = create<Props & Actions>()((set) => ({
         initialThemeIntroPending: false,
       };
     }),
+  setLocale: (locale) => set({ locale }),
   setFullscreen: (fullscreen) => set({ fullscreen }),
   setTopPanelTrue: () => set({ topPanel: true }),
   setTopPanelFalse: () => set({ topPanel: false }),

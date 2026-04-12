@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import Row from '@/components/Row';
 import IconExternal from '@/components/Icons/IconExternal';
 import Newsletter from '@/components/Newsletter/Newsletter';
@@ -6,6 +5,7 @@ import IconArrowLongUp from '@/components/Icons/IconArrowLongUp';
 import ScrollToTopLink from './ScrollToTopLink';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
+import FooterNav from './FooterNav';
 import styles from './BlokFooter.module.sass';
 
 const BlokFooter = () => {
@@ -16,12 +16,7 @@ const BlokFooter = () => {
       <Row>
         <div className={styles.footerColumnLeft}>
           <div className={`column column-FooterColumn ${styles.leftside}`}>
-            <Link href="/" className="cursorInteract linkAnimation">
-              Work
-            </Link>
-            <Link href="/about" className="cursorInteract linkAnimation">
-              About
-            </Link>
+            <FooterNav />
         </div>
         </div>
         <div className={styles.footerColumnRight}>

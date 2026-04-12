@@ -8,7 +8,8 @@ type ActionButtonDropPage = 'home' | 'projects' | 'about';
 
 interface ActionButtonProps {
   copy: string;
-  link: string;
+  link?: string;
+  onClick?: () => void;
   linkType?: ActionButtonLinkType;
   className?: string;
   cursorMessage?: string;
@@ -40,9 +41,24 @@ const getUrlHref = (link: string) => {
   return `https://${link}`;
 };
 
+const sharedProps = (
+  className: string,
+  cursorMessage: string | undefined,
+  dropLeftPx: number | undefined,
+  dropCenterPercent: number | undefined,
+  dropOnPage: ActionButtonDropPage | undefined,
+) => ({
+  className: `${styles.actionButton} ${className}`.trim(),
+  'data-cursor-message': cursorMessage,
+  'data-action-drop-left': dropLeftPx,
+  'data-action-drop-center-percent': dropCenterPercent,
+  'data-action-drop-page': dropOnPage,
+});
+
 const ActionButton = ({
   copy,
   link,
+  onClick,
   linkType,
   className = '',
   cursorMessage,
@@ -50,19 +66,26 @@ const ActionButton = ({
   dropCenterPercent,
   dropOnPage,
 }: ActionButtonProps) => {
-  const isEmail = isEmailLink(link, linkType);
-  const href = isEmail ? getEmailHref(link) : getUrlHref(link);
+  const props = sharedProps(className, cursorMessage, dropLeftPx, dropCenterPercent, dropOnPage);
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} {...props}>
+        <GrainyGradient variant="blok" />
+        <span className={styles.copy}>{copy}</span>
+      </button>
+    );
+  }
+
+  const isEmail = isEmailLink(link ?? '', linkType);
+  const href = isEmail ? getEmailHref(link ?? '') : getUrlHref(link ?? '');
 
   return (
     <a
       href={href}
-      className={`${styles.actionButton} ${className}`.trim()}
+      {...props}
       target={isEmail ? undefined : '_blank'}
       rel={isEmail ? undefined : 'noopener noreferrer'}
-      data-cursor-message={cursorMessage}
-      data-action-drop-left={dropLeftPx}
-      data-action-drop-center-percent={dropCenterPercent}
-      data-action-drop-page={dropOnPage}
     >
       <GrainyGradient variant="blok" />
       <span className={styles.copy}>{copy}</span>

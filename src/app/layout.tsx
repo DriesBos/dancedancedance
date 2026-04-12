@@ -10,10 +10,12 @@ import '@/assets/styles/global.sass';
 import '@/assets/styles/icon-styles.sass';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import AppInitializer from '@/components/AppInitStore';
+import LocaleInitializer from '@/components/LocaleInitializer';
 import BlokHead from '@/components/BlokHead';
 import BlokAction from '@/components/BlokAction';
 import ActionButton, {
   ActionButtonContainer,
+  LocaleActionButton,
 } from '@/components/ActionButton';
 import BlokFooter from '@/components/BlokFooter';
 import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
@@ -210,6 +212,7 @@ export default async function RootLayout({
         <BackgroundEffectsByTheme />
         <GrainyGradient variant="page" />
         <AppInitializer />
+        <LocaleInitializer />
         <ClientEnhancements />
         {gaId && (
           <>
@@ -259,6 +262,7 @@ export default async function RootLayout({
                 dropLeftPx={50}
                 dropOnPage="about"
               />
+              <LocaleActionButton />
             </ActionButtonContainer>
           </PageContentGate>
         </PerformanceTelemetry>
