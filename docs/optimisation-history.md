@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-04-27] Theme typography color transitions now come from one low-specificity document-level color cascade, removing the temporary `data-theme-changing` override and duplicated blok descendant cascades while keeping component interaction transitions scoped to their own properties; inline word-swap text no longer owns color transitions and keeps its rotator state stable across same-content parent rerenders.
 - [2026-03-24] Theme swaps now use shared theme-transition cascade tokens plus a short-lived `body[data-theme-changing='true']` override, so blok chrome, filter/message content, top panels, and nested theme-colored descendants switch more uniformly without permanently slowing interaction-specific hover transitions.
 - [2026-03-18] The `TRON` backgrid intro now keeps mouse and scroll perspective locked until the depth animation completes, then reveals page content on the following animation frame, avoiding competing geometry updates and reducing end-of-intro hitching.
 - [2026-03-17] The `TRON` backgrid tunnel now keeps a stable DOM skeleton and applies mouse, scroll, depth, and route-pulse geometry through imperative GSAP/ref updates, so interactive perspective changes no longer force React re-renders or rebuild connector markup on every motion tick.

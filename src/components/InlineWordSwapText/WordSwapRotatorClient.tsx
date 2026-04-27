@@ -18,10 +18,13 @@ const WordSwapRotatorClient = ({
   words,
   durationSeconds,
 }: WordSwapRotatorClientProps) => {
-  const normalizedWords = useMemo(
-    () => (words.length >= 2 ? words : [words[0] ?? '', words[0] ?? '']),
-    [words],
-  );
+  const wordsKey = words.join('\u001f');
+  const normalizedWords = useMemo(() => {
+    const stableWords = wordsKey ? wordsKey.split('\u001f') : [''];
+    return stableWords.length >= 2
+      ? stableWords
+      : [stableWords[0] ?? '', stableWords[0] ?? ''];
+  }, [wordsKey]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [phase, setPhase] = useState<'hold' | 'slide'>('hold');
   const nextIndex = (currentIndex + 1) % normalizedWords.length;

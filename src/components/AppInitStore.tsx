@@ -18,8 +18,6 @@ type InitialUIState = {
   initialRouteEffectsSuppressedPathname: string | null;
 };
 
-const THEME_CHANGE_DATA_ATTR_DURATION_MS = 700;
-
 const shouldSuppressInitialLandingEffects = (pathname: string) => {
   const slug = pathname.split('/')[1] || 'home';
   return slug === 'about' || slug === 'projects';
@@ -53,31 +51,18 @@ const getInitialUIState = (): InitialUIState => {
 
 const applyBodyState = (theme: Theme, fullscreen: boolean, slug: string) => {
   const body = document.body;
-  if (!body) return false;
-
-  const previousTheme = body.getAttribute('data-theme');
-  const shouldAnimateThemeChange =
-    previousTheme !== null &&
-    previousTheme !== theme &&
-    body.getAttribute('data-initializing') !== 'true';
-
-  if (shouldAnimateThemeChange) {
-    body.setAttribute('data-theme-changing', 'true');
-  }
+  if (!body) return;
 
   body.setAttribute('data-theme', theme);
   body.setAttribute('data-fullscreen', String(fullscreen));
   body.setAttribute('data-page', slug);
   body.setAttribute('data-border', 'minimal');
-
-  return shouldAnimateThemeChange;
 };
 
 const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const readyFrameRef = useRef<number | null>(null);
   const readyTimeoutRef = useRef<number | null>(null);
-  const themeChangeTimeoutRef = useRef<number | null>(null);
   const {
     initializeUiState,
     clearInitialRouteEffectsSuppression,
@@ -140,20 +125,7 @@ const AppInitializer = () => {
       return;
     }
 
-    const didStartThemeChange = applyBodyState(theme, fullscreen, slug);
-
-    if (!didStartThemeChange) {
-      return;
-    }
-
-    if (themeChangeTimeoutRef.current !== null) {
-      window.clearTimeout(themeChangeTimeoutRef.current);
-    }
-
-    themeChangeTimeoutRef.current = window.setTimeout(() => {
-      document.body?.removeAttribute('data-theme-changing');
-      themeChangeTimeoutRef.current = null;
-    }, THEME_CHANGE_DATA_ATTR_DURATION_MS);
+    applyBodyState(theme, fullscreen, slug);
   }, [
     pathname,
     initializeUiState,
@@ -180,10 +152,6 @@ const AppInitializer = () => {
       }
       if (readyTimeoutRef.current !== null) {
         window.clearTimeout(readyTimeoutRef.current);
-      }
-      if (themeChangeTimeoutRef.current !== null) {
-        window.clearTimeout(themeChangeTimeoutRef.current);
-        document.body?.removeAttribute('data-theme-changing');
       }
     };
   }, []);
