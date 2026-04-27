@@ -54,6 +54,13 @@ export async function generateStaticParams() {
 
 type Params = Promise<{ slug?: string[] }>;
 
+type MetadataStory = {
+  name?: string;
+  content?: {
+    component?: string;
+  };
+};
+
 const getStoryVersion = (): 'draft' | 'published' => {
   const useDraftInDev =
     process.env.NODE_ENV === 'development' &&
@@ -94,7 +101,7 @@ export async function generateMetadata({
       };
     }
 
-    const story = pageData.story as any;
+    const story = pageData.story as MetadataStory;
     const storyName = story.name || '';
     const storySlug = slugPath;
 

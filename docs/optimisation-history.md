@@ -1,6 +1,10 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-04-27] The About top-panel dithered video portrait is temporarily disabled, keeping the panel/link surface while avoiding the lazy portrait chunk, MP4 load, canvas setup, and dither frame processing.
+- [2026-04-27] Page-level background effects are temporarily no longer mounted from the root layout, removing the theme-store background subscriber, inactive dynamic background import path, and page grain layer from the app shell.
+- [2026-04-27] Production builds now use Next.js app-only mode for this App Router-only project, avoiding unnecessary generated Pages Router artifacts and the failing `/_document` prerender path.
+- [2026-04-27] TypeScript checking now excludes stale JavaScript include paths and avoids `allowJs` for this TypeScript-only app surface; Storyblok project/page mapping also uses local CMS response types instead of `any` casts in the touched paths.
 - [2026-04-27] The outer navigation and outer theming controls were temporarily disabled behind a root-layout flag, keeping the components available while avoiding their client mounts and route/theme/fullscreen subscriptions in the app shell.
 - [2026-04-27] The `SEGMENTS` theme now skips its p5.js background mount temporarily, preserving the static theme styling while avoiding the `p5` and segments sketch chunk load plus the runtime canvas animation work.
 - [2026-04-27] Theme typography color transitions now come from one low-specificity document-level color cascade, removing the temporary `data-theme-changing` override and duplicated blok descendant cascades while keeping component interaction transitions scoped to their own properties; inline word-swap text no longer owns color transitions and keeps its rotator state stable across same-content parent rerenders.

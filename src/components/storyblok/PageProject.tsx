@@ -16,7 +16,7 @@ interface ProjectProps {
 const PageProject = ({ blok }: ProjectProps) => {
   return (
     <div className="page page-Project" {...storyblokEditable(blok)}>
-      {blok.body.map((nestedBlok: any) => (
+      {blok.body.map((nestedBlok) => (
         <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
       ))}
     </div>

@@ -12,10 +12,10 @@ interface PageProps {
   blok: SbPageData;
 }
 
-const Page: React.FunctionComponent<PageProps> = ({ blok }) => {
+const Page = ({ blok }: PageProps) => {
   return (
     <div className="page page-General" {...storyblokEditable(blok)}>
-      {blok.body.map((nestedBlok: any) => (
+      {blok.body.map((nestedBlok) => (
         <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
       ))}
     </div>

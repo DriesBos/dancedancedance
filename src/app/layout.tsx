@@ -20,8 +20,6 @@ import {
   ScheduleActionButton,
 } from '@/components/ActionButton';
 import BlokFooter from '@/components/BlokFooter';
-import BackgroundEffectsByTheme from '@/components/BackgroundEffects/BackgroundEffectsByTheme';
-import GrainyGradient from '@/components/GrainyGradient';
 import OuterTheming from '@/components/OuterTheming';
 import OuterNavigation from '@/components/OuterNavigation';
 import ClientEnhancements from '@/components/ClientEnhancements';
@@ -213,8 +211,7 @@ export default async function RootLayout({
         <Script id="initial-ui-state" strategy="beforeInteractive">
           {INITIAL_UI_STATE_SCRIPT}
         </Script>
-        <BackgroundEffectsByTheme />
-        <GrainyGradient variant="page" />
+        {/* Page background effects are temporarily disabled. */}
         <AppInitializer />
         <LocaleInitializer />
         <ClientEnhancements />

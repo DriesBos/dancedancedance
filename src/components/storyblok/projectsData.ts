@@ -16,6 +16,18 @@ export interface ProjectData {
   external_link?: { cached_url: string };
 }
 
+type StoryblokProjectStory = {
+  slug: string;
+  content: {
+    year?: string;
+    title?: string;
+    category?: string[];
+    highlight?: boolean;
+    thumbnail?: ProjectData['thumbnail'];
+    external_link?: ProjectData['external_link'];
+  };
+};
+
 export async function fetchProjectData(): Promise<ProjectData[]> {
   const sbParams: ISbStoriesParams = {
     version: 'published',
@@ -35,7 +47,9 @@ export async function fetchProjectData(): Promise<ProjectData[]> {
     },
   });
 
-  return projects.data.stories.map((story: any) => ({
+  const stories = (projects.data?.stories ?? []) as StoryblokProjectStory[];
+
+  return stories.map((story) => ({
     slug: story.slug,
     year: story.content.year,
     title: story.content.title,

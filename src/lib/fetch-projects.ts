@@ -10,6 +10,16 @@ export interface ProjectData {
   external_link?: { cached_url: string };
 }
 
+type StoryblokProjectStory = {
+  slug: string;
+  name: string;
+  content: {
+    year?: string;
+    title?: string;
+    external_link?: { cached_url: string };
+  };
+};
+
 export async function fetchProjectSlugs(): Promise<ProjectData[]> {
   const sbParams: ISbStoriesParams = {
     version: 'published',
@@ -35,7 +45,9 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
   });
 
   // Return projects in CMS order
-  const projects = response.data.stories.map((story: any) => ({
+  const stories = (response.data?.stories ?? []) as StoryblokProjectStory[];
+
+  const projects = stories.map((story) => ({
     slug: story.slug,
     year: story.content.year || '0',
     title: story.content.title || story.name,

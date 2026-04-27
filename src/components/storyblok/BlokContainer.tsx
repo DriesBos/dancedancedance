@@ -22,7 +22,7 @@ const BlokContainer = ({ blok }: BlokProps) => {
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row wideColumns={blok.wideColumns}>
-        {blok.body.map((nestedBlok: any) => (
+        {blok.body.map((nestedBlok) => (
           <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
         ))}
       </Row>
