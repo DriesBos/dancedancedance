@@ -124,6 +124,8 @@ const INITIAL_UI_STATE_SCRIPT = `
   })();
 `;
 
+const ENABLE_OUTER_CHROME = false;
+
 const buildGoogleAnalyticsBootstrapScript = (gaId: string) => `
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -231,8 +233,12 @@ export default async function RootLayout({
         <PerformanceTelemetry>
           <PageContentGate>
             <HeaderInitAnimation />
-            <OuterNavigation />
-            <OuterTheming />
+            {ENABLE_OUTER_CHROME && (
+              <>
+                <OuterNavigation />
+                <OuterTheming />
+              </>
+            )}
             <main className="main">
               <BlokHead projects={projects} />
               {children}

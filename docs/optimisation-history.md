@@ -1,6 +1,8 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-04-27] The outer navigation and outer theming controls were temporarily disabled behind a root-layout flag, keeping the components available while avoiding their client mounts and route/theme/fullscreen subscriptions in the app shell.
+- [2026-04-27] The `SEGMENTS` theme now skips its p5.js background mount temporarily, preserving the static theme styling while avoiding the `p5` and segments sketch chunk load plus the runtime canvas animation work.
 - [2026-04-27] Theme typography color transitions now come from one low-specificity document-level color cascade, removing the temporary `data-theme-changing` override and duplicated blok descendant cascades while keeping component interaction transitions scoped to their own properties; inline word-swap text no longer owns color transitions and keeps its rotator state stable across same-content parent rerenders.
 - [2026-03-24] Theme swaps now use shared theme-transition cascade tokens plus a short-lived `body[data-theme-changing='true']` override, so blok chrome, filter/message content, top panels, and nested theme-colored descendants switch more uniformly without permanently slowing interaction-specific hover transitions.
 - [2026-03-18] The `TRON` backgrid intro now keeps mouse and scroll perspective locked until the depth animation completes, then reveals page content on the following animation frame, avoiding competing geometry updates and reducing end-of-intro hitching.

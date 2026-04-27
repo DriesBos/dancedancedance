@@ -12,13 +12,6 @@ const RadiatingBackground = dynamic(
   () => import('@/components/BackgroundEffects/RadiatingBackground/RadiatingBackground'),
   { ssr: false },
 );
-const SegmentsBackground = dynamic(
-  () =>
-    import(
-      '@/components/BackgroundEffects/SegmentsBackground/SegmentsBackground'
-    ),
-  { ssr: false },
-);
 const KusamaBackground = dynamic(
   () =>
     import(
@@ -47,7 +40,7 @@ export default function BackgroundEffectsByTheme() {
   }
 
   if (theme === 'SEGMENTS') {
-    return <SegmentsBackground />;
+    return null;
   }
 
   if (theme === 'KUSAMA') {
