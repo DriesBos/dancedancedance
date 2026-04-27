@@ -38,22 +38,25 @@ export const t = (key: TranslationKey, locale: Locale): string => {
   return translations[key][locale];
 };
 
-const DEV_LOCALE_OVERRIDE: Locale | null =
-  process.env.NODE_ENV === 'development' ? 'ja' : null;
+const getBrowserLocale = (): Locale => {
+  const preferredLanguage = navigator.languages?.[0] ?? navigator.language;
+  return preferredLanguage?.startsWith('ja') ? 'ja' : 'en';
+};
 
 export const detectInitialLocale = (): Locale => {
   if (typeof window === 'undefined') return 'en';
 
-  if (DEV_LOCALE_OVERRIDE) return DEV_LOCALE_OVERRIDE;
+  const browserLocale = getBrowserLocale();
 
   try {
     const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (stored === 'en' || stored === 'ja') return stored;
+    if (stored === 'en') return 'en';
+    if (stored === 'ja' && browserLocale === 'ja') return 'ja';
   } catch {
     // localStorage may be unavailable (private browsing, security policies)
   }
 
-  return navigator.language?.startsWith('ja') ? 'ja' : 'en';
+  return browserLocale;
 };
 
 export const persistLocale = (locale: Locale): void => {
