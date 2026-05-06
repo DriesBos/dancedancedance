@@ -23,11 +23,19 @@ const ColumnTextClient = ({
     () => {
       if (!container.current) return;
 
-      gsap.to(container.current, {
-        '--var': '100%',
+      const links = container.current.querySelectorAll<HTMLElement>('.markdown a');
+      if (links.length === 0) return;
+
+      gsap.set(links, {
+        '--markdown-underline-progress': '0%',
+      });
+
+      gsap.to(links, {
+        '--markdown-underline-progress': '100%',
         duration: 0.66,
         delay: 0.33,
         ease: 'ease',
+        stagger: 0.045,
       });
     },
     { scope: container },

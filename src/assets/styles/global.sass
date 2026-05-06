@@ -368,7 +368,6 @@ mux-player, .muxPlayer
         gap: calc(var(--spacing-half) / 2) 
         width: 100%
       &-Text
-        --var: 0%
         min-width: 0 // Ellipsis hack
         white-space: pre-line // Listens to line breaks in markdown
         // @media (min-width: 770px)
@@ -388,25 +387,6 @@ mux-player, .muxPlayer
           display: block
         em
           color: var(--theme-type-inactive)
-        a
-          position: relative
-          &::before
-            content: ''
-            position: absolute
-            left: 0
-            display: inline-block
-            bottom: calc(0px - (#{var(--border-width)} / 2))
-            top: 0
-            width: var(--var)
-            z-index: 0
-            border-bottom: var(--border-width) solid currentColor
-            will-change: width, border-bottom
-          @media (hover: hover)
-            a:hover
-              &::before
-                @media ( hover: hover )
-                  animation: hyperHyperLink .66s ease
-                  animation-iteration-count: 1
       &-TextExpandable
         display: flex
         flex-direction: column
