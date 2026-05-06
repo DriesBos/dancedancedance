@@ -2,8 +2,6 @@
 
 import { memo } from 'react';
 import GrainyGradient from '../GrainyGradient/GrainyGradient';
-import { useStore } from '@/store/store';
-import { t } from '@/lib/locale';
 import styles from './BlokSidePanels.module.sass';
 
 interface TopPanelProps {
@@ -11,22 +9,12 @@ interface TopPanelProps {
 }
 
 const TopPanelComponent = ({ showPortrait = false }: TopPanelProps) => {
-  const locale = useStore((state) => state.locale);
-  const className = `${styles.side} ${styles.side_Top} ${
-    showPortrait ? 'cursorMessage' : ''
-  } side side_Top`;
-
-  const sharedProps = {
-    className,
-    'data-cursor-message': showPortrait
-      ? t('cursor.schedule', locale)
-      : undefined,
-  } as const;
+  const className = `${styles.side} ${styles.side_Top} side side_Top`;
 
   if (showPortrait) {
     return (
       <a
-        {...sharedProps}
+        className={className}
         href="https://calendly.com/info-b9c/30min"
         target="_blank"
         rel="noopener noreferrer"
@@ -38,7 +26,7 @@ const TopPanelComponent = ({ showPortrait = false }: TopPanelProps) => {
   }
 
   return (
-    <div {...sharedProps}>
+    <div className={className}>
       <GrainyGradient variant="blok" />
     </div>
   );
