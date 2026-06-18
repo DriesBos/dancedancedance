@@ -13,15 +13,7 @@ import AppInitializer from '@/components/AppInitStore';
 import LocaleInitializer from '@/components/LocaleInitializer';
 import BlokHead from '@/components/BlokHead';
 import BlokAction from '@/components/BlokAction';
-import {
-  ActionButtonContainer,
-  LocaleActionButton,
-  ProjectActionButton,
-  ScheduleActionButton,
-} from '@/components/ActionButton';
 import BlokFooter from '@/components/BlokFooter';
-import OuterTheming from '@/components/OuterTheming';
-import OuterNavigation from '@/components/OuterNavigation';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
 import PageContentGate from '@/components/PageContentGate';
@@ -41,8 +33,6 @@ const INITIAL_UI_STATE_SCRIPT = `
   (function () {
     var pathname = window.location.pathname || '/';
     var routeSlug = pathname.split('/')[1] || 'home';
-    var suppressInitialLandingEffects =
-      routeSlug === 'about' || routeSlug === 'projects';
     var hour = new Date().getHours();
     var isPortrait =
       typeof window.matchMedia === 'function'
@@ -72,10 +62,7 @@ const INITIAL_UI_STATE_SCRIPT = `
     window.__DDD_INITIAL_STATE__ = {
       theme: theme,
       fullscreen: fullscreen,
-      initialThemeIntroPending: initialThemeIntroPending,
-      initialRouteEffectsSuppressedPathname: suppressInitialLandingEffects
-        ? pathname
-        : null
+      initialThemeIntroPending: initialThemeIntroPending
     };
 
     if (document.body) {
@@ -121,8 +108,6 @@ const INITIAL_UI_STATE_SCRIPT = `
     }
   })();
 `;
-
-const ENABLE_OUTER_CHROME = false;
 
 const buildGoogleAnalyticsBootstrapScript = (gaId: string) => `
   window.dataLayer = window.dataLayer || [];
@@ -230,23 +215,12 @@ export default async function RootLayout({
         <PerformanceTelemetry>
           <PageContentGate>
             <HeaderInitAnimation />
-            {ENABLE_OUTER_CHROME && (
-              <>
-                <OuterNavigation />
-                <OuterTheming />
-              </>
-            )}
             <main className="main">
               <BlokHead projects={projects} />
               {children}
               <BlokAction />
               <BlokFooter />
             </main>
-            <ActionButtonContainer>
-              <ProjectActionButton />
-              <ScheduleActionButton />
-              <LocaleActionButton />
-            </ActionButtonContainer>
           </PageContentGate>
         </PerformanceTelemetry>
       </body>

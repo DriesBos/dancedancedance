@@ -8,27 +8,17 @@ const translations = {
   'newsletter.label': { en: 'Newsletter', ja: 'ニュースレター' },
   'newsletter.submit': { en: 'Submit', ja: '登録する' },
   'newsletter.submitting': { en: 'Submitting..', ja: '登録中..' },
-  'action.schedule': {
-    en: 'Schedule a discovery call',
-    ja: 'ミーティングを予約する',
-  },
   'action.start': { en: 'Start your project', ja: '制作の相談をする' },
   'head.subtitle': {
     en: 'Creative Developer',
     ja: 'デザイナー デベロッパー',
   },
-  'theming.theme': { en: 'THEME:', ja: 'テーマ:' },
-  'theming.layout': { en: 'LAYOUT:', ja: 'レイアウト:' },
   'filter.year': { en: 'year', ja: '年' },
   'filter.work': { en: 'selected work', ja: '制作実績' },
   'filter.work.mobile': { en: 'Selected work', ja: '制作実績' },
   'filter.type': { en: 'type of work', ja: 'カテゴリ' },
   'slider.featured': { en: 'Featured work', ja: '主な実績' },
   'cursor.talk': { en: "Let's talk", ja: '相談してみる' },
-  'cursor.schedule': {
-    en: 'Schedule a discovery call',
-    ja: 'ミーティングを予約する',
-  },
   'cursor.mail': { en: 'infrequent but spirited mail', ja: '不定期配信' },
 } as const;
 

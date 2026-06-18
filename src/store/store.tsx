@@ -29,7 +29,6 @@ export type Props = {
   pageContentVisible: boolean;
   pageContentRevealKey: number;
   initialThemeIntroPending: boolean;
-  initialRouteEffectsSuppressedPathname: string | null;
 };
 
 export type Actions = {
@@ -37,9 +36,7 @@ export type Actions = {
     theme: Theme,
     fullscreen: boolean,
     initialThemeIntroPending: boolean,
-    initialRouteEffectsSuppressedPathname: string | null,
   ) => void;
-  clearInitialRouteEffectsSuppression: () => void;
   setNightmode: () => void;
   setDefault: () => void;
   setTheme: (theme: Theme) => void;
@@ -58,7 +55,6 @@ type BootstrapInitialUiState = {
   theme: Theme;
   fullscreen: boolean;
   initialThemeIntroPending: boolean;
-  initialRouteEffectsSuppressedPathname?: string | null;
 };
 
 const getBootstrapInitialUiState = (): BootstrapInitialUiState | null => {
@@ -79,8 +75,6 @@ const initialFullscreen = bootstrapInitialUiState?.fullscreen ?? false;
 const initialThemeIntroPending =
   bootstrapInitialUiState?.initialThemeIntroPending ??
   shouldRunInitialIntroForTheme(initialTheme);
-const initialRouteEffectsSuppressedPathname =
-  bootstrapInitialUiState?.initialRouteEffectsSuppressedPathname ?? null;
 
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
@@ -91,22 +85,13 @@ export const useStore = create<Props & Actions>()((set) => ({
   pageContentVisible: !initialThemeIntroPending,
   pageContentRevealKey: 0,
   initialThemeIntroPending,
-  initialRouteEffectsSuppressedPathname,
-  initializeUiState: (
-    theme,
-    fullscreen,
-    initialThemeIntroPending,
-    initialRouteEffectsSuppressedPathname,
-  ) =>
+  initializeUiState: (theme, fullscreen, initialThemeIntroPending) =>
     set({
       theme,
       fullscreen,
       pageContentVisible: !initialThemeIntroPending,
       initialThemeIntroPending,
-      initialRouteEffectsSuppressedPathname,
     }),
-  clearInitialRouteEffectsSuppression: () =>
-    set({ initialRouteEffectsSuppressedPathname: null }),
   setNightmode: () =>
     set({
       theme: 'NIGHT',

@@ -15,28 +15,16 @@ type InitialUIState = {
   theme: Theme;
   fullscreen: boolean;
   initialThemeIntroPending: boolean;
-  initialRouteEffectsSuppressedPathname: string | null;
-};
-
-const shouldSuppressInitialLandingEffects = (pathname: string) => {
-  const slug = pathname.split('/')[1] || 'home';
-  return slug === 'about' || slug === 'projects';
 };
 
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
   const theme = getInitialThemeForHour(hour);
-  const pathname = window.location.pathname || '/';
-  const suppressInitialLandingEffects =
-    shouldSuppressInitialLandingEffects(pathname);
 
   return {
     theme,
     fullscreen: false,
     initialThemeIntroPending: shouldRunInitialIntroForTheme(theme),
-    initialRouteEffectsSuppressedPathname: suppressInitialLandingEffects
-      ? pathname
-      : null,
   };
 };
 
@@ -65,24 +53,17 @@ const AppInitializer = () => {
   const readyTimeoutRef = useRef<number | null>(null);
   const {
     initializeUiState,
-    clearInitialRouteEffectsSuppression,
-    initialRouteEffectsSuppressedPathname,
     theme,
     fullscreen,
   } = useStore(
     useShallow((state) => ({
       initializeUiState: state.initializeUiState,
-      clearInitialRouteEffectsSuppression:
-        state.clearInitialRouteEffectsSuppression,
-      initialRouteEffectsSuppressedPathname:
-        state.initialRouteEffectsSuppressedPathname,
       theme: state.theme,
       fullscreen: state.fullscreen,
     })),
   );
   const path = usePathname();
   const slug = (path || '/').split('/')[1] || 'home';
-  const pathname = path || '/';
   const clearInitializingAttr = () => {
     document.body?.removeAttribute('data-initializing');
   };
@@ -98,7 +79,6 @@ const AppInitializer = () => {
         initialState.theme,
         initialState.fullscreen,
         initialState.initialThemeIntroPending,
-        initialState.initialRouteEffectsSuppressedPathname,
       );
 
       if (readyFrameRef.current === null) {
@@ -127,22 +107,10 @@ const AppInitializer = () => {
 
     applyBodyState(theme, fullscreen, slug);
   }, [
-    pathname,
     initializeUiState,
     slug,
     fullscreen,
     theme,
-  ]);
-
-  useEffect(() => {
-    if (!initialRouteEffectsSuppressedPathname) return;
-    if (pathname === initialRouteEffectsSuppressedPathname) return;
-
-    clearInitialRouteEffectsSuppression();
-  }, [
-    clearInitialRouteEffectsSuppression,
-    initialRouteEffectsSuppressedPathname,
-    pathname,
   ]);
 
   useEffect(() => {
