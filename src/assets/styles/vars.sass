@@ -12,31 +12,17 @@
   /* colors */
   --color-black: hsla(0, 0%, 0%, 1)
   --color-white: white
-  // Theme Light
-  // Theme Dark
-  --color-dark-type: var(--color-white)
   /* theme */
-  --theme-bg: var(--color-black)
+  --theme-bg: #E8E7E3
+  --theme-blok: #E8E7E3
+  --theme-blok-sidepanel: hsla(48, 10%, 85%, 1)
   --theme-bg-gradient: 0
-  --theme-blok: hsla(0, 0%, 100%, 0)
-  --theme-blok-showlines: var(--theme-blok)
-  --theme-blok-solid: var(--theme-blok)
-  --theme-blok-gradient: 0
-  --theme-blok-subpanel: hsla(100, 100%, 100%, 0)
-  --theme-blok-toppanel: var(--theme-blok)
-  --theme-rotatingLines-bg: 0
-  --theme-type: var(--color-tron)
-  --theme-type-inactive: var(--color-tron-inactive)
-  --theme-type-contrast: var(--color-tron)
+  --theme-type: hsla(20, 100%, 01%, 1)
+  --theme-muted-alpha: 50%
   --theme-media-filter: none
-  --theme-cypher-secondary: #FF8A2A
-  --theme-cypher-tertiary: #F3D26B
   --portrait-dither-blackness: 0.54
   --portrait-dither-threshold: 138
   --portrait-dither-invert: 0
-  --cursor-color-bg: var(--theme-type)
-  --cursor-color-blok: var(--theme-type)
-  --border-color: var(--theme-type)
 
   // typography
   --font-size-caption: 0.66rem
@@ -80,10 +66,6 @@
   --transition-layout: 0.66s ease-in-out
   --transition-layout-quick: 0.33s ease
   --transition-theme: 0.33s ease
-  --transition-theme-quick: 0.33s ease
-  --transition-theme-color: color var(--transition-theme), fill var(--transition-theme), stroke var(--transition-theme), text-decoration-color var(--transition-theme), caret-color var(--transition-theme)
-  --transition-theme-surface: background var(--transition-theme), background-color var(--transition-theme), border-color var(--transition-theme), outline-color var(--transition-theme), box-shadow var(--transition-theme)
-  --transition-theme-cascade: var(--transition-theme-color), var(--transition-theme-surface)
   --transition-cursor: 0.25s ease-in-out
   @media (prefers-reduced-motion: reduce) and (orientation: landscape)
     --transition-layout: 0s
@@ -109,148 +91,28 @@ body[data-fullscreen='false']
 body[data-theme='LIGHT']
   --theme-bg: #E8E7E3
   --theme-blok: #E8E7E3
-  --theme-blok-showlines: transparent
-  --theme-blok-solid: #E8E7E3
-  --theme-blok-toppanel: hsla(48, 10%, 85%, 1)
-  --theme-type: black
-  --theme-type-inactive: hsla(0, 0%, 0%, 0.5)
+  --theme-blok-sidepanel: hsla(48, 10%, 85%, 1)
   --theme-type: hsla(20, 100%, 01%, 1)
-  --theme-type-contrast: #E8E7E3
-  --cursor-color-bg: black
-  --cursor-color-blok: black
-  --border-color: black
-  --border-color: hsla(20, 100%, 01%, 1)
-  --slider-indicator: #E8E7E3
+  --theme-muted-alpha: 50%
+  --portrait-dither-invert: 0
+  --theme-media-filter: none
 
-body[data-theme='KUSAMA']
-  --theme-bg: #0A0000
-  --theme-blok: #0A0000
-  --theme-blok-showlines: #0A0000
-  --theme-blok-solid: #0A0000
-  --theme-blok-toppanel: #0A0000
-  --portrait-dither-invert: 1
-  --theme-type: #E1AC22
-  --theme-type-inactive: hsla(43, 76%, 51%, 0.6)
-  --theme-type-contrast: #0A0000
-  --cursor-color-bg: #E1AC22
-  --cursor-color-blok: #E1AC22
-  --border-color: #E1AC22
-  --slider-indicator: #E1AC22
-  --theme-bg-gradient: 0.066
-  --theme-blok-gradient: 0.066
-  --border-width: 1.5px
-  --border-fatwidth: 1.5px
-
-body[data-theme='SEGMENTS']
+body[data-theme='DARK']
   --theme-bg: hsla(0, 0%, 10.2%, 1)
   --theme-blok: hsla(0, 0%, 10.2%, 1)
-  --theme-blok-showlines: hsla(0, 0%, 10.2%, 1)
-  --theme-blok-solid: var(--theme-blok)
-  --theme-blok-toppanel: hsla(0, 0%, 8.2%, 1)
+  --theme-blok-sidepanel: hsla(0, 0%, 8.2%, 1)
   --portrait-dither-invert: 1
-  --theme-type: var(--color-dark-type)
-  --theme-type-inactive: hsla(0, 0%, 100%, 0.6)
-  --theme-type-contrast: black
-  --border-color: white
-  --cursor-color-bg: white
-  --cursor-color-blok: white
-  --slider-indicator: white
-  --theme-blok-gradient: 0.05
-
-body[data-theme='KERMIT']
-  --theme-bg: white
-  --theme-blok: hsla(112, 70%, 60%, 1)
-  --theme-blok-showlines: hsla(112, 70%, 60%, 1)
-  --theme-blok-solid: hsla(112, 70%, 60%, 1)
+  --theme-type: var(--color-white)
+  --theme-muted-alpha: 60%
   --theme-bg-gradient: 0.05
-  --theme-blok-gradient: 0.1
-  --theme-type: black
-  --theme-type-inactive: hsla(0, 0%, 0%, 0.45)
-  --theme-type-contrast: white
-  --cursor-color-bg: black
-  --cursor-color-blok: black
-  --slider-indicator: hsla(112, 70%, 60%, 1)
-  --border-color: black
-  --border-radius: 1.175rem
-  --border-width: 2px
-  --border-fatwidth: 2px
-  --border-gap: 1rem
-  --spacing-containerTopDistance: 4vh
-  &[data-fullscreen='false']
-    --panel-perspective-origin: 50% 0vh
-  @media (max-width: 770px)
-    --border-gap: 0.5rem
-    --theme-bg: black
-    --cursor-color-bg: white
-    --theme-bg-gradient: 0
-  @media (orientation: portrait)
-    --theme-bg-gradient: 0
-    --theme-bg: black
-    --cursor-color-bg: white
-
-body[data-theme='TRON']
-  --theme-bg: var(--color-black)
-  --theme-blok: var(--color-black)
-  --theme-blok-showlines: var(--color-black)
-  --theme-blok-solid: var(--color-black)
-  --theme-blok-toppanel: var(--color-black)
-  --theme-type: hsla(172, 100%, 75%, 1)
-  --theme-type-inactive: hsla(172, 100%, 75%, 0.6)
-  --theme-type-contrast: black
-  --border-color: hsla(172, 100%, 75%, 1)
-  --slider-indicator: hsla(172, 100%, 75%, 1)
+  --theme-media-filter: none
 
 body[data-theme='NIGHT']
   --theme-bg: var(--color-black)
   --theme-blok: var(--color-black)
-  --theme-blok-showlines: var(--theme-blok)
-  --theme-blok-solid: var(--color-black)
+  --theme-blok-sidepanel: var(--color-black)
   --theme-type: hsla(0, 100%, 50%, 1)
-  --theme-type-inactive: hsla(0, 100%, 50%, 0.6)
-  --theme-type-contrast: black
+  --theme-muted-alpha: 60%
+  --theme-bg-gradient: 0
+  --portrait-dither-invert: 1
   --theme-media-filter: grayscale(1) contrast(1.22) brightness(0.33) sepia(1) saturate(8) hue-rotate(-18deg)
-  --border-color: hsla(0, 100%, 50%, 1)
-  --cursor-color-bg: hsla(0, 100%, 50%, 1)
-  --cursor-color-blok: hsla(0, 100%, 50%, 1)
-  --slider-indicator: hsla(0, 100%, 50%, 1)
-
-body[data-theme='BLACK']
-  --theme-bg: transparent
-  --theme-blok: var(--color-black)
-  --theme-blok-showlines: var(--theme-blok)
-  --theme-blok-solid: var(--theme-blok)
-  --theme-type: var(--color-black)
-  --theme-type-inactive: hsla(0, 0%, 100%, 0.5)
-  --theme-type-contrast: white
-
-body[data-theme='RADIANT']
-  --theme-bg: hsla(249, 10%, 86%, 1)
-  --theme-blok: hsla(249, 10%, 86%, 1)
-  --theme-blok-showlines: hsla(249, 10%, 86%, 1)
-  --theme-blok-solid: var(--theme-blok)
-  --theme-blok-toppanel: hsla(249, 10%, 85%, 1)
-  --theme-type: #FA5942
-  --theme-type-inactive: hsla(7, 95%, 62%, 0.7)
-  --theme-type-contrast: white
-  --theme-rotatingLines-bg: 1
-  --border-color: #FA5942
-  --cursor-color-bg: #FA5942
-  --cursor-color-blok: #FA5942
-  --slider-indicator: #FA5942
-
-body[data-theme='SKY']
-  --theme-bg: linear-gradient(180deg, #c7b292 0%, #b49f82 46%, #a48b6a 100%)
-  --theme-blok: transparent
-  --theme-blok-solid: transparent
-  --theme-blok-showlines: transparent
-  --theme-type: black
-  --theme-type-inactive: hsla(0, 0%, 0%, 0.66)
-  --theme-type-contrast: #b49f82
-  --theme-rotatingLines-bg: 1
-  --border-color: black
-  --border-width: 2px
-  --border-fatwidth: 2px
-  --cursor-color-bg: black
-  --cursor-color-blok: black
-  --slider-indicator: black
-  --theme-bg-gradient: 0.1

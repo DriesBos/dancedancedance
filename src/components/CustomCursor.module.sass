@@ -2,17 +2,13 @@
   position: fixed
   top: 0
   left: 0
-  color: var(--cursor-color-bg)
   border-radius: var(--border-radius)
   pointer-events: none
   z-index: 9999
   will-change: transform
-  transition: color var(--transition-cursor), border-radius var(--transition-cursor)
+  transition: border-radius var(--transition-cursor)
   @media (hover: none) or (pointer: coarse)
     display: none
-
-:global(body[data-cursor-surface='blok']) .cursor
-  color: var(--cursor-color-blok)
 
 .main
   width: 1rem
@@ -33,7 +29,7 @@
 .message
   opacity: 0
   background: var(--theme-type)
-  color: var(--theme-type-contrast) !important
+  color: var(--theme-bg) !important
   padding: 6px 1.25rem 10px
   display: flex
   align-items: center
@@ -54,7 +50,7 @@
   overflow: hidden
   border: var(--border-width) solid currentColor
   border-radius: var(--border-radius)
-  background: var(--theme-blok-solid)
+  background: var(--theme-bg)
   z-index: 9998
   opacity: 0
   visibility: hidden

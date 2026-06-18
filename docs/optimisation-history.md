@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-18] Theme styling now uses only `LIGHT`, `DARK`, and `NIGHT` with one `--transition-theme` duration, inherited foreground color, `currentColor` foreground chrome, `--theme-muted-alpha` for inactive copy, and separate `--theme-bg`, `--theme-blok`, and `--theme-blok-sidepanel` surface tokens; old hidden theme branches and background effect modules were removed.
 - [2026-06-18] The disabled outer navigation and outer theming chrome were fully removed from the root layout, deleting their client components, Sass modules, and unused theming locale labels while keeping the header and footer controls.
 - [2026-06-18] The fixed falling action-button overlay was removed from the root layout, deleting its Matter.js physics runtime, route-suppression state, and action-button client components while keeping the normal in-page CTA.
 - [2026-04-27] The About top-panel dithered video portrait is temporarily disabled, keeping the panel/link surface while avoiding the lazy portrait chunk, MP4 load, canvas setup, and dither frame processing.

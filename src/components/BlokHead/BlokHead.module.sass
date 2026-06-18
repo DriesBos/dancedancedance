@@ -11,14 +11,19 @@
   top: 0
   width: 100%
   z-index: +1
-  border-top: var(--border-width) solid var(--border-color)
-  border-bottom: var(--border-width) solid var(--border-color)
-  border-left: var(--border-width) solid var(--border-color)
-  border-right: var(--border-width) solid var(--border-color)
+  border-top: var(--border-width) solid currentColor
+  border-bottom: var(--border-width) solid currentColor
+  border-left: var(--border-width) solid currentColor
+  border-right: var(--border-width) solid currentColor
   &[data-scrollborder='true']
     border-bottom-width: var(--border-width)
   :global(.side_Top)
     pointer-events: auto
+
+:global(body[data-fullscreen='false']) .blokHead
+  background: transparent
+  & > :global(.grainyGradient)
+    opacity: 0
 
 .row
   align-items: center
@@ -43,8 +48,6 @@
   min-width: 100%
   align-items: center
   white-space: nowrap
-  color: var(--theme-type)
-  transition: var(--transition-theme-color)
 
 .titleMeasure
   position: absolute
@@ -57,16 +60,14 @@
   white-space: nowrap
   visibility: hidden
   pointer-events: none
-  color: var(--theme-type)
-  transition: var(--transition-theme-color)
 
 .themeCycle
   width: var(--icon-size)
   height: var(--icon-size)
   border-radius: 1000px
   border: 1.5px solid currentColor
-  background: conic-gradient(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg), var(--theme-blok-solid)
-  transition: transform 0.25s ease, color var(--transition-theme-quick), border-color var(--transition-theme-quick), background var(--transition-theme-quick)
+  background: conic-gradient(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg), var(--theme-bg)
+  transition: transform 0.25s ease, color var(--transition-theme), border-color var(--transition-theme), background var(--transition-theme)
   will-change: transform
 
 .themeButton

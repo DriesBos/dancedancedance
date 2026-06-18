@@ -8,7 +8,12 @@ const BlokHeadSidePanels = () => {
   const showTopPanelPortrait =
     pathname === '/about' || pathname.startsWith('/about/');
 
-  return <BlokSidePanels showTopPanelPortrait={showTopPanelPortrait} />;
+  return (
+    <BlokSidePanels
+      showTopPanelPortrait={showTopPanelPortrait}
+      topPanelSurface="transparent"
+    />
+  );
 };
 
 export default BlokHeadSidePanels;

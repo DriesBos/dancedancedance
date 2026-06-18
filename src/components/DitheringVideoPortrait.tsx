@@ -240,8 +240,7 @@ const DitheringVideoPortrait = ({
     const themeType =
       bodyStyles.getPropertyValue('--theme-type').trim() || '#ffffff';
     const themeBg = bodyStyles.getPropertyValue('--theme-bg').trim() || '#000';
-    const themeTypeContrast =
-      bodyStyles.getPropertyValue('--theme-type-contrast').trim() || '#000';
+    const fallbackForeground = themeBg || '#000';
     const currentTheme = themeRef.current;
     const themeColorOverrides = themeColorsRef.current?.[currentTheme];
     const baseForeground = themeColorOverrides?.foreground ?? themeType;
@@ -261,8 +260,8 @@ const DitheringVideoPortrait = ({
     const rawForeground = resolvedInvert ? baseBackground : baseForeground;
     const rawBackground = resolvedInvert ? baseForeground : baseBackground;
     const resolvedForeground =
-      resolveCanvasColor(rawForeground, bodyStyles, themeTypeContrast) ||
-      themeTypeContrast;
+      resolveCanvasColor(rawForeground, bodyStyles, fallbackForeground) ||
+      fallbackForeground;
     const resolvedBackground = resolveCanvasColor(rawBackground, bodyStyles);
     const resolvedThreshold = Math.round(
       clamp(

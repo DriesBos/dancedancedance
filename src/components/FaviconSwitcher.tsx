@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useStore } from '@/store/store';
 import { ICON_ABOUT_FRAME_PATHS } from '@/components/Icons/IconAbout';
 
@@ -33,61 +33,19 @@ const getOrCreateFaviconLink = (rel: 'icon' | 'shortcut icon') => {
 
 export default function FaviconSwitcher() {
   const theme = useStore((state) => state.theme);
-  const [browserTheme, setBrowserTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') {
-      setBrowserTheme('light');
-      return;
-    }
-
-    const darkModeMediaQuery = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    );
-    setBrowserTheme(darkModeMediaQuery.matches ? 'dark' : 'light');
-
-    const handleThemeChange = (e: MediaQueryListEvent) => {
-      setBrowserTheme(e.matches ? 'dark' : 'light');
-    };
-
-    if (typeof darkModeMediaQuery.addEventListener === 'function') {
-      darkModeMediaQuery.addEventListener('change', handleThemeChange);
-    } else {
-      darkModeMediaQuery.addListener(handleThemeChange);
-    }
-
-    return () => {
-      if (typeof darkModeMediaQuery.removeEventListener === 'function') {
-        darkModeMediaQuery.removeEventListener('change', handleThemeChange);
-      } else {
-        darkModeMediaQuery.removeListener(handleThemeChange);
-      }
-    };
-  }, []);
 
   const themeColor = useMemo(() => {
-    const defaultColor = browserTheme === 'dark' ? '#FFFFFF' : '#000000';
     switch (theme) {
+      case 'LIGHT':
+        return '#000000';
+      case 'DARK':
+        return '#FFFFFF';
       case 'NIGHT':
         return '#FF0000';
-      case 'TRON':
-        return '#80FFE9';
-      case 'RADIANT':
-        return '#FA5942';
-      case 'SKY':
-        return defaultColor;
-      case 'KERMIT':
-        return '#62C853';
-      case 'LIGHT':
-        return defaultColor;
-      case 'SEGMENTS':
-        return defaultColor;
-      case 'KUSAMA':
-        return '#BA3A52';
       default:
-        return defaultColor;
+        return '#000000';
     }
-  }, [theme, browserTheme]);
+  }, [theme]);
 
   useEffect(() => {
     const unmanagedFavicons = document.querySelectorAll<HTMLLinkElement>(

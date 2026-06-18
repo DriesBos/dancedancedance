@@ -1,14 +1,9 @@
 import { Theme } from '@/lib/theme';
 
 export const THEME_META_COLORS: Record<Theme, string> = {
-  NIGHT: '#000000',
-  TRON: '#000000',
-  RADIANT: '#DAD9E0',
-  SKY: '#b49f82',
-  KERMIT: '#FFFFFF',
   LIGHT: '#E8E7E3',
-  SEGMENTS: '#1A1A1A',
-  KUSAMA: '#000000',
+  DARK: '#1A1A1A',
+  NIGHT: '#000000',
 };
 
 export const getThemeMetaColor = (theme: Theme): string =>
