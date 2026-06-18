@@ -11,6 +11,10 @@ const headStyleSource = readFileSync(
   new URL('./BlokHead.module.sass', import.meta.url),
   'utf8',
 );
+const globalStyleSource = readFileSync(
+  new URL('../../assets/styles/global.sass', import.meta.url),
+  'utf8',
+);
 
 test('mobile head animation uses coarse-pointer media and a 1s replay delay', () => {
   assert.match(
@@ -59,4 +63,18 @@ test('head surface CSS controls background without changing side panel transpare
   assert.match(headStyleSource, /&\[data-surface='transparent'\][\s\S]*background: transparent/);
   assert.match(headStyleSource, /&\[data-surface='solid'\][\s\S]*background: var\(--theme-blok\)/);
   assert.match(headStyleSource, /&\[data-surface='solid'\][\s\S]*& > :global\(\.grainyGradient\)[\s\S]*opacity: var\(--theme-bg-gradient\)/);
+});
+
+test('fullscreen-off head keeps its transparent top panel visible for borders', () => {
+  const fullscreenFalseHeadBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="false"\][\s\S]*?&-Project/,
+    )?.[0] || '';
+
+  assert.match(fullscreenFalseHeadBlock, /&-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
+});
+
+test('header row stays above the visible transparent top panel for clicks', () => {
+  assert.match(headStyleSource, /\.row[\s\S]*position: relative/);
+  assert.match(headStyleSource, /\.row[\s\S]*z-index: 2/);
 });
