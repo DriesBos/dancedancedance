@@ -39,20 +39,31 @@ const haveProjectsChanged = (
 
 const BlokHeadComponent = ({ projects }: Props) => {
   const headRef = useRef<HTMLDivElement>(null);
+  const headSentinelRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div
-      ref={headRef}
-      className={`${styles.blokHead} blok blok-Head blok-AnimateHead`}
-      data-active="true"
-      data-forced-closed="false"
-      data-scrollborder="false"
-    >
-      <GrainyGradient variant="blok" />
-      <BlokHeadBehavior headRef={headRef} />
-      <BlokHeadSidePanels />
-      <BlokHeadRouteContentContainer projects={projects} />
-    </div>
+    <>
+      <div
+        ref={headSentinelRef}
+        className={styles.headSentinel}
+        aria-hidden="true"
+      />
+      <div
+        ref={headRef}
+        className={`${styles.blokHead} blok blok-Head blok-AnimateHead`}
+        data-active="true"
+        data-forced-closed="false"
+        data-scrollborder="false"
+      >
+        <GrainyGradient variant="blok" />
+        <BlokHeadBehavior
+          headRef={headRef}
+          headSentinelRef={headSentinelRef}
+        />
+        <BlokHeadSidePanels />
+        <BlokHeadRouteContentContainer projects={projects} />
+      </div>
+    </>
   );
 };
 

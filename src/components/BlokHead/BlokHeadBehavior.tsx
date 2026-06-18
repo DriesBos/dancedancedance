@@ -7,11 +7,15 @@ import { useShallow } from 'zustand/react/shallow';
 
 type Props = {
   headRef: RefObject<HTMLDivElement | null>;
+  headSentinelRef: RefObject<HTMLDivElement | null>;
 };
 
 type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
 
-const BlokHeadBehavior = ({ headRef }: Props) => {
+const MOBILE_HEAD_ANIMATION_MEDIA_QUERY = '(hover: none), (pointer: coarse)';
+const MOBILE_HEAD_ANIMATION_DELAY = 330;
+
+const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
   const { fullscreen, topPanel, setTopPanelTrue, setTopPanelFalse } = useStore(
     useShallow((state) => ({
       fullscreen: state.fullscreen,
@@ -23,7 +27,11 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
   const isThreeDLayout = !fullscreen;
   const [hasScrollBorder, setHasScrollBorder] = useState(false);
   const [isTopPanelForcedClosed, setIsTopPanelForcedClosed] = useState(false);
+  const [hasMobileHeadAnimationMedia, setHasMobileHeadAnimationMedia] =
+    useState(false);
   const isHoveringTopPanelZoneRef = useRef(false);
+  const isMobileHeadAnimationLayout =
+    isThreeDLayout && hasMobileHeadAnimationMedia;
 
   const animateHead = useCallback(
     (vars: gsap.TweenVars) => {
@@ -108,6 +116,32 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
     setTopPanelMode('open');
     animateHead({ yPercent: -100 });
   }, [headRef, isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode]);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+
+    const mediaQuery = window.matchMedia(MOBILE_HEAD_ANIMATION_MEDIA_QUERY);
+
+    const syncMobileHeadAnimationMedia = () => {
+      setHasMobileHeadAnimationMedia(mediaQuery.matches);
+    };
+
+    syncMobileHeadAnimationMedia();
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', syncMobileHeadAnimationMedia);
+    } else {
+      mediaQuery.addListener(syncMobileHeadAnimationMedia);
+    }
+
+    return () => {
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', syncMobileHeadAnimationMedia);
+      } else {
+        mediaQuery.removeListener(syncMobileHeadAnimationMedia);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const head = headRef.current;
@@ -253,6 +287,7 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
 
     const syncHeadOnScroll = () => {
       updateScrollBorder();
+      if (isMobileHeadAnimationLayout) return;
       if (isThreeDLayout) {
         syncTopPanelWithScroll();
         return;
@@ -305,13 +340,20 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [headRef, isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode]);
+  }, [
+    headRef,
+    isThreeDLayout,
+    isMobileHeadAnimationLayout,
+    isPagePastTop,
+    animateHead,
+    setTopPanelMode,
+  ]);
 
   useEffect(() => {
     const main = document.querySelector('main');
     if (!main) return;
 
-    if (isThreeDLayout) {
+    if (isThreeDLayout && !isMobileHeadAnimationLayout) {
       const topPanel = headRef.current?.querySelector('.side_Top') || null;
       const isWithinInteractiveZone = (node: EventTarget | null) => {
         if (!(node instanceof Node)) return false;
@@ -343,16 +385,25 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
       };
     }
 
-    setTopPanelMode('closed');
-    animateHead({
-      y: 0,
-      yPercent: 0,
-      duration: 0.165,
-    });
-  }, [headRef, handleTopPanel, isThreeDLayout, animateHead, setTopPanelMode]);
+    if (!isThreeDLayout) {
+      setTopPanelMode('closed');
+      animateHead({
+        y: 0,
+        yPercent: 0,
+        duration: 0.165,
+      });
+    }
+  }, [
+    headRef,
+    handleTopPanel,
+    isThreeDLayout,
+    isMobileHeadAnimationLayout,
+    animateHead,
+    setTopPanelMode,
+  ]);
 
   useEffect(() => {
-    if (!isThreeDLayout) return;
+    if (!isThreeDLayout || isMobileHeadAnimationLayout) return;
 
     const main = document.querySelector('main');
     if (!main) return;
@@ -418,7 +469,96 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
         listenerOptions,
       );
     };
-  }, [headRef, isThreeDLayout, openTopPanelFromTouch]);
+  }, [
+    headRef,
+    isThreeDLayout,
+    isMobileHeadAnimationLayout,
+    openTopPanelFromTouch,
+  ]);
+
+  useEffect(() => {
+    if (!isMobileHeadAnimationLayout || !headRef.current) return;
+
+    let openTimer: number | null = null;
+    let isHeadSentinelVisible = true;
+    let observer: IntersectionObserver | null = null;
+
+    const clearOpenTimer = () => {
+      if (openTimer === null) return;
+      window.clearTimeout(openTimer);
+      openTimer = null;
+    };
+
+    const moveMobileHeadDown = (mode: TopPanelMode = 'closed') => {
+      clearOpenTimer();
+      isHoveringTopPanelZoneRef.current = false;
+      setTopPanelMode(mode);
+      animateHead({ y: 0, yPercent: 0 });
+    };
+
+    const scheduleMobileHeadUp = () => {
+      if (document.hidden || !isHeadSentinelVisible) {
+        clearOpenTimer();
+        return;
+      }
+
+      moveMobileHeadDown('closed');
+      openTimer = window.setTimeout(() => {
+        if (document.hidden || !isHeadSentinelVisible) return;
+
+        isHoveringTopPanelZoneRef.current = true;
+        setTopPanelMode('open');
+        animateHead({ y: 0, yPercent: -100 });
+        openTimer = null;
+      }, MOBILE_HEAD_ANIMATION_DELAY);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        moveMobileHeadDown('closed');
+        return;
+      }
+
+      scheduleMobileHeadUp();
+    };
+
+    const handleFocus = () => {
+      scheduleMobileHeadUp();
+    };
+
+    const sentinel = headSentinelRef.current;
+    if (sentinel && typeof IntersectionObserver === 'function') {
+      observer = new IntersectionObserver(([entry]) => {
+        isHeadSentinelVisible = entry?.isIntersecting ?? true;
+
+        if (!isHeadSentinelVisible) {
+          moveMobileHeadDown('forcedClosed');
+          return;
+        }
+
+        scheduleMobileHeadUp();
+      });
+      observer.observe(sentinel);
+    }
+
+    scheduleMobileHeadUp();
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearOpenTimer();
+      observer?.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [
+    headRef,
+    headSentinelRef,
+    isMobileHeadAnimationLayout,
+    animateHead,
+    setTopPanelMode,
+  ]);
 
   useEffect(() => {
     if (!isThreeDLayout) return;
