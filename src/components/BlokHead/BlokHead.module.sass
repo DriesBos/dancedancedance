@@ -17,13 +17,16 @@
   border-right: var(--border-width) solid currentColor
   &[data-scrollborder='true']
     border-bottom-width: var(--border-width)
+  &[data-surface='transparent']
+    background: transparent
+    & > :global(.grainyGradient)
+      opacity: 0
+  &[data-surface='solid']
+    background: var(--theme-blok)
+    & > :global(.grainyGradient)
+      opacity: var(--theme-bg-gradient)
   :global(.side_Top)
     pointer-events: auto
-
-:global(body[data-fullscreen='false']) .blokHead
-  background: transparent
-  & > :global(.grainyGradient)
-    opacity: 0
 
 .row
   align-items: center

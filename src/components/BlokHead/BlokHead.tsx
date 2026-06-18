@@ -54,6 +54,7 @@ const BlokHeadComponent = ({ projects }: Props) => {
         data-active="true"
         data-forced-closed="false"
         data-scrollborder="false"
+        data-surface="transparent"
       >
         <GrainyGradient variant="blok" />
         <BlokHeadBehavior

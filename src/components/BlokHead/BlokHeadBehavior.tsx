@@ -11,9 +11,10 @@ type Props = {
 };
 
 type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
+type HeadSurface = 'transparent' | 'solid';
 
 const MOBILE_HEAD_ANIMATION_MEDIA_QUERY = '(hover: none), (pointer: coarse)';
-const MOBILE_HEAD_ANIMATION_DELAY = 330;
+const MOBILE_HEAD_ANIMATION_DELAY = 1000;
 
 const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
   const { fullscreen, topPanel, setTopPanelTrue, setTopPanelFalse } = useStore(
@@ -55,6 +56,16 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     return window.scrollY > 0;
   }, []);
 
+  const setHeadSurface = useCallback(
+    (surface: HeadSurface) => {
+      const head = headRef.current;
+      if (!head) return;
+
+      head.dataset.surface = surface;
+    },
+    [headRef],
+  );
+
   const setTopPanelMode = useCallback(
     (mode: TopPanelMode) => {
       if (mode === 'open') {
@@ -88,34 +99,53 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
 
       if (e.type === 'mouseenter') {
         if (pagePastTop) {
+          setHeadSurface('solid');
           setTopPanelMode('forcedClosed');
           animateHead({ yPercent: 0 });
           return;
         }
 
+        setHeadSurface('transparent');
         setTopPanelMode('open');
         animateHead({ yPercent: -100 });
       } else {
+        setHeadSurface(pagePastTop ? 'solid' : 'transparent');
         setTopPanelMode(pagePastTop ? 'forcedClosed' : 'closed');
         animateHead({ yPercent: 0 });
       }
     },
-    [headRef, isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode],
+    [
+      headRef,
+      isThreeDLayout,
+      isPagePastTop,
+      animateHead,
+      setHeadSurface,
+      setTopPanelMode,
+    ],
   );
 
   const openTopPanelFromTouch = useCallback(() => {
     if (!headRef.current || !isThreeDLayout) return;
 
     if (isPagePastTop()) {
+      setHeadSurface('solid');
       setTopPanelMode('forcedClosed');
       animateHead({ yPercent: 0 });
       return;
     }
 
     isHoveringTopPanelZoneRef.current = true;
+    setHeadSurface('transparent');
     setTopPanelMode('open');
     animateHead({ yPercent: -100 });
-  }, [headRef, isThreeDLayout, isPagePastTop, animateHead, setTopPanelMode]);
+  }, [
+    headRef,
+    isThreeDLayout,
+    isPagePastTop,
+    animateHead,
+    setHeadSurface,
+    setTopPanelMode,
+  ]);
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -196,6 +226,7 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     const syncTopPanelWithScroll = () => {
       const shouldForceClosed = isPagePastTop();
       if (!shouldForceClosed) {
+        setHeadSurface('transparent');
         if (isForcedClosed) {
           if (isHoveringTopPanelZoneRef.current) {
             setTopPanelMode('open');
@@ -212,6 +243,7 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
         return;
       }
 
+      setHeadSurface('solid');
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const scrollThreshold = windowHeight * 0.1;
@@ -250,6 +282,8 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     };
 
     const syncDesktopHeadOnScroll = () => {
+      setHeadSurface('solid');
+
       if (!isLandscape) {
         if (headRef.current) {
           gsap.set(headRef.current, { y: 0 });
@@ -310,8 +344,10 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     };
 
     if (isThreeDLayout) {
+      setHeadSurface(isPagePastTop() ? 'solid' : 'transparent');
       gsap.set(headRef.current, { y: 0, yPercent: 0 });
     } else {
+      setHeadSurface('solid');
       setIsTopPanelForcedClosed(false);
       isHoveringTopPanelZoneRef.current = false;
     }
@@ -346,6 +382,7 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     isMobileHeadAnimationLayout,
     isPagePastTop,
     animateHead,
+    setHeadSurface,
     setTopPanelMode,
   ]);
 
@@ -489,9 +526,13 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
       openTimer = null;
     };
 
-    const moveMobileHeadDown = (mode: TopPanelMode = 'closed') => {
+    const moveMobileHeadDown = (
+      mode: TopPanelMode = 'closed',
+      surface: HeadSurface = 'transparent',
+    ) => {
       clearOpenTimer();
       isHoveringTopPanelZoneRef.current = false;
+      setHeadSurface(surface);
       setTopPanelMode(mode);
       animateHead({ y: 0, yPercent: 0 });
     };
@@ -502,11 +543,12 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
         return;
       }
 
-      moveMobileHeadDown('closed');
+      moveMobileHeadDown('closed', 'transparent');
       openTimer = window.setTimeout(() => {
         if (document.hidden || !isHeadSentinelVisible) return;
 
         isHoveringTopPanelZoneRef.current = true;
+        setHeadSurface('transparent');
         setTopPanelMode('open');
         animateHead({ y: 0, yPercent: -100 });
         openTimer = null;
@@ -515,7 +557,7 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        moveMobileHeadDown('closed');
+        moveMobileHeadDown('closed', 'transparent');
         return;
       }
 
@@ -532,7 +574,7 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
         isHeadSentinelVisible = entry?.isIntersecting ?? true;
 
         if (!isHeadSentinelVisible) {
-          moveMobileHeadDown('forcedClosed');
+          moveMobileHeadDown('forcedClosed', 'solid');
           return;
         }
 
@@ -557,6 +599,7 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     headSentinelRef,
     isMobileHeadAnimationLayout,
     animateHead,
+    setHeadSurface,
     setTopPanelMode,
   ]);
 
