@@ -4,6 +4,7 @@
   width: 100%
   height: 100%
   border: var(--border-width) solid currentColor
+  // border: var(--border-width) solid red
   backdrop-filter: none
   transition: height var(--transition-theme), background var(--transition-theme), border var(--transition-theme), backdrop-filter var(--transition-theme), opacity var(--transition-theme)
   pointer-events: none
@@ -11,15 +12,17 @@
   background: var(--theme-blok-sidepanel)
   &[data-surface='transparent']
     background: transparent
-    border-color: currentColor
-    box-shadow: inset 0 0 0 var(--border-width) currentColor
-    :global(.grainyGradient)
-      opacity: 0
+    // border-color: currentColor
+    // box-shadow: inset 0 0 0 var(--border-width) currentColor
+    // :global(.grainyGradient)
+    //   opacity: 0
   &_Top
-    left: calc(0px - 1.15 * #{var(--border-width)})
-    top: calc(0px - 0 * #{var(--border-width)})
+    left: calc(0px - 1.25 * #{var(--border-width)})
+    top: 0
+    @media (max-width: 768px)
+      top: -1px
     height: var(--panel-height)
-    width: calc(100% + 2.2 * #{var(--border-width)})
+    width: calc(100% + 2.5 * #{var(--border-width)})
     transform: rotateX(90deg) rotateY(0deg) translateY(calc(var(--panel-height) * -1))
     transform-origin: 0 0
     border-top: var(--border-width) solid currentColor
