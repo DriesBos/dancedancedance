@@ -5,10 +5,18 @@ import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
 
 export interface ProjectData {
   slug: string;
-  year: string;
-  title: string;
+  year?: string;
+  title?: string;
+  category?: string[];
+  highlight?: boolean;
+  thumbnail?: {
+    filename: string;
+    alt?: string;
+  };
   external_link?: { cached_url: string };
 }
+
+export type ProjectSlugData = Pick<ProjectData, 'slug' | 'external_link'>;
 
 type StoryblokProjectStory = {
   slug: string;
@@ -16,16 +24,19 @@ type StoryblokProjectStory = {
   content: {
     year?: string;
     title?: string;
-    external_link?: { cached_url: string };
+    category?: string[];
+    highlight?: boolean;
+    thumbnail?: ProjectData['thumbnail'];
+    external_link?: ProjectData['external_link'];
   };
 };
 
-export async function fetchProjectSlugs(): Promise<ProjectData[]> {
+export async function fetchProjectData(): Promise<ProjectData[]> {
   const sbParams: ISbStoriesParams = {
     version: 'published',
     starts_with: 'projects',
     is_startpage: false,
-    sort_by: 'content.year:desc', // Sort by year descending
+    sort_by: 'content.year:desc',
   };
   const publishedToken = getStoryblokAccessToken(false);
   const paramsWithCv = await withPublishedStoryblokCv(sbParams, publishedToken);
@@ -39,20 +50,29 @@ export async function fetchProjectSlugs(): Promise<ProjectData[]> {
   const response = await storyblokApi.get(`cdn/stories`, paramsWithCv, {
     cache: 'force-cache',
     next: {
-      revalidate: 3600, // Revalidate every hour
+      revalidate: 3600,
       tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS],
     },
   });
 
-  // Return projects in CMS order
   const stories = (response.data?.stories ?? []) as StoryblokProjectStory[];
 
-  const projects = stories.map((story) => ({
+  return stories.map((story) => ({
     slug: story.slug,
-    year: story.content.year || '0',
+    year: story.content.year,
     title: story.content.title || story.name,
+    category: story.content.category,
+    highlight: story.content.highlight,
+    thumbnail: story.content.thumbnail,
     external_link: story.content.external_link,
   }));
+}
 
-  return projects;
+export async function fetchProjectSlugs(): Promise<ProjectSlugData[]> {
+  const projects = await fetchProjectData();
+
+  return projects.map(({ slug, external_link }) => ({
+    slug,
+    external_link,
+  }));
 }

@@ -23,18 +23,10 @@ export default function CursorLoader() {
       setHasFinePointer(event.matches);
     };
 
-    if (typeof mediaQuery.addEventListener === 'function') {
-      mediaQuery.addEventListener('change', onChange);
-    } else {
-      mediaQuery.addListener(onChange);
-    }
+    mediaQuery.addEventListener('change', onChange);
 
     return () => {
-      if (typeof mediaQuery.removeEventListener === 'function') {
-        mediaQuery.removeEventListener('change', onChange);
-      } else {
-        mediaQuery.removeListener(onChange);
-      }
+      mediaQuery.removeEventListener('change', onChange);
     };
   }, []);
 

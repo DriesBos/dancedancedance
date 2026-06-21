@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function TitleSwitcher() {
-  const [originalTitle, setOriginalTitle] = useState<string>('');
+  const originalTitleRef = useRef('');
 
   useEffect(() => {
     // Store the original title when component mounts
-    setOriginalTitle(document.title);
+    originalTitleRef.current = document.title;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -15,7 +15,7 @@ export default function TitleSwitcher() {
         document.title = 'Hire this guy';
       } else {
         // User returned to the tab
-        document.title = originalTitle;
+        document.title = originalTitleRef.current;
       }
     };
 
@@ -26,7 +26,7 @@ export default function TitleSwitcher() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [originalTitle]);
+  }, []);
 
   // Update originalTitle whenever the document title changes
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function TitleSwitcher() {
 
     const observer = new MutationObserver(() => {
       if (!document.hidden) {
-        setOriginalTitle(document.title);
+        originalTitleRef.current = document.title;
       }
     });
 

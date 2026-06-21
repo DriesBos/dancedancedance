@@ -14,7 +14,6 @@ export type ProjectSortDirection = 'asc' | 'desc';
 
 interface BlokFilterProps {
   sortField: ProjectSortField;
-  sortDirection: ProjectSortDirection;
   onSortChange: (field: ProjectSortField) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -22,15 +21,12 @@ interface BlokFilterProps {
 
 export default function BlokFilter({
   sortField,
-  sortDirection,
   onSortChange,
   searchValue,
   onSearchChange,
 }: BlokFilterProps) {
   const locale = useStore((state) => state.locale);
   const isSortActive = (field: ProjectSortField) => sortField === field;
-  const sortIndicator = (field: ProjectSortField) =>
-    isSortActive(field) ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
 
   return (
     <div className={`blok blok-Filter blok-Animate ${styles.blokFilter}`}>

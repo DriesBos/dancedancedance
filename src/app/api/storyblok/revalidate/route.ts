@@ -75,15 +75,16 @@ const flushStoryblokMemoryCache = () => {
 };
 
 const revalidateTagWithBestProfile = (tag: string) => {
-  // Next.js versions before profile support accept a single argument only.
-  if (revalidateTag.length <= 1) {
-    revalidateTag(tag);
-    return;
-  }
+  const revalidateTagWithProfile = revalidateTag as unknown as (
+    cacheTag: string,
+    profile: 'max',
+  ) => void;
 
-  (
-    revalidateTag as unknown as (cacheTag: string, profile: 'max') => void
-  )(tag, 'max');
+  try {
+    revalidateTagWithProfile(tag, 'max');
+  } catch {
+    revalidateTag(tag);
+  }
 };
 
 export async function POST(request: NextRequest) {

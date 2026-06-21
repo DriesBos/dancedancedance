@@ -3,7 +3,6 @@ import Link from 'next/link';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient';
 import InlineWordSwapText from '@/components/InlineWordSwapText';
-import IconRightSmall from '@/components/Icons/IconRightSmall';
 import IconArrow from '@/components/Icons/IconArrow';
 import styles from './BlokIntro.module.sass';
 
@@ -36,23 +35,11 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
         {blok.line_two ? (
           <p className={`${styles.line} ${styles.lineTwo} desktop`}>
             <InlineWordSwapText text={blok.line_two} keyPrefix="line-two" />
-            <span className={`${styles.moreButtonContainer} cursorMagnetic`}>
-              {/* <span className={styles.moreButton}>More</span> */}
-              {/* <span className={styles.moreButtonIcon} aria-hidden="true">
-                <IconRightSmall />
-              </span> */}
-            </span>
           </p>
         ) : null}
         {blok.line_combined ? (
           <p className={`${styles.line} ${styles.lineCombined} mobile`}>
             <InlineWordSwapText text={blok.line_combined} keyPrefix="line-combined" />
-            <span className={`${styles.moreButtonContainer} cursorMagnetic`}>
-              {/* <span className={styles.moreButton}>More</span> */}
-              {/* <span className={styles.moreButtonIcon} aria-hidden="true">
-                <IconRightSmall />
-              </span> */}
-            </span>
           </p>
         ) : null}
       </div>

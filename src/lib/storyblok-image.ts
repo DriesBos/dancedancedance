@@ -14,6 +14,13 @@ interface StoryblokImageTransformOptions {
   noUpscale?: boolean;
 }
 
+interface WarmStoryblokImageOptions extends StoryblokImageTransformOptions {
+  fetchPriority?: 'high' | 'low' | 'auto';
+  cacheLimit?: number;
+}
+
+const DEFAULT_STORYBLOK_WARM_CACHE_LIMIT = 256;
+
 export const isStoryblokAssetUrl = (src?: string): boolean => {
   if (!src) return false;
 
@@ -86,4 +93,46 @@ export const storyblokVideoPosterUrl = (
 ): string | undefined => {
   if (!src) return undefined;
   return transformStoryblokImageUrl(src, { width, quality, noUpscale: true });
+};
+
+const addCappedWarmSrc = (
+  warmedSrcs: Set<string>,
+  src: string,
+  cacheLimit: number,
+) => {
+  // Warm caches are per component module and capped for long-lived sessions.
+  while (warmedSrcs.size >= cacheLimit) {
+    const oldestSrc = warmedSrcs.values().next().value as string | undefined;
+    if (!oldestSrc) break;
+    warmedSrcs.delete(oldestSrc);
+  }
+
+  warmedSrcs.add(src);
+};
+
+export const warmStoryblokImage = (
+  src: string | null | undefined,
+  {
+    fetchPriority = 'high',
+    cacheLimit = DEFAULT_STORYBLOK_WARM_CACHE_LIMIT,
+    ...transformOptions
+  }: WarmStoryblokImageOptions,
+  warmedSrcs: Set<string>,
+) => {
+  if (!src) return;
+
+  const warmSrc = transformStoryblokImageUrl(src, transformOptions);
+  if (!warmSrc || warmedSrcs.has(warmSrc)) return;
+
+  addCappedWarmSrc(warmedSrcs, warmSrc, cacheLimit);
+  if (typeof window === 'undefined') return;
+
+  const image = new window.Image();
+  if ('fetchPriority' in image) {
+    (image as HTMLImageElement & { fetchPriority?: 'high' | 'low' | 'auto' })
+      .fetchPriority = fetchPriority;
+  }
+  image.decoding = 'async';
+  image.src = warmSrc;
+  image.decode?.().catch(() => {});
 };

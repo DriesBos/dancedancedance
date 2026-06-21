@@ -57,7 +57,7 @@ export const getPublishedStoryblokCv = async (
 ): Promise<number | undefined> => {
   if (!token) return undefined;
   const cv = await fetchPublishedStoryblokCv(token);
-  return cv ?? undefined;
+  return cv === null ? undefined : cv;
 };
 
 export const withPublishedStoryblokCv = async <T extends ISbStoriesParams>(

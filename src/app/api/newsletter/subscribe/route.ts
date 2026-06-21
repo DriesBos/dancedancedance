@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     );
 
     // Tag endpoint returns 204 No Content on success
-    if (!tagResponse.ok && tagResponse.status !== 204) {
+    if (!tagResponse.ok) {
       console.error('Failed to add tag:', await tagResponse.text());
       // Don't fail the whole request if tagging fails
     }

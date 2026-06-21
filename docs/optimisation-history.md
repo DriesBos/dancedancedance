@@ -1,6 +1,9 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-21] Markdown link underline animation now runs through one shared hook, and Storyblok image prewarming now uses one capped helper shared by project and column sliders.
+- [2026-06-21] Cursor behavior was split out of the monolithic GSAP setup into focused runtime, route-reset, event-listener, and intro-message hooks; smaller maintenance cleanups also removed duplicate Markdown word-swap renderers, stale listener fallbacks, and fragile Storyblok revalidation branching.
+- [2026-06-21] Project data now has one tag-aware Storyblok fetch path, newsletter copy uses one shared scramble hook, and inline word swaps pass word arrays directly instead of serializing through a control-character string.
 - [2026-06-21] Theme foreground changes now transition once from `body` through `--theme-transition`, with descendant text, icons, borders, and muted states inheriting `currentColor`; muted copy now uses `--theme-muted-opacity` instead of color-mixing the theme token, avoiding staggered color phases during theme swaps.
 - [2026-06-21] `BlokHead` now uses the single shared `--blok-height` token directly and lets its row fill the frame, bringing the header rhythm closer to project-list rows without introducing extra height variables.
 - [2026-06-21] `BlokHead` initial animation now fades opacity only, leaving active up/down movement owned by the header surface transform so first render no longer delays the lifted header state or overlaps the next blok.

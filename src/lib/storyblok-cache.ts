@@ -15,7 +15,7 @@ export const getStoryblokTagsForSlug = (slug?: string | null): string[] => {
   const normalizedSlug = normalizeStorySlug(slug);
   const tags = new Set<string>([
     STORYBLOK_TAG_ALL,
-    getStoryblokSlugTag(normalizedSlug),
+    `storyblok:slug:${normalizedSlug}`,
   ]);
 
   if (normalizedSlug === 'projects' || normalizedSlug.startsWith('projects/')) {

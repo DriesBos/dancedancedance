@@ -1,11 +1,37 @@
 'use client';
 
 import MuxPlayerReact from '@mux/mux-player-react/lazy';
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import type { CSSProperties, ForwardedRef } from 'react';
+import type {
+  MuxPlayerProps as MuxPlayerReactProps,
+  MuxPlayerRefAttributes,
+} from '@mux/mux-player-react';
 import { createBlurUp } from '@mux/blurup';
 import '@/assets/styles/mux-player.css';
 
-interface MuxPlayerProps {
+export type MuxPlayerHandle = MuxPlayerRefAttributes;
+
+type MuxPlayerLoading = 'page' | 'viewport';
+
+interface MuxPlayerProps
+  extends Omit<
+    MuxPlayerReactProps,
+    | 'playbackId'
+    | 'poster'
+    | 'placeholder'
+    | 'loop'
+    | 'muted'
+    | 'autoPlay'
+    | 'playsInline'
+    | 'pause'
+    | 'preload'
+    | 'style'
+    | 'className'
+    | 'accentColor'
+    | 'primaryColor'
+    | 'secondaryColor'
+  > {
   playbackId: string;
   poster?: string;
   placeholderTime?: number; // Time in seconds for Mux auto-generated placeholder (default: 0)
@@ -25,15 +51,27 @@ interface MuxPlayerProps {
   aspectRatio?: string; // Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
   dynamicAspectRatio?: boolean; // Auto-detect aspect ratio from video metadata (default: true)
   noControls?: boolean; // Hide player controls (default: false)
-  loading?: 'page' | 'viewport'; // When to load the player (default: 'viewport')
-  style?: React.CSSProperties;
+  loading?: MuxPlayerLoading; // When to load the player (default: 'viewport')
+  style?: CSSProperties;
   className?: string;
   accentColor?: string;
   primaryColor?: string;
   secondaryColor?: string;
-  // Additional Mux Player props
-  [key: string]: any;
 }
+
+const assignRef = (
+  ref: ForwardedRef<MuxPlayerHandle>,
+  value: MuxPlayerHandle | null,
+) => {
+  if (typeof ref === 'function') {
+    ref(value);
+    return;
+  }
+
+  if (ref) {
+    ref.current = value;
+  }
+};
 
 /**
  * Reusable Mux Player component for Next.js + Storyblok
@@ -58,146 +96,161 @@ interface MuxPlayerProps {
  * @param primaryColor - Mux Player primary color
  * @param secondaryColor - Mux Player secondary color
  */
-const MuxPlayer: React.FC<MuxPlayerProps> = ({
-  playbackId,
-  poster,
-  placeholderTime = 0,
-  blurUpOptions,
-  loop = false,
-  muted = true,
-  autoPlay = false,
-  playsInline = true,
-  pause,
-  preload = 'auto',
-  aspectRatio = '16 / 9',
-  dynamicAspectRatio = true,
-  noControls = true,
-  loading = 'viewport',
-  style,
-  className,
-  accentColor,
-  primaryColor,
-  secondaryColor,
-  ...rest
-}) => {
-  const playerRef = useRef<any>(null);
-  const [detectedAspectRatio, setDetectedAspectRatio] = useState<string | null>(
-    null
-  );
-  const [blurDataURL, setBlurDataURL] = useState<string | null>(null);
+const MuxPlayer = forwardRef<MuxPlayerHandle, MuxPlayerProps>(
+  (
+    {
+      playbackId,
+      poster,
+      placeholderTime = 0,
+      blurUpOptions,
+      loop = false,
+      muted = true,
+      autoPlay = false,
+      playsInline = true,
+      pause,
+      preload = 'auto',
+      aspectRatio = '16 / 9',
+      dynamicAspectRatio = true,
+      noControls = true,
+      loading = 'viewport',
+      style,
+      className,
+      accentColor,
+      primaryColor,
+      secondaryColor,
+      ...rest
+    },
+    forwardedRef,
+  ) => {
+    const playerRef = useRef<MuxPlayerHandle | null>(null);
+    const [detectedAspectRatio, setDetectedAspectRatio] = useState<string | null>(
+      null
+    );
+    const [blurDataURL, setBlurDataURL] = useState<string | null>(null);
+    const setPlayerRef = useCallback(
+      (node: MuxPlayerHandle | null) => {
+        playerRef.current = node;
+        assignRef(forwardedRef, node);
+      },
+      [forwardedRef],
+    );
 
-  // Generate BlurUp placeholder for smooth loading experience
-  useEffect(() => {
-    let isMounted = true;
+    // Generate BlurUp placeholder for smooth loading experience
+    useEffect(() => {
+      let isMounted = true;
 
-    const generateBlurUp = async () => {
-      try {
-        const options = {
-          time: placeholderTime,
-          ...blurUpOptions,
-        };
+      const generateBlurUp = async () => {
+        try {
+          const options = {
+            time: placeholderTime,
+            ...blurUpOptions,
+          };
 
-        const { blurDataURL: generatedBlurDataURL } = await createBlurUp(
-          playbackId,
-          options
-        );
+          const { blurDataURL: generatedBlurDataURL } = await createBlurUp(
+            playbackId,
+            options
+          );
 
-        if (isMounted) {
-          setBlurDataURL(generatedBlurDataURL);
+          if (isMounted) {
+            setBlurDataURL(generatedBlurDataURL);
+          }
+        } catch (error) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Failed to generate BlurUp placeholder:', error);
+          }
         }
-      } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('Failed to generate BlurUp placeholder:', error);
+      };
+
+      generateBlurUp();
+
+      return () => {
+        isMounted = false;
+      };
+    }, [playbackId, placeholderTime, blurUpOptions]);
+
+    // Handle metadata loaded to detect aspect ratio
+    useEffect(() => {
+      if (!playerRef.current || !dynamicAspectRatio) return;
+
+      const player = playerRef.current;
+
+      const handleLoadedMetadata = () => {
+        const media = player.media;
+        const video =
+          media instanceof HTMLVideoElement ? media : player.querySelector('video');
+
+        if (video && video.videoWidth && video.videoHeight) {
+          const width = video.videoWidth;
+          const height = video.videoHeight;
+          const calculatedRatio = `${width} / ${height}`;
+
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Detected video dimensions:', {
+              width,
+              height,
+              ratio: calculatedRatio,
+            });
+          }
+          setDetectedAspectRatio(calculatedRatio);
         }
-      }
-    };
+      };
 
-    generateBlurUp();
+      // Try to get metadata immediately if already loaded
+      handleLoadedMetadata();
 
-    return () => {
-      isMounted = false;
-    };
-  }, [playbackId, placeholderTime, blurUpOptions]);
+      // Listen for loadedmetadata event
+      player.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-  // Handle metadata loaded to detect aspect ratio
-  useEffect(() => {
-    if (!playerRef.current || !dynamicAspectRatio) return;
+      return () => {
+        player.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      };
+    }, [dynamicAspectRatio, playbackId]);
 
-    const player = playerRef.current;
+    // Use detected aspect ratio if available and dynamicAspectRatio is enabled, otherwise use provided aspectRatio
+    const finalAspectRatio =
+      dynamicAspectRatio && detectedAspectRatio
+        ? detectedAspectRatio
+        : aspectRatio;
 
-    const handleLoadedMetadata = () => {
-      // Access the internal video element
-      const video = player.media || player.querySelector('video');
+    // Determine the placeholder strategy:
+    // 1. If poster provided, show blurDataURL as background while poster loads
+    // 2. If no poster, show blurDataURL then Mux thumbnail
+    const placeholderImage = poster
+      ? undefined
+      : `https://image.mux.com/${playbackId}/thumbnail.jpg?time=${placeholderTime}`;
 
-      if (video && video.videoWidth && video.videoHeight) {
-        const width = video.videoWidth;
-        const height = video.videoHeight;
-        const calculatedRatio = `${width} / ${height}`;
+    return (
+      <MuxPlayerReact
+        ref={setPlayerRef}
+        playbackId={playbackId}
+        poster={poster}
+        placeholder={blurDataURL || placeholderImage}
+        loop={loop}
+        muted={muted}
+        autoPlay={autoPlay}
+        playsInline={playsInline}
+        preload={preload}
+        loading={loading}
+        streamType="on-demand"
+        nohotkeys={noControls}
+        style={{
+          width: '100%',
+          aspectRatio: finalAspectRatio,
+          display: 'block',
+          position: 'relative',
+          ...style,
+        }}
+        className={className}
+        accentColor={accentColor}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
+        {...(noControls ? { controls: false } : {})}
+        {...rest}
+      />
+    );
+  },
+);
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Detected video dimensions:', {
-            width,
-            height,
-            ratio: calculatedRatio,
-          });
-        }
-        setDetectedAspectRatio(calculatedRatio);
-      }
-    };
-
-    // Try to get metadata immediately if already loaded
-    handleLoadedMetadata();
-
-    // Listen for loadedmetadata event
-    player.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-    return () => {
-      player.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-  }, [dynamicAspectRatio, playbackId]);
-
-  // Use detected aspect ratio if available and dynamicAspectRatio is enabled, otherwise use provided aspectRatio
-  const finalAspectRatio =
-    dynamicAspectRatio && detectedAspectRatio
-      ? detectedAspectRatio
-      : aspectRatio;
-
-  // Determine the placeholder strategy:
-  // 1. If poster provided, show blurDataURL as background while poster loads
-  // 2. If no poster, show blurDataURL then Mux thumbnail
-  const placeholderImage = poster
-    ? undefined
-    : `https://image.mux.com/${playbackId}/thumbnail.jpg?time=${placeholderTime}`;
-
-  return (
-    <MuxPlayerReact
-      ref={playerRef}
-      playbackId={playbackId}
-      poster={poster}
-      placeholder={blurDataURL || placeholderImage}
-      loop={loop}
-      muted={muted}
-      autoPlay={autoPlay}
-      playsInline={playsInline}
-      preload={preload}
-      loading={loading}
-      streamType="on-demand"
-      nohotkeys={noControls}
-      style={{
-        width: '100%',
-        aspectRatio: finalAspectRatio,
-        display: 'block',
-        position: 'relative',
-        ...style,
-      }}
-      className={className}
-      accentColor={accentColor}
-      primaryColor={primaryColor}
-      secondaryColor={secondaryColor}
-      {...(noControls ? { controls: false } : {})}
-      {...rest}
-    />
-  );
-};
+MuxPlayer.displayName = 'MuxPlayer';
 
 export default MuxPlayer;

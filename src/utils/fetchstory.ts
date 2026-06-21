@@ -1,9 +1,10 @@
 import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
 import { getStoryblokTagsForSlug } from '@/lib/storyblok-cache';
 import { getPublishedStoryblokCv } from '@/lib/storyblok-cv';
+import type { ISbStoryData } from '@storyblok/react/rsc';
 
-type StoryblokResponse = { story: any };
-type StoryblokStartpageResponse = { stories?: any[] };
+type StoryblokResponse = { story: ISbStoryData };
+type StoryblokStartpageResponse = { stories?: ISbStoryData[] };
 
 class StoryblokHttpError extends Error {
   status: number;

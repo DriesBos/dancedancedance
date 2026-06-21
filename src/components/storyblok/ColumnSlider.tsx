@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
   storyblokImageLoader,
-  transformStoryblokImageUrl,
+  warmStoryblokImage,
 } from '@/lib/storyblok-image';
 import SliderIndicators from '../SliderIndicators';
 
@@ -75,23 +75,15 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   useEffect(() => {
     if (!nextImage?.filename) return;
 
-    const warmSrc = transformStoryblokImageUrl(nextImage.filename, {
-      width: 1600,
-      quality: 70,
-      noUpscale: true,
-    });
-
-    if (!warmSrc || warmedColumnSliderImageSrcs.has(warmSrc)) return;
-
-    warmedColumnSliderImageSrcs.add(warmSrc);
-    const image = new window.Image();
-    if ('fetchPriority' in image) {
-      (image as HTMLImageElement & { fetchPriority?: 'high' | 'low' | 'auto' })
-        .fetchPriority = 'high';
-    }
-    image.decoding = 'async';
-    image.src = warmSrc;
-    image.decode?.().catch(() => {});
+    warmStoryblokImage(
+      nextImage.filename,
+      {
+        width: 1600,
+        quality: 70,
+        noUpscale: true,
+      },
+      warmedColumnSliderImageSrcs,
+    );
   }, [nextImage?.filename]);
 
   useEffect(() => {

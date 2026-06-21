@@ -1,6 +1,12 @@
 'use client';
 
-import { FormEvent, useState, useEffect, useRef } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type RefObject,
+} from 'react';
 import { useGSAP } from '@/lib/gsap';
 import { vibrate } from '@/lib/vibration';
 import { useStore } from '@/store/store';
@@ -10,6 +16,62 @@ import styles from './Newsletter.module.sass';
 interface NewsletterProps {
   className?: string;
 }
+
+const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz';
+const SCRAMBLE_ITERATIONS_PER_CHARACTER = 8;
+const SCRAMBLE_FRAME_MS = 30;
+
+const shouldPreserveScrambleCharacter = (char: string) =>
+  char === ' ' || char === '!' || char === '.';
+
+const useTextScramble = (
+  textRef: RefObject<HTMLElement | null>,
+  targetText: string,
+) => {
+  useGSAP(
+    () => {
+      const element = textRef.current;
+      if (!element || !targetText) return;
+
+      if (!/^[\x00-\x7F]*$/.test(targetText)) {
+        element.textContent = targetText;
+        return;
+      }
+
+      let iteration = 0;
+      const interval = window.setInterval(() => {
+        const currentElement = textRef.current;
+        if (!currentElement) return;
+
+        currentElement.textContent = targetText
+          .split('')
+          .map((char, index) => {
+            if (shouldPreserveScrambleCharacter(char)) return char;
+            if (
+              index <
+              (iteration / SCRAMBLE_ITERATIONS_PER_CHARACTER) * targetText.length
+            ) {
+              return targetText[index];
+            }
+            return SCRAMBLE_CHARS[
+              Math.floor(Math.random() * SCRAMBLE_CHARS.length)
+            ];
+          })
+          .join('');
+
+        iteration += 1;
+
+        if (iteration > targetText.length * SCRAMBLE_ITERATIONS_PER_CHARACTER) {
+          window.clearInterval(interval);
+          currentElement.textContent = targetText;
+        }
+      }, SCRAMBLE_FRAME_MS);
+
+      return () => window.clearInterval(interval);
+    },
+    { dependencies: [targetText] },
+  );
+};
 
 export default function Newsletter({ className }: NewsletterProps) {
   const locale = useStore((state) => state.locale);
@@ -23,92 +85,8 @@ export default function Newsletter({ className }: NewsletterProps) {
   const messageRef = useRef<HTMLParagraphElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Playful scramble animation with random characters
-  useGSAP(
-    () => {
-      if (buttonTextRef.current) {
-        const targetText = buttonText;
-
-        // Skip scramble for non-ASCII text (e.g. Japanese) — Latin random chars
-        // make no sense and the animation duration is calibrated for ASCII length.
-        const isAsciiOnly = /^[\x00-\x7F]*$/.test(targetText);
-        if (!isAsciiOnly) {
-          buttonTextRef.current.textContent = targetText;
-          return;
-        }
-
-        const chars = 'abcdefghijklmnopqrstuvwxyz';
-        const iterations = 8; // Number of scramble iterations per character
-
-        let iteration = 0;
-        const interval = setInterval(() => {
-          if (buttonTextRef.current) {
-            buttonTextRef.current.textContent = targetText
-              .split('')
-              .map((char, index) => {
-                if (char === ' ') return ' ';
-                if (index < (iteration / iterations) * targetText.length) {
-                  return targetText[index];
-                }
-                return chars[Math.floor(Math.random() * chars.length)];
-              })
-              .join('');
-          }
-
-          iteration++;
-
-          if (iteration > targetText.length * iterations) {
-            clearInterval(interval);
-            if (buttonTextRef.current) {
-              buttonTextRef.current.textContent = targetText;
-            }
-          }
-        }, 30); // Speed of scramble (30ms per frame)
-
-        return () => clearInterval(interval);
-      }
-    },
-    { dependencies: [buttonText] },
-  );
-
-  // Playful scramble animation for message text
-  useGSAP(
-    () => {
-      if (messageRef.current && message) {
-        const targetText = message;
-        const chars = 'abcdefghijklmnopqrstuvwxyz';
-        const iterations = 8;
-
-        let iteration = 0;
-        const interval = setInterval(() => {
-          if (messageRef.current) {
-            messageRef.current.textContent = targetText
-              .split('')
-              .map((char, index) => {
-                if (char === ' ' || char === '!' || char === '.') return char;
-                if (index < (iteration / iterations) * targetText.length) {
-                  return targetText[index];
-                }
-                return chars[Math.floor(Math.random() * chars.length)];
-              })
-              .join('');
-          }
-
-          iteration++;
-
-          if (iteration > targetText.length * iterations) {
-            clearInterval(interval);
-            if (messageRef.current) {
-              messageRef.current.textContent = targetText;
-            }
-          }
-        }, 30);
-
-        return () => clearInterval(interval);
-      }
-    },
-    { dependencies: [message] },
-  );
+  useTextScramble(buttonTextRef, buttonText);
+  useTextScramble(messageRef, message);
 
   // Update button text based on state
   useEffect(() => {

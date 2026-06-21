@@ -19,12 +19,10 @@ import HeaderInitAnimation from '@/components/HeaderInitAnimation';
 import PageContentGate from '@/components/PageContentGate';
 import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 import {
-  DEVELOPMENT_DEFAULT_THEME,
-  IS_DEVELOPMENT,
-  LANDSCAPE_DEFAULT_THEME,
+  DARK_THEME,
+  LIGHT_THEME,
   NIGHT_THEME,
   NIGHT_THEME_HOUR_END,
-  PORTRAIT_DEFAULT_THEME,
   THEMES_WITH_INITIAL_INTRO,
 } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
@@ -34,24 +32,16 @@ const INITIAL_UI_STATE_SCRIPT = `
     var pathname = window.location.pathname || '/';
     var routeSlug = pathname.split('/')[1] || 'home';
     var hour = new Date().getHours();
-    var isPortrait =
-      typeof window.matchMedia === 'function'
-        ? window.matchMedia('(orientation: portrait)').matches
-        : window.innerHeight > window.innerWidth;
-    var orientation =
-      isPortrait ? 'portrait' : 'landscape';
-    var defaultTheme =
-      ${JSON.stringify(IS_DEVELOPMENT)}
-        ? ${JSON.stringify(DEVELOPMENT_DEFAULT_THEME)}
-        : orientation === 'portrait'
-        ? ${JSON.stringify(PORTRAIT_DEFAULT_THEME)}
-        : ${JSON.stringify(LANDSCAPE_DEFAULT_THEME)};
+    var prefersDark =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var preferredTheme =
+      prefersDark ? ${JSON.stringify(DARK_THEME)} : ${JSON.stringify(LIGHT_THEME)};
     var theme =
-      ${JSON.stringify(IS_DEVELOPMENT)}
-        ? ${JSON.stringify(DEVELOPMENT_DEFAULT_THEME)}
-        : hour >= 0 && hour < ${NIGHT_THEME_HOUR_END}
+      preferredTheme === ${JSON.stringify(DARK_THEME)} &&
+      hour >= 0 && hour < ${NIGHT_THEME_HOUR_END}
         ? ${JSON.stringify(NIGHT_THEME)}
-        : defaultTheme;
+        : preferredTheme;
     var fullscreen = false;
     var initialThemeIntroPending =
       ${JSON.stringify(THEMES_WITH_INITIAL_INTRO)}.indexOf(theme) !== -1;

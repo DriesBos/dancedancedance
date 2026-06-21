@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSwipeable } from 'react-swipeable';
 import MuxPlayer from '@/components/MuxPlayer';
+import type { MuxPlayerHandle } from '@/components/MuxPlayer';
 import SliderIndicators from '@/components/SliderIndicators';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
@@ -16,7 +17,7 @@ import { t } from '@/lib/locale';
 import {
   storyblokImageLoader,
   storyblokVideoPosterUrl,
-  transformStoryblokImageUrl,
+  warmStoryblokImage,
 } from '@/lib/storyblok-image';
 import styles from './BlokProjectSlider.module.sass';
 
@@ -69,7 +70,7 @@ const warmedSlideImageSrcs = new Set<string>();
 const SlideItem = ({ item, isActive, isNext, index }: SlideItemProps) => {
   const locale = useStore((state) => state.locale);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const muxPlayerRef = useRef<any>(null);
+  const muxPlayerRef = useRef<MuxPlayerHandle | null>(null);
   const optimizedPoster = storyblokVideoPosterUrl(item.media?.filename);
   const shouldWarmMedia = isActive || isNext;
   const isStillImageSlide = !item.mux_playback_id && !item.video_link;
@@ -80,22 +81,15 @@ const SlideItem = ({ item, isActive, isNext, index }: SlideItemProps) => {
   useEffect(() => {
     if (!isNext || !stillImageSrc) return;
 
-    const warmSrc = transformStoryblokImageUrl(stillImageSrc, {
-      width: 1920,
-      quality: 60,
-      noUpscale: true,
-    });
-    if (!warmSrc || warmedSlideImageSrcs.has(warmSrc)) return;
-
-    warmedSlideImageSrcs.add(warmSrc);
-    const image = new window.Image();
-    if ('fetchPriority' in image) {
-      (image as HTMLImageElement & { fetchPriority?: 'high' | 'low' | 'auto' })
-        .fetchPriority = 'high';
-    }
-    image.decoding = 'async';
-    image.src = warmSrc;
-    image.decode?.().catch(() => {});
+    warmStoryblokImage(
+      stillImageSrc,
+      {
+        width: 1920,
+        quality: 60,
+        noUpscale: true,
+      },
+      warmedSlideImageSrcs,
+    );
   }, [isNext, stillImageSrc]);
 
   // Control video playback based on isActive state
@@ -124,7 +118,7 @@ const SlideItem = ({ item, isActive, isNext, index }: SlideItemProps) => {
     if (item.mux_playback_id && muxPlayer) {
       if (isActive) {
         muxPlayer.currentTime = 0;
-        muxPlayer.play().catch((err: any) => {
+        muxPlayer.play().catch((err: unknown) => {
           console.warn('MuxPlayer play failed:', err);
         });
       } else {

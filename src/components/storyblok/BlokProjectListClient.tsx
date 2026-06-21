@@ -85,7 +85,6 @@ export default function BlokProjectListClient({
     <>
       <BlokFilter
         sortField={sortField}
-        sortDirection={sortDirection}
         onSortChange={handleSortChange}
         searchValue={searchValue}
         onSearchChange={setSearchValue}

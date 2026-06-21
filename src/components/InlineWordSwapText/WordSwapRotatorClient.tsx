@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CSSProperties, PointerEvent } from 'react';
 import { SWAP_TRANSITION_MS } from './wordSwapShared';
 import styles from './InlineWordSwapText.module.sass';
@@ -18,34 +18,25 @@ const WordSwapRotatorClient = ({
   words,
   durationSeconds,
 }: WordSwapRotatorClientProps) => {
-  const wordsKey = words.join('\u001f');
-  const normalizedWords = useMemo(() => {
-    const stableWords = wordsKey ? wordsKey.split('\u001f') : [''];
-    return stableWords.length >= 2
-      ? stableWords
-      : [stableWords[0] ?? '', stableWords[0] ?? ''];
-  }, [wordsKey]);
+  const normalizedWords =
+    words.length >= 2 ? words : [words[0] ?? '', words[0] ?? ''];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [phase, setPhase] = useState<'hold' | 'slide'>('hold');
   const nextIndex = (currentIndex + 1) % normalizedWords.length;
   const currentWord = normalizedWords[currentIndex];
   const nextWord = normalizedWords[nextIndex];
-  const holdDurationMs = useMemo(
-    () =>
-      Math.max(
-        400,
-        ((durationSeconds * 1000 -
-          SWAP_TRANSITION_MS * normalizedWords.length) /
-          normalizedWords.length) |
-          0,
-      ),
-    [durationSeconds, normalizedWords.length],
+  const holdDurationMs = Math.max(
+    400,
+    ((durationSeconds * 1000 -
+      SWAP_TRANSITION_MS * normalizedWords.length) /
+      normalizedWords.length) |
+      0,
   );
 
   useEffect(() => {
     setCurrentIndex(0);
     setPhase('hold');
-  }, [normalizedWords]);
+  }, [words]);
 
   useEffect(() => {
     const timeout =

@@ -1,8 +1,7 @@
 import type { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/lib/site-url';
 import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
 import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
-
-const DEFAULT_SITE_URL = 'https://www.driesbos.com';
 
 type StoryblokStoryListItem = {
   slug?: string;
@@ -10,9 +9,6 @@ type StoryblokStoryListItem = {
   published_at?: string;
   updated_at?: string;
 };
-
-const getSiteUrl = () =>
-  (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, '');
 
 const getPublishedEntries = async (
   baseUrl: string,

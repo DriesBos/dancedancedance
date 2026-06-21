@@ -30,6 +30,7 @@ const BlokFooter = () => {
           <a
             href="mailto:hello@driesbos.com?subject=Let's Make Internet"
             target="_blank"
+            rel="noopener noreferrer"
             className="linkAnimation cursorMessage"
             data-cursor-message={t('cursor.talk', locale)}
           >
@@ -41,7 +42,8 @@ const BlokFooter = () => {
           </a>
           <a
             href="https://www.instagram.com/dries_bos"
-            target="blank"
+            target="_blank"
+            rel="noopener noreferrer"
             className="cursorInteract linkAnimation hasExternalIcon"
           >
             Instagram
@@ -49,7 +51,8 @@ const BlokFooter = () => {
           </a>
           <a
             href="https://www.linkedin.com/in/dries-bos/"
-            target="blank"
+            target="_blank"
+            rel="noopener noreferrer"
             className="cursorInteract linkAnimation hasExternalIcon"
           >
             LinkedIn

@@ -34,12 +34,6 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  // Add experimental features for better stability
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
-  },
 };
 
 export default nextConfig;
