@@ -30,11 +30,13 @@ test('mobile head animation replays when the tab becomes visible or focused', ()
   assert.match(behaviorSource, /document\.hidden/);
 });
 
-test('mobile head animation uses a stable sentinel instead of observing the transformed head', () => {
-  assert.match(behaviorSource, /headSentinelRef/);
-  assert.match(behaviorSource, /new IntersectionObserver/);
-  assert.match(headSource, /headSentinelRef/);
-  assert.match(headSource, /className=\{styles\.headSentinel\}/);
+test('BlokHead renders one direct main child without a sentinel sibling', () => {
+  assert.doesNotMatch(behaviorSource, /headSentinelRef/);
+  assert.doesNotMatch(behaviorSource, /new IntersectionObserver/);
+  assert.doesNotMatch(headSource, /headSentinelRef/);
+  assert.doesNotMatch(headSource, /className=\{styles\.headSentinel\}/);
+  assert.doesNotMatch(headStyleSource, /\.headSentinel/);
+  assert.match(headSource, /return \(\s*<div[\s\S]*className=\{`\$\{styles\.blokHead\} blok blok-Head blok-AnimateHead`\}/);
 });
 
 test('touch-to-open behavior is disabled while the mobile animation owns head movement', () => {
@@ -50,11 +52,9 @@ test('head owns an explicit surface state separate from panel state', () => {
   assert.match(behaviorSource, /const setHeadSurface = useCallback/);
 });
 
-test('mobile scrolled head uses solid surface while at-top replay uses transparent surface', () => {
-  assert.match(
-    behaviorSource,
-    /moveMobileHeadDown\('forcedClosed', 'solid'\)/,
-  );
+test('mobile replay no longer depends on sentinel-specific scrolled state', () => {
+  assert.doesNotMatch(behaviorSource, /isHeadSentinelVisible/);
+  assert.doesNotMatch(behaviorSource, /moveMobileHeadDown\('forcedClosed', 'solid'\)/);
   assert.match(behaviorSource, /moveMobileHeadDown\('closed', 'transparent'\)/);
   assert.match(behaviorSource, /setHeadSurface\('transparent'\)/);
 });
@@ -72,6 +72,11 @@ test('fullscreen-off head keeps its transparent top panel visible for borders', 
     )?.[0] || '';
 
   assert.match(fullscreenFalseHeadBlock, /&-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
+});
+
+test('layout targets the head blok explicitly instead of by child index', () => {
+  assert.match(globalStyleSource, /& > \.blok-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
+  assert.doesNotMatch(globalStyleSource, /&:nth-child\(2\)[\s\S]*z-index: -1/);
 });
 
 test('header row stays above the visible transparent top panel for clicks', () => {

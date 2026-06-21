@@ -7,7 +7,6 @@ import { useShallow } from 'zustand/react/shallow';
 
 type Props = {
   headRef: RefObject<HTMLDivElement | null>;
-  headSentinelRef: RefObject<HTMLDivElement | null>;
 };
 
 type TopPanelMode = 'open' | 'closed' | 'forcedClosed';
@@ -16,7 +15,7 @@ type HeadSurface = 'transparent' | 'solid';
 const MOBILE_HEAD_ANIMATION_MEDIA_QUERY = '(hover: none), (pointer: coarse)';
 const MOBILE_HEAD_ANIMATION_DELAY = 1000;
 
-const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
+const BlokHeadBehavior = ({ headRef }: Props) => {
   const { fullscreen, topPanel, setTopPanelTrue, setTopPanelFalse } = useStore(
     useShallow((state) => ({
       fullscreen: state.fullscreen,
@@ -517,8 +516,6 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     if (!isMobileHeadAnimationLayout || !headRef.current) return;
 
     let openTimer: number | null = null;
-    let isHeadSentinelVisible = true;
-    let observer: IntersectionObserver | null = null;
 
     const clearOpenTimer = () => {
       if (openTimer === null) return;
@@ -538,14 +535,14 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
     };
 
     const scheduleMobileHeadUp = () => {
-      if (document.hidden || !isHeadSentinelVisible) {
+      if (document.hidden) {
         clearOpenTimer();
         return;
       }
 
       moveMobileHeadDown('closed', 'transparent');
       openTimer = window.setTimeout(() => {
-        if (document.hidden || !isHeadSentinelVisible) return;
+        if (document.hidden) return;
 
         isHoveringTopPanelZoneRef.current = true;
         setHeadSurface('transparent');
@@ -568,21 +565,6 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
       scheduleMobileHeadUp();
     };
 
-    const sentinel = headSentinelRef.current;
-    if (sentinel && typeof IntersectionObserver === 'function') {
-      observer = new IntersectionObserver(([entry]) => {
-        isHeadSentinelVisible = entry?.isIntersecting ?? true;
-
-        if (!isHeadSentinelVisible) {
-          moveMobileHeadDown('forcedClosed', 'solid');
-          return;
-        }
-
-        scheduleMobileHeadUp();
-      });
-      observer.observe(sentinel);
-    }
-
     scheduleMobileHeadUp();
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -590,13 +572,11 @@ const BlokHeadBehavior = ({ headRef, headSentinelRef }: Props) => {
 
     return () => {
       clearOpenTimer();
-      observer?.disconnect();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
   }, [
     headRef,
-    headSentinelRef,
     isMobileHeadAnimationLayout,
     animateHead,
     setHeadSurface,

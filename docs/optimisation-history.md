@@ -1,6 +1,8 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-21] `BlokHead` now renders as a single direct `.blok-Head` child of `main` by removing the hidden sentinel sibling and its observer path; layout styling targets `.blok-Head` explicitly instead of relying on child indexes.
+- [2026-06-21] Theme/style vars were trimmed by removing unused typography/color/transition aliases, redundant fullscreen and mobile overrides, stale border-radius transitions, and the empty custom-cursor magnetic module class while keeping the active theme/layout tokens intact.
 - [2026-06-18] Theme styling now uses only `LIGHT`, `DARK`, and `NIGHT` with one `--transition-theme` duration, inherited foreground color, `currentColor` foreground chrome, `--theme-muted-alpha` for inactive copy, and separate `--theme-bg`, `--theme-blok`, and `--theme-blok-sidepanel` surface tokens; old hidden theme branches and background effect modules were removed.
 - [2026-06-18] The disabled outer navigation and outer theming chrome were fully removed from the root layout, deleting their client components, Sass modules, and unused theming locale labels while keeping the header and footer controls.
 - [2026-06-18] The fixed falling action-button overlay was removed from the root layout, deleting its Matter.js physics runtime, route-suppression state, and action-button client components while keeping the normal in-page CTA.

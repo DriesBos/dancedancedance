@@ -9,9 +9,6 @@
 // $z-mouse: 999 */
 
 :root
-  /* colors */
-  --color-black: hsla(0, 0%, 0%, 1)
-  --color-white: white
   /* theme */
   --theme-bg: #E8E7E3
   --theme-blok: #E8E7E3
@@ -26,17 +23,13 @@
 
   // typography
   --font-size-caption: 0.66rem
-  --font-size-outer: 0.8rem
   --line-height: 1.45
   @media (max-width: 770px)
     --font-size-caption: 0.8rem
 
   // Sizing
   --icon-size: 1.1363636364rem
-  --border-width: 1px
-  --border-fatwidth: 1px
-  --border-radius: 0
-  --border-gap: 0
+  --border-width: 2px
   --border-hyperlink: 1.5px
   --blok-height: calc(var(--blok-padding) * 2 + var(--line-height) * 1rem)
   --blok-padding: 1.25rem
@@ -52,7 +45,6 @@
   // 124px panel height + blok height + desired margin
   --spacing-containerTopDistance: 0
   @media (max-width: 770px)
-    --border-fatwidth: 2px
     --spacing-side: 1rem
     --spacing-side-image: 0
     --spacing-base: 1rem
@@ -64,22 +56,17 @@
   // Transition
   --transition-button: .33s ease
   --transition-layout: 0.66s ease-in-out
-  --transition-layout-quick: 0.33s ease
   --transition-theme: 0.33s ease
-  --transition-cursor: 0.25s ease-in-out
   @media (prefers-reduced-motion: reduce) and (orientation: landscape)
     --transition-layout: 0s
     --transition-theme: 0s
 
 // LAYOUTS
-body[data-fullscreen='true']
-  --panel-perspective-origin: 50% 0vh
-
 body[data-fullscreen='false']
-  --spacing-containerTopDistance: calc(124px + var(--blok-height) + 27vh)
+  // Height topPanel + blok height + 25vh
+  --spacing-containerTopDistance: calc(124px + var(--blok-height) + 25vh)
   --panel-perspective-origin: 50% -70rem
   @media (orientation: portrait)
-    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 16vh)
     --spacing-containerTopDistance: calc(124px + var(--blok-height) + 10vh)
   @media (max-width: 770px)
     --panel-perspective-origin: 50% -38rem
@@ -88,31 +75,20 @@ body[data-fullscreen='false']
     --panel-perspective-origin: 50% -32rem
 
 // THEMES
-body[data-theme='LIGHT']
-  --theme-bg: #E8E7E3
-  --theme-blok: #E8E7E3
-  --theme-blok-sidepanel: hsla(48, 10%, 85%, 1)
-  --theme-type: hsla(20, 100%, 01%, 1)
-  --theme-muted-alpha: 50%
-  --portrait-dither-invert: 0
-  --theme-media-filter: none
-
 body[data-theme='DARK']
   --theme-bg: hsla(0, 0%, 10.2%, 1)
   --theme-blok: hsla(0, 0%, 10.2%, 1)
   --theme-blok-sidepanel: hsla(0, 0%, 8.2%, 1)
   --portrait-dither-invert: 1
-  --theme-type: var(--color-white)
+  --theme-type: white
   --theme-muted-alpha: 60%
   --theme-bg-gradient: 0.05
-  --theme-media-filter: none
 
 body[data-theme='NIGHT']
-  --theme-bg: var(--color-black)
-  --theme-blok: var(--color-black)
-  --theme-blok-sidepanel: var(--color-black)
+  --theme-bg: black
+  --theme-blok: black
+  --theme-blok-sidepanel: black
   --theme-type: hsla(0, 100%, 50%, 1)
   --theme-muted-alpha: 60%
-  --theme-bg-gradient: 0
   --portrait-dither-invert: 1
   --theme-media-filter: grayscale(1) contrast(1.22) brightness(0.33) sepia(1) saturate(8) hue-rotate(-18deg)

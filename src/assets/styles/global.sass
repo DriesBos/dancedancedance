@@ -56,15 +56,13 @@ main
   position: relative
   display: flex
   flex-direction: column
-  gap: var(--border-gap)
   width: 100%
   max-width: 100%
   height: auto
   height: calc-size(auto)
   max-height: auto
   max-height: calc-size(auto)
-  border-radius: var(--main-border-radius)
-  transition: gap var(--transition-theme), border var(--transition-theme), border-radius var(--transition-layout-quick), width var(--transition-layout), max-width var(--transition-layout), height var(--transition-layout), max-height var(--transition-layout), transform var(--transition-layout)
+  transition: border var(--transition-theme), width var(--transition-layout), max-width var(--transition-layout), height var(--transition-layout), max-height var(--transition-layout), transform var(--transition-layout)
   // Safe envs
   padding-top: env(safe-area-inset-top)
   padding-right: env(safe-area-inset-right)
@@ -77,7 +75,6 @@ main
   transition: margin-top var(--transition-layout)
   display: flex
   flex-direction: column
-  gap: var(--border-gap)
   & > .blok
     margin-top: calc(0px - (#{var(--border-width)}))
   &-Thumbnail
@@ -263,12 +260,11 @@ mux-player, .muxPlayer
   display: flex
   flex-direction: column
   border: var(--border-width) solid currentColor
-  border-radius: var(--border-radius)
   background: var(--theme-blok)
   perspective: 1000px
   perspective-origin: var(--panel-perspective-origin)
   opacity: 0
-  transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), border-radius var(--transition-theme), background var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
+  transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
   &.inactive
     display: none
   .row
@@ -698,13 +694,11 @@ mux-player, .muxPlayer
 // LAYOUT
 body
   main
-    & > .blok
-      &:first-child
-        .side_Top
-          opacity: 1
-        .side_Bottom
-          z-index: -1
-      &:nth-child(2)
+    & > .blok-Head
+      z-index: 3
+      .side_Top
+        opacity: 1
+      .side_Bottom
         z-index: -1
   .page
     &-Project, &-General, &-Error
@@ -729,15 +723,18 @@ body
     .blok
       border-left-width: 0
       border-right-width: 0
-      &-Head
-        background: var(--theme-blok)
+      // &-Head
+      //   background: var(--theme-blok)
       &-Project
         overflow: hidden
       &-Footer
         padding-top: var(--blok-padding-extraTop)
-        padding-bottom: var(--blok-padding-extraTop)
+        padding-bottom: calc(var(--spacing-base) + env(safe-area-inset-bottom))
   &[data-fullscreen="false"]
-    padding-bottom: 10rem
+    @media (orientation: landscape)
+      padding-bottom: calc(var(--blok-height) + env(safe-area-inset-bottom))
+    @media (orientation: portrait)
+      padding-bottom: calc(var(--spacing-side) + env(safe-area-inset-bottom))
     .currentTheme
       opacity: 1
       @media (max-width: 770px)
@@ -752,7 +749,6 @@ body
         z-index: 2
       .blok
         &-Head
-          z-index: 3
           .side_Top
             opacity: 1
         // &-ProjectList
@@ -778,9 +774,8 @@ body
   user-select: none
 
 .imageItem
-  border-radius: calc(var(--border-radius) / 2)
   filter: var(--theme-media-filter)
-  transition: border-radius var(--transition-theme), opacity var(--transition-theme), filter var(--transition-theme)
+  transition: opacity var(--transition-theme), filter var(--transition-theme)
 
 @keyframes hyperLink
   0%
