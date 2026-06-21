@@ -25,7 +25,7 @@
   &:hover
     @media (hover: hover)
       .moreButton
-        background: var(--theme-type)
+        background: currentColor
         color: var(--theme-bg)
       .moreButtonIcon
         transform: translate(1px, -1px)
@@ -38,14 +38,14 @@
   padding: 0px 4px .5px !important
   height: 16px
   border-radius: 1000px
-  border: var(--border-width) solid var(--theme-type)
+  border: var(--border-width) solid currentColor
   text-decoration: none
   background: transparent
   line-height: 1
   font-size: 12px !important
   text-transform: lowercase
   transform: translateY(-1px)
-  transition: color var(--transition-theme), background var(--transition-theme), border-color var(--transition-theme)
+  transition: background var(--theme-transition)
 
 .moreButtonIcon
   display: inline-flex
@@ -55,4 +55,4 @@
   width: 25px
   height: 12px
   transform: translateY(-1px)
-  transition: color var(--transition-theme), transform var(--transition-button)
+  transition: transform var(--transition-button)

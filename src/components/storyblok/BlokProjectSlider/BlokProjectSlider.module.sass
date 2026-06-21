@@ -60,7 +60,7 @@
   aspect-ratio: 16 / 9
   pointer-events: none
   z-index: 2
-  transition: top var(--transition-theme)
+  transition: top var(--theme-transition)
   @media (orientation: portrait)
     aspect-ratio: 3 / 2
   @media (max-width: 770px)
@@ -87,7 +87,8 @@
   flex-grow: 1
   padding-right: var(--spacing-side)
   span
-    color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+    color: inherit
+    opacity: var(--theme-muted-opacity)
 
 .progressWrapper
   position: relative

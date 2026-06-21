@@ -11,8 +11,16 @@ const headStyleSource = readFileSync(
   new URL('./BlokHead.module.sass', import.meta.url),
   'utf8',
 );
+const sidePanelStyleSource = readFileSync(
+  new URL('../BlokSidePanels/BlokSidePanels.module.sass', import.meta.url),
+  'utf8',
+);
 const globalStyleSource = readFileSync(
   new URL('../../assets/styles/global.sass', import.meta.url),
+  'utf8',
+);
+const varsStyleSource = readFileSync(
+  new URL('../../assets/styles/vars.sass', import.meta.url),
   'utf8',
 );
 const storeSource = readFileSync(new URL('../../store/store.tsx', import.meta.url), 'utf8');
@@ -132,6 +140,13 @@ test('fullscreen-off head keeps its transparent top panel visible for borders', 
   assert.match(fullscreenFalseHeadBlock, /&-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
 });
 
+test('mobile top panel adds one pixel to its top border without moving the panel', () => {
+  assert.match(
+    sidePanelStyleSource,
+    /&_Top[\s\S]*@media \(max-width: 768px\)\n\s+top: -1px\n\s+border-top-width: calc\(var\(--border-width\) \+ 1px\)/,
+  );
+});
+
 test('layout targets the head blok explicitly instead of by child index', () => {
   assert.match(globalStyleSource, /& > \.blok-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
   assert.doesNotMatch(globalStyleSource, /&:nth-child\(2\)[\s\S]*z-index: -1/);
@@ -140,4 +155,24 @@ test('layout targets the head blok explicitly instead of by child index', () => 
 test('header row stays above the visible transparent top panel for clicks', () => {
   assert.match(headStyleSource, /\.row[\s\S]*position: relative/);
   assert.match(headStyleSource, /\.row[\s\S]*z-index: 2/);
+});
+
+test('theme foreground transition is body-owned and inherited by chrome', () => {
+  assert.match(globalStyleSource, /body[\s\S]*color: var\(--theme-type\)/);
+  assert.match(globalStyleSource, /body[\s\S]*transition: [^\n]*color var\(--theme-transition\)/);
+  assert.doesNotMatch(globalStyleSource, /body :where\(\*\)[\s\S]*transition:/);
+  assert.doesNotMatch(globalStyleSource, /color-mix\(in srgb, var\(--theme-type\)/);
+  assert.doesNotMatch(headStyleSource, /transition: [^\n]*color var\(--theme-transition\)/);
+  assert.doesNotMatch(headStyleSource, /transition: [^\n]*border-color var\(--theme-transition\)/);
+  assert.match(headStyleSource, /border: var\(--border-width\) solid currentColor/);
+  assert.match(headStyleSource, /border: 1\.5px solid currentColor/);
+});
+
+test('muted text inherits theme color and changes only opacity', () => {
+  assert.match(varsStyleSource, /--theme-muted-opacity: \.5/);
+  assert.match(varsStyleSource, /body\[data-theme='DARK'\][\s\S]*--theme-muted-opacity: \.6/);
+  assert.match(varsStyleSource, /body\[data-theme='NIGHT'\][\s\S]*--theme-muted-opacity: \.6/);
+  assert.match(globalStyleSource, /\.u-muted[\s\S]*color: inherit[\s\S]*opacity: var\(--theme-muted-opacity\)/);
+  assert.doesNotMatch(varsStyleSource, /--theme-muted-alpha/);
+  assert.doesNotMatch(globalStyleSource, /--theme-muted-alpha/);
 });

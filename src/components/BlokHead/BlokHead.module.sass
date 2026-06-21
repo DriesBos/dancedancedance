@@ -31,7 +31,7 @@
   perspective: 1000px
   perspective-origin: var(--panel-perspective-origin)
   transform: translateY(0)
-  transition: transform var(--transition-button), background var(--transition-theme), border-color var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
+  transition: transform var(--transition-button), background var(--theme-transition), perspective var(--transition-layout), perspective-origin var(--transition-layout)
   :global(body[data-fullscreen='true']) &
     left: 0
     right: 0
@@ -83,7 +83,7 @@
   border-radius: 1000px
   border: 1.5px solid currentColor
   background: conic-gradient(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg), var(--theme-bg)
-  transition: transform 0.25s ease, color var(--transition-theme), border-color var(--transition-theme), background var(--transition-theme)
+  transition: transform 0.25s ease, background var(--theme-transition)
   will-change: transform
 
 .themeButton
@@ -110,7 +110,7 @@
     inset: 0
     display: grid
     place-items: center
-    transition: opacity var(--transition-theme)
+    transition: opacity var(--theme-transition)
     will-change: opacity
     pointer-events: none
   :global(svg)

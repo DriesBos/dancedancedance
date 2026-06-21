@@ -29,7 +29,7 @@ body
   padding-top: var(--spacing-containerTopDistance)
   min-height: 100vh
   min-height: 100lvh
-  transition: padding-top var(--transition-layout), padding-bottom var(--transition-layout), color var(--transition-theme), background var(--transition-theme)
+  transition: padding-top var(--transition-layout), padding-bottom var(--transition-layout), color var(--theme-transition), background var(--theme-transition)
 
 @media (hover: none)
   body[data-page='projects']
@@ -46,11 +46,9 @@ body[data-initializing='true'] *::before,
 body[data-initializing='true'] *::after
   transition: none !important
 
-// Keep theme-driven text/icon colors consistent without per-component cascades.
-body :where(*),
-body :where(*)::before,
-body :where(*)::after
-  transition: color var(--transition-theme), background-color var(--transition-theme), border-color var(--transition-theme), text-decoration-color var(--transition-theme), caret-color var(--transition-theme)
+.u-muted
+  color: inherit
+  opacity: var(--theme-muted-opacity)
 
 main
   position: relative
@@ -62,7 +60,7 @@ main
   height: calc-size(auto)
   max-height: auto
   max-height: calc-size(auto)
-  transition: border var(--transition-theme), width var(--transition-layout), max-width var(--transition-layout), height var(--transition-layout), max-height var(--transition-layout), transform var(--transition-layout)
+  transition: width var(--transition-layout), max-width var(--transition-layout), height var(--transition-layout), max-height var(--transition-layout), transform var(--transition-layout)
   // Safe envs
   padding-top: env(safe-area-inset-top)
   padding-right: env(safe-area-inset-right)
@@ -82,7 +80,7 @@ main
   &-Blurbs
     position: relative
     background: var(--theme-bg)
-    transition: background var(--transition-theme)
+    transition: background var(--theme-transition)
     width: 100vw
     height: 100vh
     height: 100lvh
@@ -189,7 +187,8 @@ main
           height: auto
           // object-fit: cover
       &-Caption
-        color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+        color: inherit
+        opacity: var(--theme-muted-opacity)
         font-size: var(--font-size-caption)
         letter-spacing: 0.02em
         line-height: 1.32
@@ -203,7 +202,7 @@ main
         transform: translateX(-50%)
         z-index: 100
         padding: 0.75rem 1.5rem
-        background: var(--theme-type)
+        background: currentColor
         color: var(--theme-bg)
         border-radius: 100px
         font-size: var(--font-size-caption)
@@ -264,7 +263,7 @@ mux-player, .muxPlayer
   perspective: 1000px
   perspective-origin: var(--panel-perspective-origin)
   opacity: 0
-  transition: padding-top var(--transition-theme), border var(--transition-theme), border-left var(--transition-theme), border-right var(--transition-theme), border-top var(--transition-theme), border-bottom var(--transition-theme), background var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
+  transition: padding-top var(--theme-transition), background var(--theme-transition), perspective var(--transition-layout), perspective-origin var(--transition-layout)
   &.inactive
     display: none
   .row
@@ -308,8 +307,9 @@ mux-player, .muxPlayer
       padding: var(--blok-padding) var(--spacing-side)
       // For showing unpublished stories
       &[data-inactive='true']
-        color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
-        will-change: color
+        color: inherit
+        opacity: var(--theme-muted-opacity)
+        will-change: opacity
       &-Empty
         @media (max-width: 770px)
           display: none
@@ -356,7 +356,8 @@ mux-player, .muxPlayer
         &-Item
           width: 100%
       &-Caption
-        color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+        color: inherit
+        opacity: var(--theme-muted-opacity)
         font-size: var(--font-size-caption)
         letter-spacing: 0.02em
         line-height: 1.32
@@ -384,24 +385,29 @@ mux-player, .muxPlayer
         // @media (min-width: 770px)
         //   text-align: justify
         &[data-display='desktop']
-          color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+          color: inherit
+          opacity: var(--theme-muted-opacity)
         &[data-display='mobile']
           @media (min-width: 770px)
             display: none
         &[data-color='primary']
-          color: var(--theme-type)
+          color: inherit
+          opacity: 1
         &[data-color='secondary']
-          color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+          color: inherit
+          opacity: var(--theme-muted-opacity)
         p
           display: block
         em
-          color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+          color: inherit
+          opacity: var(--theme-muted-opacity)
       &-TextExpandable
         display: flex
         flex-direction: column
         gap: var(--spacing-base)
         &-More, &-Details
-          color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+          color: inherit
+          opacity: var(--theme-muted-opacity)
         &-Details
           @media (min-width: 770px)
             display: none
@@ -472,16 +478,19 @@ mux-player, .muxPlayer
           min-width: auto
           max-width: none
           overflow: visible
-          color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+          color: inherit
+          opacity: var(--theme-muted-opacity)
           @media (max-width: 770px)
             display: none
           .icon
             opacity: 1 !important
           &[data-active="true"]
-            color: var(--theme-type)
+            color: inherit
+            opacity: 1
           &:hover
             @media (hover: hover)
-              color: var(--theme-type)
+              color: inherit
+              opacity: 1
           &-Trigger
             background: none
             border: 0
@@ -505,7 +514,7 @@ mux-player, .muxPlayer
             min-width: 0
             border: 0
             background: transparent
-            color: var(--theme-type)
+            color: inherit
             font: inherit
             line-height: inherit
             outline: none
@@ -514,7 +523,8 @@ mux-player, .muxPlayer
             pointer-events: none
             transition: width var(--transition-button), padding var(--transition-button), opacity var(--transition-button)
             &::placeholder
-              color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+              color: inherit
+              opacity: var(--theme-muted-opacity)
           &[data-active="true"] .searchInput-Field
             width: clamp(7rem, 14vw, 12rem)
             opacity: 1
@@ -525,7 +535,8 @@ mux-player, .muxPlayer
           user-select: none
           .projectNumber
             font-size: 0.66rem
-            color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+            color: inherit
+            opacity: var(--theme-muted-opacity)
             position: absolute
             top: 0.56rem
             left: 5.95rem
@@ -594,19 +605,18 @@ mux-player, .muxPlayer
     .icon
       opacity: 0 !important
     .mobile
-      color: color-mix(in srgb, var(--theme-type) var(--theme-muted-alpha), transparent)
+      color: inherit
+      opacity: var(--theme-muted-opacity)
   &-Project
     position: relative
     opacity: 1
-    color: var(--theme-type)
+    color: inherit
     padding-bottom: calc(3.95rem * 0.5)
     margin-bottom: calc(-3.95rem * 0.5)
     transform: translateY(0)
-    transition: transform 0.7s cubic-bezier(0.77, 0, 0.28, 1), color var(--transition-theme), background-color var(--transition-theme), border-color var(--transition-theme), text-decoration-color var(--transition-theme), caret-color var(--transition-theme), box-shadow var(--transition-theme)
+    transition: transform 0.7s cubic-bezier(0.77, 0, 0.28, 1), background-color var(--theme-transition), box-shadow var(--theme-transition)
     border-top: var(--border-width) solid currentColor !important
     background: var(--theme-blok)
-    .column-Left, .column-Right, .column-Year, .column-Project, .column-Category
-      transition: color var(--transition-theme), text-decoration-color var(--transition-theme), caret-color var(--transition-theme)
     .column-Left, .column-Right
       width: 50%
       padding: 0 !important
@@ -641,7 +651,7 @@ mux-player, .muxPlayer
         flex: 0 0 auto
     @media (hover: hover)
       &:hover
-        transition: transform 0.22s cubic-bezier(0.77, 0, 0.28, 1), color var(--transition-theme), background-color var(--transition-theme), border-color var(--transition-theme), text-decoration-color var(--transition-theme), caret-color var(--transition-theme), box-shadow var(--transition-theme)
+        transition: transform 0.22s cubic-bezier(0.77, 0, 0.28, 1), background-color var(--theme-transition), box-shadow var(--theme-transition)
   &-Portrait
     background: var(--theme-blok)
     .grainyGradient
@@ -801,7 +811,7 @@ body
 
 .imageItem
   filter: var(--theme-media-filter)
-  transition: opacity var(--transition-theme), filter var(--transition-theme)
+  transition: opacity var(--theme-transition), filter var(--theme-transition)
 
 @keyframes hyperLink
   0%

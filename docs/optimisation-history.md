@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-21] Theme foreground changes now transition once from `body` through `--theme-transition`, with descendant text, icons, borders, and muted states inheriting `currentColor`; muted copy now uses `--theme-muted-opacity` instead of color-mixing the theme token, avoiding staggered color phases during theme swaps.
 - [2026-06-21] `BlokHead` now uses the single shared `--blok-height` token directly and lets its row fill the frame, bringing the header rhythm closer to project-list rows without introducing extra height variables.
 - [2026-06-21] `BlokHead` initial animation now fades opacity only, leaving active up/down movement owned by the header surface transform so first render no longer delays the lifted header state or overlaps the next blok.
 - [2026-06-21] Fullscreen mode now quiets top and bottom borders on first-level project/general page bloks only, preserving nested project-list row borders while extending the transparent-border transition pattern beyond the header and footer.
@@ -9,7 +10,7 @@
 - [2026-06-21] `BlokHead` active movement now uses one local `data-active` flag with CSS-owned transforms, removing the shared `topPanel` store state, forced-closed/scroll-border attributes, and direct GSAP header movement while preserving the sticky 10vh scroll threshold.
 - [2026-06-21] `BlokHead` now renders as a single direct `.blok-Head` child of `main` by removing the hidden sentinel sibling and its observer path; layout styling targets `.blok-Head` explicitly instead of relying on child indexes.
 - [2026-06-21] Theme/style vars were trimmed by removing unused typography/color/transition aliases, redundant fullscreen and mobile overrides, stale border-radius transitions, and the empty custom-cursor magnetic module class while keeping the active theme/layout tokens intact.
-- [2026-06-18] Theme styling now uses only `LIGHT`, `DARK`, and `NIGHT` with one `--transition-theme` duration, inherited foreground color, `currentColor` foreground chrome, `--theme-muted-alpha` for inactive copy, and separate `--theme-bg`, `--theme-blok`, and `--theme-blok-sidepanel` surface tokens; old hidden theme branches and background effect modules were removed.
+- [2026-06-18] Theme styling now uses only `LIGHT`, `DARK`, and `NIGHT` with one theme duration, inherited foreground color, `currentColor` foreground chrome, muted inactive copy, and separate `--theme-bg`, `--theme-blok`, and `--theme-blok-sidepanel` surface tokens; old hidden theme branches and background effect modules were removed.
 - [2026-06-18] The disabled outer navigation and outer theming chrome were fully removed from the root layout, deleting their client components, Sass modules, and unused theming locale labels while keeping the header and footer controls.
 - [2026-06-18] The fixed falling action-button overlay was removed from the root layout, deleting its Matter.js physics runtime, route-suppression state, and action-button client components while keeping the normal in-page CTA.
 - [2026-04-27] The About top-panel dithered video portrait is temporarily disabled, keeping the panel/link surface while avoiding the lazy portrait chunk, MP4 load, canvas setup, and dither frame processing.
