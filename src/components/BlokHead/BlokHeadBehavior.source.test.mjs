@@ -25,7 +25,7 @@ test('head active state is local and CSS-driven', () => {
   assert.match(headSource, /data-active="false"/);
   assert.doesNotMatch(headSource, /data-forced-closed/);
   assert.doesNotMatch(headSource, /data-scrollborder/);
-  assert.match(headStyleSource, /&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(calc\(var\(--head-intro-y\) - 100%\)\)/);
+  assert.match(headStyleSource, /&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/);
   assert.doesNotMatch(behaviorSource, /gsap\.to\(headRef\.current/);
   assert.doesNotMatch(behaviorSource, /gsap\.set\(headRef\.current/);
   assert.doesNotMatch(behaviorSource, /yPercent/);
@@ -34,11 +34,13 @@ test('head active state is local and CSS-driven', () => {
   assert.doesNotMatch(storeSource, /topPanel/);
 });
 
-test('header intro animation composes with active transform through a CSS variable', () => {
-  assert.match(headStyleSource, /--head-intro-y: 0px/);
-  assert.match(headStyleSource, /transform: translateY\(var\(--head-intro-y\)\)/);
-  assert.match(headerInitSource, /'--head-intro-y': '5vh'/);
-  assert.match(headerInitSource, /'--head-intro-y': '0vh'/);
+test('header intro animation is opacity-only and independent from active movement', () => {
+  assert.doesNotMatch(headStyleSource, /--head-intro-y/);
+  assert.match(headStyleSource, /transform: translateY\(0\)/);
+  assert.match(headStyleSource, /&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/);
+  assert.match(headerInitSource, /opacity: 0/);
+  assert.match(headerInitSource, /opacity: 1/);
+  assert.doesNotMatch(headerInitSource, /--head-intro-y/);
   assert.doesNotMatch(headerInitSource, /\by:\s*'5vh'/);
   assert.doesNotMatch(headerInitSource, /\by:\s*0/);
 });
@@ -55,11 +57,12 @@ test('BlokHead renders one direct main child without a sentinel sibling', () => 
 test('BlokHead measures a stable frame while the inner visual surface moves', () => {
   assert.match(headSource, /ref=\{headRef\}[\s\S]*className=\{`\$\{styles\.blokHeadFrame\} blok blok-Head blok-AnimateHead`\}/);
   assert.match(headSource, /<div className=\{styles\.blokHead\}>[\s\S]*<GrainyGradient variant="blok" \/>/);
-  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*height: calc\(var\(--blok-height\) \+ 2 \* var\(--border-width\)\)/);
+  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*height: var\(--blok-height\)/);
   assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*border-color: transparent/);
-  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(calc\(var\(--head-intro-y\) - 100%\)\)/);
+  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/);
   assert.match(headStyleSource, /\.blokHead[\s\S]*position: absolute[\s\S]*inset: calc\(0px - var\(--border-width\)\)/);
-  assert.match(headStyleSource, /\.blokHead[\s\S]*transform: translateY\(var\(--head-intro-y\)\)/);
+  assert.match(headStyleSource, /\.blokHead[\s\S]*transform: translateY\(0\)/);
+  assert.match(headStyleSource, /\.row[\s\S]*height: 100%/);
 });
 
 test('head owns an explicit surface state separate from panel state', () => {

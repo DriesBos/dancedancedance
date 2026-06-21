@@ -31,12 +31,10 @@ export default function HeaderInitAnimation() {
 
     gsap.set(headerTargets, {
       opacity: 0,
-      '--head-intro-y': '5vh',
     });
 
     gsap.to(headerTargets, {
       opacity: 1,
-      '--head-intro-y': '0vh',
       duration: 1,
       ease: 'expo.out',
       overwrite: 'auto',
