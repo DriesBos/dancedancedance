@@ -1,15 +1,18 @@
 .blokHead
+  --head-intro-y: 0px
   position: sticky
   left: 0
   top: 0
   width: 100%
   z-index: 3
+  transform: translateY(var(--head-intro-y))
+  transition: transform var(--transition-button), background var(--transition-theme), border-color var(--transition-theme)
   border-top: var(--border-width) solid currentColor
   border-bottom: var(--border-width) solid currentColor
   border-left: var(--border-width) solid currentColor
   border-right: var(--border-width) solid currentColor
-  &[data-scrollborder='true']
-    border-bottom-width: var(--border-width)
+  &[data-active='true']
+    transform: translateY(calc(var(--head-intro-y) - 100%))
   &[data-surface='transparent']
     background: transparent
     & > :global(.grainyGradient)

@@ -15,19 +15,32 @@ const globalStyleSource = readFileSync(
   new URL('../../assets/styles/global.sass', import.meta.url),
   'utf8',
 );
+const storeSource = readFileSync(new URL('../../store/store.tsx', import.meta.url), 'utf8');
+const headerInitSource = readFileSync(
+  new URL('../HeaderInitAnimation.tsx', import.meta.url),
+  'utf8',
+);
 
-test('mobile head animation uses coarse-pointer media and a 1s replay delay', () => {
-  assert.match(
-    behaviorSource,
-    /MOBILE_HEAD_ANIMATION_MEDIA_QUERY\s*=\s*'\(hover: none\), \(pointer: coarse\)'/,
-  );
-  assert.match(behaviorSource, /MOBILE_HEAD_ANIMATION_DELAY\s*=\s*1000/);
+test('head active state is local and CSS-driven', () => {
+  assert.match(headSource, /data-active="false"/);
+  assert.doesNotMatch(headSource, /data-forced-closed/);
+  assert.doesNotMatch(headSource, /data-scrollborder/);
+  assert.match(headStyleSource, /&\[data-active='true'\][\s\S]*transform: translateY\(calc\(var\(--head-intro-y\) - 100%\)\)/);
+  assert.doesNotMatch(behaviorSource, /gsap\.to\(headRef\.current/);
+  assert.doesNotMatch(behaviorSource, /gsap\.set\(headRef\.current/);
+  assert.doesNotMatch(behaviorSource, /yPercent/);
+  assert.doesNotMatch(behaviorSource, /setTopPanel/);
+  assert.doesNotMatch(behaviorSource, /topPanel:/);
+  assert.doesNotMatch(storeSource, /topPanel/);
 });
 
-test('mobile head animation replays when the tab becomes visible or focused', () => {
-  assert.match(behaviorSource, /document\.addEventListener\('visibilitychange'/);
-  assert.match(behaviorSource, /window\.addEventListener\('focus'/);
-  assert.match(behaviorSource, /document\.hidden/);
+test('header intro animation composes with active transform through a CSS variable', () => {
+  assert.match(headStyleSource, /--head-intro-y: 0px/);
+  assert.match(headStyleSource, /transform: translateY\(var\(--head-intro-y\)\)/);
+  assert.match(headerInitSource, /'--head-intro-y': '5vh'/);
+  assert.match(headerInitSource, /'--head-intro-y': '0vh'/);
+  assert.doesNotMatch(headerInitSource, /\by:\s*'5vh'/);
+  assert.doesNotMatch(headerInitSource, /\by:\s*0/);
 });
 
 test('BlokHead renders one direct main child without a sentinel sibling', () => {
@@ -39,24 +52,32 @@ test('BlokHead renders one direct main child without a sentinel sibling', () => 
   assert.match(headSource, /return \(\s*<div[\s\S]*className=\{`\$\{styles\.blokHead\} blok blok-Head blok-AnimateHead`\}/);
 });
 
-test('touch-to-open behavior is disabled while the mobile animation owns head movement', () => {
-  assert.match(
-    behaviorSource,
-    /if \(!isThreeDLayout \|\| isMobileHeadAnimationLayout\) return;/,
-  );
-});
-
 test('head owns an explicit surface state separate from panel state', () => {
   assert.match(headSource, /data-surface="transparent"/);
   assert.match(behaviorSource, /type HeadSurface = 'transparent' \| 'solid'/);
   assert.match(behaviorSource, /const setHeadSurface = useCallback/);
 });
 
-test('mobile replay no longer depends on sentinel-specific scrolled state', () => {
-  assert.doesNotMatch(behaviorSource, /isHeadSentinelVisible/);
-  assert.doesNotMatch(behaviorSource, /moveMobileHeadDown\('forcedClosed', 'solid'\)/);
-  assert.match(behaviorSource, /moveMobileHeadDown\('closed', 'transparent'\)/);
-  assert.match(behaviorSource, /setHeadSurface\('transparent'\)/);
+test('sticky or fullscreen geometry decides whether scroll owns active', () => {
+  assert.match(behaviorSource, /const getIsSticky = useCallback/);
+  assert.match(behaviorSource, /window\.scrollY > 0/);
+  assert.match(behaviorSource, /getBoundingClientRect\(\)\.top <= STICKY_TOP_OFFSET \+ STICKY_TOP_EPSILON/);
+  assert.match(behaviorSource, /const scrollOwnsActive = fullscreen \|\| getIsSticky\(\)/);
+  assert.match(behaviorSource, /scrollOwnsActive\s*\?\s*scrollActiveRef\.current\s*:\s*interactionActiveRef\.current/);
+});
+
+test('sticky scroll controller keeps a symmetric 10vh threshold', () => {
+  assert.match(behaviorSource, /const SCROLL_DIRECTION_THRESHOLD_RATIO = 0\.1/);
+  assert.match(behaviorSource, /window\.innerHeight \* SCROLL_DIRECTION_THRESHOLD_RATIO/);
+  assert.match(behaviorSource, /scrollingDown[\s\S]*setScrollActive\(true\)/);
+  assert.match(behaviorSource, /!scrollingDown[\s\S]*setScrollActive\(false\)/);
+});
+
+test('mobile has no separate timer replay controller', () => {
+  assert.doesNotMatch(behaviorSource, /MOBILE_HEAD_ANIMATION/);
+  assert.doesNotMatch(behaviorSource, /visibilitychange/);
+  assert.doesNotMatch(behaviorSource, /window\.addEventListener\('focus'/);
+  assert.doesNotMatch(behaviorSource, /setTimeout/);
 });
 
 test('head surface CSS controls background without changing side panel transparency', () => {

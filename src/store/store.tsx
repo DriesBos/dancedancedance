@@ -25,7 +25,6 @@ export type Props = {
   theme: Theme;
   locale: Locale;
   fullscreen: boolean;
-  topPanel: boolean;
   pageContentVisible: boolean;
   pageContentRevealKey: number;
   initialThemeIntroPending: boolean;
@@ -43,8 +42,6 @@ export type Actions = {
   cycleTheme: () => void;
   setLocale: (locale: Locale) => void;
   setFullscreen: (fullscreen: boolean) => void;
-  setTopPanelTrue: () => void;
-  setTopPanelFalse: () => void;
   hidePageContent: () => void;
   restorePageContentVisibility: () => void;
   showPageContent: () => void;
@@ -81,7 +78,6 @@ export const useStore = create<Props & Actions>()((set) => ({
   theme: initialTheme,
   locale: 'en',
   fullscreen: initialFullscreen,
-  topPanel: true,
   pageContentVisible: !initialThemeIntroPending,
   pageContentRevealKey: 0,
   initialThemeIntroPending,
@@ -122,8 +118,6 @@ export const useStore = create<Props & Actions>()((set) => ({
     }),
   setLocale: (locale) => set({ locale }),
   setFullscreen: (fullscreen) => set({ fullscreen }),
-  setTopPanelTrue: () => set({ topPanel: true }),
-  setTopPanelFalse: () => set({ topPanel: false }),
   hidePageContent: () => set({ pageContentVisible: false }),
   restorePageContentVisibility: () => set({ pageContentVisible: true }),
   showPageContent: () =>

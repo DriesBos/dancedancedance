@@ -30,16 +30,16 @@ export default function HeaderInitAnimation() {
     markHeaderInitCompleted();
 
     gsap.set(headerTargets, {
-        opacity: 0,
-        y: '5vh',
+      opacity: 0,
+      '--head-intro-y': '5vh',
     });
 
     gsap.to(headerTargets, {
-        opacity: 1,
-        y: 0,
-        duration: 1,
-        ease: 'expo.out',
-        overwrite: 'auto',
+      opacity: 1,
+      '--head-intro-y': '0vh',
+      duration: 1,
+      ease: 'expo.out',
+      overwrite: 'auto',
     });
 
     hasAnimatedHeader.current = true;

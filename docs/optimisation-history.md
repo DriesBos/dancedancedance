@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-21] `BlokHead` active movement now uses one local `data-active` flag with CSS-owned transforms, removing the shared `topPanel` store state, forced-closed/scroll-border attributes, and direct GSAP header movement while preserving the sticky 10vh scroll threshold.
 - [2026-06-21] `BlokHead` now renders as a single direct `.blok-Head` child of `main` by removing the hidden sentinel sibling and its observer path; layout styling targets `.blok-Head` explicitly instead of relying on child indexes.
 - [2026-06-21] Theme/style vars were trimmed by removing unused typography/color/transition aliases, redundant fullscreen and mobile overrides, stale border-radius transitions, and the empty custom-cursor magnetic module class while keeping the active theme/layout tokens intact.
 - [2026-06-18] Theme styling now uses only `LIGHT`, `DARK`, and `NIGHT` with one `--transition-theme` duration, inherited foreground color, `currentColor` foreground chrome, `--theme-muted-alpha` for inactive copy, and separate `--theme-bg`, `--theme-blok`, and `--theme-blok-sidepanel` surface tokens; old hidden theme branches and background effect modules were removed.

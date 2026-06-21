@@ -44,9 +44,7 @@ const BlokHeadComponent = ({ projects }: Props) => {
     <div
       ref={headRef}
       className={`${styles.blokHead} blok blok-Head blok-AnimateHead`}
-      data-active="true"
-      data-forced-closed="false"
-      data-scrollborder="false"
+      data-active="false"
       data-surface="transparent"
     >
       <GrainyGradient variant="blok" />
