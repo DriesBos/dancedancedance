@@ -68,6 +68,28 @@ test('head owns an explicit surface state separate from panel state', () => {
   assert.match(behaviorSource, /const setHeadSurface = useCallback/);
 });
 
+test('fullscreen quiets selected borders by color without changing border widths', () => {
+  assert.match(headSource, /data-scroll-start="true"/);
+  assert.match(behaviorSource, /const nextScrollStart = String\(window\.scrollY <= 10\)/);
+  assert.match(behaviorSource, /head\.dataset\.scrollStart = nextScrollStart/);
+  assert.doesNotMatch(headStyleSource, /:global\(body\[data-fullscreen='true'\]\) \.blokHeadFrame\[data-scroll-start='true'\]/);
+
+  const fullscreenTrueBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="true"\][\s\S]*?&\[data-fullscreen="false"\]/,
+    )?.[0] || '';
+
+  assert.match(
+    fullscreenTrueBlock,
+    /& > \.blok-Head\n\s+& > div\n\s+border-top-color: transparent/,
+  );
+  assert.match(fullscreenTrueBlock, /& > \.blok-Head\[data-scroll-start='true'\]\n\s+& > div\n\s+border-bottom-color: transparent/);
+  assert.doesNotMatch(fullscreenTrueBlock, /& > \.blok-Head\[data-scroll-start='true'\]\n\s+& > div\n\s+border-top-color: transparent/);
+  assert.match(fullscreenTrueBlock, /border-left-width: 0/);
+  assert.match(fullscreenTrueBlock, /border-right-width: 0/);
+  assert.match(fullscreenTrueBlock, /&-Footer[\s\S]*border-bottom-color: transparent/);
+});
+
 test('sticky or fullscreen geometry decides whether scroll owns active', () => {
   assert.match(behaviorSource, /const getIsSticky = useCallback/);
   assert.match(behaviorSource, /window\.scrollY > 0/);

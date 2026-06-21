@@ -45,6 +45,7 @@ const BlokHeadComponent = ({ projects }: Props) => {
       ref={headRef}
       className={`${styles.blokHeadFrame} blok blok-Head blok-AnimateHead`}
       data-active="false"
+      data-scroll-start="true"
       data-surface="transparent"
     >
       <div className={styles.blokHead}>

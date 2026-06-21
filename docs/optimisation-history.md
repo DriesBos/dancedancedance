@@ -1,6 +1,8 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-21] Fullscreen mode now quiets top and bottom borders on first-level project/general page bloks only, preserving nested project-list row borders while extending the transparent-border transition pattern beyond the header and footer.
+- [2026-06-21] Fullscreen mode now quiets selected horizontal chrome by fading the footer bottom border, always hiding the header top border, and hiding the header bottom border only at scroll start while preserving border widths and the existing edge-to-edge left/right fullscreen transition.
 - [2026-06-21] `BlokHead` now measures sticky geometry from a stable direct `.blok-Head` frame while moving the inner visual surface, avoiding active-state feedback loops when the header crosses the sticky boundary.
 - [2026-06-21] `BlokHead` active movement now uses one local `data-active` flag with CSS-owned transforms, removing the shared `topPanel` store state, forced-closed/scroll-border attributes, and direct GSAP header movement while preserving the sticky 10vh scroll threshold.
 - [2026-06-21] `BlokHead` now renders as a single direct `.blok-Head` child of `main` by removing the hidden sentinel sibling and its observer path; layout styling targets `.blok-Head` explicitly instead of relying on child indexes.

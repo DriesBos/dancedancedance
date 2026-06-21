@@ -57,3 +57,23 @@ test('stacked rows keep desktop text columns visible on mobile', () => {
     /&\[data-display='desktop'\][\s\S]*@media \(max-width: 770px\)[\s\S]*display: none/,
   );
 });
+
+test('fullscreen page border quieting only targets first-level page bloks', () => {
+  const fullscreenTrueBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="true"\][\s\S]*?&\[data-fullscreen="false"\]/,
+    )?.[0] || '';
+
+  assert.match(
+    fullscreenTrueBlock,
+    /\.page\n\s+&-Project,\n\s+&-General\n\s+& > \.blok\n\s+border-top-color: transparent\n\s+border-bottom-color: transparent/,
+  );
+  assert.doesNotMatch(
+    fullscreenTrueBlock,
+    /blok-ProjectList[\s\S]*border-(top|bottom)-color: transparent/,
+  );
+  assert.doesNotMatch(
+    fullscreenTrueBlock,
+    /\.blok\s+\.blok[\s\S]*border-(top|bottom)-color: transparent/,
+  );
+});

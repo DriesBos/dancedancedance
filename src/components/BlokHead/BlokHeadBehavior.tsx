@@ -36,6 +36,16 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
     [headRef],
   );
 
+  const setHeadScrollStart = useCallback(() => {
+    const head = headRef.current;
+    if (!head) return;
+
+    const nextScrollStart = String(window.scrollY <= 10);
+    if (head.dataset.scrollStart === nextScrollStart) return;
+
+    head.dataset.scrollStart = nextScrollStart;
+  }, [headRef]);
+
   const getIsSticky = useCallback(() => {
     const head = headRef.current;
     if (!head) return false;
@@ -148,6 +158,7 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
     const syncScrollController = () => {
       const currentScrollY = window.scrollY;
       const scrollOwnsActive = fullscreen || getIsSticky();
+      setHeadScrollStart();
 
       if (!scrollOwnsActive) {
         scrollActiveRef.current = false;
@@ -211,7 +222,7 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [fullscreen, getIsSticky, setScrollActive, syncActive]);
+  }, [fullscreen, getIsSticky, setHeadScrollStart, setScrollActive, syncActive]);
 
   return null;
 };
