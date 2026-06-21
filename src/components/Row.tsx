@@ -1,11 +1,18 @@
+import type { ReactNode } from 'react';
+
+type ColumnBehaviour = 'none' | 'hide-first' | 'stack';
+
 interface Props {
-  children?: any;
-  wideColumns?: boolean;
+  children?: ReactNode;
+  columnBehaviour?: ColumnBehaviour;
   className?: string;
 }
 
-const Row = ({ children, wideColumns, className }: Props) => (
-  <div className={`row ${className || ''}`} data-wide-columns={wideColumns}>
+const Row = ({ children, columnBehaviour, className }: Props) => (
+  <div
+    className={`row ${className || ''}`}
+    data-column-behaviour={columnBehaviour || 'none'}
+  >
     {children}
   </div>
 );
