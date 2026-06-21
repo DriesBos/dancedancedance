@@ -25,7 +25,7 @@ test('head active state is local and CSS-driven', () => {
   assert.match(headSource, /data-active="false"/);
   assert.doesNotMatch(headSource, /data-forced-closed/);
   assert.doesNotMatch(headSource, /data-scrollborder/);
-  assert.match(headStyleSource, /&\[data-active='true'\][\s\S]*transform: translateY\(calc\(var\(--head-intro-y\) - 100%\)\)/);
+  assert.match(headStyleSource, /&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(calc\(var\(--head-intro-y\) - 100%\)\)/);
   assert.doesNotMatch(behaviorSource, /gsap\.to\(headRef\.current/);
   assert.doesNotMatch(behaviorSource, /gsap\.set\(headRef\.current/);
   assert.doesNotMatch(behaviorSource, /yPercent/);
@@ -49,7 +49,17 @@ test('BlokHead renders one direct main child without a sentinel sibling', () => 
   assert.doesNotMatch(headSource, /headSentinelRef/);
   assert.doesNotMatch(headSource, /className=\{styles\.headSentinel\}/);
   assert.doesNotMatch(headStyleSource, /\.headSentinel/);
-  assert.match(headSource, /return \(\s*<div[\s\S]*className=\{`\$\{styles\.blokHead\} blok blok-Head blok-AnimateHead`\}/);
+  assert.match(headSource, /return \(\s*<div[\s\S]*className=\{`\$\{styles\.blokHeadFrame\} blok blok-Head blok-AnimateHead`\}/);
+});
+
+test('BlokHead measures a stable frame while the inner visual surface moves', () => {
+  assert.match(headSource, /ref=\{headRef\}[\s\S]*className=\{`\$\{styles\.blokHeadFrame\} blok blok-Head blok-AnimateHead`\}/);
+  assert.match(headSource, /<div className=\{styles\.blokHead\}>[\s\S]*<GrainyGradient variant="blok" \/>/);
+  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*height: calc\(var\(--blok-height\) \+ 2 \* var\(--border-width\)\)/);
+  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*border-color: transparent/);
+  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(calc\(var\(--head-intro-y\) - 100%\)\)/);
+  assert.match(headStyleSource, /\.blokHead[\s\S]*position: absolute[\s\S]*inset: calc\(0px - var\(--border-width\)\)/);
+  assert.match(headStyleSource, /\.blokHead[\s\S]*transform: translateY\(var\(--head-intro-y\)\)/);
 });
 
 test('head owns an explicit surface state separate from panel state', () => {
@@ -61,7 +71,9 @@ test('head owns an explicit surface state separate from panel state', () => {
 test('sticky or fullscreen geometry decides whether scroll owns active', () => {
   assert.match(behaviorSource, /const getIsSticky = useCallback/);
   assert.match(behaviorSource, /window\.scrollY > 0/);
-  assert.match(behaviorSource, /getBoundingClientRect\(\)\.top <= STICKY_TOP_OFFSET \+ STICKY_TOP_EPSILON/);
+  assert.doesNotMatch(behaviorSource, /const STICKY_TOP_OFFSET/);
+  assert.doesNotMatch(behaviorSource, /const STICKY_TOP_EPSILON/);
+  assert.match(behaviorSource, /getBoundingClientRect\(\)\.top <= 1/);
   assert.match(behaviorSource, /const scrollOwnsActive = fullscreen \|\| getIsSticky\(\)/);
   assert.match(behaviorSource, /scrollOwnsActive\s*\?\s*scrollActiveRef\.current\s*:\s*interactionActiveRef\.current/);
 });

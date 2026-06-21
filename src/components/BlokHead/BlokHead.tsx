@@ -43,14 +43,16 @@ const BlokHeadComponent = ({ projects }: Props) => {
   return (
     <div
       ref={headRef}
-      className={`${styles.blokHead} blok blok-Head blok-AnimateHead`}
+      className={`${styles.blokHeadFrame} blok blok-Head blok-AnimateHead`}
       data-active="false"
       data-surface="transparent"
     >
-      <GrainyGradient variant="blok" />
-      <BlokHeadBehavior headRef={headRef} />
-      <BlokHeadSidePanels />
-      <BlokHeadRouteContentContainer projects={projects} />
+      <div className={styles.blokHead}>
+        <GrainyGradient variant="blok" />
+        <BlokHeadBehavior headRef={headRef} />
+        <BlokHeadSidePanels />
+        <BlokHeadRouteContentContainer projects={projects} />
+      </div>
     </div>
   );
 };

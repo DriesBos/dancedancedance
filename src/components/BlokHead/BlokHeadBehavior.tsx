@@ -9,8 +9,6 @@ type Props = {
 
 type HeadSurface = 'transparent' | 'solid';
 
-const STICKY_TOP_OFFSET = 0;
-const STICKY_TOP_EPSILON = 1;
 const SCROLL_DIRECTION_THRESHOLD_RATIO = 0.1;
 
 const BlokHeadBehavior = ({ headRef }: Props) => {
@@ -44,7 +42,7 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
 
     return (
       window.scrollY > 0 &&
-      head.getBoundingClientRect().top <= STICKY_TOP_OFFSET + STICKY_TOP_EPSILON
+      head.getBoundingClientRect().top <= 1
     );
   }, [headRef]);
 

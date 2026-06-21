@@ -1,28 +1,43 @@
-.blokHead
+.blokHeadFrame
   --head-intro-y: 0px
   position: sticky
   left: 0
   top: 0
   width: 100%
+  height: calc(var(--blok-height) + 2 * var(--border-width))
   z-index: 3
-  transform: translateY(var(--head-intro-y))
-  transition: transform var(--transition-button), background var(--transition-theme), border-color var(--transition-theme)
-  border-top: var(--border-width) solid currentColor
-  border-bottom: var(--border-width) solid currentColor
-  border-left: var(--border-width) solid currentColor
-  border-right: var(--border-width) solid currentColor
-  &[data-active='true']
+  border-color: transparent
+  background: transparent
+  &[data-active='true'] .blokHead
     transform: translateY(calc(var(--head-intro-y) - 100%))
-  &[data-surface='transparent']
+  &[data-surface='transparent'] .blokHead
     background: transparent
     & > :global(.grainyGradient)
       opacity: 0
-  &[data-surface='solid']
+  &[data-surface='solid'] .blokHead
     background: var(--theme-blok)
     & > :global(.grainyGradient)
       opacity: var(--theme-bg-gradient)
   :global(.side_Top)
     pointer-events: auto
+
+.blokHead
+  position: absolute
+  inset: calc(0px - var(--border-width))
+  display: flex
+  flex-direction: column
+  isolation: isolate
+  border: var(--border-width) solid currentColor
+  background: var(--theme-blok)
+  perspective: 1000px
+  perspective-origin: var(--panel-perspective-origin)
+  transform: translateY(var(--head-intro-y))
+  transition: transform var(--transition-button), background var(--transition-theme), border-color var(--transition-theme), perspective var(--transition-layout), perspective-origin var(--transition-layout)
+  :global(body[data-fullscreen='true']) &
+    left: 0
+    right: 0
+    border-left-width: 0
+    border-right-width: 0
 
 .row
   position: relative

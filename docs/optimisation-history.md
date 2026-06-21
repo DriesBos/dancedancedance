@@ -1,6 +1,7 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-21] `BlokHead` now measures sticky geometry from a stable direct `.blok-Head` frame while moving the inner visual surface, avoiding active-state feedback loops when the header crosses the sticky boundary.
 - [2026-06-21] `BlokHead` active movement now uses one local `data-active` flag with CSS-owned transforms, removing the shared `topPanel` store state, forced-closed/scroll-border attributes, and direct GSAP header movement while preserving the sticky 10vh scroll threshold.
 - [2026-06-21] `BlokHead` now renders as a single direct `.blok-Head` child of `main` by removing the hidden sentinel sibling and its observer path; layout styling targets `.blok-Head` explicitly instead of relying on child indexes.
 - [2026-06-21] Theme/style vars were trimmed by removing unused typography/color/transition aliases, redundant fullscreen and mobile overrides, stale border-radius transitions, and the empty custom-cursor magnetic module class while keeping the active theme/layout tokens intact.
