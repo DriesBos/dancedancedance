@@ -18,6 +18,11 @@ test('Storyblok image dimensions are parsed centrally and used by image bloks', 
 
   assert.match(columnImageSource, /parseStoryblokImageDimensions/);
   assert.match(columnSliderSource, /parseStoryblokImageDimensions/);
+  assert.match(columnImageSource, /transformStoryblokImageUrl/);
+  assert.match(columnSliderSource, /transformStoryblokImageUrl/);
+  assert.doesNotMatch(columnImageSource, /loader=\{storyblokImageLoader\}/);
+  assert.doesNotMatch(columnSliderSource, /loader=\{storyblokImageLoader\}/);
+  assert.doesNotMatch(imageHelperSource, /ImageLoaderProps/);
   assert.doesNotMatch(columnImageSource, /width=\{0\}/);
   assert.doesNotMatch(columnImageSource, /height=\{0\}/);
   assert.doesNotMatch(columnSliderSource, /width=\{0\}/);

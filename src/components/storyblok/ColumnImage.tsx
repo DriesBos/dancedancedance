@@ -3,7 +3,7 @@ import Image from 'next/image';
 import {
   parseStoryblokImageDimensions,
   STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
-  storyblokImageLoader,
+  transformStoryblokImageUrl,
 } from '@/lib/storyblok-image';
 
 interface SbPageData extends SbBlokData {
@@ -24,6 +24,10 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
   const imageDimensions =
     parseStoryblokImageDimensions(blok.image.filename) ??
     STORYBLOK_FALLBACK_IMAGE_DIMENSIONS;
+  const imageSrc = transformStoryblokImageUrl(blok.image.filename, {
+    width: imageDimensions.width,
+    quality: 70,
+  });
 
   return (
     <div
@@ -33,8 +37,7 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
       data-caption={blok.caption ? true : false}
     >
       <Image
-        loader={storyblokImageLoader}
-        src={blok.image.filename}
+        src={imageSrc}
         alt={blok.image.alt || blok.caption || 'Image'}
         width={imageDimensions.width}
         height={imageDimensions.height}

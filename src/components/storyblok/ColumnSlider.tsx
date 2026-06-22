@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   parseStoryblokImageDimensions,
   STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
-  storyblokImageLoader,
+  transformStoryblokImageUrl,
   warmStoryblokImage,
 } from '@/lib/storyblok-image';
 import SliderIndicators from '../SliderIndicators';
@@ -120,6 +120,10 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           const imageDimensions =
             parseStoryblokImageDimensions(image.filename) ??
             STORYBLOK_FALLBACK_IMAGE_DIMENSIONS;
+          const imageSrc = transformStoryblokImageUrl(image.filename, {
+            width: imageDimensions.width,
+            quality: 70,
+          });
 
           return (
             <div
@@ -129,8 +133,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
             >
               <div className="column-Slider-ImageWrapper">
                 <Image
-                  loader={storyblokImageLoader}
-                  src={image.filename}
+                  src={imageSrc}
                   alt={image.alt || image.name || 'Project image'}
                   width={imageDimensions.width}
                   height={imageDimensions.height}

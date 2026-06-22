@@ -89,6 +89,7 @@ test('Content Security Policy is enforced with a script nonce', () => {
   assert.match(middlewareSource, /report-uri \/api\/csp-report/);
   assert.match(layoutSource, /headers\(\)/);
   assert.match(layoutSource, /nonce=\{nonce\}/);
+  assert.match(layoutSource, /id="initial-ui-state"[\s\S]*suppressHydrationWarning/);
   assert.match(layoutSource, /export const dynamic = 'force-dynamic'/);
 });
 

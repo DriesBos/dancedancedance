@@ -189,7 +189,12 @@ export default async function RootLayout({
         data-initializing="true"
         suppressHydrationWarning
       >
-        <Script id="initial-ui-state" nonce={nonce} strategy="beforeInteractive">
+        <Script
+          id="initial-ui-state"
+          suppressHydrationWarning
+          nonce={nonce}
+          strategy="beforeInteractive"
+        >
           {INITIAL_UI_STATE_SCRIPT}
         </Script>
         {/* Page background effects are temporarily disabled. */}

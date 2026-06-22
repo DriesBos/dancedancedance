@@ -1,5 +1,3 @@
-import type { ImageLoaderProps } from 'next/image';
-
 const DEFAULT_STORYBLOK_QUALITY = 70;
 const STORYBLOK_HOST_SUFFIXES = ['.storyblok.com', '.storyblokchina.cn'];
 const STORYBLOK_ASSET_URL_BASE = 'https://storyblok.local';
@@ -118,16 +116,6 @@ export const transformStoryblokImageUrl = (
 
   return query ? `${transformed}?${query}` : transformed;
 };
-
-export const storyblokImageLoader = ({
-  src,
-  width,
-  quality,
-}: ImageLoaderProps): string =>
-  transformStoryblokImageUrl(src, {
-    width,
-    quality: quality ?? DEFAULT_STORYBLOK_QUALITY,
-  });
 
 export const storyblokVideoPosterUrl = (
   src?: string,
