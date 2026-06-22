@@ -26,6 +26,8 @@ test('experience blok renders Storyblok body content with editable attributes', 
   assert.match(componentSource, /storyblokEditable/);
   assert.match(componentSource, /StoryblokServerComponent/);
   assert.match(componentSource, /<h2[^>]*>Experience<\/h2>/);
-  assert.match(componentSource, /blok\.body\.map/);
+  assert.match(componentSource, /Array\.isArray\(blok\.body\) \? blok\.body : \[\]/);
+  assert.match(componentSource, /body\.map/);
+  assert.doesNotMatch(componentSource, /blok\.body\.map/);
   assert.doesNotMatch(componentSource, /Dries Bos Studio|Mmerch|Anatha|Fotomat|Close My Eyes/);
 });

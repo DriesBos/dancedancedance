@@ -8,7 +8,7 @@ import BlokSidePanels from '../../BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient';
 
 interface SbPageData extends SbBlokData {
-  body: SbBlokData[];
+  body?: SbBlokData[];
 }
 
 interface BlokProps {
@@ -16,6 +16,8 @@ interface BlokProps {
 }
 
 const BlokExperience = ({ blok }: BlokProps) => {
+  const body = Array.isArray(blok.body) ? blok.body : [];
+
   return (
     <div className="blok blok-Exp blok-Animate" {...storyblokEditable(blok)}>
       <GrainyGradient variant="blok" />
@@ -24,7 +26,7 @@ const BlokExperience = ({ blok }: BlokProps) => {
         <h2>Experience</h2>
       </div>
       <div className={styles.content}>
-        {blok.body.map((nestedBlok) => (
+        {body.map((nestedBlok) => (
           <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
         ))}
       </div>
