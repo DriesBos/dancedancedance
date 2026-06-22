@@ -44,6 +44,14 @@ test('global styles define none, hide-first, and stack mobile column behaviours'
   assert.doesNotMatch(globalStyleSource, /data-wide-columns/);
 });
 
+test('global styles hide scrollbars across browser engines', () => {
+  assert.match(
+    globalStyleSource,
+    /\*\n\s+cursor: none !important\n\s+scrollbar-width: none\n\s+-ms-overflow-style: none/,
+  );
+  assert.match(globalStyleSource, /&::-webkit-scrollbar\n\s+display: none/);
+});
+
 test('stacked rows keep desktop text columns visible on mobile', () => {
   const columnTextBlock =
     globalStyleSource.match(/&-Text\n[\s\S]*?&-TextExpandable/)?.[0] || '';
