@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 import { useStore } from '@/store/store';
 import { useShallow } from 'zustand/react/shallow';
 import { detectInitialLocale, persistLocale } from '@/lib/locale';
@@ -13,11 +13,10 @@ const LocaleInitializer = () => {
     })),
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const detected = detectInitialLocale();
     setLocale(detected);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setLocale]);
 
   useEffect(() => {
     persistLocale(locale);

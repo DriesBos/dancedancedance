@@ -1,6 +1,6 @@
 'use client';
 
-import { createElement, type ReactNode } from 'react';
+import { createElement, useMemo, type ReactNode } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { renderWordSwapChildren } from '@/components/InlineWordSwapText/renderWordSwap';
@@ -74,11 +74,7 @@ const wordSwapComponents = Object.fromEntries(
 const Markdown = ({ content, className = '' }: MarkdownProps) => {
   const locale = useStore((state) => state.locale);
 
-  if (!content) {
-    return null;
-  }
-
-  const components: Components = {
+  const components: Components = useMemo(() => ({
     ...wordSwapComponents,
     a: ({ node: _node, href, className, children, ...props }) => {
       const isMailto =
@@ -98,7 +94,11 @@ const Markdown = ({ content, className = '' }: MarkdownProps) => {
         </a>
       );
     },
-  };
+  }), [locale]);
+
+  if (!content) {
+    return null;
+  }
 
   return (
     <div className={`${className} ${styles.markdown} markdown`}>

@@ -10,7 +10,7 @@ import BlokSidePanels from './BlokSidePanels';
 import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
 
 interface Props {
-  slug?: String;
+  slug?: string;
   year?: string;
   title?: string;
   category?: string[];
