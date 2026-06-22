@@ -43,7 +43,11 @@ const INITIAL_UI_STATE_SCRIPT = `
       hour >= 0 && hour < ${NIGHT_THEME_HOUR_END}
         ? ${JSON.stringify(NIGHT_THEME)}
         : preferredTheme;
-    var fullscreen = false;
+    var isMobile =
+      typeof window.matchMedia === 'function'
+        ? window.matchMedia('(max-width: 770px)').matches
+        : window.innerWidth < 770;
+    var fullscreen = isMobile;
     var pageContentVisible = true;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = themeMetaColors[theme] || '#FFFFFF';

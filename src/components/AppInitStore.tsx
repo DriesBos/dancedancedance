@@ -12,13 +12,21 @@ type InitialUIState = {
   fullscreen: boolean;
 };
 
+const getInitialFullscreen = () => {
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia('(max-width: 770px)').matches;
+  }
+
+  return window.innerWidth < 770;
+};
+
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
   const theme = getInitialThemeForHour(hour);
 
   return {
     theme,
-    fullscreen: false,
+    fullscreen: getInitialFullscreen(),
   };
 };
 
