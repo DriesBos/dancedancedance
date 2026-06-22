@@ -30,7 +30,7 @@
   --border-hyperlink: 1.5px
   --blok-height: calc(var(--blok-padding) * 2 + (var(--line-height) * 1rem))
   --blok-padding: 1.25rem
-  --blok-padding-extraTop: var(--blok-height)
+  --blok-padding-extraTop: calc(var(--blok-height) * 2)
   --filter-bottom-padding: 1rem
   --panel-height: 150px
   --panel-perspective-origin: 50% 0vh
@@ -58,6 +58,7 @@
 // LAYOUTS
 body[data-fullscreen='false']
   // Height topPanel + blok height + 25vh
+  --blok-padding-extraTop: var(--blok-height)
   --spacing-containerTopDistance: calc(124px + var(--blok-height) + 25vh)
   --panel-perspective-origin: 50% -70rem
   @media (orientation: portrait)

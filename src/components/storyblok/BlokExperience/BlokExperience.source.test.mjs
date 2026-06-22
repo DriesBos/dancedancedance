@@ -22,12 +22,12 @@ test('mobile experience title keeps the same padding rhythm as stacked titles', 
   assert.doesNotMatch(blokNameBlock, /padding-top: 0/);
 });
 
-test('experience blok renders Storyblok body content with editable attributes', () => {
+test('experience blok is code-owned and uses Storyblok only for placement', () => {
   assert.match(componentSource, /storyblokEditable/);
-  assert.match(componentSource, /StoryblokServerComponent/);
   assert.match(componentSource, /<h2[^>]*>Experience<\/h2>/);
-  assert.match(componentSource, /Array\.isArray\(blok\.body\) \? blok\.body : \[\]/);
-  assert.match(componentSource, /body\.map/);
+  assert.match(componentSource, /experienceItems\.map/);
+  assert.match(componentSource, /Dries Bos Studio|Mmerch|Anatha|Fotomat|Close My Eyes/);
+  assert.doesNotMatch(componentSource, /StoryblokServerComponent/);
+  assert.doesNotMatch(componentSource, /Array\.isArray\(blok\.body\)/);
   assert.doesNotMatch(componentSource, /blok\.body\.map/);
-  assert.doesNotMatch(componentSource, /Dries Bos Studio|Mmerch|Anatha|Fotomat|Close My Eyes/);
 });
