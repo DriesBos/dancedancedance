@@ -47,6 +47,13 @@ const applyBodyState = (theme: Theme, fullscreen: boolean, slug: string) => {
   body.setAttribute('data-border', 'minimal');
 };
 
+const applyThemeMetaColor = (theme: Theme) => {
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (!metaThemeColor) return;
+
+  metaThemeColor.setAttribute('content', getThemeMetaColor(theme));
+};
+
 const AppInitializer = () => {
   const hasInitializedUIRef = useRef(false);
   const readyFrameRef = useRef<number | null>(null);
@@ -125,19 +132,21 @@ const AppInitializer = () => {
   }, []);
 
   useEffect(() => {
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) return;
+    applyThemeMetaColor(theme);
+  }, [theme]);
+
+  useEffect(() => {
     const body = document.body;
+    if (!body) return;
 
     const updateMetaThemeColor = () => {
-      const bodyTheme = body?.getAttribute('data-theme');
-      const resolvedTheme = (bodyTheme as Theme | null) ?? theme;
-      metaThemeColor.setAttribute('content', getThemeMetaColor(resolvedTheme));
+      const themeAttribute = document.body.getAttribute('data-theme');
+      if (!themeAttribute) return;
+
+      applyThemeMetaColor(themeAttribute as Theme);
     };
 
     updateMetaThemeColor();
-
-    if (!body) return;
 
     const observer = new MutationObserver(updateMetaThemeColor);
     observer.observe(body, {
@@ -148,7 +157,7 @@ const AppInitializer = () => {
     return () => {
       observer.disconnect();
     };
-  }, [theme]);
+  }, []);
 
   return null;
 };

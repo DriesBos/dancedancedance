@@ -36,12 +36,7 @@ const TopPanelComponent = ({
   );
 };
 
-const TopPanel = memo(
-  TopPanelComponent,
-  (prevProps, nextProps) =>
-    prevProps.showPortrait === nextProps.showPortrait &&
-    prevProps.surface === nextProps.surface,
-);
+const TopPanel = memo(TopPanelComponent);
 
 TopPanel.displayName = 'TopPanel';
 

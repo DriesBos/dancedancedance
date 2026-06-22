@@ -2,7 +2,7 @@
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   parseStoryblokImageDimensions,
   STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
@@ -54,11 +54,17 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
   }, []);
 
   // Select the appropriate images array based on screen width
-  const activeImages = (
-    isMobile && blok.images_mobile?.length ? blok.images_mobile : blok.images
-  )?.filter((image): image is NonNullable<typeof image> & { filename: string } =>
-    Boolean(image?.filename),
-  ) ?? [];
+  const activeImages = useMemo(() => {
+    const sourceImages =
+      isMobile && blok.images_mobile?.length ? blok.images_mobile : blok.images;
+
+    return (
+      sourceImages?.filter(
+        (image): image is NonNullable<typeof image> & { filename: string } =>
+          Boolean(image?.filename),
+      ) ?? []
+    );
+  }, [blok.images, blok.images_mobile, isMobile]);
   const currentImage = activeImages[activeIndex];
   const nextImage =
     activeImages.length > 1
@@ -138,15 +144,15 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
                   }
                   style={{ width: '100%', height: 'auto' }}
                 />
-                <SliderIndicators
-                  total={activeImages.length}
-                  activeIndex={activeIndex}
-                />
               </div>
               {image.name && <div className="column-Caption">{image.name}</div>}
             </div>
           );
         })}
+        <SliderIndicators
+          total={activeImages.length}
+          activeIndex={activeIndex}
+        />
       </div>
       {blok.caption && <div className="column-Caption">{blok.caption}</div>}
     </div>

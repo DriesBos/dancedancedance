@@ -5,8 +5,7 @@ import GrainyGradient from '@/components/GrainyGradient';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from '@/components/Row';
 import SearchInput from '@/components/SearchInput';
-import { useStore } from '@/store/store';
-import { t } from '@/lib/locale';
+import { t, type Locale } from '@/lib/locale';
 import styles from './BlokFilter.module.sass';
 
 export type ProjectSortField = 'year' | 'title' | 'category';
@@ -17,6 +16,7 @@ interface BlokFilterProps {
   onSortChange: (field: ProjectSortField) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
+  locale: Locale;
 }
 
 export default function BlokFilter({
@@ -24,8 +24,8 @@ export default function BlokFilter({
   onSortChange,
   searchValue,
   onSearchChange,
+  locale,
 }: BlokFilterProps) {
-  const locale = useStore((state) => state.locale);
   const isSortActive = (field: ProjectSortField) => sortField === field;
 
   return (

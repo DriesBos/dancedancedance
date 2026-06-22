@@ -14,29 +14,6 @@ interface Props {
   }>;
 }
 
-const haveProjectsChanged = (
-  prevProjects: Props['projects'],
-  nextProjects: Props['projects'],
-) => {
-  if (prevProjects === nextProjects) return false;
-  if (prevProjects.length !== nextProjects.length) return true;
-
-  for (let index = 0; index < prevProjects.length; index += 1) {
-    const previousProject = prevProjects[index];
-    const nextProject = nextProjects[index];
-
-    if (!previousProject || !nextProject) return true;
-    if (previousProject.slug !== nextProject.slug) return true;
-
-    const previousExternalLink = previousProject.external_link?.cached_url ?? '';
-    const nextExternalLink = nextProject.external_link?.cached_url ?? '';
-
-    if (previousExternalLink !== nextExternalLink) return true;
-  }
-
-  return false;
-};
-
 const BlokHeadComponent = ({ projects }: Props) => {
   const headRef = useRef<HTMLDivElement>(null);
 
@@ -58,11 +35,7 @@ const BlokHeadComponent = ({ projects }: Props) => {
   );
 };
 
-const BlokHead = memo(
-  BlokHeadComponent,
-  (prevProps, nextProps) =>
-    !haveProjectsChanged(prevProps.projects, nextProps.projects),
-);
+const BlokHead = memo(BlokHeadComponent);
 
 BlokHead.displayName = 'BlokHead';
 

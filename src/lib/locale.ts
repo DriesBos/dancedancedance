@@ -1,6 +1,7 @@
 export type Locale = 'en' | 'ja';
 
 export const LOCALE_STORAGE_KEY = 'ddd-locale';
+export const DEFAULT_LOCALE: Locale = 'en';
 
 const translations = {
   'nav.work': { en: 'Work', ja: '制作実績' },
@@ -34,7 +35,7 @@ const getBrowserLocale = (): Locale => {
 };
 
 export const detectInitialLocale = (): Locale => {
-  if (typeof window === 'undefined') return 'en';
+  if (typeof window === 'undefined') return DEFAULT_LOCALE;
 
   const browserLocale = getBrowserLocale();
 

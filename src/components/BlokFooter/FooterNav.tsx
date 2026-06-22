@@ -1,12 +1,11 @@
-'use client';
-
 import Link from 'next/link';
-import { useStore } from '@/store/store';
-import { t } from '@/lib/locale';
+import { t, type Locale } from '@/lib/locale';
 
-const FooterNav = () => {
-  const locale = useStore((state) => state.locale);
+interface FooterNavProps {
+  locale: Locale;
+}
 
+const FooterNav = ({ locale }: FooterNavProps) => {
   return (
     <>
       <Link href="/" className="cursorInteract linkAnimation">

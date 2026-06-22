@@ -11,10 +11,12 @@ import BlokFilter, {
 } from '../BlokFilter';
 import type { ProjectData } from './projectsData';
 import Row from '../Row';
+import type { Locale } from '@/lib/locale';
 
 interface BlokProjectListClientProps {
   projects: ProjectData[];
   editableProps?: HTMLAttributes<HTMLDivElement>;
+  locale: Locale;
 }
 
 const getTimeValue = (value?: string) => {
@@ -32,6 +34,7 @@ const getSearchableText = (project: ProjectData) =>
 export default function BlokProjectListClient({
   projects,
   editableProps,
+  locale,
 }: BlokProjectListClientProps) {
   const [sortField, setSortField] = useState<ProjectSortField>('year');
   const [sortDirection, setSortDirection] =
@@ -88,6 +91,7 @@ export default function BlokProjectListClient({
         onSortChange={handleSortChange}
         searchValue={searchValue}
         onSearchChange={setSearchValue}
+        locale={locale}
       />
       <div className="blok blok-Animate blok-ProjectList" {...editableProps}>
         <GrainyGradient variant="blok" />

@@ -27,6 +27,7 @@ import {
   THEMES_WITH_INITIAL_INTRO,
 } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
+import { DEFAULT_LOCALE } from '@/lib/locale';
 
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
@@ -126,11 +127,18 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
   },
   openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: 'Dries Bos',
+    locale: 'en_US',
     title: 'Dries Bos — Creative Developer',
     description: 'Dries Bos — Creative Developer',
     images: [
       {
         url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        type: 'image/png',
         alt: 'Dries Bos — Creative Developer',
       },
     ],
@@ -165,6 +173,7 @@ export default async function RootLayout({
   const nonce = (await headers()).get('x-nonce') ?? undefined;
   const projects = await fetchProjectSlugs();
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const locale = DEFAULT_LOCALE;
   const performanceTelemetryEnabled =
     process.env.NEXT_PUBLIC_ENABLE_PERF_TELEMETRY === 'true';
   const pageShell = (
@@ -174,7 +183,7 @@ export default async function RootLayout({
         <BlokHead projects={projects} />
         {children}
         <BlokAction />
-        <BlokFooter />
+        <BlokFooter locale={locale} />
       </main>
     </PageContentGate>
   );

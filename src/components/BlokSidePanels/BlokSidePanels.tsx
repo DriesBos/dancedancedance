@@ -24,12 +24,7 @@ const BlokSidePanelsComponent = ({
   );
 };
 
-const BlokSidePanels = memo(
-  BlokSidePanelsComponent,
-  (prevProps, nextProps) =>
-    prevProps.showTopPanelPortrait === nextProps.showTopPanelPortrait &&
-    prevProps.topPanelSurface === nextProps.topPanelSurface,
-);
+const BlokSidePanels = memo(BlokSidePanelsComponent);
 
 BlokSidePanels.displayName = 'BlokSidePanels';
 

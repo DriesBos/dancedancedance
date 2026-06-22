@@ -9,12 +9,12 @@ import {
 } from 'react';
 import { useGSAP } from '@/lib/gsap';
 import { vibrate } from '@/lib/vibration';
-import { useStore } from '@/store/store';
-import { t } from '@/lib/locale';
+import { t, type Locale } from '@/lib/locale';
 import styles from './Newsletter.module.sass';
 
 interface NewsletterProps {
   className?: string;
+  locale: Locale;
 }
 
 const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz';
@@ -73,8 +73,7 @@ const useTextScramble = (
   );
 };
 
-export default function Newsletter({ className }: NewsletterProps) {
-  const locale = useStore((state) => state.locale);
+export default function Newsletter({ className, locale }: NewsletterProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isActive, setIsActive] = useState(false);

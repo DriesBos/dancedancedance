@@ -1,5 +1,4 @@
 import type { ISbStoriesParams } from '@storyblok/react/rsc';
-import { unstable_cache } from 'next/cache';
 import { STORYBLOK_TAG_ALL, STORYBLOK_TAG_CV } from '@/lib/storyblok-cache';
 
 type StoryblokSpaceResponse = {
@@ -10,7 +9,6 @@ type StoryblokSpaceResponse = {
 };
 
 const STORYBLOK_CV_REVALIDATE_SECONDS = 3600;
-const STORYBLOK_CV_CACHE_KEY = 'storyblok:space-cv';
 
 const readStoryblokCv = (payload: StoryblokSpaceResponse): number | null => {
   const candidate = payload.cv ?? payload.space?.version;
@@ -21,36 +19,31 @@ const readStoryblokCv = (payload: StoryblokSpaceResponse): number | null => {
   return candidate > 0 ? candidate : null;
 };
 
-const fetchPublishedStoryblokCv = unstable_cache(
-  async (token: string): Promise<number | null> => {
-    try {
-      const response = await fetch(
-        `https://api.storyblok.com/v2/cdn/spaces/me?token=${encodeURIComponent(token)}`,
-        {
-          cache: 'force-cache',
-          next: {
-            revalidate: STORYBLOK_CV_REVALIDATE_SECONDS,
-            tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_CV],
-          },
-        },
-      );
+const fetchPublishedStoryblokCv = async (
+  token: string,
+): Promise<number | null> => {
+  try {
+    const url = new URL('https://api.storyblok.com/v2/cdn/spaces/me');
+    url.searchParams.set('token', token);
 
-      if (!response.ok) {
-        return null;
-      }
+    const response = await fetch(url, {
+      cache: 'force-cache',
+      next: {
+        revalidate: STORYBLOK_CV_REVALIDATE_SECONDS,
+        tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_CV],
+      },
+    });
 
-      const payload = (await response.json()) as StoryblokSpaceResponse;
-      return readStoryblokCv(payload);
-    } catch {
+    if (!response.ok) {
       return null;
     }
-  },
-  [STORYBLOK_CV_CACHE_KEY],
-  {
-    revalidate: STORYBLOK_CV_REVALIDATE_SECONDS,
-    tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_CV],
-  },
-);
+
+    const payload = (await response.json()) as StoryblokSpaceResponse;
+    return readStoryblokCv(payload);
+  } catch {
+    return null;
+  }
+};
 
 export const getPublishedStoryblokCv = async (
   token?: string,

@@ -10,6 +10,10 @@ test('storyblok cv and cache helpers avoid redundant normalization noise', () =>
   const cacheSource = readSource('./storyblok-cache.ts');
 
   assert.doesNotMatch(cvSource, /return cv \?\? undefined/);
+  assert.doesNotMatch(cvSource, /unstable_cache/);
+  assert.doesNotMatch(cvSource, /\?token=\$\{encodeURIComponent\(token\)\}/);
+  assert.doesNotMatch(cvSource, /STORYBLOK_CV_CACHE_KEY/);
+  assert.match(cvSource, /url\.searchParams\.set\('token', token\)/);
   assert.doesNotMatch(cacheSource, /getStoryblokSlugTag\(normalizedSlug\)/);
   assert.match(cacheSource, /`storyblok:slug:\$\{normalizedSlug\}`/);
 });
