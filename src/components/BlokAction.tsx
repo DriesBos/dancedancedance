@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 import Row from './Row';
 import GrainyGradient from './GrainyGradient';
@@ -16,6 +17,7 @@ const ACTION_ICON_FRAME_COUNT =
   ICON_ABOUT_FRAME_SEQUENCES[ACTION_ICON_VARIANT].length;
 
 export default function BlokAction() {
+  const pathname = usePathname();
   const locale = useStore((state) => state.locale);
   const label = t('action.start', locale);
   const [iconFrameIndex, setIconFrameIndex] = useState(0);
@@ -29,6 +31,8 @@ export default function BlokAction() {
       window.clearInterval(intervalId);
     };
   }, []);
+
+  if (pathname !== '/') return null;
 
   return (
     <a

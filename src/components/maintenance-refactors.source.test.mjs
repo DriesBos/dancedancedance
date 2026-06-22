@@ -144,6 +144,14 @@ test('blok action drives repeated about icons from one shared animation frame', 
   assert.match(iconSource, /frameIndex\?: number/);
 });
 
+test('blok action only renders on the home route', () => {
+  const actionSource = readSource('./BlokAction.tsx');
+
+  assert.match(actionSource, /usePathname/);
+  assert.match(actionSource, /pathname !== '\/'/);
+  assert.match(actionSource, /return null/);
+});
+
 test('blok chrome memoization uses React shallow comparison only', () => {
   const headSource = readSource('./BlokHead/BlokHead.tsx');
   const topPanelSource = readSource('./BlokSidePanels/TopPanel.tsx');
