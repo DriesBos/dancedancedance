@@ -10,16 +10,13 @@
 
 :root
   /* theme */
-  --theme-bg: #E8E7E3
-  --theme-blok: #E8E7E3
+  --theme-bg: hsla(48, 10%, 90%, 1)
+  --theme-blok: hsla(48, 10%, 90%, 1)
   --theme-blok-sidepanel: hsla(48, 10%, 85%, 1)
   --theme-bg-gradient: 0
   --theme-type: hsla(20, 100%, 01%, 1)
-  --theme-muted-opacity: .5
+  --theme-muted-opacity: .35
   --theme-media-filter: none
-  --portrait-dither-blackness: 0.54
-  --portrait-dither-threshold: 138
-  --portrait-dither-invert: 0
 
   // typography
   --font-size-caption: 0.66rem
@@ -73,13 +70,12 @@ body[data-fullscreen='false']
 
 // THEMES
 body[data-theme='DARK']
-  --theme-bg: hsla(0, 0%, 10.2%, 1)
-  --theme-blok: hsla(0, 0%, 10.2%, 1)
-  --theme-blok-sidepanel: hsla(0, 0%, 8.2%, 1)
-  --portrait-dither-invert: 1
+  --theme-bg: hsla(0, 0%, 10%, 1)
+  --theme-blok: hsla(0, 0%, 10%, 1)
+  --theme-blok-sidepanel: hsla(0, 0%, 7%, 1)
   --theme-type: white
-  --theme-muted-opacity: .6
-  --theme-bg-gradient: 0.05
+  --theme-muted-opacity: .5
+  --theme-bg-gradient: 0
 
 body[data-theme='NIGHT']
   --theme-bg: black
@@ -87,5 +83,4 @@ body[data-theme='NIGHT']
   --theme-blok-sidepanel: black
   --theme-type: hsla(0, 100%, 50%, 1)
   --theme-muted-opacity: .6
-  --portrait-dither-invert: 1
   --theme-media-filter: grayscale(1) contrast(1.22) brightness(0.33) sepia(1) saturate(8) hue-rotate(-18deg)
