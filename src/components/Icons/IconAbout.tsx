@@ -17,7 +17,7 @@ export const ICON_ABOUT_FRAME_PATHS = {
     'M12.25 0c1.375 0 2.5 1.125 2.5 2.5S13.625 5 12.25 5a2.507 2.507 0 0 1-2.5-2.5c0-1.375 1.125-2.5 2.5-2.5M16 8.75V25h-2.5v-7.5h-5V8.75H1v-2.5h15zM16 1.25h2.5v7.5H16z',
 } as const;
 
-const ICON_ABOUT_FRAME_SEQUENCES: Record<
+export const ICON_ABOUT_FRAME_SEQUENCES: Record<
   IconAboutVariant,
   Array<keyof typeof ICON_ABOUT_FRAME_PATHS>
 > = {
@@ -39,35 +39,42 @@ interface IconAboutProps {
   variant?: IconAboutVariant;
   animate?: boolean;
   frameDurationMs?: number;
+  frameIndex?: number;
 }
 
 const IconAbout = ({
   variant = 'legs',
   animate = false,
   frameDurationMs = 500,
+  frameIndex,
 }: IconAboutProps) => {
-  const [frameIndex, setFrameIndex] = useState(0);
+  const [localFrameIndex, setLocalFrameIndex] = useState(0);
   const frameSequence = useMemo(
     () => ICON_ABOUT_FRAME_SEQUENCES[variant],
     [variant],
   );
 
   useEffect(() => {
+    if (frameIndex !== undefined) {
+      return;
+    }
+
     if (!animate) {
-      setFrameIndex(0);
+      setLocalFrameIndex(0);
       return;
     }
 
     const intervalId = window.setInterval(() => {
-      setFrameIndex((prev) => (prev + 1) % frameSequence.length);
+      setLocalFrameIndex((prev) => (prev + 1) % frameSequence.length);
     }, frameDurationMs);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [animate, frameDurationMs, frameSequence]);
+  }, [animate, frameDurationMs, frameIndex, frameSequence]);
 
-  const activeFrame = frameSequence[frameIndex];
+  const activeFrameIndex = frameIndex ?? localFrameIndex;
+  const activeFrame = frameSequence[activeFrameIndex % frameSequence.length];
 
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 25 25">

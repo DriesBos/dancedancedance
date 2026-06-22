@@ -1,17 +1,34 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import Row from './Row';
 import GrainyGradient from './GrainyGradient';
-import IconAbout from './Icons/IconAbout';
+import IconAbout, { ICON_ABOUT_FRAME_SEQUENCES } from './Icons/IconAbout';
 import { useStore } from '@/store/store';
 import { t } from '@/lib/locale';
 
 const MARQUEE_GROUP_COUNT = 1;
 const MARQUEE_REPEATS_PER_GROUP = 50;
+const ACTION_ICON_VARIANT = 'mixed';
+const ACTION_ICON_FRAME_DURATION_MS = 500;
+const ACTION_ICON_FRAME_COUNT =
+  ICON_ABOUT_FRAME_SEQUENCES[ACTION_ICON_VARIANT].length;
 
 export default function BlokAction() {
   const locale = useStore((state) => state.locale);
   const label = t('action.start', locale);
+  const [iconFrameIndex, setIconFrameIndex] = useState(0);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setIconFrameIndex((prev) => (prev + 1) % ACTION_ICON_FRAME_COUNT);
+    }, ACTION_ICON_FRAME_DURATION_MS);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   return (
     <a
@@ -38,7 +55,10 @@ export default function BlokAction() {
                         <div className="animateSlideLeftUnit" key={unitIndex}>
                           <span>{label}</span>
                           <div className="icon">
-                            <IconAbout variant="mixed" animate />
+                            <IconAbout
+                              variant={ACTION_ICON_VARIANT}
+                              frameIndex={iconFrameIndex}
+                            />
                           </div>
                         </div>
                       ),

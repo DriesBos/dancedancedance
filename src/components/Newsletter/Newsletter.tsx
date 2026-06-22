@@ -143,7 +143,10 @@ export default function Newsletter({ className }: NewsletterProps) {
     const email = formData.get('email');
 
     const response = await fetch('/api/newsletter/subscribe', {
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({
+        email,
+        company: formData.get('company'),
+      }),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -208,6 +211,14 @@ export default function Newsletter({ className }: NewsletterProps) {
             data-active={isActive}
           />
         </div>
+        <input
+          type="text"
+          name="company"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          style={{ display: 'none' }}
+        />
       </form>
       {message ? (
         <p ref={messageRef} className={styles.message}>
