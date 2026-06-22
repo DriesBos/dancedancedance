@@ -85,3 +85,13 @@ test('fullscreen page border quieting only targets first-level page bloks', () =
     /\.blok\s+\.blok[\s\S]*border-(top|bottom)-color: transparent/,
   );
 });
+
+test('project list contains the final project row overlap', () => {
+  const projectListBlock =
+    globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';
+
+  assert.match(
+    projectListBlock,
+    /padding-bottom: calc\(3\.95rem \* 0\.5\)/,
+  );
+});

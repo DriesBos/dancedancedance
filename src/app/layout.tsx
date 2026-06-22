@@ -13,7 +13,6 @@ import { getSiteUrl } from '@/lib/site-url';
 import AppInitializer from '@/components/AppInitStore';
 import LocaleInitializer from '@/components/LocaleInitializer';
 import BlokHead from '@/components/BlokHead';
-import BlokAction from '@/components/BlokAction';
 import BlokFooter from '@/components/BlokFooter';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
@@ -176,7 +175,6 @@ export default async function RootLayout({
       <main className="main">
         <BlokHead projects={projects} />
         {children}
-        <BlokAction />
         <BlokFooter locale={locale} />
       </main>
     </PageContentGate>
@@ -193,14 +191,12 @@ export default async function RootLayout({
         data-initializing="true"
         suppressHydrationWarning
       >
-        <Script
+        <script
           id="initial-ui-state"
           suppressHydrationWarning
           nonce={nonce}
-          strategy="beforeInteractive"
-        >
-          {INITIAL_UI_STATE_SCRIPT}
-        </Script>
+          dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }}
+        />
         {/* Page background effects are temporarily disabled. */}
         <AppInitializer />
         <LocaleInitializer />
