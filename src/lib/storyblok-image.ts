@@ -2,8 +2,20 @@ import type { ImageLoaderProps } from 'next/image';
 
 const DEFAULT_STORYBLOK_QUALITY = 70;
 const STORYBLOK_HOST_SUFFIXES = ['.storyblok.com', '.storyblokchina.cn'];
+const STORYBLOK_ASSET_URL_BASE = 'https://storyblok.local';
+const STORYBLOK_IMAGE_DIMENSIONS_PATTERN = /\/f\/[^/]+\/(\d+)x(\d+)\//;
 
 type StoryblokImageFormat = 'webp' | 'avif' | 'jpg' | 'jpeg' | 'png';
+
+export type StoryblokImageDimensions = {
+  width: number;
+  height: number;
+};
+
+export const STORYBLOK_FALLBACK_IMAGE_DIMENSIONS: StoryblokImageDimensions = {
+  width: 1600,
+  height: 900,
+};
 
 interface StoryblokImageTransformOptions {
   width?: number;
@@ -25,12 +37,40 @@ export const isStoryblokAssetUrl = (src?: string): boolean => {
   if (!src) return false;
 
   try {
-    const { hostname } = new URL(src);
+    const { hostname } = new URL(src, STORYBLOK_ASSET_URL_BASE);
     return STORYBLOK_HOST_SUFFIXES.some(
       (suffix) => hostname === suffix.slice(1) || hostname.endsWith(suffix),
     );
   } catch {
     return false;
+  }
+};
+
+export const parseStoryblokImageDimensions = (
+  src?: string | null,
+): StoryblokImageDimensions | null => {
+  if (!src || !isStoryblokAssetUrl(src)) return null;
+
+  try {
+    const { pathname } = new URL(src, STORYBLOK_ASSET_URL_BASE);
+    const match = pathname.match(STORYBLOK_IMAGE_DIMENSIONS_PATTERN);
+    if (!match) return null;
+
+    const width = Number(match[1]);
+    const height = Number(match[2]);
+
+    if (
+      !Number.isFinite(width) ||
+      !Number.isFinite(height) ||
+      width <= 0 ||
+      height <= 0
+    ) {
+      return null;
+    }
+
+    return { width, height };
+  } catch {
+    return null;
   }
 };
 
@@ -68,8 +108,11 @@ export const transformStoryblokImageUrl = (
   const hasResize = normalizedWidth > 0 || normalizedHeight > 0;
   if (!hasResize && filters.length === 0) return src;
 
-  const resizePart = hasResize ? `/m/${normalizedWidth}x${normalizedHeight}` : '/m';
-  const smartPart = smart && normalizedWidth > 0 && normalizedHeight > 0 ? '/smart' : '';
+  const resizePart = hasResize
+    ? `/m/${normalizedWidth}x${normalizedHeight}`
+    : '/m';
+  const smartPart =
+    smart && normalizedWidth > 0 && normalizedHeight > 0 ? '/smart' : '';
   const filtersPart = filters.length > 0 ? `/filters:${filters.join(':')}` : '';
   const transformed = `${path}${resizePart}${smartPart}${filtersPart}`;
 

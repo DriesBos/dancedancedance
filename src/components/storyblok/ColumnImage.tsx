@@ -1,6 +1,10 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
-import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
+import {
+  parseStoryblokImageDimensions,
+  STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
+  storyblokImageLoader,
+} from '@/lib/storyblok-image';
 
 interface SbPageData extends SbBlokData {
   image?: {
@@ -17,10 +21,9 @@ interface ColumnImageProps {
 
 const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
   if (!blok.image?.filename) return null;
-  const imageSrc = transformStoryblokImageUrl(blok.image.filename, {
-    width: 1600,
-    quality: 70,
-  });
+  const imageDimensions =
+    parseStoryblokImageDimensions(blok.image.filename) ??
+    STORYBLOK_FALLBACK_IMAGE_DIMENSIONS;
 
   return (
     <div
@@ -30,10 +33,11 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
       data-caption={blok.caption ? true : false}
     >
       <Image
-        src={imageSrc}
+        loader={storyblokImageLoader}
+        src={blok.image.filename}
         alt={blok.image.alt || blok.caption || 'Image'}
-        width={0}
-        height={0}
+        width={imageDimensions.width}
+        height={imageDimensions.height}
         sizes="(max-width: 770px) 100vw, 50vw"
         className="imageItem"
         quality={70}

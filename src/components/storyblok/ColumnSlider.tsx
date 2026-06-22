@@ -4,6 +4,8 @@ import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
+  parseStoryblokImageDimensions,
+  STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
   storyblokImageLoader,
   warmStoryblokImage,
 } from '@/lib/storyblok-image';
@@ -109,6 +111,9 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
         {activeImages.map((image, index) => {
           const isActive = index === activeIndex;
           const isNext = index === (activeIndex + 1) % activeImages.length;
+          const imageDimensions =
+            parseStoryblokImageDimensions(image.filename) ??
+            STORYBLOK_FALLBACK_IMAGE_DIMENSIONS;
 
           return (
             <div
@@ -121,8 +126,8 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
                   loader={storyblokImageLoader}
                   src={image.filename}
                   alt={image.alt || image.name || 'Project image'}
-                  width={0}
-                  height={0}
+                  width={imageDimensions.width}
+                  height={imageDimensions.height}
                   sizes="(max-width: 770px) 100vw, 50vw"
                   quality={70}
                   className="imageItem"

@@ -14,6 +14,35 @@ type FetchPublishedStoryListOptions = {
   tags?: string[];
 };
 
+type StoryblokStoriesResponse<TStory> = {
+  data?: {
+    stories?: TStory[];
+  };
+  total?: number | string;
+  headers?: {
+    total?: number | string;
+    get?: (name: string) => number | string | null | undefined;
+  };
+};
+
+const STORYBLOK_STORIES_PER_PAGE = 100;
+const STORYBLOK_STORIES_PAGE_BATCH_SIZE = 4;
+const STORYBLOK_STORIES_REVALIDATE_SECONDS = 3600;
+
+const readStoryblokTotal = <TStory extends PublishedStoryListItem>(
+  response: StoryblokStoriesResponse<TStory>,
+): number => {
+  const rawTotal =
+    response.total ??
+    response.headers?.total ??
+    response.headers?.get?.('total') ??
+    response.data?.stories?.length ??
+    0;
+  const total = Number(rawTotal);
+
+  return Number.isFinite(total) && total >= 0 ? total : 0;
+};
+
 export async function fetchPublishedStoryList<
   TStory extends PublishedStoryListItem = PublishedStoryListItem,
 >(
@@ -31,19 +60,65 @@ export async function fetchPublishedStoryList<
     {
       version: 'published',
       is_startpage: false,
-      per_page: 100,
       ...params,
     },
     publishedToken,
   );
 
-  const response = await storyblokApi.get('cdn/stories', paramsWithCv, {
-    cache: 'force-cache',
+  const cacheOptions = {
+    cache: 'force-cache' as const,
     next: {
-      revalidate: 3600,
+      revalidate: STORYBLOK_STORIES_REVALIDATE_SECONDS,
       tags: [STORYBLOK_TAG_ALL, ...tags],
     },
-  });
+  };
 
-  return (response.data?.stories ?? []) as TStory[];
+  const fetchStoryPage = async (
+    page: number,
+  ): Promise<StoryblokStoriesResponse<TStory>> =>
+    (await storyblokApi.get(
+      'cdn/stories',
+      {
+        ...paramsWithCv,
+        per_page: STORYBLOK_STORIES_PER_PAGE,
+        page,
+      },
+      cacheOptions,
+    )) as StoryblokStoriesResponse<TStory>;
+
+  const firstResponse = await fetchStoryPage(1);
+  const firstStories = firstResponse.data?.stories ?? [];
+  const total = readStoryblokTotal(firstResponse);
+  const lastPage = Math.ceil(total / STORYBLOK_STORIES_PER_PAGE);
+
+  if (lastPage <= 1) {
+    return firstStories as TStory[];
+  }
+
+  const remainingPages = Array.from(
+    { length: lastPage - 1 },
+    (_, index) => index + 2,
+  );
+  const remainingStories: TStory[][] = [];
+
+  for (
+    let index = 0;
+    index < remainingPages.length;
+    index += STORYBLOK_STORIES_PAGE_BATCH_SIZE
+  ) {
+    const pageBatch = remainingPages.slice(
+      index,
+      index + STORYBLOK_STORIES_PAGE_BATCH_SIZE,
+    );
+    const pageStories = await Promise.all(
+      pageBatch.map(async (currentPage) => {
+        const response = await fetchStoryPage(currentPage);
+        return response.data?.stories ?? [];
+      }),
+    );
+
+    remainingStories.push(...pageStories);
+  }
+
+  return [firstStories, ...remainingStories].flat() as TStory[];
 }
