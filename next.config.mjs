@@ -11,6 +11,7 @@ const nextConfig = {
   //   additionalData: `@import "src/assets/styles/variables.sass"`,
   // },
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -25,6 +26,7 @@ const nextConfig = {
         search: '',
       },
     ],
+    minimumCacheTTL: 86400,
     qualities: [50, 60, 70, 75, 80, 90],
   },
   // Ensure proper handling on Netlify

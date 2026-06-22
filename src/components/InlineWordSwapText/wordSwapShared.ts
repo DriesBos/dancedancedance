@@ -33,6 +33,10 @@ const normalizeTerminalPunctuation = (words: string[]) => {
   }
 
   const firstPunctuation = punctuations[0];
+  if (!firstPunctuation) {
+    return words;
+  }
+
   const allSamePunctuation = punctuations.every(
     (punctuation) => punctuation === firstPunctuation,
   );
@@ -72,12 +76,27 @@ export const parseTextSegments = (
       return [{ type: 'text', value: text }];
     }
 
-    const [, leadingText, firstWord, secondWord, trailingText] = delimiterMatch;
+    const leadingText = delimiterMatch[1] ?? '';
+    const firstWord = delimiterMatch[2];
+    const secondWord = delimiterMatch[3];
+    const trailingText = delimiterMatch[4] ?? '';
+
+    if (!firstWord || !secondWord) {
+      return [{ type: 'text', value: text }];
+    }
+
     const normalizedWords = normalizeTerminalPunctuation([firstWord, secondWord]);
+    const firstNormalizedWord = normalizedWords[0];
+    const secondNormalizedWord = normalizedWords[1];
+
+    if (!firstNormalizedWord || !secondNormalizedWord) {
+      return [{ type: 'text', value: text }];
+    }
+
     const formattedFirstWord =
       tokenFormat === 'ampersand'
-        ? `${normalizedWords[0]} &`
-        : normalizedWords[0];
+        ? `${firstNormalizedWord} &`
+        : firstNormalizedWord;
     const segments: TextSegment[] = [];
 
     if (leadingText) {
@@ -86,7 +105,7 @@ export const parseTextSegments = (
 
     segments.push({
       type: 'rotator',
-      words: [formattedFirstWord, normalizedWords[1]],
+      words: [formattedFirstWord, secondNormalizedWord],
     });
 
     if (trailingText) {
@@ -107,7 +126,12 @@ export const parseTextSegments = (
       segments.push({ type: 'text', value: text.slice(cursor, index) });
     }
 
-    const rawWords = match[1].split(/\s*=\s*/).filter(Boolean);
+    const rawToken = match[1];
+    if (!rawToken) {
+      continue;
+    }
+
+    const rawWords = rawToken.split(/\s*=\s*/).filter(Boolean);
     const normalizedWords = normalizeTerminalPunctuation(rawWords);
 
     segments.push({

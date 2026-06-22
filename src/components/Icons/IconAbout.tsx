@@ -74,7 +74,8 @@ const IconAbout = ({
   }, [animate, frameDurationMs, frameIndex, frameSequence]);
 
   const activeFrameIndex = frameIndex ?? localFrameIndex;
-  const activeFrame = frameSequence[activeFrameIndex % frameSequence.length];
+  const activeFrame =
+    frameSequence[activeFrameIndex % frameSequence.length] ?? 'default';
 
   return (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 25 25">

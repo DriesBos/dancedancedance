@@ -59,8 +59,9 @@ export default function FaviconSwitcher() {
     let frameIndex = 0;
 
     const renderFrame = () => {
+      const frameKey = MIXED_FAVICON_FRAMES[frameIndex] ?? 'default';
       const framePath =
-        ICON_ABOUT_FRAME_PATHS[MIXED_FAVICON_FRAMES[frameIndex]];
+        ICON_ABOUT_FRAME_PATHS[frameKey];
       const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25"><path d="${framePath}" fill="${themeColor}"/></svg>`;
       const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
 
