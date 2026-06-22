@@ -21,6 +21,23 @@ test('custom cursor runtime is split into focused hooks with documented offsets'
   assert.match(eventHookSource, /document\.addEventListener\('pointermove'/);
 });
 
+test('custom cursor caches layout measurements outside the pointer frame', () => {
+  const source = readSource('./CustomCursor.tsx');
+  const pointerFrameStart = source.indexOf('const runPointerFrame = () => {');
+  const scheduleFrameStart = source.indexOf('const schedulePointerFrame = () => {');
+
+  assert.notEqual(pointerFrameStart, -1);
+  assert.notEqual(scheduleFrameStart, -1);
+
+  const pointerFrameSource = source.slice(pointerFrameStart, scheduleFrameStart);
+
+  assert.match(source, /const refreshPreviewSize = /);
+  assert.match(source, /const refreshMessageSize = /);
+  assert.match(source, /let activeMagneticRect: DOMRect \| null = null/);
+  assert.doesNotMatch(pointerFrameSource, /offsetWidth|offsetHeight/);
+  assert.doesNotMatch(pointerFrameSource, /getBoundingClientRect/);
+});
+
 test('cursor message uses inverted theme tokens without inverse vars', () => {
   const source = readSource('./CustomCursor.module.sass');
   const messageStart = source.indexOf('.message');

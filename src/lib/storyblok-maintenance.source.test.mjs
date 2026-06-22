@@ -22,3 +22,23 @@ test('storyblok revalidation uses call fallback instead of revalidateTag arity c
   assert.match(source, /catch/);
   assert.match(source, /revalidateTagWithProfile\(tag, 'max'\)/);
 });
+
+test('storyblok revalidation compares webhook secrets in constant time', () => {
+  const source = readSource('../app/api/storyblok/revalidate/route.ts');
+
+  assert.match(source, /timingSafeEqual/);
+  assert.match(source, /safeCompareSecret/);
+  assert.doesNotMatch(source, /incomingSecret !== configuredSecret/);
+  assert.doesNotMatch(source, /export const dynamic = 'force-dynamic'/);
+});
+
+test('page story fetches use storyblok cache tags revalidated by the webhook', () => {
+  const fetchStorySource = readSource('../utils/fetchstory.ts');
+  const cacheSource = readSource('./storyblok-cache.ts');
+  const revalidateSource = readSource('../app/api/storyblok/revalidate/route.ts');
+
+  assert.match(fetchStorySource, /STORYBLOK_TAG_ALL/);
+  assert.doesNotMatch(fetchStorySource, /['"`]cms['"`]/);
+  assert.match(cacheSource, /export const STORYBLOK_TAG_ALL = 'storyblok'/);
+  assert.match(revalidateSource, /new Set<string>\(\[STORYBLOK_TAG_ALL/);
+});

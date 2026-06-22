@@ -78,6 +78,20 @@ test('Netlify headers do not target deleted static assets', () => {
   assert.match(netlifySource, /for = "\/og-image\.png"/);
 });
 
+test('Content Security Policy is enforced with a script nonce', () => {
+  const netlifySource = readRoot('netlify.toml');
+  const middlewareSource = readRoot('src/middleware.ts');
+  const layoutSource = readRoot('src/app/layout.tsx');
+
+  assert.doesNotMatch(netlifySource, /Content-Security-Policy-Report-Only/);
+  assert.match(middlewareSource, /Content-Security-Policy/);
+  assert.match(middlewareSource, /'nonce-\$\{nonce\}'/);
+  assert.match(middlewareSource, /report-uri \/api\/csp-report/);
+  assert.match(layoutSource, /headers\(\)/);
+  assert.match(layoutSource, /nonce=\{nonce\}/);
+  assert.match(layoutSource, /export const dynamic = 'force-dynamic'/);
+});
+
 test('project intentionally avoids reduced motion preference handling', () => {
   const agentsSource = readRoot('agents.md');
   const varsSource = readRoot('src/assets/styles/vars.sass');

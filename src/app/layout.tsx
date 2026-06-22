@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import Script from 'next/script';
+import { headers } from 'next/headers';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
 import '@/assets/styles/vars.sass';
@@ -99,14 +100,6 @@ const INITIAL_UI_STATE_SCRIPT = `
   })();
 `;
 
-const buildGoogleAnalyticsBootstrapScript = (gaId: string) => `
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  window.gtag = window.gtag || gtag;
-  gtag('js', new Date());
-  gtag('config', '${gaId}');
-`;
-
 const myFont = localFont({
   src: '../assets/fonts/soehne-web-buch.woff2',
   display: 'swap',
@@ -162,11 +155,14 @@ export const viewport: Viewport = {
   interactiveWidget: 'overlays-content',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   const projects = await fetchProjectSlugs();
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const performanceTelemetryEnabled =
@@ -194,7 +190,7 @@ export default async function RootLayout({
         data-initializing="true"
         suppressHydrationWarning
       >
-        <Script id="initial-ui-state" strategy="beforeInteractive">
+        <Script id="initial-ui-state" nonce={nonce} strategy="beforeInteractive">
           {INITIAL_UI_STATE_SCRIPT}
         </Script>
         {/* Page background effects are temporarily disabled. */}
@@ -204,13 +200,17 @@ export default async function RootLayout({
         {gaId && (
           <>
             <Script
+              id="google-analytics-bootstrap"
+              nonce={nonce}
+              src={`/api/google-analytics/bootstrap?measurementId=${encodeURIComponent(gaId)}`}
+              strategy="lazyOnload"
+            />
+            <Script
               id="google-analytics-loader"
+              nonce={nonce}
               src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
               strategy="lazyOnload"
             />
-            <Script id="google-analytics" strategy="lazyOnload">
-              {buildGoogleAnalyticsBootstrapScript(gaId)}
-            </Script>
           </>
         )}
         {performanceTelemetryEnabled ? (

@@ -1,5 +1,6 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { getStoryblokApi } from '@/lib/storyblok';
 import {
   STORYBLOK_TAG_ALL,
@@ -10,7 +11,6 @@ import {
 } from '@/lib/storyblok-cache';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
 type StoryblokWebhookPayload = {
   action?: string;
@@ -30,6 +30,12 @@ const getIncomingSecret = (request: NextRequest): string | null =>
   request.nextUrl.searchParams.get('secret') ||
   request.headers.get('x-webhook-secret') ||
   request.headers.get('x-storyblok-secret');
+
+const hashSecret = (secret: string): Buffer =>
+  createHash('sha256').update(secret).digest();
+
+const safeCompareSecret = (incomingSecret: string, configuredSecret: string) =>
+  timingSafeEqual(hashSecret(incomingSecret), hashSecret(configuredSecret));
 
 const extractSlugs = (payload: StoryblokWebhookPayload): string[] => {
   const slugs = new Set<string>();
@@ -97,7 +103,7 @@ export async function POST(request: NextRequest) {
   }
 
   const incomingSecret = getIncomingSecret(request);
-  if (!incomingSecret || incomingSecret !== configuredSecret) {
+  if (!incomingSecret || !safeCompareSecret(incomingSecret, configuredSecret)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

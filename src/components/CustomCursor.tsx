@@ -24,6 +24,10 @@ type PositionBoundary = {
   right: number;
   bottom: number;
 };
+type ElementSize = {
+  width: number;
+  height: number;
+};
 type CursorRuntime = {
   resetPreviewForRoute: () => void;
   updateCursorMeasurements: () => void;
@@ -178,6 +182,23 @@ const createCustomCursorRuntime = ({
   let messageOffsetX = 0;
   let messageOffsetY = 0;
   let previewRightInset = 0;
+  let messageSize: ElementSize = { width: 220, height: 44 };
+  let previewSize: ElementSize = { width: 360, height: 270 };
+  let previewBoundary: PositionBoundary = {
+    left: 0,
+    top: 0,
+    right: window.innerWidth,
+    bottom: window.innerHeight,
+  };
+  let activeMagneticRect: DOMRect | null = null;
+
+  const getCachedElementSize = (
+    element: HTMLElement,
+    fallback: ElementSize,
+  ): ElementSize => ({
+    width: element.offsetWidth || fallback.width,
+    height: element.offsetHeight || fallback.height,
+  });
 
   const setFollowerMode = (mode: FollowerMode) => {
     if (currentFollowerMode === mode) return;
@@ -220,9 +241,18 @@ const createCustomCursorRuntime = ({
     previewRightInset = iconSize + iconSpacing;
   };
 
-  const updateCursorMeasurements = () => {
-    updateMessageOffsets();
-    updatePreviewBoundaryInset();
+  const refreshMessageSize = () => {
+    messageSize = getCachedElementSize(messageContainer, {
+      width: 220,
+      height: 44,
+    });
+  };
+
+  const refreshPreviewSize = () => {
+    previewSize = getCachedElementSize(previewContainer, {
+      width: 360,
+      height: 270,
+    });
   };
 
   const getTextTweens = (textEl: HTMLElement): TextTweenSetters => {
@@ -252,6 +282,13 @@ const createCustomCursorRuntime = ({
     tweens.yTo(0);
   };
 
+  const setActiveMagneticTarget = (target: HTMLElement | null) => {
+    if (target === activeMagneticTarget) return;
+    clearMagneticTextTween(activeMagneticTarget);
+    activeMagneticTarget = target;
+    refreshActiveMagneticRect();
+  };
+
   const preloadPreviewImage = (src: string) => {
     if (!src || preloadedPreviewUrls.has(src)) return;
     preloadedPreviewUrls.add(src);
@@ -267,7 +304,7 @@ const createCustomCursorRuntime = ({
     }
   };
 
-  const getPreviewBoundary = (): PositionBoundary => {
+  const refreshPreviewBoundary = () => {
     const viewportBoundary: PositionBoundary = {
       left: 0,
       top: 0,
@@ -279,7 +316,10 @@ const createCustomCursorRuntime = ({
       document.querySelector<HTMLElement>('main.main') ??
       document.querySelector<HTMLElement>('main');
 
-    if (!mainContainer) return viewportBoundary;
+    if (!mainContainer) {
+      previewBoundary = viewportBoundary;
+      return;
+    }
 
     const rect = mainContainer.getBoundingClientRect();
     const mainBoundary: PositionBoundary = {
@@ -293,16 +333,30 @@ const createCustomCursorRuntime = ({
       mainBoundary.right <= mainBoundary.left ||
       mainBoundary.bottom <= mainBoundary.top
     ) {
-      return viewportBoundary;
+      previewBoundary = viewportBoundary;
+      return;
     }
 
-    return mainBoundary;
+    previewBoundary = mainBoundary;
+  };
+
+  const refreshActiveMagneticRect = () => {
+    activeMagneticRect = activeMagneticTarget?.getBoundingClientRect() ?? null;
+  };
+
+  const updateCursorMeasurements = () => {
+    updateMessageOffsets();
+    updatePreviewBoundaryInset();
+    refreshMessageSize();
+    refreshPreviewSize();
+    refreshPreviewBoundary();
+    refreshActiveMagneticRect();
   };
 
   const clampPreviewPosition = (clientX: number, clientY: number) => {
-    const previewWidth = previewContainer.offsetWidth || 360;
-    const previewHeight = previewContainer.offsetHeight || 270;
-    const boundary = getPreviewBoundary();
+    const previewWidth = previewSize.width;
+    const previewHeight = previewSize.height;
+    const boundary = previewBoundary;
     const padding = 16;
     let x = clientX - previewWidth / 2;
     let y = clientY - previewHeight / 2;
@@ -338,8 +392,8 @@ const createCustomCursorRuntime = ({
   };
 
   const clampMessagePosition = (clientX: number, clientY: number) => {
-    const messageWidth = messageContainer.offsetWidth || 220;
-    const messageHeight = messageContainer.offsetHeight || 44;
+    const messageWidth = messageSize.width;
+    const messageHeight = messageSize.height;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const padding = 16;
@@ -364,9 +418,16 @@ const createCustomCursorRuntime = ({
     gsap.set(messageContainer, { x, y });
   };
 
+  const refreshMessageSizeAfterRender = () => {
+    refreshMessageSize();
+    window.requestAnimationFrame(refreshMessageSize);
+  };
+
   const showPreview = () => {
     if (isPreviewVisible.current) return;
     isPreviewVisible.current = true;
+    refreshPreviewSize();
+    refreshPreviewBoundary();
     gsap.to(previewContainer, {
       autoAlpha: 1,
       scale: 1,
@@ -428,6 +489,7 @@ const createCustomCursorRuntime = ({
       setMessageToPointerInstant(latestPointerX, latestPointerY);
       rotateMessageTo(0);
       setMessage(messageText);
+      refreshMessageSizeAfterRender();
       messageFadeAnim.restart();
     } else {
       messageFadeAnim.reverse();
@@ -458,6 +520,8 @@ const createCustomCursorRuntime = ({
 
     const alt = resolvedTarget.getAttribute('data-cursor-preview-alt') || '';
     preloadPreviewImage(src);
+    refreshPreviewSize();
+    refreshPreviewBoundary();
 
     if (previewImage.getAttribute('src') !== src) {
       previewImage.setAttribute('src', src);
@@ -503,14 +567,11 @@ const createCustomCursorRuntime = ({
     const magneticTarget = hoveredElement?.closest('.cursorMagnetic');
     const resolvedMagneticTarget =
       magneticTarget instanceof HTMLElement ? magneticTarget : null;
-    if (resolvedMagneticTarget !== activeMagneticTarget) {
-      clearMagneticTextTween(activeMagneticTarget);
-      activeMagneticTarget = resolvedMagneticTarget;
-    }
+    setActiveMagneticTarget(resolvedMagneticTarget);
 
     let foundTarget = false;
-    if (activeMagneticTarget) {
-      const rect = activeMagneticTarget.getBoundingClientRect();
+    if (activeMagneticTarget && activeMagneticRect) {
+      const rect = activeMagneticRect;
       const triggerDistance = rect.width;
       const targetPosition = {
         x: rect.left + rect.width / 2,
@@ -599,6 +660,7 @@ const createCustomCursorRuntime = ({
     prevMousePos.current = { x: latestPointerX, y: latestPointerY };
     activeMessageTarget = introTarget;
     setMessage(messageText);
+    refreshMessageSizeAfterRender();
     setMessageToPointerInstant(latestPointerX, latestPointerY);
     rotateMessageTo(0);
     messageFadeAnim.progress(1).pause();
@@ -626,6 +688,7 @@ const createCustomCursorRuntime = ({
     setFollowerMode('default');
     clearMagneticTextTween(activeMagneticTarget);
     activeMagneticTarget = null;
+    activeMagneticRect = null;
     activeMessageTarget = null;
     activePreviewTarget = null;
 
@@ -661,6 +724,7 @@ const createCustomCursorRuntime = ({
 
     hintShowTimeout.current = setTimeout(() => {
       setMessage("tip: use ←, → or 'esc'");
+      refreshMessageSizeAfterRender();
       messageFadeAnim.play();
 
       hintHideTimeout.current = setTimeout(() => {
@@ -678,6 +742,8 @@ const createCustomCursorRuntime = ({
     gsap.set(previewContainer, PREVIEW_HIDDEN_STATE);
     previewImage.setAttribute('src', '');
     previewImage.setAttribute('alt', '');
+    refreshPreviewSize();
+    refreshPreviewBoundary();
     showProjectNavigationHint();
   };
 
@@ -803,6 +869,9 @@ const useCursorEventListeners = (
     const handleResize = () => {
       runtimeRef.current?.updateCursorMeasurements();
     };
+    const handleScroll = () => {
+      runtimeRef.current?.updateCursorMeasurements();
+    };
     const handleBlur = () => {
       runtimeRef.current?.handleMouseLeaveWindow();
     };
@@ -817,6 +886,7 @@ const useCursorEventListeners = (
     };
 
     window.addEventListener('resize', handleResize, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('blur', handleBlur);
     if (typeof window.PointerEvent === 'function') {
       document.addEventListener('pointermove', handlePointerMove, {
@@ -830,6 +900,7 @@ const useCursorEventListeners = (
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('blur', handleBlur);
       if (typeof window.PointerEvent === 'function') {
         document.removeEventListener('pointermove', handlePointerMove);
