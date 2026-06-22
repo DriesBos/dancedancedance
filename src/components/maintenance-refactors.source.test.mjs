@@ -129,29 +129,6 @@ test('project list sort/search helpers stay hoisted outside the client component
   }
 });
 
-test('blok action drives repeated about icons from one shared animation frame', () => {
-  const actionSource = readSource('./BlokAction.tsx');
-  const iconSource = readSource('./Icons/IconAbout.tsx');
-
-  assert.match(actionSource, /window\.setInterval/);
-  assert.equal(
-    (actionSource.match(/window\.setInterval/g) || []).length,
-    1,
-    'BlokAction should create one shared animation clock',
-  );
-  assert.match(actionSource, /frameIndex=\{iconFrameIndex\}/);
-  assert.doesNotMatch(actionSource, /<IconAbout[^>]*animate/);
-  assert.match(iconSource, /frameIndex\?: number/);
-});
-
-test('blok action only renders on the home route', () => {
-  const actionSource = readSource('./BlokAction.tsx');
-
-  assert.match(actionSource, /usePathname/);
-  assert.match(actionSource, /pathname !== '\/'/);
-  assert.match(actionSource, /return null/);
-});
-
 test('blok chrome memoization uses React shallow comparison only', () => {
   const headSource = readSource('./BlokHead/BlokHead.tsx');
   const topPanelSource = readSource('./BlokSidePanels/TopPanel.tsx');

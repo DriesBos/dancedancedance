@@ -504,14 +504,6 @@ mux-player, .muxPlayer
     @media (hover: hover)
       &:hover
         transition: transform 0.22s cubic-bezier(0.77, 0, 0.28, 1), background-color var(--theme-transition), box-shadow var(--theme-transition)
-  &-Action
-    border-top: var(--border-width) solid currentColor !important
-    color: inherit
-    text-decoration: none
-    padding: var(--spacing-base) 0
-    .column-Icons
-      & > div:first-child
-        opacity: 1
   &-Highlights
     display: grid
     grid-template-columns: repeat(2, minmax(0, 1fr))
@@ -633,9 +625,6 @@ body
         // &-ProjectList
         //   border-top-width: 0
         &-Project
-          background: var(--theme-blok)
-        &-Action
-          z-index: 2
           background: var(--theme-blok)
         &-Footer
           z-index: 1

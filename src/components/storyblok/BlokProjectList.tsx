@@ -3,7 +3,6 @@ import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import { fetchProjectData } from './projectsData';
 import BlokProjectListClient from './BlokProjectListClient';
 import { DEFAULT_LOCALE } from '@/lib/locale';
-// import BlokAction from '../BlokAction';
 
 interface BlokProjectListProps {
   blok: SbBlokData;
