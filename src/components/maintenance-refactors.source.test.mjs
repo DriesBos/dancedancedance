@@ -21,6 +21,22 @@ test('custom cursor runtime is split into focused hooks with documented offsets'
   assert.match(eventHookSource, /document\.addEventListener\('pointermove'/);
 });
 
+test('cursor message uses inverted theme tokens without inverse vars', () => {
+  const source = readSource('./CustomCursor.module.sass');
+  const messageStart = source.indexOf('.message');
+  const previewStart = source.indexOf('.preview');
+
+  assert.notEqual(messageStart, -1);
+  assert.notEqual(previewStart, -1);
+
+  const messageSource = source.slice(messageStart, previewStart);
+
+  assert.match(messageSource, /background: var\(--theme-type\)/);
+  assert.match(messageSource, /color: var\(--theme-bg\) !important/);
+  assert.doesNotMatch(messageSource, /background: currentColor/);
+  assert.doesNotMatch(messageSource, /--inversed-/);
+});
+
 test('title switcher registers visibility listener once and tracks title in a ref', () => {
   const source = readSource('./TitleSwitcher.tsx');
 
