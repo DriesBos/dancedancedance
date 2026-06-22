@@ -1,6 +1,10 @@
 # Optimisation History
 
 ## 1. Have been optimised
+- [2026-06-22] CI and local tooling now share source-test, lint, build, typecheck, and production-audit scripts; dependency overrides patch current transitive audit advisories while keeping the app on the Next 15 line.
+- [2026-06-22] Retired visual experiments and stale assets were removed, including the hidden project slider implementation, disabled dither portrait chunk/media, unused local image assets, legacy font formats, old transition-class CSS, dead helper code, and unused icon components.
+- [2026-06-22] Published Storyblok story-list fetching now goes through one shared helper used by static params, sitemap, and project data, with a real optional API fallback instead of unreachable guards.
+- [2026-06-22] Mux videos now use the supplied poster or lightweight Mux thumbnail placeholder instead of running client-side BlurUp generation on mount, and performance telemetry only wraps the app when explicitly enabled.
 - [2026-06-21] Markdown link underline animation now runs through one shared hook, and Storyblok image prewarming now uses one capped helper shared by project and column sliders.
 - [2026-06-21] Cursor behavior was split out of the monolithic GSAP setup into focused runtime, route-reset, event-listener, and intro-message hooks; smaller maintenance cleanups also removed duplicate Markdown word-swap renderers, stale listener fallbacks, and fragile Storyblok revalidation branching.
 - [2026-06-21] Project data now has one tag-aware Storyblok fetch path, newsletter copy uses one shared scramble hook, and inline word swaps pass word arrays directly instead of serializing through a control-character string.

@@ -1,7 +1,6 @@
 import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
-import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
-import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
+import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 import PageTransition from '@/components/PageTransition';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -12,29 +11,10 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   try {
-    const storyblokApi = getStoryblokApi(false);
-    const publishedToken = getStoryblokAccessToken(false);
-    const paramsWithCv = await withPublishedStoryblokCv(
-      {
-        version: 'published',
-        is_startpage: false,
-        per_page: 100,
-      },
-      publishedToken,
-    );
-    const response = await storyblokApi.get(
-      'cdn/stories',
-      paramsWithCv,
-      {
-        cache: 'force-cache',
-        next: { revalidate: 3600 },
-      },
-    );
-
-    const stories = (response.data?.stories || []) as Array<{
+    const stories = await fetchPublishedStoryList<{
       slug?: string;
       is_folder?: boolean;
-    }>;
+    }>();
 
     const staticParams = stories
       .filter(

@@ -5,7 +5,6 @@ import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
 import '@/assets/styles/vars.sass';
 import '@/assets/styles/typography.sass';
-import '@/assets/styles/transitions.sass';
 import '@/assets/styles/global.sass';
 import '@/assets/styles/icon-styles.sass';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
@@ -171,6 +170,19 @@ export default async function RootLayout({
 }>) {
   const projects = await fetchProjectSlugs();
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const performanceTelemetryEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_PERF_TELEMETRY === 'true';
+  const pageShell = (
+    <PageContentGate>
+      <HeaderInitAnimation />
+      <main className="main">
+        <BlokHead projects={projects} />
+        {children}
+        <BlokAction />
+        <BlokFooter />
+      </main>
+    </PageContentGate>
+  );
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -202,17 +214,11 @@ export default async function RootLayout({
             </Script>
           </>
         )}
-        <PerformanceTelemetry>
-          <PageContentGate>
-            <HeaderInitAnimation />
-            <main className="main">
-              <BlokHead projects={projects} />
-              {children}
-              <BlokAction />
-              <BlokFooter />
-            </main>
-          </PageContentGate>
-        </PerformanceTelemetry>
+        {performanceTelemetryEnabled ? (
+          <PerformanceTelemetry>{pageShell}</PerformanceTelemetry>
+        ) : (
+          pageShell
+        )}
       </body>
     </html>
   );

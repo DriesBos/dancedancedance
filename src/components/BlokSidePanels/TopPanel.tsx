@@ -25,7 +25,6 @@ const TopPanelComponent = ({
         rel="noopener noreferrer"
       >
         <GrainyGradient variant="blok" />
-        {/* Dithered video portrait temporarily disabled. */}
       </a>
     );
   }

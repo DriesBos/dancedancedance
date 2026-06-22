@@ -1,7 +1,6 @@
-import { ISbStoriesParams } from '@storyblok/react/rsc';
-import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
-import { STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS } from '@/lib/storyblok-cache';
-import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
+import type { ISbStoriesParams } from '@storyblok/react/rsc';
+import { STORYBLOK_TAG_PROJECTS } from '@/lib/storyblok-cache';
+import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 
 export interface ProjectData {
   slug: string;
@@ -33,29 +32,12 @@ type StoryblokProjectStory = {
 
 export async function fetchProjectData(): Promise<ProjectData[]> {
   const sbParams: ISbStoriesParams = {
-    version: 'published',
     starts_with: 'projects',
-    is_startpage: false,
     sort_by: 'content.year:desc',
   };
-  const publishedToken = getStoryblokAccessToken(false);
-  const paramsWithCv = await withPublishedStoryblokCv(sbParams, publishedToken);
-
-  const storyblokApi = getStoryblokApi();
-  if (!storyblokApi) {
-    console.warn('Storyblok API not initialized, returning empty projects');
-    return [];
-  }
-
-  const response = await storyblokApi.get(`cdn/stories`, paramsWithCv, {
-    cache: 'force-cache',
-    next: {
-      revalidate: 3600,
-      tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS],
-    },
+  const stories = await fetchPublishedStoryList<StoryblokProjectStory>(sbParams, {
+    tags: [STORYBLOK_TAG_PROJECTS],
   });
-
-  const stories = (response.data?.stories ?? []) as StoryblokProjectStory[];
 
   return stories.map((story) => ({
     slug: story.slug,

@@ -7,9 +7,6 @@ const readSource = (path) =>
 
 test('storyblok image prewarming is centralized and cache capped', () => {
   const imageSource = readSource('./storyblok-image.ts');
-  const projectSliderSource = readSource(
-    '../components/storyblok/BlokProjectSlider/BlokProjectSlider.tsx',
-  );
   const columnSliderSource = readSource(
     '../components/storyblok/ColumnSlider.tsx',
   );
@@ -19,12 +16,10 @@ test('storyblok image prewarming is centralized and cache capped', () => {
   assert.match(imageSource, /capped/i);
   assert.match(imageSource, /new window\.Image\(\)/);
 
-  for (const source of [projectSliderSource, columnSliderSource]) {
-    assert.match(
-      source,
-      /warmStoryblokImage\([^,]+,[\s\S]*warmed[A-Za-z]+ImageSrcs,?\s*\)/,
-    );
-    assert.doesNotMatch(source, /new window\.Image\(\)/);
-    assert.doesNotMatch(source, /image\.decode\?\.\(\)\.catch/);
-  }
+  assert.match(
+    columnSliderSource,
+    /warmStoryblokImage\([^,]+,[\s\S]*warmed[A-Za-z]+ImageSrcs,?\s*\)/,
+  );
+  assert.doesNotMatch(columnSliderSource, /new window\.Image\(\)/);
+  assert.doesNotMatch(columnSliderSource, /image\.decode\?\.\(\)\.catch/);
 });

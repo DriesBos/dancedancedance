@@ -1,4 +1,4 @@
-name: Lint
+name: Check
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -21,11 +21,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run ESLint
-        run: pnpm lint
+      - name: Run checks
+        run: pnpm check
+
+      - name: Run production audit
+        run: pnpm run audit

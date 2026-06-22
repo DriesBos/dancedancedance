@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getSiteUrl } from '@/lib/site-url';
-import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
-import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
+import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 
 type StoryblokStoryListItem = {
   slug?: string;
@@ -14,26 +13,7 @@ const getPublishedEntries = async (
   baseUrl: string,
 ): Promise<MetadataRoute.Sitemap> => {
   try {
-    const storyblokApi = getStoryblokApi(false);
-    const publishedToken = getStoryblokAccessToken(false);
-    const paramsWithCv = await withPublishedStoryblokCv(
-      {
-        version: 'published',
-        is_startpage: false,
-        per_page: 100,
-      },
-      publishedToken,
-    );
-    const response = await storyblokApi.get(
-      'cdn/stories',
-      paramsWithCv,
-      {
-        cache: 'force-cache',
-        next: { revalidate: 3600 },
-      },
-    );
-
-    const stories = (response.data?.stories || []) as StoryblokStoryListItem[];
+    const stories = await fetchPublishedStoryList<StoryblokStoryListItem>();
 
     return stories
       .filter(

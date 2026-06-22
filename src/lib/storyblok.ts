@@ -13,13 +13,13 @@ import ColumnText from '@/components/storyblok/ColumnText';
 import ColumnTextExpandable from '@/components/storyblok/ColumnTextExpandable';
 import ColumnEmpty from '@/components/storyblok/ColumnEmpty';
 
-const HiddenProjectSlider = () => null;
+const HiddenCmsBlock = () => null;
 
 const components = {
   Page: Page,
   'Page Project': Project,
   'Blok Project List': BlokProjectList,
-  'Blok Project Slider': HiddenProjectSlider,
+  'Blok Project Slider': HiddenCmsBlock,
   'Blok Experience': BlokExperience,
   'Blok Intro': BlokIntro,
   'Blok Container': BlokContainer,
@@ -63,4 +63,12 @@ export const getStoryblokApi = (preview = false) => {
       },
     },
   })();
+};
+
+export const getOptionalStoryblokApi = (preview = false) => {
+  try {
+    return getStoryblokApi(preview);
+  } catch {
+    return null;
+  }
 };
