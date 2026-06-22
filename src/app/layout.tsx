@@ -24,7 +24,6 @@ import {
   LIGHT_THEME,
   NIGHT_THEME,
   NIGHT_THEME_HOUR_END,
-  THEMES_WITH_INITIAL_INTRO,
 } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
 import { DEFAULT_LOCALE } from '@/lib/locale';
@@ -45,16 +44,13 @@ const INITIAL_UI_STATE_SCRIPT = `
         ? ${JSON.stringify(NIGHT_THEME)}
         : preferredTheme;
     var fullscreen = false;
-    var initialThemeIntroPending =
-      ${JSON.stringify(THEMES_WITH_INITIAL_INTRO)}.indexOf(theme) !== -1;
-    var pageContentVisible = !initialThemeIntroPending;
+    var pageContentVisible = true;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = themeMetaColors[theme] || '#FFFFFF';
 
     window.__DDD_INITIAL_STATE__ = {
       theme: theme,
-      fullscreen: fullscreen,
-      initialThemeIntroPending: initialThemeIntroPending
+      fullscreen: fullscreen
     };
 
     if (document.body) {
@@ -63,14 +59,8 @@ const INITIAL_UI_STATE_SCRIPT = `
       document.body.setAttribute('data-page', routeSlug);
       document.body.setAttribute('data-page-content-visible', pageContentVisible ? 'true' : 'false');
     }
-    if (!pageContentVisible) {
-      document.documentElement.style.overflow = 'hidden';
-      document.body && (document.body.style.overflow = 'hidden');
-      window.scrollTo(0, 0);
-    } else {
-      document.documentElement.style.overflow = '';
-      document.body && (document.body.style.overflow = '');
-    }
+    document.documentElement.style.overflow = '';
+    document.body && (document.body.style.overflow = '');
 
     var metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {

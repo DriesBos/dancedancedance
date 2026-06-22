@@ -8,9 +8,7 @@ export const NIGHT_THEME_HOUR_END = 4;
 export const LIGHT_THEME: Theme = 'LIGHT';
 export const DARK_THEME: Theme = 'DARK';
 export const NIGHT_THEME: Theme = 'NIGHT';
-export const DEVELOPMENT_DEFAULT_THEME: Theme = LIGHT_THEME;
 export const FALLBACK_THEME_PREFERENCE: ThemePreference = 'light';
-export const THEMES_WITH_INITIAL_INTRO: Theme[] = [];
 
 export const LANDSCAPE_THEME_ORDER: Theme[] = [
   LIGHT_THEME,
@@ -26,7 +24,6 @@ export const PORTRAIT_THEME_ORDER: Theme[] = [
 
 export const LANDSCAPE_DEFAULT_THEME: Theme = LIGHT_THEME;
 export const PORTRAIT_DEFAULT_THEME: Theme = LIGHT_THEME;
-export const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
 
 const getViewportOrientation = (): ThemeOrientation => {
   if (typeof window === 'undefined') {
@@ -41,9 +38,6 @@ const getViewportOrientation = (): ThemeOrientation => {
 
   return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
 };
-
-export const shouldRunInitialIntroForTheme = (theme: Theme) =>
-  THEMES_WITH_INITIAL_INTRO.includes(theme);
 
 export const getPreferredColorScheme = (): ThemePreference => {
   if (

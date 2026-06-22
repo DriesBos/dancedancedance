@@ -39,20 +39,6 @@ type CursorRuntime = {
   destroy: () => void;
 };
 type CursorRuntimeOptions = {
-  cursor: HTMLDivElement;
-  follower: HTMLDivElement;
-  messageContainer: HTMLDivElement;
-  previewContainer: HTMLDivElement;
-  previewImage: HTMLImageElement;
-  isVisible: MutableRef<boolean>;
-  isPreviewVisible: MutableRef<boolean>;
-  cursorSurface: MutableRef<'bg' | 'blok'>;
-  prevMousePos: MutableRef<{ x: number; y: number }>;
-  hintShowTimeout: MutableRef<ReturnType<typeof setTimeout> | null>;
-  hintHideTimeout: MutableRef<ReturnType<typeof setTimeout> | null>;
-  setMessage: Dispatch<SetStateAction<string>>;
-};
-type CursorRuntimeHookOptions = {
   cursorRef: MutableRef<HTMLDivElement | null>;
   followerRef: MutableRef<HTMLDivElement | null>;
   messageRef: MutableRef<HTMLDivElement | null>;
@@ -90,6 +76,9 @@ const MESSAGE_OFFSET_Y_REM = 0.4545454545;
 const supportsHoverCursor = () =>
   typeof window !== 'undefined' && !window.matchMedia('(hover: none)').matches;
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
+
 const toPixels = (cssLength: string, remInPixels: number): number => {
   if (!cssLength) return 0;
   const value = cssLength.trim();
@@ -121,7 +110,22 @@ const createCustomCursorRuntime = ({
   hintShowTimeout,
   hintHideTimeout,
   setMessage,
-}: CursorRuntimeOptions): CursorRuntime => {
+}: {
+  cursor: HTMLDivElement;
+  follower: HTMLDivElement;
+  messageContainer: HTMLDivElement;
+  previewContainer: HTMLDivElement;
+  previewImage: HTMLImageElement;
+} & Pick<
+  CursorRuntimeOptions,
+  | 'isVisible'
+  | 'isPreviewVisible'
+  | 'cursorSurface'
+  | 'prevMousePos'
+  | 'hintShowTimeout'
+  | 'hintHideTimeout'
+  | 'setMessage'
+>): CursorRuntime => {
   const setCursorX = gsap.quickSetter(cursor, 'x', 'px') as QuickToSetter;
   const setCursorY = gsap.quickSetter(cursor, 'y', 'px') as QuickToSetter;
 
@@ -167,8 +171,7 @@ const createCustomCursorRuntime = ({
     })
     .pause();
 
-  const preloadedPreviewUrls = new Set<string>();
-  const preloadedPreviewImages: HTMLImageElement[] = [];
+  const preloadedPreviewImages = new Map<string, HTMLImageElement>();
   const textTweenMap = new WeakMap<HTMLElement, TextTweenSetters>();
 
   let currentFollowerMode: FollowerMode = 'default';
@@ -290,14 +293,13 @@ const createCustomCursorRuntime = ({
   };
 
   const preloadPreviewImage = (src: string) => {
-    if (!src || preloadedPreviewUrls.has(src)) return;
-    preloadedPreviewUrls.add(src);
+    if (!src || preloadedPreviewImages.has(src)) return;
 
     const image = new Image();
     image.decoding = 'async';
     image.loading = 'eager';
     image.src = src;
-    preloadedPreviewImages.push(image);
+    preloadedPreviewImages.set(src, image);
 
     if (typeof image.decode === 'function') {
       image.decode().catch(() => {});
@@ -368,13 +370,13 @@ const createCustomCursorRuntime = ({
     if (maxX < minX) {
       x = boundary.left + (boundary.right - boundary.left - previewWidth) / 2;
     } else {
-      x = Math.max(minX, Math.min(maxX, x));
+      x = clamp(x, minX, maxX);
     }
 
     if (maxY < minY) {
       y = boundary.top + (boundary.bottom - boundary.top - previewHeight) / 2;
     } else {
-      y = Math.max(minY, Math.min(maxY, y));
+      y = clamp(y, minY, maxY);
     }
 
     return { x, y };
@@ -399,14 +401,8 @@ const createCustomCursorRuntime = ({
     const padding = 16;
 
     return {
-      x: Math.max(
-        padding,
-        Math.min(viewportWidth - messageWidth - padding, clientX),
-      ),
-      y: Math.max(
-        padding,
-        Math.min(viewportHeight - messageHeight - padding, clientY),
-      ),
+      x: clamp(clientX, padding, viewportWidth - messageWidth - padding),
+      y: clamp(clientY, padding, viewportHeight - messageHeight - padding),
     };
   };
 
@@ -451,11 +447,6 @@ const createCustomCursorRuntime = ({
     });
   };
 
-  const shouldSkipInteractSize = (target: Element | null) =>
-    target instanceof Element &&
-    (target.hasAttribute('data-cursor-message') ||
-      target.hasAttribute('data-cursor-preview'));
-
   const resolveFollowerMode = (
     hoveredElement: Element | null,
   ): FollowerMode => {
@@ -465,7 +456,11 @@ const createCustomCursorRuntime = ({
     const interactTarget = hoveredElement?.closest(
       '.cursorInteract, .markdown a',
     );
-    if (interactTarget && !shouldSkipInteractSize(interactTarget)) {
+    if (
+      interactTarget &&
+      !interactTarget.hasAttribute('data-cursor-message') &&
+      !interactTarget.hasAttribute('data-cursor-preview')
+    ) {
       return 'interact';
     }
 
@@ -625,7 +620,7 @@ const createCustomCursorRuntime = ({
     }
 
     const deltaY = cursorPosition.y - prevMousePos.current.y;
-    const rotation = Math.max(-25, Math.min(25, -deltaY * 0.5));
+    const rotation = clamp(-deltaY * 0.5, -25, 25);
     rotateMessageTo(rotation);
     rotationReset.restart(true);
 
@@ -763,8 +758,7 @@ const createCustomCursorRuntime = ({
     }
 
     rotationReset.kill();
-    preloadedPreviewImages.length = 0;
-    preloadedPreviewUrls.clear();
+    preloadedPreviewImages.clear();
     hidePreview();
     document.body.removeAttribute('data-cursor-surface');
   };
@@ -807,7 +801,7 @@ const useCustomCursorRuntime = ({
   hintShowTimeout,
   hintHideTimeout,
   setMessage,
-}: CursorRuntimeHookOptions) => {
+}: CursorRuntimeOptions) => {
   useGSAP(() => {
     if (!supportsHoverCursor()) return;
 

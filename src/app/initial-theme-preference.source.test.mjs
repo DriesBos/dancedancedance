@@ -12,4 +12,6 @@ test('initial bootstrap theme uses color-scheme preference before time fallback'
   assert.doesNotMatch(layoutSource, /DEVELOPMENT_DEFAULT_THEME/);
   assert.doesNotMatch(layoutSource, /LANDSCAPE_DEFAULT_THEME/);
   assert.doesNotMatch(layoutSource, /PORTRAIT_DEFAULT_THEME/);
+  assert.doesNotMatch(layoutSource, /initialThemeIntroPending/);
+  assert.doesNotMatch(layoutSource, /THEMES_WITH_INITIAL_INTRO/);
 });
