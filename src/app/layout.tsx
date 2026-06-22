@@ -8,6 +8,7 @@ import '@/assets/styles/typography.sass';
 import '@/assets/styles/global.sass';
 import '@/assets/styles/icon-styles.sass';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
+import { getSiteUrl } from '@/lib/site-url';
 import AppInitializer from '@/components/AppInitStore';
 import LocaleInitializer from '@/components/LocaleInitializer';
 import BlokHead from '@/components/BlokHead';
@@ -113,9 +114,7 @@ const myFont = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://www.driesbos.com',
-  ),
+  metadataBase: new URL(getSiteUrl()),
   applicationName: 'Dries Bos',
   manifest: '/manifest.webmanifest',
   title: 'Dries Bos — Creative Developer',

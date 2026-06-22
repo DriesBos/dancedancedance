@@ -67,6 +67,34 @@ test('retired slider, dither portrait, helper, fonts, and transition css are rem
   assert.deepEqual(fontFiles.sort(), ['soehne-web-buch.woff2']);
 });
 
+test('Netlify headers do not target deleted static assets', () => {
+  const netlifySource = readRoot('netlify.toml');
+
+  assert.doesNotMatch(netlifySource, /for = "\/\*\.woff"/);
+  assert.doesNotMatch(netlifySource, /for = "\/\*\.eot"/);
+  assert.doesNotMatch(netlifySource, /for = "\/favicon\.png"/);
+  assert.doesNotMatch(netlifySource, /for = "\/icon\.png"/);
+  assert.match(netlifySource, /for = "\/\*\.woff2"/);
+  assert.match(netlifySource, /for = "\/og-image\.png"/);
+});
+
+test('project intentionally avoids reduced motion preference handling', () => {
+  const agentsSource = readRoot('agents.md');
+  const varsSource = readRoot('src/assets/styles/vars.sass');
+  const scrollToTopSource = readRoot(
+    'src/components/BlokFooter/ScrollToTopLink.tsx',
+  );
+
+  assert.match(
+    agentsSource,
+    /Do not add reduced motion preference handling \(`prefers-reduced-motion`\); this project intentionally keeps motion enabled unless the user explicitly asks otherwise\./,
+  );
+  assert.equal(existsRoot('src/lib/reduced-motion.ts'), false);
+  assert.doesNotMatch(varsSource, /prefers-reduced-motion/);
+  assert.doesNotMatch(scrollToTopSource, /reduced-motion/);
+  assert.doesNotMatch(scrollToTopSource, /shouldApplyReducedMotion/);
+});
+
 test('published Storyblok story lists are fetched through the shared helper', () => {
   const helperSource = readRoot('src/lib/storyblok-stories.ts');
   const pageSource = readRoot('src/app/[[...slug]]/page.tsx');
