@@ -11,19 +11,29 @@ const FaviconSwitcher = dynamic(() => import('@/components/FaviconSwitcher'), {
   ssr: false,
 });
 
+const RETIRED_SERVICE_WORKER_CACHE_PREFIX = 'driesbos-webapp-';
+
 export default function ClientEnhancements() {
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      return;
+    if ('serviceWorker' in navigator) {
+      void navigator.serviceWorker.getRegistrations().then((registrations) =>
+        Promise.all(
+          registrations.map((registration) => registration.unregister()),
+        ),
+      );
     }
 
-    if (!('serviceWorker' in navigator)) {
-      return;
+    if ('caches' in window) {
+      void window.caches.keys().then((cacheNames) =>
+        Promise.all(
+          cacheNames
+            .filter((cacheName) =>
+              cacheName.startsWith(RETIRED_SERVICE_WORKER_CACHE_PREFIX),
+            )
+            .map((cacheName) => window.caches.delete(cacheName)),
+        ),
+      );
     }
-
-    void navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-    });
   }, []);
 
   return (

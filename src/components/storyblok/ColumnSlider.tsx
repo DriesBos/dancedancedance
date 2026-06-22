@@ -145,6 +145,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
                   fetchPriority={
                     index === 0 || isActive || isNext ? 'high' : 'low'
                   }
+                  unoptimized
                   style={{ width: '100%', height: 'auto' }}
                 />
               </div>

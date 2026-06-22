@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const readSource = (path) =>
@@ -219,4 +219,17 @@ test('static locale labels are passed as props instead of reading the store', ()
   assert.doesNotMatch(readSource('./BlokFooter/FooterNav.tsx'), /^'use client';/);
   assert.doesNotMatch(readSource('./TheMarkdown/TheMarkdown.tsx'), /^'use client';/);
   assert.match(readSource('./storyblok/BlokProjectList.tsx'), /locale=\{locale\}/);
+});
+
+test('retired service worker is unregistered and not cached immutably', () => {
+  const source = readSource('./ClientEnhancements.tsx');
+  const netlifySource = readFileSync(new URL('../../netlify.toml', import.meta.url), 'utf8');
+  const serviceWorkerFile = new URL('../../public/sw.js', import.meta.url);
+
+  assert.equal(existsSync(serviceWorkerFile), false);
+  assert.doesNotMatch(source, /serviceWorker\.register/);
+  assert.match(source, /serviceWorker\.getRegistrations/);
+  assert.match(source, /registration\.unregister/);
+  assert.match(source, /driesbos-webapp-/);
+  assert.match(netlifySource, /for = "\/sw\.js"[\s\S]*Cache-Control = "no-store, max-age=0, must-revalidate"/);
 });

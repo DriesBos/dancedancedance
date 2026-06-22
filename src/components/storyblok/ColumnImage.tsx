@@ -45,6 +45,7 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
         className="imageItem"
         quality={70}
         loading="lazy"
+        unoptimized
         style={{ width: '100%', height: 'auto' }}
       />
       {blok.caption && <div className="column-Caption">{blok.caption}</div>}
