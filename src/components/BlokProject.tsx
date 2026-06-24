@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useRef, useCallback } from 'react';
+import type { MouseEvent } from 'react';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
@@ -17,7 +18,27 @@ interface Props {
   external_link?: { cached_url: string };
   thumbnail?: { filename: string; alt?: string };
   stackIndex?: number;
+  isHoverActive?: boolean;
+  disableCursorPreview?: boolean;
+  hideProjectCopy?: boolean;
+  onProjectHover?: (element: HTMLDivElement) => void;
+  onProjectLeave?: () => void;
 }
+
+export const getProjectThumbnailSrc = (
+  thumbnail?: { filename: string; alt?: string },
+) => {
+  const base = thumbnail?.filename;
+  if (!base) return undefined;
+
+  return transformStoryblokImageUrl(base, {
+    width: 640,
+    height: 480,
+    quality: 70,
+    smart: true,
+    noUpscale: true,
+  });
+};
 
 const BlokProject = ({
   slug,
@@ -27,27 +48,28 @@ const BlokProject = ({
   external_link,
   thumbnail,
   stackIndex,
+  isHoverActive,
+  disableCursorPreview,
+  hideProjectCopy,
+  onProjectHover,
+  onProjectLeave,
 }: Props) => {
   const router = useRouter();
   const hasPrefetchedRef = useRef(false);
   const href = slug ? `/projects/${slug}` : null;
-  const cursorPreviewImage = (() => {
-    const base = thumbnail?.filename;
-    if (!base) return undefined;
-    return transformStoryblokImageUrl(base, {
-      width: 640,
-      height: 480,
-      quality: 70,
-      smart: true,
-      noUpscale: true,
-    });
-  })();
+  const cursorPreviewImage = getProjectThumbnailSrc(thumbnail);
+  const hasCursorPreview = !!cursorPreviewImage && !disableCursorPreview;
 
   const prefetchProject = useCallback(() => {
     if (!href || hasPrefetchedRef.current) return;
     router.prefetch(href);
     hasPrefetchedRef.current = true;
   }, [href, router]);
+
+  const handleMouseEnter = (event: MouseEvent<HTMLDivElement>) => {
+    prefetchProject();
+    onProjectHover?.(event.currentTarget);
+  };
 
   const handleClick = () => {
     if (!href) return;
@@ -60,14 +82,16 @@ const BlokProject = ({
   return (
     <div
       className={`blok blok-Project cursorInteract ${
-        cursorPreviewImage ? 'cursorPreview' : ''
+        hasCursorPreview ? 'cursorPreview' : ''
       }`}
       onClick={handleClick}
-      onMouseEnter={prefetchProject}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={onProjectLeave}
       onTouchStart={prefetchProject}
-      data-cursor-preview={cursorPreviewImage || undefined}
+      data-cursor-preview={hasCursorPreview ? cursorPreviewImage : undefined}
       data-cursor-preview-alt={thumbnail?.alt || title || ''}
-      style={{ cursor: 'pointer', zIndex: stackIndex ?? 0 }}
+      data-hide-copy={hideProjectCopy ? true : undefined}
+      style={{ cursor: 'pointer', zIndex: isHoverActive ? 9998 : stackIndex }}
     >
       <BlokSidePanels />
       <GrainyGradient variant="blok" />

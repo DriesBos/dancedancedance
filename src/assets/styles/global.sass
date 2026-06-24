@@ -434,12 +434,8 @@ mux-player, .muxPlayer
     position: relative
     overflow: visible
     border-top: 0
-    padding-bottom: calc(3.95rem * 0.5)
     & > .blok
       border: 0
-    @media (hover: hover)
-      .blok-Project:hover
-        transform: translateY(-1.8rem) !important
   &-Filter
     justify-content: flex-end
     padding-top: var(--blok-padding-extraTop)
@@ -459,10 +455,7 @@ mux-player, .muxPlayer
     position: relative
     opacity: 1
     color: inherit
-    padding-bottom: calc(3.95rem * 0.5)
-    margin-bottom: calc(-3.95rem * 0.5)
-    transform: translateY(0)
-    transition: transform 0.7s cubic-bezier(0.77, 0, 0.28, 1), background-color var(--theme-transition), box-shadow var(--theme-transition)
+    transition: background-color var(--theme-transition), box-shadow var(--theme-transition)
     border-top: var(--border-width) solid currentColor !important
     background: var(--theme-blok)
     .column-Left, .column-Right
@@ -497,9 +490,6 @@ mux-player, .muxPlayer
       .column-Right
         width: auto
         flex: 0 0 auto
-    @media (hover: hover)
-      &:hover
-        transition: transform 0.22s cubic-bezier(0.77, 0, 0.28, 1), background-color var(--theme-transition), box-shadow var(--theme-transition)
   &-Highlights
     display: grid
     grid-template-columns: repeat(2, minmax(0, 1fr))

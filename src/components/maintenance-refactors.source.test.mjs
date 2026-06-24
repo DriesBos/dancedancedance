@@ -129,6 +129,129 @@ test('project list sort/search helpers stay hoisted outside the client component
   }
 });
 
+test('home project thumbnail wrapper owns fixed hover thumbnails without cursor preview', () => {
+  const projectSource = readSource('./BlokProject.tsx');
+  const listSource = readSource('./storyblok/BlokProjectListClient.tsx');
+  const listStyleSource = readSource('./storyblok/BlokProjectListClient.module.sass');
+  const globalStyleSource = readSource('../assets/styles/global.sass');
+  const wrapperSource = readSource('./storyblok/ThumbnailWrapper.tsx');
+  const wrapperStyleSource = readSource('./storyblok/ThumbnailWrapper.module.sass');
+  const globalProjectListBlock =
+    globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';
+  const globalProjectBlock =
+    globalStyleSource.match(/&-Project\n[\s\S]*?&-Highlights/)?.[0] || '';
+  const activeProjectLayerBlock =
+    listStyleSource.match(/\.activeProjectLayer\n[\s\S]*?\.activeProjectRow/)?.[0] || '';
+  const imageClassStart = wrapperStyleSource.indexOf('.thumbnailImage');
+  const imageClassEnd = wrapperStyleSource.indexOf('@keyframes', imageClassStart);
+  const imageClassSource = wrapperStyleSource.slice(imageClassStart, imageClassEnd);
+  const leavingClassStart = wrapperStyleSource.indexOf('.thumbnailItemLeaving');
+  const leavingClassEnd = wrapperStyleSource.indexOf('.thumbnailImage', leavingClassStart);
+  const leavingClassSource = wrapperStyleSource.slice(
+    leavingClassStart,
+    leavingClassEnd,
+  );
+
+  assert.match(projectSource, /disableCursorPreview\?: boolean;/);
+  assert.match(projectSource, /hideProjectCopy\?: boolean;/);
+  assert.match(projectSource, /onProjectHover\?: \(element: HTMLDivElement\) => void;/);
+  assert.match(projectSource, /const hasCursorPreview = !!cursorPreviewImage && !disableCursorPreview;/);
+  assert.match(projectSource, /onProjectHover\?\.\(event\.currentTarget\);/);
+  assert.match(projectSource, /data-hide-copy=\{hideProjectCopy \? true : undefined\}/);
+  assert.match(listSource, /disableCursorPreview/);
+  assert.match(listSource, /hideProjectCopy=\{activeProjectSlug === item\.slug\}/);
+  assert.match(listSource, /activeProjectOverlay/);
+  assert.match(wrapperSource, /children\?: ReactNode;/);
+  assert.match(wrapperSource, /children\}/);
+  assert.match(wrapperSource, /\{children\}/);
+  assert.match(listSource, /activeProjectElementRef/);
+  assert.match(listSource, /activeProjectElementRef\.current = element;/);
+  assert.match(listSource, /window\.requestAnimationFrame/);
+  assert.match(listSource, /window\.addEventListener\('scroll', updateOverlayPosition, \{ passive: true \}\)/);
+  assert.match(listSource, /window\.addEventListener\('resize', updateOverlayPosition\)/);
+  assert.match(listSource, /getBoundingClientRect\(\)/);
+  assert.match(listSource, /<ThumbnailWrapper[\s\S]*\{activeProjectOverlay && \(/);
+  assert.match(listSource, /className=\{styles\.activeProjectLayer\} aria-hidden="true" inert/);
+  assert.match(listSource, /style=\{activeProjectOverlayStyle\}/);
+  assert.doesNotMatch(listStyleSource, /:global\(\.blok-Project:hover\)/);
+  assert.match(listStyleSource, /:global\(\.blok-Project\[data-hide-copy='true'\] \.row > \.column\)/);
+  assert.match(listStyleSource, /opacity: 0/);
+  assert.match(listStyleSource, /\.activeProjectLayer/);
+  assert.match(listStyleSource, /pointer-events: none/);
+  assert.match(listStyleSource, /\.activeProjectRow/);
+  assert.doesNotMatch(listStyleSource, /transform: translateY\(-1\.8rem\)/);
+  assert.match(activeProjectLayerBlock, /display: contents/);
+  assert.doesNotMatch(activeProjectLayerBlock, /z-index: 1/);
+  assert.doesNotMatch(activeProjectLayerBlock, /color: #fff/);
+  assert.doesNotMatch(activeProjectLayerBlock, /mix-blend-mode: difference/);
+  assert.match(projectSource, /zIndex: isHoverActive \? 9998 : stackIndex/);
+  assert.doesNotMatch(projectSource, /stackIndex \?\? 0/);
+  assert.match(listStyleSource, /isolation: auto !important/);
+  assert.match(listStyleSource, /:global\(\.blok-Project \.row > \.column\)[\s\S]*mix-blend-mode: difference/);
+  assert.match(listStyleSource, /background: transparent !important/);
+  assert.match(listStyleSource, /border-color: transparent !important/);
+  assert.match(listStyleSource, /border-left-width: 0 !important/);
+  assert.match(listStyleSource, /border-right-width: 0 !important/);
+  assert.match(listStyleSource, /:global\(\.blok-Project \.column-Icons\)/);
+  assert.match(listStyleSource, /opacity: 0 !important/);
+  assert.doesNotMatch(globalProjectListBlock, /\.blok-Project:hover[\s\S]*transform: translateY\(-1\.8rem\) !important/);
+  assert.doesNotMatch(globalProjectListBlock, /padding-bottom: calc\(3\.95rem \* 0\.5\)/);
+  assert.doesNotMatch(globalProjectBlock, /padding-bottom: calc\(3\.95rem \* 0\.5\)/);
+  assert.doesNotMatch(globalProjectBlock, /margin-bottom: calc\(-3\.95rem \* 0\.5\)/);
+  assert.doesNotMatch(globalProjectBlock, /\n    transition: transform/);
+  assert.match(listSource, /<ThumbnailWrapper/);
+  assert.match(listSource, /<\/ThumbnailWrapper>/);
+  assert.match(listSource, /projects=\{projects\}/);
+  assert.match(listSource, /hoverEvent=\{hoverEvent\}/);
+  assert.match(listSource, /leaveEvent=\{leaveEvent\}/);
+  const thumbnailWrapperIndex = listSource.indexOf(
+    '<ThumbnailWrapper\n        projects={projects}',
+  );
+  const projectListIndex = listSource.indexOf(
+    '<div\n        className={`blok blok-Animate blok-ProjectList',
+  );
+
+  assert.notEqual(thumbnailWrapperIndex, -1);
+  assert.notEqual(projectListIndex, -1);
+  assert.ok(
+    thumbnailWrapperIndex < projectListIndex,
+    'thumbnail wrapper must render outside the animated project list container',
+  );
+  assert.doesNotMatch(listSource, /const getRandomThumbnailPosition = /);
+  assert.match(wrapperSource, /projects: ProjectData\[\];/);
+  assert.match(wrapperSource, /const getRandomThumbnailPosition = /);
+  assert.match(wrapperSource, /const getThumbnailSize = /);
+  assert.match(wrapperSource, /getProjectThumbnailSrc/);
+  assert.match(wrapperSource, /import Image from 'next\/image';/);
+  assert.match(wrapperSource, /<Image/);
+  assert.match(wrapperSource, /fill/);
+  assert.match(wrapperSource, /unoptimized/);
+  assert.match(wrapperSource, /sizes="\(max-width: 770px\) calc\(100vw - var\(--spacing-base\) \* 2\), 25vw"/);
+  assert.match(wrapperSource, /HOVER_THUMBNAIL_LIFETIME_MS = 1250/);
+  assert.match(wrapperSource, /Math\.min\(viewportWidth, viewportHeight\) - padding \* 2/);
+  assert.match(wrapperSource, /viewportWidth \* 0\.25 - padding/);
+  assert.match(wrapperStyleSource, /\.thumbnailWrapper/);
+  assert.match(wrapperStyleSource, /position: fixed/);
+  assert.match(wrapperStyleSource, /width: 100vw/);
+  assert.match(wrapperStyleSource, /height: 100vh/);
+  assert.match(wrapperStyleSource, /pointer-events: none/);
+  assert.match(wrapperStyleSource, /isolation: auto/);
+  assert.doesNotMatch(wrapperStyleSource, /\bborder:/);
+  assert.match(wrapperStyleSource, /width: min\(36rem, max\(18rem, calc\(22vw - var\(--spacing-base\)\)\), max\(0px, calc\(100vw - var\(--spacing-base\) \* 2\)\), max\(0px, calc\(100vh - var\(--spacing-base\) \* 2\)\)\)/);
+  assert.match(wrapperStyleSource, /aspect-ratio: 1 \/ 1/);
+  assert.match(wrapperStyleSource, /\.thumbnailImage/);
+  assert.match(wrapperStyleSource, /aspect-ratio: 4 \/ 3/);
+  assert.match(wrapperStyleSource, /border-radius: 10px/);
+  assert.match(wrapperStyleSource, /overflow: hidden/);
+  assert.match(wrapperStyleSource, /object-fit: contain/);
+  assert.match(wrapperStyleSource, /\.thumbnailItemLeaving/);
+  assert.match(leavingClassSource, /opacity: 1/);
+  assert.match(leavingClassSource, /animation: thumbnailItemExit 0\.3s ease 0\.95s forwards/);
+  assert.doesNotMatch(imageClassSource, /transform:/);
+  assert.doesNotMatch(imageClassSource, /animation:/);
+  assert.doesNotMatch(wrapperStyleSource, /thumbnailImageEnter/);
+});
+
 test('blok chrome memoization uses React shallow comparison only', () => {
   const headSource = readSource('./BlokHead/BlokHead.tsx');
   const topPanelSource = readSource('./BlokSidePanels/TopPanel.tsx');

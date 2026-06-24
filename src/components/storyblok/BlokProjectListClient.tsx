@@ -1,7 +1,7 @@
 'use client';
 
-import type { HTMLAttributes } from 'react';
-import { useMemo, useState } from 'react';
+import type { CSSProperties, HTMLAttributes } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BlokProject from '../BlokProject';
 import GrainyGradient from '../GrainyGradient';
 import BlokSidePanels from '../BlokSidePanels';
@@ -12,12 +12,25 @@ import BlokFilter, {
 import type { ProjectData } from './projectsData';
 import Row from '../Row';
 import type { Locale } from '@/lib/locale';
+import styles from './BlokProjectListClient.module.sass';
+import ThumbnailWrapper, {
+  type ThumbnailWrapperEvent,
+} from './ThumbnailWrapper';
 
 interface BlokProjectListClientProps {
   projects: ProjectData[];
   editableProps?: HTMLAttributes<HTMLDivElement>;
   locale: Locale;
 }
+
+type ActiveProjectOverlay = {
+  project: ProjectData;
+  rect: {
+    top: number;
+    left: number;
+    width: number;
+  };
+};
 
 const getTimeValue = (value?: string) => {
   if (!value) return 0;
@@ -31,6 +44,16 @@ const getCategoryValue = (categories?: string[]) =>
 const getSearchableText = (project: ProjectData) =>
   `${project.title || ''} ${project.year || ''} ${(project.category || []).join(' ')}`.toLocaleLowerCase();
 
+const getProjectOverlayRect = (element: HTMLDivElement) => {
+  const rect = element.getBoundingClientRect();
+
+  return {
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+  };
+};
+
 export default function BlokProjectListClient({
   projects,
   editableProps,
@@ -40,6 +63,20 @@ export default function BlokProjectListClient({
   const [sortDirection, setSortDirection] =
     useState<ProjectSortDirection>('desc');
   const [searchValue, setSearchValue] = useState('');
+  const [activeProjectSlug, setActiveProjectSlug] = useState<string | null>(
+    null,
+  );
+  const [hoverEvent, setHoverEvent] = useState<ThumbnailWrapperEvent | null>(
+    null,
+  );
+  const [leaveEvent, setLeaveEvent] = useState<ThumbnailWrapperEvent | null>(
+    null,
+  );
+  const [activeProjectOverlay, setActiveProjectOverlay] =
+    useState<ActiveProjectOverlay | null>(null);
+  const thumbnailEventIdRef = useRef(0);
+  const activeProjectElementRef = useRef<HTMLDivElement | null>(null);
+  const activeProjectElementSlugRef = useRef<string | null>(null);
 
   const handleSortChange = (field: ProjectSortField) => {
     if (sortField === field) {
@@ -84,6 +121,77 @@ export default function BlokProjectListClient({
   const isSearching = searchValue.trim().length > 0;
   const hasNoSearchResults = isSearching && visibleProjects.length === 0;
 
+  const createThumbnailEvent = useCallback((projectSlug: string) => {
+    const id = thumbnailEventIdRef.current + 1;
+    thumbnailEventIdRef.current = id;
+    return { projectSlug, id };
+  }, []);
+
+  const showProjectThumbnail = useCallback((project: ProjectData, element: HTMLDivElement) => {
+    activeProjectElementRef.current = element;
+    activeProjectElementSlugRef.current = project.slug;
+    setActiveProjectSlug(project.slug);
+    setActiveProjectOverlay({
+      project,
+      rect: getProjectOverlayRect(element),
+    });
+    setHoverEvent(createThumbnailEvent(project.slug));
+  }, [createThumbnailEvent]);
+
+  const clearActiveProject = useCallback((projectSlug: string) => {
+    if (activeProjectElementSlugRef.current === projectSlug) {
+      activeProjectElementRef.current = null;
+      activeProjectElementSlugRef.current = null;
+    }
+    setActiveProjectSlug((slug) => (slug === projectSlug ? null : slug));
+    setActiveProjectOverlay((overlay) =>
+      overlay?.project.slug === projectSlug ? null : overlay,
+    );
+    setLeaveEvent(createThumbnailEvent(projectSlug));
+  }, [createThumbnailEvent]);
+
+  const activeProjectOverlaySlug = activeProjectOverlay?.project.slug ?? null;
+
+  useEffect(() => {
+    if (!activeProjectOverlaySlug) return;
+
+    let animationFrame = 0;
+
+    const updateOverlayPosition = () => {
+      if (animationFrame) return;
+
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = 0;
+        const element = activeProjectElementRef.current;
+        if (!element) return;
+
+        setActiveProjectOverlay((overlay) =>
+          overlay
+            ? { ...overlay, rect: getProjectOverlayRect(element) }
+            : overlay,
+        );
+      });
+    };
+
+    window.addEventListener('scroll', updateOverlayPosition, { passive: true });
+    window.addEventListener('resize', updateOverlayPosition);
+
+    return () => {
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener('scroll', updateOverlayPosition);
+      window.removeEventListener('resize', updateOverlayPosition);
+    };
+  }, [activeProjectOverlaySlug]);
+
+  const activeProjectOverlayStyle: CSSProperties | undefined =
+    activeProjectOverlay
+      ? {
+          top: activeProjectOverlay.rect.top,
+          left: activeProjectOverlay.rect.left,
+          width: activeProjectOverlay.rect.width,
+        }
+      : undefined;
+
   return (
     <>
       <BlokFilter
@@ -93,7 +201,34 @@ export default function BlokProjectListClient({
         onSearchChange={setSearchValue}
         locale={locale}
       />
-      <div className="blok blok-Animate blok-ProjectList" {...editableProps}>
+      <ThumbnailWrapper
+        projects={projects}
+        hoverEvent={hoverEvent}
+        leaveEvent={leaveEvent}
+      >
+        {activeProjectOverlay && (
+          <div className={styles.activeProjectLayer} aria-hidden="true" inert>
+            <div
+              className={styles.activeProjectRow}
+              style={activeProjectOverlayStyle}
+            >
+              <BlokProject
+                slug={activeProjectOverlay.project.slug}
+                year={activeProjectOverlay.project.year}
+                title={activeProjectOverlay.project.title}
+                category={activeProjectOverlay.project.category}
+                external_link={activeProjectOverlay.project.external_link}
+                thumbnail={activeProjectOverlay.project.thumbnail}
+                disableCursorPreview
+              />
+            </div>
+          </div>
+        )}
+      </ThumbnailWrapper>
+      <div
+        className={`blok blok-Animate blok-ProjectList ${styles.projectList}`}
+        {...editableProps}
+      >
         <GrainyGradient variant="blok" />
         <BlokSidePanels />
         {hasNoSearchResults ? (
@@ -119,6 +254,11 @@ export default function BlokProjectListClient({
               external_link={item.external_link}
               thumbnail={item.thumbnail}
               stackIndex={index}
+              isHoverActive={activeProjectSlug === item.slug}
+              disableCursorPreview
+              hideProjectCopy={activeProjectSlug === item.slug}
+              onProjectHover={(element) => showProjectThumbnail(item, element)}
+              onProjectLeave={() => clearActiveProject(item.slug)}
             />
           ))
         )}

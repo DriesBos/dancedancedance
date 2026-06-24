@@ -1,0 +1,37 @@
+.projectList
+  z-index: 4
+
+  :global(.blok-Project[data-hide-copy='true'] .row > .column)
+    opacity: 0
+
+.activeProjectLayer
+  display: contents
+  pointer-events: none
+
+.activeProjectRow
+  position: fixed
+  pointer-events: none
+  color: #fff
+
+  :global(.blok-Project)
+    width: 100%
+    pointer-events: none
+    background: transparent !important
+    border-color: transparent !important
+    border-left-width: 0 !important
+    border-right-width: 0 !important
+    isolation: auto !important
+
+  :global(.blok-Project .row)
+    background: transparent !important
+    border-color: transparent !important
+    isolation: auto !important
+
+  :global(.blok-Project .row > .column)
+    mix-blend-mode: difference
+
+  :global(.blok-Project > .grainyGradient),
+  :global(.blok-Project > .side),
+  :global(.blok-Project .row > .grainyGradient),
+  :global(.blok-Project .column-Icons)
+    opacity: 0 !important
