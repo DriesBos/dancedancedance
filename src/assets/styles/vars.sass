@@ -36,7 +36,7 @@
   --panel-height: 150px
   --panel-perspective-origin: 50% 0vh
   --spacing-side: 1.25rem
-  --spacing-side-image: 1.25rem
+  --spacing-side-image: var(--spacing-side)
   --spacing-base: 1.25rem
   --spacing-icons: 1.25rem
   --spacing-half: 0.625rem
@@ -44,7 +44,6 @@
   --spacing-containerTopDistance: 0
   @media (max-width: 770px)
     --spacing-side: 1rem
-    --spacing-side-image: 0
     --spacing-base: 1rem
     --spacing-icons: 1rem
     --border-hyperlink: 1px
@@ -69,6 +68,7 @@ body[data-fullscreen='false']
     --panel-perspective-origin: 50% -38rem
     --blok-padding-extraTop: 1rem
     --blok-padding-firstTop: 1rem
+    --spacing-side-image: 0
   @media (max-width: 450px)
     --panel-perspective-origin: 50% -32rem
 

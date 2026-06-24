@@ -114,6 +114,26 @@ test('fullscreen project media runs collapse only adjacent media column padding'
   );
 });
 
+test('mobile media caption padding only applies outside fullscreen', () => {
+  const mediaColumnBlock =
+    globalStyleSource.match(
+      /&-Image, &-Thumbnail, &-Video, &-Slider[\s\S]*?&-Slider\n\s+&-Stack/,
+    )?.[0] || '';
+  const fullscreenFalseBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="false"\][\s\S]*?&\[data-theme='NIGHT'\]/,
+    )?.[0] || '';
+
+  assert.match(
+    fullscreenFalseBlock,
+    /@media \(max-width: 770px\)\n\s+\.blok \.row > :where\(\.column-Image, \.column-Thumbnail, \.column-Video, \.column-Slider\)\n\s+\.column-Caption\n\s+padding: var\(--spacing-base\)\n\s+padding-top: 0/,
+  );
+  assert.doesNotMatch(
+    mediaColumnBlock,
+    /@media \(max-width: 770px\)[\s\S]*\.column-Caption\s+padding: var\(--spacing-base\)/,
+  );
+});
+
 test('project list contains the final project row overlap', () => {
   const projectListBlock =
     globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';

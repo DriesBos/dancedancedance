@@ -295,10 +295,6 @@ mux-player, .muxPlayer
               overflow-wrap: anywhere
               // min-width: 8rem
               // flex-shrink: 0
-        @media (max-width: 770px)
-          .column-Caption 
-            padding: var(--spacing-base)
-            padding-top: 0
       &-Slider
         &-Stack
           display: grid
@@ -617,6 +613,10 @@ body
       padding-bottom: calc(var(--blok-height) + env(safe-area-inset-bottom))
     @media (orientation: portrait)
       padding-bottom: calc(var(--spacing-side) + env(safe-area-inset-bottom))
+    @media (max-width: 770px)
+      .column-Caption
+        padding: var(--spacing-base)
+        padding-top: 0
     .currentTheme
       opacity: 1
       @media (max-width: 770px)
