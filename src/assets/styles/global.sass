@@ -579,11 +579,13 @@ body
       & > .blok:has(> .row > :where(.column-Image, .column-Video, .column-Slider)):has(+ .blok:has(> .row > :where(.column-Image, .column-Video, .column-Slider)))
         & > .row > :where(.column-Image, .column-Video, .column-Slider)
           padding-bottom: 0
-          // border: 1px solid green !important
       & > .blok:has(> .row > :where(.column-Image, .column-Video, .column-Slider)) + .blok:has(> .row > :where(.column-Image, .column-Video, .column-Slider))
         & > .row > :where(.column-Image, .column-Video, .column-Slider)
           padding-top: 0
-          // border: 1px solid red !important
+    @media (max-width: 770px)
+      .page-Project .row[data-column-behaviour='stack']:has(> :where(.column-Image, .column-Video, .column-Slider):first-child):has(> :where(.column-Image, .column-Video, .column-Slider):nth-child(2))
+        & > :where(.column-Image, .column-Video, .column-Slider):first-child
+          padding-bottom: var(--spacing-side-image)
     main
       max-width: 100%
       min-height: 100vh
@@ -614,9 +616,10 @@ body
     @media (orientation: portrait)
       padding-bottom: calc(var(--spacing-side) + env(safe-area-inset-bottom))
     @media (max-width: 770px)
-      .column-Caption
-        padding: var(--spacing-base)
-        padding-top: 0
+      .blok .row > :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider)
+        .column-Caption
+          padding: var(--spacing-base)
+          padding-top: 0
     .currentTheme
       opacity: 1
       @media (max-width: 770px)

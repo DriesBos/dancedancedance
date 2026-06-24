@@ -114,6 +114,26 @@ test('fullscreen project media runs collapse only adjacent media column padding'
   );
 });
 
+test('fullscreen mobile stacked media columns keep an inner gap', () => {
+  const fullscreenTrueBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="true"\][\s\S]*?&\[data-fullscreen="false"\]/,
+    )?.[0] || '';
+
+  assert.match(
+    fullscreenTrueBlock,
+    /@media \(max-width: 770px\)\n\s+\.page-Project \.row\[data-column-behaviour='stack'\]:has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):first-child\):has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):nth-child\(2\)\)/,
+  );
+  assert.match(
+    fullscreenTrueBlock,
+    /& > :where\(\.column-Image, \.column-Video, \.column-Slider\):first-child\n\s+padding-bottom: var\(--spacing-side-image\)/,
+  );
+  assert.doesNotMatch(
+    fullscreenTrueBlock,
+    /data-stack-media|data-stacked-media|data-media-gap/,
+  );
+});
+
 test('mobile media caption padding only applies outside fullscreen', () => {
   const mediaColumnBlock =
     globalStyleSource.match(
