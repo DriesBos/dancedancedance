@@ -86,6 +86,34 @@ test('fullscreen page border quieting only targets first-level page bloks', () =
   );
 });
 
+test('fullscreen project media runs collapse only adjacent media column padding', () => {
+  const fullscreenTrueBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="true"\][\s\S]*?&\[data-fullscreen="false"\]/,
+    )?.[0] || '';
+
+  assert.match(
+    fullscreenTrueBlock,
+    /\.page-Project[\s\S]*& > \.blok:has\(> \.row > :where\(\.column-Image, \.column-Video, \.column-Slider\)\):has\(\+ \.blok:has\(> \.row > :where\(\.column-Image, \.column-Video, \.column-Slider\)\)\)/,
+  );
+  assert.match(
+    fullscreenTrueBlock,
+    /padding-bottom: 0/,
+  );
+  assert.match(
+    fullscreenTrueBlock,
+    /& > \.blok:has\(> \.row > :where\(\.column-Image, \.column-Video, \.column-Slider\)\) \+ \.blok:has\(> \.row > :where\(\.column-Image, \.column-Video, \.column-Slider\)\)/,
+  );
+  assert.match(
+    fullscreenTrueBlock,
+    /padding-top: 0/,
+  );
+  assert.doesNotMatch(
+    fullscreenTrueBlock,
+    /data-media-rhythm|data-project-media-sequence/,
+  );
+});
+
 test('project list contains the final project row overlap', () => {
   const projectListBlock =
     globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';

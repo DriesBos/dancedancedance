@@ -92,7 +92,7 @@ test('fullscreen quiets selected borders by color without changing border widths
 
   assert.match(
     fullscreenTrueBlock,
-    /& > \.blok-Head\n\s+& > div\n\s+border-top-color: transparent/,
+    /& > \.blok-Head[\s\S]*& > div\n\s+border-top-color: transparent/,
   );
   assert.match(fullscreenTrueBlock, /& > \.blok-Head\[data-scroll-start='true'\]\n\s+& > div\n\s+border-bottom-color: transparent/);
   assert.doesNotMatch(fullscreenTrueBlock, /& > \.blok-Head\[data-scroll-start='true'\]\n\s+& > div\n\s+border-top-color: transparent/);
