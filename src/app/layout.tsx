@@ -95,7 +95,18 @@ const INITIAL_UI_STATE_SCRIPT = `
 `;
 
 const myFont = localFont({
-  src: '../assets/fonts/soehne-web-buch.woff2',
+  src: [
+    {
+      path: '../assets/fonts/soehne-web-buch.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../assets/fonts/soehne-web-kraftig.woff2',
+      weight: '500',
+      style: 'normal',
+    },
+  ],
   display: 'swap',
   preload: true,
 });

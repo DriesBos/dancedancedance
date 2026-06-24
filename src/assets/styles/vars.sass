@@ -10,11 +10,12 @@
 
 :root
   /* theme */
-  --theme-bg: hsla(48, 10%, 90%, 1)
+  --theme-bg: hsla(48, 10%, 82%, 1)
   --theme-blok: hsla(48, 10%, 90%, 1)
-  --theme-blok-sidepanel: hsla(48, 10%, 85%, 1)
+  --theme-blok-sidepanel: hsla(48, 10%, 86%, 1)
   --theme-bg-gradient: 0
   --theme-type: hsla(20, 100%, 01%, 1)
+  --theme-type-support: #339A62
   --theme-muted-opacity: .35
   --theme-media-filter: none
 
@@ -74,10 +75,11 @@ body[data-fullscreen='false']
 
 // THEMES
 body[data-theme='DARK']
-  --theme-bg: hsla(0, 0%, 10%, 1)
-  --theme-blok: hsla(0, 0%, 10%, 1)
-  --theme-blok-sidepanel: hsla(0, 0%, 7%, 1)
+  --theme-bg: hsla(0, 0%, 0%, 1)
+  --theme-blok: hsla(0, 0%, 8%, 1)
+  --theme-blok-sidepanel: hsla(0, 0%, 4%, 1)
   --theme-type: white
+  --theme-type-support: #339A62
   --theme-muted-opacity: .5
   --theme-bg-gradient: 0
 
@@ -86,5 +88,6 @@ body[data-theme='NIGHT']
   --theme-blok: black
   --theme-blok-sidepanel: black
   --theme-type: hsla(0, 100%, 50%, 1)
+  --theme-type-support: hsla(0, 100%, 50%, 1)
   --theme-muted-opacity: .6
   --theme-media-filter: grayscale(1) contrast(1.22) brightness(0.33) sepia(1) saturate(8) hue-rotate(-18deg)

@@ -11,6 +11,7 @@
 .activeProjectRow
   position: fixed
   pointer-events: none
+  z-index: 1
   color: #fff
 
   :global(.blok-Project)
@@ -27,7 +28,10 @@
     border-color: transparent !important
     isolation: auto !important
 
-  :global(.blok-Project .row > .column)
+  :global(.blok-Project .column-Year),
+  :global(.blok-Project .column-Project),
+  :global(.blok-Project .column-Category)
+    font-weight: 500
     mix-blend-mode: difference
 
   :global(.blok-Project > .grainyGradient),

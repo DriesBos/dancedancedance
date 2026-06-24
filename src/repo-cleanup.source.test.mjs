@@ -49,7 +49,8 @@ test('retired slider, dither portrait, helper, fonts, and transition css are rem
   const storyblokSource = readRoot('src/lib/storyblok.ts');
   const layoutSource = readRoot('src/app/layout.tsx');
   const assetsImagesUrl = new URL('../src/assets/images', import.meta.url);
-  const fontFiles = readdirSync(new URL('../src/assets/fonts', import.meta.url));
+  const fontFiles = readdirSync(new URL('../src/assets/fonts', import.meta.url))
+    .filter((file) => file.endsWith('.woff2'));
 
   assert.equal(existsRoot('src/components/storyblok/BlokProjectSlider'), false);
   assert.equal(existsRoot('src/components/DitheringVideoPortrait.tsx'), false);
@@ -59,12 +60,17 @@ test('retired slider, dither portrait, helper, fonts, and transition css are rem
   assert.equal(existsRoot('src/helpers/fetchData.tsx'), false);
   assert.equal(existsRoot('src/assets/styles/transitions.sass'), false);
   assert.doesNotMatch(layoutSource, /transitions\.sass/);
+  assert.match(layoutSource, /soehne-web-kraftig\.woff2/);
+  assert.match(layoutSource, /weight: '500'/);
   assert.doesNotMatch(storyblokSource, /BlokProjectSlider/);
   assert.equal(
     existsSync(assetsImagesUrl) ? readdirSync(assetsImagesUrl).length : 0,
     0,
   );
-  assert.deepEqual(fontFiles.sort(), ['soehne-web-buch.woff2']);
+  assert.deepEqual(fontFiles.sort(), [
+    'soehne-web-buch.woff2',
+    'soehne-web-kraftig.woff2',
+  ]);
 });
 
 test('Netlify headers do not target deleted static assets', () => {

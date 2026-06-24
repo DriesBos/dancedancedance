@@ -13,9 +13,9 @@ import type { ProjectData } from './projectsData';
 import Row from '../Row';
 import type { Locale } from '@/lib/locale';
 import styles from './BlokProjectListClient.module.sass';
-import ThumbnailWrapper, {
+import GridThumbnailWrapper, {
   type ThumbnailWrapperEvent,
-} from './ThumbnailWrapper';
+} from './GridThumbnailWrapper';
 
 interface BlokProjectListClientProps {
   projects: ProjectData[];
@@ -201,8 +201,8 @@ export default function BlokProjectListClient({
         onSearchChange={setSearchValue}
         locale={locale}
       />
-      <ThumbnailWrapper
-        projects={projects}
+      <GridThumbnailWrapper
+        projects={visibleProjects}
         hoverEvent={hoverEvent}
         leaveEvent={leaveEvent}
       >
@@ -224,7 +224,7 @@ export default function BlokProjectListClient({
             </div>
           </div>
         )}
-      </ThumbnailWrapper>
+      </GridThumbnailWrapper>
       <div
         className={`blok blok-Animate blok-ProjectList ${styles.projectList}`}
         {...editableProps}
