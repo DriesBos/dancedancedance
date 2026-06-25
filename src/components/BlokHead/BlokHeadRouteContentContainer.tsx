@@ -19,6 +19,24 @@ const formatThemeLabel = (theme: string) =>
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
 
+const FULLSCREEN_STORAGE_KEY = 'ddd-fullscreen';
+
+const getIsMobileViewport = () => {
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia('(max-width: 770px)').matches;
+  }
+
+  return window.innerWidth < 770;
+};
+
+const setStoredFullscreenPreference = (fullscreen: boolean) => {
+  try {
+    window.localStorage.setItem(FULLSCREEN_STORAGE_KEY, String(fullscreen));
+  } catch {
+    return;
+  }
+};
+
 const BlokHeadRouteContentContainer = ({ projects }: Props) => {
   const { theme, cycleTheme, fullscreen, setFullscreen } = useStore(
     useShallow((state) => ({
@@ -37,8 +55,14 @@ const BlokHeadRouteContentContainer = ({ projects }: Props) => {
   const layoutToggleTimeoutRef = useRef<number | null>(null);
 
   const toggleFullscreen = useCallback(() => {
-    const nextFullscreen = !fullscreen;
-    const applyNextMode = () => setFullscreen(nextFullscreen);
+    const isMobileViewport = getIsMobileViewport();
+    const nextFullscreen = isMobileViewport ? true : !fullscreen;
+    const applyNextMode = () => {
+      setFullscreen(nextFullscreen);
+      if (!isMobileViewport) {
+        setStoredFullscreenPreference(nextFullscreen);
+      }
+    };
 
     if (layoutToggleRafRef.current !== null) {
       window.cancelAnimationFrame(layoutToggleRafRef.current);
