@@ -134,6 +134,22 @@ test('fullscreen mobile stacked media columns keep an inner gap', () => {
   );
 });
 
+test('fullscreen-off mobile stacked project media adds divider before second media column', () => {
+  const fullscreenFalseBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="false"\][\s\S]*?&\[data-theme='NIGHT'\]/,
+    )?.[0] || '';
+
+  assert.match(
+    fullscreenFalseBlock,
+    /@media \(max-width: 770px\)\n\s+\.page-Project \.row\[data-column-behaviour='stack'\]:has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):first-child\):has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):nth-child\(2\):last-child\)/,
+  );
+  assert.match(
+    fullscreenFalseBlock,
+    /& > :where\(\.column-Image, \.column-Video, \.column-Slider\):nth-child\(2\)\n\s+border-top: var\(--border-width\) solid currentColor/,
+  );
+});
+
 test('mobile media caption padding only applies outside fullscreen', () => {
   const mediaColumnBlock =
     globalStyleSource.match(
@@ -146,7 +162,7 @@ test('mobile media caption padding only applies outside fullscreen', () => {
 
   assert.match(
     fullscreenFalseBlock,
-    /@media \(max-width: 770px\)\n\s+\.blok \.row > :where\(\.column-Image, \.column-Thumbnail, \.column-Video, \.column-Slider\)\n\s+\.column-Caption\n\s+padding: var\(--spacing-base\)\n\s+padding-top: 0/,
+    /@media \(max-width: 770px\)[\s\S]*\.blok \.row > :where\(\.column-Image, \.column-Thumbnail, \.column-Video, \.column-Slider\)\n\s+\.column-Caption\n\s+padding: var\(--spacing-base\)\n\s+padding-top: 0/,
   );
   assert.doesNotMatch(
     mediaColumnBlock,
