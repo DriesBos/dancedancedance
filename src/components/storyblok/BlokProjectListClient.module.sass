@@ -12,7 +12,7 @@
   position: fixed
   pointer-events: none
   z-index: 1
-  color: #fff
+  color: var(--theme-type)
 
   :global(.blok-Project)
     width: 100%
@@ -31,11 +31,22 @@
   :global(.blok-Project .column-Year),
   :global(.blok-Project .column-Project),
   :global(.blok-Project .column-Category)
-    font-weight: 500
-    mix-blend-mode: difference
+    font-weight: 400
 
   :global(.blok-Project > .grainyGradient),
   :global(.blok-Project > .side),
   :global(.blok-Project .row > .grainyGradient),
   :global(.blok-Project .column-Icons)
     opacity: 0 !important
+
+.activeProjectRowBlend
+  display: none
+
+  @supports (mix-blend-mode: difference)
+    display: block
+
+    :global(.blok-Project .column-Year),
+    :global(.blok-Project .column-Project),
+    :global(.blok-Project .column-Category)
+      color: #fff
+      mix-blend-mode: difference

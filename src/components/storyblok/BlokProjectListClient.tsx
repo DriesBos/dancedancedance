@@ -13,9 +13,9 @@ import type { ProjectData } from './projectsData';
 import Row from '../Row';
 import type { Locale } from '@/lib/locale';
 import styles from './BlokProjectListClient.module.sass';
-import GridThumbnailWrapper, {
+import ThumbnailWrapper, {
   type ThumbnailWrapperEvent,
-} from './GridThumbnailWrapper';
+} from './ThumbnailWrapper';
 
 interface BlokProjectListClientProps {
   projects: ProjectData[];
@@ -53,6 +53,9 @@ const getProjectOverlayRect = (element: HTMLDivElement) => {
     width: rect.width,
   };
 };
+
+const canUseHoverThumbnails = () =>
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 export default function BlokProjectListClient({
   projects,
@@ -128,6 +131,8 @@ export default function BlokProjectListClient({
   }, []);
 
   const showProjectThumbnail = useCallback((project: ProjectData, element: HTMLDivElement) => {
+    if (!canUseHoverThumbnails()) return;
+
     activeProjectElementRef.current = element;
     activeProjectElementSlugRef.current = project.slug;
     setActiveProjectSlug(project.slug);
@@ -192,6 +197,28 @@ export default function BlokProjectListClient({
         }
       : undefined;
 
+  const renderActiveProjectOverlay = (isBlendLayer = false) =>
+    activeProjectOverlay && (
+      <div className={styles.activeProjectLayer} aria-hidden="true" inert>
+        <div
+          className={`${styles.activeProjectRow} ${
+            isBlendLayer ? styles.activeProjectRowBlend : ''
+          }`}
+          style={activeProjectOverlayStyle}
+        >
+          <BlokProject
+            slug={activeProjectOverlay.project.slug}
+            year={activeProjectOverlay.project.year}
+            title={activeProjectOverlay.project.title}
+            category={activeProjectOverlay.project.category}
+            external_link={activeProjectOverlay.project.external_link}
+            thumbnail={activeProjectOverlay.project.thumbnail}
+            disableCursorPreview
+          />
+        </div>
+      </div>
+    );
+
   return (
     <>
       <BlokFilter
@@ -201,30 +228,14 @@ export default function BlokProjectListClient({
         onSearchChange={setSearchValue}
         locale={locale}
       />
-      <GridThumbnailWrapper
+      <ThumbnailWrapper
         projects={visibleProjects}
         hoverEvent={hoverEvent}
         leaveEvent={leaveEvent}
+        blendChildren={renderActiveProjectOverlay(true)}
       >
-        {activeProjectOverlay && (
-          <div className={styles.activeProjectLayer} aria-hidden="true" inert>
-            <div
-              className={styles.activeProjectRow}
-              style={activeProjectOverlayStyle}
-            >
-              <BlokProject
-                slug={activeProjectOverlay.project.slug}
-                year={activeProjectOverlay.project.year}
-                title={activeProjectOverlay.project.title}
-                category={activeProjectOverlay.project.category}
-                external_link={activeProjectOverlay.project.external_link}
-                thumbnail={activeProjectOverlay.project.thumbnail}
-                disableCursorPreview
-              />
-            </div>
-          </div>
-        )}
-      </GridThumbnailWrapper>
+        {renderActiveProjectOverlay()}
+      </ThumbnailWrapper>
       <div
         className={`blok blok-Animate blok-ProjectList ${styles.projectList}`}
         {...editableProps}

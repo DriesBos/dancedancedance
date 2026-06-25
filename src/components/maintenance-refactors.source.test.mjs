@@ -129,66 +129,29 @@ test('project list sort/search helpers stay hoisted outside the client component
   }
 });
 
-test('home project thumbnail wrapper owns fixed hover thumbnails without cursor preview', () => {
+test('home project thumbnail wrapper owns irregular hover thumbnails without cursor preview', () => {
   const projectSource = readSource('./BlokProject.tsx');
   const listSource = readSource('./storyblok/BlokProjectListClient.tsx');
   const listStyleSource = readSource('./storyblok/BlokProjectListClient.module.sass');
   const globalStyleSource = readSource('../assets/styles/global.sass');
   const wrapperSource = readSource('./storyblok/ThumbnailWrapper.tsx');
   const wrapperStyleSource = readSource('./storyblok/ThumbnailWrapper.module.sass');
-  const gridWrapperUrl = new URL('./storyblok/GridThumbnailWrapper.tsx', import.meta.url);
-  const gridWrapperStyleUrl = new URL('./storyblok/GridThumbnailWrapper.module.sass', import.meta.url);
-  assert.ok(existsSync(gridWrapperUrl));
-  assert.ok(existsSync(gridWrapperStyleUrl));
-  const gridWrapperSource = readFileSync(gridWrapperUrl, 'utf8');
-  const gridWrapperStyleSource = readFileSync(gridWrapperStyleUrl, 'utf8');
   const globalProjectListBlock =
     globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';
   const globalProjectBlock =
     globalStyleSource.match(/&-Project\n[\s\S]*?&-Highlights/)?.[0] || '';
   const activeProjectLayerBlock =
     listStyleSource.match(/\.activeProjectLayer\n[\s\S]*?\.activeProjectRow/)?.[0] || '';
-  const imageClassStart = wrapperStyleSource.indexOf('.thumbnailImage');
-  const imageClassEnd = wrapperStyleSource.indexOf('@keyframes', imageClassStart);
-  const imageClassSource = wrapperStyleSource.slice(imageClassStart, imageClassEnd);
-  const gridImageClassStart = gridWrapperStyleSource.indexOf('.thumbnailImage');
-  const gridImageClassEnd = gridWrapperStyleSource.indexOf('@keyframes', gridImageClassStart);
-  const gridImageClassSource = gridWrapperStyleSource.slice(
-    gridImageClassStart,
-    gridImageClassEnd,
-  );
-  const gridThumbnailItemClassStart = gridWrapperStyleSource.indexOf('.thumbnailItem');
-  const gridThumbnailItemClassEnd = gridWrapperStyleSource.indexOf(
-    '&::after',
-    gridThumbnailItemClassStart,
-  );
-  const gridThumbnailItemClassSource = gridWrapperStyleSource.slice(
-    gridThumbnailItemClassStart,
-    gridThumbnailItemClassEnd,
-  );
-  const gridThumbnailFrameStart = gridWrapperStyleSource.indexOf('&::after');
-  const gridThumbnailFrameEnd = gridWrapperStyleSource.indexOf(
-    '.thumbnailItemLeaving',
-    gridThumbnailFrameStart,
-  );
-  const gridThumbnailFrameSource = gridWrapperStyleSource.slice(
-    gridThumbnailFrameStart,
-    gridThumbnailFrameEnd,
-  );
-  const leavingClassStart = wrapperStyleSource.indexOf('.thumbnailItemLeaving');
-  const leavingClassEnd = wrapperStyleSource.indexOf('.thumbnailImage', leavingClassStart);
-  const leavingClassSource = wrapperStyleSource.slice(
-    leavingClassStart,
-    leavingClassEnd,
-  );
-  const gridThumbnailMapIndex = gridWrapperSource.indexOf('{hoverThumbnails.map');
-  const gridLineLayerIndex = gridWrapperSource.indexOf('styles.gridLineLayer');
-  const gridChildrenIndex = gridWrapperSource.indexOf('{children}');
-  const existingThumbnailIndex = gridWrapperSource.indexOf(
-    'const existingItem = items.find',
-  );
-  const thumbnailIdIncrementIndex = gridWrapperSource.indexOf(
-    'const id = thumbnailIdRef.current + 1;',
+  const thumbnailItemBlock =
+    wrapperStyleSource.match(/\.thumbnailItem\n[\s\S]*?\.thumbnailItemLeaving/)?.[0] || '';
+  const thumbnailBlendOverlayBlock =
+    wrapperStyleSource.match(/\.thumbnailBlendOverlay\n[\s\S]*?\.thumbnailItemLeaving/)?.[0] || '';
+  const thumbnailImageBlock =
+    wrapperStyleSource.match(/\.thumbnailImage\n[\s\S]*?@keyframes/)?.[0] || '';
+  const thumbnailBaseChildrenIndex = wrapperSource.indexOf('      {children}');
+  const thumbnailMapIndex = wrapperSource.indexOf('{hoverThumbnails.map');
+  const thumbnailBlendOverlayIndex = wrapperSource.indexOf(
+    '{blendChildren && thumbnailMaskStyle && (',
   );
 
   assert.match(projectSource, /disableCursorPreview\?: boolean;/);
@@ -200,16 +163,17 @@ test('home project thumbnail wrapper owns fixed hover thumbnails without cursor 
   assert.match(listSource, /disableCursorPreview/);
   assert.match(listSource, /hideProjectCopy=\{activeProjectSlug === item\.slug\}/);
   assert.match(listSource, /activeProjectOverlay/);
-  assert.match(gridWrapperSource, /children\?: ReactNode;/);
-  assert.match(gridWrapperSource, /children\}/);
-  assert.match(gridWrapperSource, /\{children\}/);
   assert.match(listSource, /activeProjectElementRef/);
   assert.match(listSource, /activeProjectElementRef\.current = element;/);
   assert.match(listSource, /window\.requestAnimationFrame/);
   assert.match(listSource, /window\.addEventListener\('scroll', updateOverlayPosition, \{ passive: true \}\)/);
   assert.match(listSource, /window\.addEventListener\('resize', updateOverlayPosition\)/);
   assert.match(listSource, /getBoundingClientRect\(\)/);
-  assert.match(listSource, /<GridThumbnailWrapper[\s\S]*\{activeProjectOverlay && \(/);
+  assert.match(listSource, /const canUseHoverThumbnails = \(\) =>/);
+  assert.match(listSource, /window\.matchMedia\('\(hover: hover\) and \(pointer: fine\)'\)\.matches/);
+  assert.match(listSource, /if \(!canUseHoverThumbnails\(\)\) return;/);
+  assert.match(listSource, /const renderActiveProjectOverlay = \(isBlendLayer = false\) =>/);
+  assert.match(listSource, /isBlendLayer \? styles\.activeProjectRowBlend : ''/);
   assert.match(listSource, /className=\{styles\.activeProjectLayer\} aria-hidden="true" inert/);
   assert.match(listSource, /style=\{activeProjectOverlayStyle\}/);
   assert.doesNotMatch(listStyleSource, /:global\(\.blok-Project:hover\)/);
@@ -219,7 +183,7 @@ test('home project thumbnail wrapper owns fixed hover thumbnails without cursor 
   assert.match(listStyleSource, /pointer-events: none/);
   assert.match(listStyleSource, /\.activeProjectRow/);
   assert.match(listStyleSource, /\.activeProjectRow[\s\S]*z-index: 1/);
-  assert.match(listStyleSource, /color: #fff/);
+  assert.match(listStyleSource, /color: var\(--theme-type\)/);
   assert.doesNotMatch(listStyleSource, /color: var\(--theme-type-support\)/);
   assert.doesNotMatch(listStyleSource, /transform: translateY\(-1\.8rem\)/);
   assert.match(activeProjectLayerBlock, /display: contents/);
@@ -227,11 +191,15 @@ test('home project thumbnail wrapper owns fixed hover thumbnails without cursor 
   assert.match(projectSource, /zIndex: isHoverActive \? 9998 : stackIndex/);
   assert.doesNotMatch(projectSource, /stackIndex \?\? 0/);
   assert.match(listStyleSource, /isolation: auto !important/);
-  assert.match(listStyleSource, /font-weight: 500/);
+  assert.match(listStyleSource, /font-weight: 400/);
   assert.match(listStyleSource, /:global\(\.blok-Project \.column-Year\),/);
   assert.match(listStyleSource, /:global\(\.blok-Project \.column-Project\),/);
-  assert.match(listStyleSource, /:global\(\.blok-Project \.column-Category\)[\s\S]*mix-blend-mode: difference/);
-  assert.doesNotMatch(listStyleSource, /:global\(\.blok-Project \.row > \.column\)[\s\S]*mix-blend-mode: difference/);
+  assert.match(listStyleSource, /:global\(\.blok-Project \.column-Category\)[\s\S]*font-weight: 400/);
+  assert.match(listStyleSource, /\.activeProjectRowBlend/);
+  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*display: none/);
+  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*@supports \(mix-blend-mode: difference\)[\s\S]*display: block/);
+  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*color: #fff/);
+  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*mix-blend-mode: difference/);
   assert.match(listStyleSource, /background: transparent !important/);
   assert.match(listStyleSource, /border-color: transparent !important/);
   assert.match(listStyleSource, /border-left-width: 0 !important/);
@@ -243,16 +211,20 @@ test('home project thumbnail wrapper owns fixed hover thumbnails without cursor 
   assert.doesNotMatch(globalProjectBlock, /padding-bottom: calc\(3\.95rem \* 0\.5\)/);
   assert.doesNotMatch(globalProjectBlock, /margin-bottom: calc\(-3\.95rem \* 0\.5\)/);
   assert.doesNotMatch(globalProjectBlock, /\n    transition: transform/);
-  assert.match(listSource, /import GridThumbnailWrapper/);
-  assert.match(listSource, /from '\.\/GridThumbnailWrapper';/);
-  assert.match(listSource, /<GridThumbnailWrapper/);
-  assert.match(listSource, /<\/GridThumbnailWrapper>/);
-  assert.doesNotMatch(listSource, /from '\.\/ThumbnailWrapper';/);
+  assert.match(globalProjectBlock, /&:hover[\s\S]*background: var\(--theme-blok-hover\)[\s\S]*\.row[\s\S]*background: var\(--theme-blok-hover\)/);
+  assert.match(globalProjectBlock, /transition: background var\(--theme-transition\)/);
+  assert.match(listSource, /import ThumbnailWrapper/);
+  assert.match(listSource, /from '\.\/ThumbnailWrapper';/);
+  assert.match(listSource, /<ThumbnailWrapper/);
+  assert.match(listSource, /<\/ThumbnailWrapper>/);
+  assert.doesNotMatch(listSource, /GridThumbnailWrapper/);
   assert.match(listSource, /projects=\{visibleProjects\}/);
   assert.match(listSource, /hoverEvent=\{hoverEvent\}/);
   assert.match(listSource, /leaveEvent=\{leaveEvent\}/);
+  assert.match(listSource, /blendChildren=\{renderActiveProjectOverlay\(true\)\}/);
+  assert.match(listSource, /\{renderActiveProjectOverlay\(\)\}/);
   const thumbnailWrapperIndex = listSource.indexOf(
-    '<GridThumbnailWrapper\n        projects={visibleProjects}',
+    '<ThumbnailWrapper\n        projects={visibleProjects}',
   );
   const projectListIndex = listSource.indexOf(
     '<div\n        className={`blok blok-Animate blok-ProjectList',
@@ -264,121 +236,110 @@ test('home project thumbnail wrapper owns fixed hover thumbnails without cursor 
     thumbnailWrapperIndex < projectListIndex,
     'thumbnail wrapper must render outside the animated project list container',
   );
-  assert.doesNotMatch(listSource, /const getRandomThumbnailPosition = /);
   assert.match(wrapperSource, /projects: ProjectData\[\];/);
+  assert.match(wrapperSource, /children\?: ReactNode;/);
+  assert.match(wrapperSource, /blendChildren\?: ReactNode;/);
+  assert.match(wrapperSource, /\{children\}/);
+  assert.match(wrapperSource, /type ThumbnailMaskStyle = CSSProperties &/);
+  assert.match(wrapperSource, /parseStoryblokImageDimensions/);
+  assert.match(wrapperSource, /transformStoryblokImageUrl/);
+  assert.match(wrapperSource, /const getProjectHoverThumbnail = /);
+  assert.match(wrapperSource, /width: 1200/);
+  assert.doesNotMatch(wrapperSource, /getProjectThumbnailSrc/);
+  assert.match(wrapperSource, /const thumbnailMaskStyle = useMemo<ThumbnailMaskStyle \| undefined>/);
+  assert.match(wrapperSource, /'--thumb-mask-image': maskImage/);
+  assert.match(wrapperSource, /'--thumb-mask-position': maskPosition/);
+  assert.match(wrapperSource, /'--thumb-mask-size': maskSize/);
+  assert.match(wrapperSource, /thumbnail\.x \+ \(thumbnail\.size - thumbnail\.frameWidth\) \/ 2/);
+  assert.match(wrapperSource, /thumbnail\.y \+ \(thumbnail\.size - thumbnail\.frameHeight\) \/ 2/);
+  assert.match(wrapperSource, /`\$\{thumbnail\.frameWidth\}px \$\{thumbnail\.frameHeight\}px`/);
+  assert.match(wrapperSource, /className=\{styles\.thumbnailBlendOverlay\}/);
+  assert.notEqual(thumbnailBaseChildrenIndex, -1);
+  assert.notEqual(thumbnailMapIndex, -1);
+  assert.notEqual(thumbnailBlendOverlayIndex, -1);
+  assert.ok(thumbnailBaseChildrenIndex < thumbnailMapIndex);
+  assert.ok(thumbnailMapIndex < thumbnailBlendOverlayIndex);
+  assert.match(wrapperSource, /import \{ createPortal \} from 'react-dom';/);
+  assert.match(wrapperSource, /const \[portalTarget, setPortalTarget\] = useState<HTMLElement \| null>\(null\);/);
+  assert.match(wrapperSource, /setPortalTarget\(document\.body\);/);
+  assert.match(wrapperSource, /const thumbnailLayer = \(/);
+  assert.match(wrapperSource, /return portalTarget \? createPortal\(thumbnailLayer, portalTarget\) : null;/);
   assert.match(wrapperSource, /const getRandomThumbnailPosition = /);
-  assert.match(gridWrapperSource, /projects: ProjectData\[\];/);
-  assert.match(gridWrapperSource, /const LANDSCAPE_GRID_COLUMN_COUNT = 4/);
-  assert.match(gridWrapperSource, /const LANDSCAPE_GRID_ROW_COUNT = 2/);
-  assert.match(gridWrapperSource, /const PORTRAIT_GRID_COLUMN_COUNT = 2/);
-  assert.match(gridWrapperSource, /const GRID_SLOT_COUNT = LANDSCAPE_GRID_COLUMN_COUNT \* LANDSCAPE_GRID_ROW_COUNT/);
-  assert.doesNotMatch(gridWrapperSource, /GRID_COLUMN_COUNT \* GRID_COLUMN_COUNT/);
-  assert.match(gridWrapperSource, /const getGridThumbnailPosition = /);
-  assert.match(gridWrapperSource, /const slotIndex = projectIndex % GRID_SLOT_COUNT/);
-  assert.match(gridWrapperSource, /portraitColumn: \(slotIndex % PORTRAIT_GRID_COLUMN_COUNT\) \+ 1/);
-  assert.match(gridWrapperSource, /portraitRow: Math\.floor\(slotIndex \/ PORTRAIT_GRID_COLUMN_COUNT\) \+ 1/);
-  assert.match(gridWrapperSource, /projectIndexBySlug\.get\(hoverEvent\.projectSlug\)/);
-  assert.match(gridWrapperSource, /const hasVisibleThumbnails = hoverThumbnails\.length > 0;/);
-  assert.match(gridWrapperSource, /const hasActiveThumbnails = hoverThumbnails\.some/);
-  assert.match(gridWrapperSource, /styles\.gridLineLayer/);
-  assert.match(gridWrapperSource, /styles\.gridLineLayerVisible/);
-  assert.match(gridWrapperSource, /styles\.gridLineLayerLeaving/);
-  assert.match(gridWrapperSource, /Array\.from\(\{ length: GRID_SLOT_COUNT \}/);
-  assert.match(gridWrapperSource, /const existingItem = items\.find/);
-  assert.match(gridWrapperSource, /leaveEventId: undefined/);
-  assert.ok(existingThumbnailIndex < thumbnailIdIncrementIndex);
-  assert.match(gridWrapperSource, /'--thumbnail-landscape-overlap-x'/);
-  assert.match(gridWrapperSource, /'--thumbnail-landscape-overlap-y'/);
-  assert.match(gridWrapperSource, /'--thumbnail-portrait-overlap-x'/);
-  assert.match(gridWrapperSource, /'--thumbnail-portrait-overlap-y'/);
-  assert.ok(gridThumbnailMapIndex < gridLineLayerIndex);
-  assert.ok(gridLineLayerIndex < gridChildrenIndex);
-  assert.doesNotMatch(gridWrapperSource, /getRandomThumbnailPosition/);
   assert.match(wrapperSource, /const getThumbnailSize = /);
-  assert.match(gridWrapperSource, /getProjectThumbnailSrc/);
-  assert.match(gridWrapperSource, /import Image from 'next\/image';/);
-  assert.match(gridWrapperSource, /import \{ createPortal \} from 'react-dom';/);
-  assert.match(gridWrapperSource, /const \[portalTarget, setPortalTarget\] = useState<HTMLElement \| null>\(null\);/);
-  assert.match(gridWrapperSource, /setPortalTarget\(document\.body\);/);
-  assert.match(gridWrapperSource, /const thumbnailLayer = \(/);
-  assert.match(gridWrapperSource, /return portalTarget \? createPortal\(thumbnailLayer, portalTarget\) : null;/);
-  assert.match(gridWrapperSource, /<Image/);
-  assert.match(gridWrapperSource, /fill/);
-  assert.match(gridWrapperSource, /unoptimized/);
-  assert.match(gridWrapperSource, /sizes="\(orientation: portrait\) 50vw, 25vw"/);
-  assert.match(gridWrapperSource, /HOVER_THUMBNAIL_LIFETIME_MS = 1250/);
+  assert.match(wrapperSource, /const isLandscapeThumbnail = thumbnail\.aspectRatio >= 1;/);
+  assert.match(wrapperSource, /randomBetween/);
+  assert.match(wrapperSource, /import Image from 'next\/image';/);
+  assert.match(wrapperSource, /<Image/);
+  assert.match(wrapperSource, /fill/);
+  assert.match(wrapperSource, /unoptimized/);
+  assert.match(wrapperSource, /sizes="\(max-width: 770px\) calc\(100vw - var\(--spacing-base\) \* 2\), 25vw"/);
+  assert.match(wrapperSource, /HOVER_THUMBNAIL_EXIT_DURATION_MS = 300/);
+  assert.match(wrapperSource, /HOVER_THUMBNAIL_EXIT_DELAY_MS = 950/);
+  assert.match(wrapperSource, /HOVER_THUMBNAIL_LIFETIME_MS =\n  HOVER_THUMBNAIL_EXIT_DELAY_MS \+ HOVER_THUMBNAIL_EXIT_DURATION_MS/);
+  assert.match(wrapperSource, /HOVER_THUMBNAIL_DELAY_MS = 100/);
+  assert.match(wrapperSource, /const toMilliseconds = /);
+  assert.match(wrapperSource, /const getThumbnailDelayMs = /);
+  assert.match(wrapperSource, /const getThumbnailLifetimeMs = /);
+  assert.match(wrapperSource, /getPropertyValue\('--thumb-delay'\)/);
+  assert.match(wrapperSource, /getPropertyValue\('--thumb-exit-delay'\)/);
+  assert.match(wrapperSource, /getPropertyValue\('--thumb-exit-duration'\)/);
+  assert.match(wrapperSource, /thumbnailWrapperRef/);
+  assert.match(wrapperSource, /ref=\{thumbnailWrapperRef\}/);
+  assert.match(wrapperSource, /pendingHoverTimerRef/);
+  assert.match(wrapperSource, /pendingHoverSlugRef/);
+  assert.match(wrapperSource, /window\.setTimeout\(\(\) => \{/);
+  assert.match(wrapperSource, /getThumbnailDelayMs\(thumbnailWrapperRef\.current\)\)/);
+  assert.match(wrapperSource, /getThumbnailLifetimeMs\(thumbnailWrapperRef\.current\)\)/);
   assert.match(wrapperStyleSource, /\.thumbnailWrapper/);
+  assert.match(wrapperStyleSource, /--thumb-delay:/);
+  assert.match(wrapperStyleSource, /--thumb-enter:/);
+  assert.doesNotMatch(wrapperStyleSource, /--thumb-enter-start-scale/);
+  assert.match(wrapperStyleSource, /--thumb-image-reveal:/);
+  assert.match(wrapperStyleSource, /--thumb-image-reveal-start-x:/);
+  assert.match(wrapperStyleSource, /--thumb-image-reveal-start-y:/);
+  assert.match(wrapperStyleSource, /--thumb-exit-duration:/);
+  assert.match(wrapperStyleSource, /--thumb-exit-delay:/);
+  assert.match(wrapperStyleSource, /--thumb-exit-ease: ease/);
+  assert.match(wrapperStyleSource, /--thumb-exit: var\(--thumb-exit-duration\) var\(--thumb-exit-ease\) var\(--thumb-exit-delay\)/);
+  assert.match(wrapperStyleSource, /--thumb-size: min\(36rem/);
+  assert.doesNotMatch(wrapperStyleSource, /--thumb-border/);
+  assert.doesNotMatch(wrapperStyleSource, /--thumb-shadow/);
   assert.match(wrapperStyleSource, /position: fixed/);
   assert.match(wrapperStyleSource, /width: 100vw/);
   assert.match(wrapperStyleSource, /height: 100vh/);
   assert.match(wrapperStyleSource, /pointer-events: none/);
   assert.match(wrapperStyleSource, /isolation: auto/);
-  assert.match(gridWrapperStyleSource, /\.thumbnailWrapper/);
-  assert.match(gridWrapperStyleSource, /z-index: 9998/);
-  assert.doesNotMatch(gridWrapperStyleSource, /z-index: 9997/);
-  assert.match(gridWrapperStyleSource, /grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
-  assert.match(gridWrapperStyleSource, /grid-template-rows: repeat\(2, minmax\(0, 1fr\)\)/);
-  assert.match(gridWrapperStyleSource, /@media \(orientation: portrait\)/);
-  assert.match(gridWrapperStyleSource, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)[\s\S]*grid-template-rows: repeat\(4, minmax\(0, 1fr\)\)/);
-  assert.doesNotMatch(gridWrapperStyleSource, /grid-template-rows: repeat\(3, minmax\(0, 1fr\)\)/);
-  assert.match(gridWrapperStyleSource, /\.gridLineLayer/);
-  assert.match(gridWrapperStyleSource, /transition: opacity 0\.3s ease/);
-  assert.match(gridWrapperStyleSource, /\.gridLineLayerVisible/);
-  assert.match(gridWrapperStyleSource, /\.gridLineLayerLeaving/);
-  assert.match(gridWrapperStyleSource, /animation: gridLineLayerExit 0\.3s ease 0\.95s forwards/);
-  assert.match(gridWrapperStyleSource, /\.gridLineCell/);
-  assert.match(gridWrapperStyleSource, /border-top: var\(--border-width\) solid currentColor/);
-  assert.match(gridWrapperStyleSource, /&:nth-child\(4n\)/);
-  assert.match(gridWrapperStyleSource, /&:nth-last-child\(-n \+ 4\)/);
-  assert.match(gridWrapperStyleSource, /&:nth-child\(2n\)/);
-  assert.match(gridWrapperStyleSource, /&:nth-last-child\(-n \+ 2\)/);
-  assert.match(gridWrapperStyleSource, /@keyframes gridLineLayerExit/);
-  assert.match(gridWrapperStyleSource, /inset: 0/);
-  assert.match(gridWrapperStyleSource, /box-sizing: border-box/);
-  assert.doesNotMatch(gridWrapperStyleSource, /padding: var\(--spacing-base\)/);
-  assert.doesNotMatch(gridWrapperStyleSource, /inset: var\(--spacing-base\)/);
-  assert.match(gridWrapperStyleSource, /grid-column: var\(--thumbnail-landscape-column\)/);
-  assert.match(gridWrapperStyleSource, /grid-row: var\(--thumbnail-landscape-row\)/);
-  assert.match(gridWrapperStyleSource, /grid-column: var\(--thumbnail-portrait-column\)/);
-  assert.match(gridWrapperStyleSource, /grid-row: var\(--thumbnail-portrait-row\)/);
-  assert.match(gridThumbnailItemClassSource, /width: calc\(100% \+ var\(--thumbnail-landscape-overlap-x\)\)/);
-  assert.match(gridThumbnailItemClassSource, /height: calc\(100% \+ var\(--thumbnail-landscape-overlap-y\)\)/);
-  assert.match(gridThumbnailItemClassSource, /margin-top: calc\(0px - var\(--thumbnail-landscape-overlap-y\)\)/);
-  assert.match(gridThumbnailItemClassSource, /margin-left: calc\(0px - var\(--thumbnail-landscape-overlap-x\)\)/);
-  assert.match(gridThumbnailItemClassSource, /position: relative/);
-  assert.doesNotMatch(gridThumbnailItemClassSource, /\n\s+border: var\(--border-width\) solid var\(--theme-type\)/);
-  assert.match(gridThumbnailFrameSource, /inset: 8%/);
-  assert.match(gridThumbnailFrameSource, /border: var\(--border-width\) solid var\(--theme-type\)/);
-  assert.match(gridThumbnailFrameSource, /animation: thumbnailFrameReveal 0\.32s cubic-bezier\(0\.22, 1, 0\.36, 1\) forwards/);
-  assert.match(gridWrapperStyleSource, /width: calc\(100% \+ var\(--thumbnail-portrait-overlap-x\)\)/);
-  assert.match(gridWrapperStyleSource, /height: calc\(100% \+ var\(--thumbnail-portrait-overlap-y\)\)/);
-  assert.match(gridWrapperStyleSource, /width: 100%/);
-  assert.match(gridWrapperStyleSource, /height: 100%/);
-  assert.doesNotMatch(gridWrapperStyleSource, /width: calc\(100vh \/ 4\)/);
-  assert.doesNotMatch(gridWrapperStyleSource, /aspect-ratio: 1 \/ 1/);
-  assert.match(gridWrapperStyleSource, /\.thumbnailImage/);
-  assert.doesNotMatch(gridWrapperStyleSource, /aspect-ratio: 4 \/ 3/);
-  assert.doesNotMatch(gridWrapperStyleSource, /border-radius: 10px/);
-  assert.match(gridWrapperStyleSource, /overflow: hidden/);
-  assert.match(gridWrapperStyleSource, /object-fit: cover/);
-  assert.doesNotMatch(gridImageClassSource, /border: var\(--border-width\) solid var\(--theme-type\)/);
-  assert.doesNotMatch(gridWrapperStyleSource, /object-fit: contain/);
-  assert.match(gridWrapperStyleSource, /transition: opacity 0\.35s cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
-  assert.match(gridWrapperStyleSource, /animation: thumbnailItemEnter 0\.12s cubic-bezier\(0\.77, 0, 0\.175, 1\)/);
-  assert.doesNotMatch(gridWrapperStyleSource, /transform: scale\(0\.96\)/);
-  assert.match(gridImageClassSource, /clip-path: inset\(8%\)/);
-  assert.match(gridImageClassSource, /animation: thumbnailImageReveal 0\.32s cubic-bezier\(0\.22, 1, 0\.36, 1\) forwards/);
-  assert.doesNotMatch(gridImageClassSource, /transform:/);
-  assert.match(gridWrapperStyleSource, /@keyframes thumbnailImageReveal/);
-  assert.match(gridWrapperStyleSource, /@keyframes thumbnailFrameReveal/);
-  assert.match(gridWrapperStyleSource, /\.thumbnailItemLeaving/);
-  assert.match(gridWrapperStyleSource, /\.thumbnailItemLeaving[\s\S]*opacity: 0/);
-  assert.match(gridWrapperStyleSource, /\.thumbnailItemLeaving[\s\S]*transition-delay: 0\.9s/);
-  assert.doesNotMatch(gridWrapperStyleSource, /thumbnailItemExit 0s ease 0\.95s forwards/);
-  assert.doesNotMatch(gridWrapperStyleSource, /@keyframes thumbnailItemExit/);
-  assert.doesNotMatch(imageClassSource, /transform:/);
-  assert.doesNotMatch(imageClassSource, /animation:/);
-  assert.doesNotMatch(wrapperStyleSource, /thumbnailImageEnter/);
+  assert.match(wrapperStyleSource, /z-index: 9998/);
+  assert.match(wrapperStyleSource, /width: var\(--thumb-size\)/);
+  assert.match(wrapperStyleSource, /aspect-ratio: 1 \/ 1/);
+  assert.match(thumbnailItemBlock, /overflow: visible/);
+  assert.match(thumbnailItemBlock, /z-index: 2/);
+  assert.doesNotMatch(thumbnailItemBlock, /filter: var\(--thumb-shadow\)/);
+  assert.doesNotMatch(thumbnailItemBlock, /scale\(/);
+  assert.match(thumbnailBlendOverlayBlock, /z-index: 3/);
+  assert.match(thumbnailBlendOverlayBlock, /-webkit-mask-image: var\(--thumb-mask-image\)/);
+  assert.match(thumbnailBlendOverlayBlock, /mask-image: var\(--thumb-mask-image\)/);
+  assert.match(thumbnailBlendOverlayBlock, /mask-position: var\(--thumb-mask-position\)/);
+  assert.match(thumbnailBlendOverlayBlock, /mask-size: var\(--thumb-mask-size\)/);
+  assert.doesNotMatch(thumbnailImageBlock, /filter: var\(--thumb-shadow\)/);
+  assert.match(wrapperStyleSource, /transform: translate3d\(var\(--thumbnail-x\), var\(--thumbnail-y\), 0\)/);
+  assert.doesNotMatch(wrapperStyleSource, /scale\(/);
+  assert.match(wrapperStyleSource, /animation: thumbnailItemEnter var\(--thumb-enter\) forwards/);
+  assert.match(wrapperStyleSource, /animation: thumbnailItemExit var\(--thumb-exit\) forwards/);
+  assert.match(wrapperStyleSource, /width: var\(--thumb-frame-width\)/);
+  assert.match(wrapperStyleSource, /height: var\(--thumb-frame-height\)/);
+  assert.match(wrapperStyleSource, /max-width: 100%/);
+  assert.match(wrapperStyleSource, /max-height: 100%/);
+  assert.match(wrapperStyleSource, /border: 1px solid color-mix\(in srgb, var\(--theme-type\) 20%, transparent\)/);
+  assert.match(wrapperStyleSource, /border-radius: 1\.1rem/);
+  assert.doesNotMatch(thumbnailImageBlock, /border-radius: 1rem/);
+  assert.match(wrapperStyleSource, /clip-path: inset\(var\(--thumb-image-reveal-start-y\) var\(--thumb-image-reveal-start-x\)\)/);
+  assert.match(wrapperStyleSource, /animation: thumbnailImageReveal var\(--thumb-image-reveal\) forwards/);
+  assert.doesNotMatch(wrapperStyleSource, /border: var\(--border-width\) solid var\(--theme-type\)/);
+  assert.doesNotMatch(wrapperStyleSource, /&::after/);
+  assert.match(wrapperStyleSource, /@keyframes thumbnailImageReveal/);
+  assert.doesNotMatch(wrapperStyleSource, /@keyframes thumbnailFrameReveal/);
+  assert.match(wrapperStyleSource, /object-fit: cover/);
 });
 
 test('blok chrome memoization uses React shallow comparison only', () => {

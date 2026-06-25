@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import {
-  getDefaultTheme,
   getNextThemeForButtonCycle,
+  LIGHT_THEME,
   type Theme,
 } from '@/lib/theme';
 import { type Locale } from '@/lib/locale';
@@ -36,32 +36,11 @@ export type Actions = {
   revealPageContent: () => void;
 };
 
-type BootstrapInitialUiState = {
-  theme: Theme;
-  fullscreen: boolean;
-};
-
-const getBootstrapInitialUiState = (): BootstrapInitialUiState | null => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  const win = window as Window & {
-    __DDD_INITIAL_STATE__?: BootstrapInitialUiState;
-  };
-
-  return win.__DDD_INITIAL_STATE__ ?? null;
-};
-
-const bootstrapInitialUiState = getBootstrapInitialUiState();
-const initialTheme = bootstrapInitialUiState?.theme ?? getDefaultTheme();
-const initialFullscreen = bootstrapInitialUiState?.fullscreen ?? false;
-
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
-  theme: initialTheme,
+  theme: LIGHT_THEME,
   locale: 'en',
-  fullscreen: initialFullscreen,
+  fullscreen: false,
   pageContentVisible: true,
   pageContentRevealKey: 0,
   initializeUiState: (theme, fullscreen) =>

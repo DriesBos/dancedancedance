@@ -7,6 +7,10 @@ const appInitializerSource = readFileSync(
   new URL('../components/AppInitStore.tsx', import.meta.url),
   'utf8',
 );
+const storeSource = readFileSync(
+  new URL('../store/store.tsx', import.meta.url),
+  'utf8',
+);
 
 test('initial bootstrap theme uses color-scheme preference before time fallback', () => {
   assert.match(layoutSource, /prefers-color-scheme: dark/);
@@ -29,4 +33,11 @@ test('mobile devices start with fullscreen enabled before React hydrates', () =>
   assert.match(appInitializerSource, /const getInitialFullscreen = /);
   assert.match(appInitializerSource, /max-width: 770px/);
   assert.match(appInitializerSource, /fullscreen: getInitialFullscreen\(\)/);
+});
+
+test('store defaults stay stable for the first hydration render', () => {
+  assert.match(storeSource, /theme: LIGHT_THEME/);
+  assert.match(storeSource, /fullscreen: false/);
+  assert.doesNotMatch(storeSource, /__DDD_INITIAL_STATE__/);
+  assert.doesNotMatch(storeSource, /typeof window/);
 });

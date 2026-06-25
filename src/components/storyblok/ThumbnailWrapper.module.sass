@@ -1,10 +1,21 @@
 .thumbnailWrapper
+  --thumb-delay: 150ms
+  --thumb-enter: .3s ease
+  --thumb-image-reveal: .33s cubic-bezier(0.22, 1, 0.36, 1)
+  --thumb-image-reveal-start-x: 25%
+  --thumb-image-reveal-start-y: 25%
+  --thumb-exit-duration: .3s
+  --thumb-exit-delay: 1s
+  --thumb-exit-ease: ease
+  --thumb-exit: var(--thumb-exit-duration) var(--thumb-exit-ease) var(--thumb-exit-delay)
+  --thumb-size: min(36rem, max(18rem, calc(23vw - var(--spacing-base))), max(0px, calc(100vw - var(--spacing-base) * 2)), max(0px, calc(100vh - var(--spacing-base) * 2)))
+
   position: fixed
   inset: 0
   width: 100vw
   height: 100vh
   pointer-events: none
-  z-index: 9997
+  z-index: 9998
   isolation: auto
 
 .thumbnailItem
@@ -14,41 +25,67 @@
   display: flex
   align-items: center
   justify-content: center
-  width: min(36rem, max(18rem, calc(22vw - var(--spacing-base))), max(0px, calc(100vw - var(--spacing-base) * 2)), max(0px, calc(100vh - var(--spacing-base) * 2)))
+  width: var(--thumb-size)
   aspect-ratio: 1 / 1
-  overflow: hidden
+  overflow: visible
   opacity: 0
-  transform: translate3d(var(--thumbnail-x), var(--thumbnail-y), 0) scale(0.96)
-  animation: thumbnailItemEnter 0.3s ease forwards
-  will-change: transform, opacity
+  z-index: 2
+  transform: translate3d(var(--thumbnail-x), var(--thumbnail-y), 0)
+  animation: thumbnailItemEnter var(--thumb-enter) forwards
+  will-change: opacity
+
+.thumbnailBlendOverlay
+  position: fixed
+  inset: 0
+  pointer-events: none
+  z-index: 3
+  -webkit-mask-image: var(--thumb-mask-image)
+  mask-image: var(--thumb-mask-image)
+  -webkit-mask-position: var(--thumb-mask-position)
+  mask-position: var(--thumb-mask-position)
+  -webkit-mask-repeat: no-repeat
+  mask-repeat: no-repeat
+  -webkit-mask-size: var(--thumb-mask-size)
+  mask-size: var(--thumb-mask-size)
 
 .thumbnailItemLeaving
-  opacity: 1
-  transform: translate3d(var(--thumbnail-x), var(--thumbnail-y), 0) scale(1)
-  animation: thumbnailItemExit 0.3s ease 0.95s forwards
+  animation: thumbnailItemExit var(--thumb-exit) forwards
 
 .thumbnailImage
   position: relative
-  width: 100%
-  aspect-ratio: 4 / 3
+  width: var(--thumb-frame-width)
+  height: var(--thumb-frame-height)
+  max-width: 100%
+  max-height: 100%
   overflow: hidden
-  border-radius: 10px
+  border: 1px solid color-mix(in srgb, var(--theme-type) 20%, transparent)
+  border-radius: 1.1rem
+  clip-path: inset(var(--thumb-image-reveal-start-y) var(--thumb-image-reveal-start-x))
+  animation: thumbnailImageReveal var(--thumb-image-reveal) forwards
+  will-change: clip-path
 
   img
-    object-fit: contain
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    object-fit: cover
 
 @keyframes thumbnailItemEnter
   0%
     opacity: 0
-    transform: translate3d(var(--thumbnail-x), var(--thumbnail-y), 0) scale(0.96)
   100%
     opacity: 1
-    transform: translate3d(var(--thumbnail-x), var(--thumbnail-y), 0) scale(1)
 
 @keyframes thumbnailItemExit
   0%
     opacity: 1
-    transform: translate3d(var(--thumbnail-x), var(--thumbnail-y), 0) scale(1)
   100%
     opacity: 0
-    transform: translate3d(var(--thumbnail-x), var(--thumbnail-y), 0) scale(1)
+
+@keyframes thumbnailImageReveal
+  0%
+    clip-path: inset(var(--thumb-image-reveal-start-y) var(--thumb-image-reveal-start-x))
+  100%
+    clip-path: inset(0)

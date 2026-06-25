@@ -458,6 +458,11 @@ mux-player, .muxPlayer
     transition: background-color var(--theme-transition), box-shadow var(--theme-transition)
     border-top: var(--border-width) solid currentColor !important
     background: var(--theme-blok)
+    @media (hover: hover)
+      &:hover
+        background: var(--theme-blok-hover)
+        .row
+          background: var(--theme-blok-hover)
     .column-Left, .column-Right
       width: 50%
       padding: 0 !important
@@ -478,6 +483,7 @@ mux-player, .muxPlayer
       overflow: hidden
       border: 0 !important
       background: var(--theme-blok)
+      transition: background var(--theme-transition)
       .grainyInRow
         z-index: 0
       & > .column

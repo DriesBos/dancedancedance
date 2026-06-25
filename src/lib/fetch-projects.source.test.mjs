@@ -14,13 +14,13 @@ const storyblokStoriesSource = readFileSync(
   new URL('./storyblok-stories.ts', import.meta.url),
   'utf8',
 );
+const removedThumbnailFieldPattern = new RegExp('thumbnail_' + 'new');
 
 test('project data has one Storyblok API caller and slug list derives from it', () => {
   assert.match(fetchProjectsSource, /export async function fetchProjectData/);
-  assert.match(fetchProjectsSource, /thumbnail_new\?: ProjectData\['thumbnail'\]/);
-  assert.match(fetchProjectsSource, /const getPreferredThumbnail = /);
-  assert.match(fetchProjectsSource, /content\.thumbnail_new\?\.filename \? content\.thumbnail_new : content\.thumbnail/);
-  assert.match(fetchProjectsSource, /thumbnail: getPreferredThumbnail\(story\.content\)/);
+  assert.doesNotMatch(fetchProjectsSource, removedThumbnailFieldPattern);
+  assert.doesNotMatch(fetchProjectsSource, /getPreferredThumbnail/);
+  assert.match(fetchProjectsSource, /thumbnail: story\.content\.thumbnail/);
   assert.match(fetchProjectsSource, /fetchPublishedStoryList/);
   assert.doesNotMatch(fetchProjectsSource, /storyblokApi\.get/);
   assert.match(fetchProjectsSource, /export async function fetchProjectSlugs/);

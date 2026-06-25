@@ -25,14 +25,10 @@ type StoryblokProjectStory = {
     title?: string;
     category?: string[];
     highlight?: boolean;
-    thumbnail_new?: ProjectData['thumbnail'];
     thumbnail?: ProjectData['thumbnail'];
     external_link?: ProjectData['external_link'];
   };
 };
-
-const getPreferredThumbnail = (content: StoryblokProjectStory['content']) =>
-  content.thumbnail_new?.filename ? content.thumbnail_new : content.thumbnail;
 
 export async function fetchProjectData(): Promise<ProjectData[]> {
   const sbParams: ISbStoriesParams = {
@@ -49,7 +45,7 @@ export async function fetchProjectData(): Promise<ProjectData[]> {
     title: story.content.title || story.name,
     category: story.content.category,
     highlight: story.content.highlight,
-    thumbnail: getPreferredThumbnail(story.content),
+    thumbnail: story.content.thumbnail,
     external_link: story.content.external_link,
   }));
 }
