@@ -142,11 +142,31 @@ test('fullscreen-off mobile stacked project media adds divider before second med
 
   assert.match(
     fullscreenFalseBlock,
-    /@media \(max-width: 770px\)\n\s+\.page-Project \.row\[data-column-behaviour='stack'\]:has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):first-child\):has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):nth-child\(2\):last-child\)/,
+    /@media \(max-width: 770px\)[\s\S]*\.page-Project \.row\[data-column-behaviour='stack'\]:has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):first-child\):has\(> :where\(\.column-Image, \.column-Video, \.column-Slider\):nth-child\(2\):last-child\)/,
   );
   assert.match(
     fullscreenFalseBlock,
     /& > :where\(\.column-Image, \.column-Video, \.column-Slider\):nth-child\(2\)\n\s+border-top: var\(--border-width\) solid currentColor/,
+  );
+});
+
+test('fullscreen-off mobile unstacked project media removes inner padding and adds divider', () => {
+  const fullscreenFalseBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="false"\][\s\S]*?&\[data-theme='NIGHT'\]/,
+    )?.[0] || '';
+
+  assert.match(
+    fullscreenFalseBlock,
+    /@media \(max-width: 770px\)\n\s+\.page-Project \.row\[data-column-behaviour='none'\]:has\(> :where\(\.column-Image, \.column-Thumbnail, \.column-Video, \.column-Slider\):first-child\):has\(> :where\(\.column-Image, \.column-Thumbnail, \.column-Video, \.column-Slider\):nth-child\(2\):last-child\)/,
+  );
+  assert.match(
+    fullscreenFalseBlock,
+    /& > :where\(\.column-Image, \.column-Thumbnail, \.column-Video, \.column-Slider\):first-child\n\s+padding-right: 0/,
+  );
+  assert.match(
+    fullscreenFalseBlock,
+    /& > :where\(\.column-Image, \.column-Thumbnail, \.column-Video, \.column-Slider\):nth-child\(2\)\n\s+padding-left: 0\n\s+border-left: var\(--border-width\) solid currentColor/,
   );
 });
 

@@ -613,6 +613,12 @@ body
     @media (orientation: portrait)
       padding-bottom: calc(var(--spacing-side) + env(safe-area-inset-bottom))
     @media (max-width: 770px)
+      .page-Project .row[data-column-behaviour='none']:has(> :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider):first-child):has(> :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider):nth-child(2):last-child)
+        & > :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider):first-child
+          padding-right: 0
+        & > :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider):nth-child(2)
+          padding-left: 0
+          border-left: var(--border-width) solid currentColor
       .page-Project .row[data-column-behaviour='stack']:has(> :where(.column-Image, .column-Video, .column-Slider):first-child):has(> :where(.column-Image, .column-Video, .column-Slider):nth-child(2):last-child)
         & > :where(.column-Image, .column-Video, .column-Slider):nth-child(2)
           border-top: var(--border-width) solid currentColor
