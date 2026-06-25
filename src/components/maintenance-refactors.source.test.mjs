@@ -325,7 +325,8 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.match(wrapperStyleSource, /transform: translate3d\(var\(--thumbnail-x\), var\(--thumbnail-y\), 0\)/);
   assert.doesNotMatch(wrapperStyleSource, /scale\(/);
   assert.match(wrapperStyleSource, /animation: thumbnailItemEnter var\(--thumb-enter\) forwards/);
-  assert.match(wrapperStyleSource, /animation: thumbnailItemExit var\(--thumb-exit\) forwards/);
+  assert.match(wrapperStyleSource, /animation: thumbnailItemExit var\(--thumb-exit\) both/);
+  assert.doesNotMatch(wrapperStyleSource, /animation: thumbnailItemExit var\(--thumb-exit\) forwards/);
   assert.match(wrapperStyleSource, /width: var\(--thumb-frame-width\)/);
   assert.match(wrapperStyleSource, /height: var\(--thumb-frame-height\)/);
   assert.match(wrapperStyleSource, /max-width: 100%/);

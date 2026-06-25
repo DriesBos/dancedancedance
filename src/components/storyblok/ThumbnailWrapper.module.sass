@@ -1,10 +1,10 @@
 .thumbnailWrapper
   --thumb-delay: 150ms
-  --thumb-enter: .3s ease
+  --thumb-enter: .33s ease
   --thumb-image-reveal: .33s cubic-bezier(0.22, 1, 0.36, 1)
   --thumb-image-reveal-start-x: 25%
   --thumb-image-reveal-start-y: 25%
-  --thumb-exit-duration: .3s
+  --thumb-exit-duration: .33s
   --thumb-exit-delay: 1s
   --thumb-exit-ease: ease
   --thumb-exit: var(--thumb-exit-duration) var(--thumb-exit-ease) var(--thumb-exit-delay)
@@ -49,7 +49,7 @@
   mask-size: var(--thumb-mask-size)
 
 .thumbnailItemLeaving
-  animation: thumbnailItemExit var(--thumb-exit) forwards
+  animation: thumbnailItemExit var(--thumb-exit) both
 
 .thumbnailImage
   position: relative
