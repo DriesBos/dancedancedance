@@ -12,8 +12,6 @@ type InitialUIState = {
   fullscreen: boolean;
 };
 
-const FULLSCREEN_STORAGE_KEY = 'ddd-fullscreen';
-
 const getIsMobileViewport = () => {
   if (typeof window.matchMedia === 'function') {
     return window.matchMedia('(max-width: 770px)').matches;
@@ -22,16 +20,8 @@ const getIsMobileViewport = () => {
   return window.innerWidth < 770;
 };
 
-const getStoredFullscreenPreference = () => {
-  try {
-    return window.localStorage.getItem(FULLSCREEN_STORAGE_KEY);
-  } catch {
-    return null;
-  }
-};
-
 const getInitialFullscreen = () =>
-  getIsMobileViewport() ? true : getStoredFullscreenPreference() === 'true';
+  getIsMobileViewport();
 
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();

@@ -46,11 +46,7 @@ const INITIAL_UI_STATE_SCRIPT = `
       typeof window.matchMedia === 'function'
         ? window.matchMedia('(max-width: 770px)').matches
         : window.innerWidth < 770;
-    var storedFullscreenPreference = null;
-    try {
-      storedFullscreenPreference = window.localStorage.getItem('ddd-fullscreen');
-    } catch {}
-    var fullscreen = isMobile ? true : storedFullscreenPreference === 'true';
+    var fullscreen = isMobile;
     var pageContentVisible = true;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = themeMetaColors[theme] || '#FFFFFF';

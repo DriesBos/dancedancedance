@@ -28,27 +28,24 @@ test('initial bootstrap theme uses color-scheme preference before time fallback'
   assert.doesNotMatch(layoutSource, /THEMES_WITH_INITIAL_INTRO/);
 });
 
-test('fullscreen bootstrap uses mobile default and desktop browser preference', () => {
+test('fullscreen starts on mobile and off on desktop, then toggles normally', () => {
   assert.match(layoutSource, /var isMobile =/);
   assert.match(layoutSource, /max-width: 770px/);
-  assert.match(layoutSource, /localStorage\.getItem\('ddd-fullscreen'\)/);
-  assert.match(layoutSource, /try \{[\s\S]*localStorage\.getItem\('ddd-fullscreen'\)[\s\S]*\} catch \{\}/);
-  assert.match(layoutSource, /var fullscreen = isMobile \? true : storedFullscreenPreference === 'true'/);
+  assert.match(layoutSource, /var fullscreen = isMobile;/);
   assert.match(layoutSource, /data-fullscreen', String\(fullscreen\)/);
+  assert.doesNotMatch(layoutSource, /ddd-fullscreen/);
 
-  assert.match(appInitializerSource, /const FULLSCREEN_STORAGE_KEY = 'ddd-fullscreen';/);
   assert.match(appInitializerSource, /const getInitialFullscreen = /);
   assert.match(appInitializerSource, /max-width: 770px/);
-  assert.match(appInitializerSource, /window\.localStorage\.getItem\(FULLSCREEN_STORAGE_KEY\)/);
-  assert.match(appInitializerSource, /catch \{\n\s+return null;\n\s+\}/);
-  assert.match(appInitializerSource, /getIsMobileViewport\(\) \? true : getStoredFullscreenPreference\(\) === 'true'/);
+  assert.match(appInitializerSource, /const getInitialFullscreen = \(\) =>\n\s+getIsMobileViewport\(\);/);
   assert.match(appInitializerSource, /fullscreen: getInitialFullscreen\(\)/);
+  assert.doesNotMatch(appInitializerSource, /ddd-fullscreen/);
+  assert.doesNotMatch(appInitializerSource, /localStorage/);
 
-  assert.match(headRouteContentContainerSource, /const FULLSCREEN_STORAGE_KEY = 'ddd-fullscreen';/);
-  assert.match(headRouteContentContainerSource, /const isMobileViewport = getIsMobileViewport\(\);/);
-  assert.match(headRouteContentContainerSource, /const nextFullscreen = isMobileViewport \? true : !fullscreen;/);
-  assert.match(headRouteContentContainerSource, /window\.localStorage\.setItem\(FULLSCREEN_STORAGE_KEY, String\(fullscreen\)\)/);
-  assert.match(headRouteContentContainerSource, /if \(!isMobileViewport\) \{\n\s+setStoredFullscreenPreference\(nextFullscreen\);\n\s+\}/);
+  assert.match(headRouteContentContainerSource, /setFullscreen\(!fullscreen\)/);
+  assert.doesNotMatch(headRouteContentContainerSource, /getIsMobileViewport/);
+  assert.doesNotMatch(headRouteContentContainerSource, /ddd-fullscreen/);
+  assert.doesNotMatch(headRouteContentContainerSource, /localStorage/);
 });
 
 test('store defaults stay stable for the first hydration render', () => {
