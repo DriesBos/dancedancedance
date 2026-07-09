@@ -141,11 +141,12 @@ test('fullscreen-off head keeps its transparent top panel visible for borders', 
   assert.match(fullscreenFalseHeadBlock, /&-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
 });
 
-test('mobile top panel adds one pixel to its top border without moving the panel', () => {
+test('mobile top panel compensates its skewed top border without moving the panel', () => {
   assert.match(
     sidePanelStyleSource,
-    /&_Top[\s\S]*@media \(max-width: 768px\)\n\s+top: -1px\n\s+border-top-width: calc\(var\(--border-width\) \+ 1px\)/,
+    /&_Top[\s\S]*@media \(max-width: 770px\)\n\s+border-top-width: calc\(var\(--border-width\) \+ 1px\)/,
   );
+  assert.doesNotMatch(sidePanelStyleSource, /@media \(max-width: 770px\)\n\s+top: -1px/);
 });
 
 test('layout targets the head blok explicitly instead of by child index', () => {

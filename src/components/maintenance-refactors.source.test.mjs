@@ -345,14 +345,13 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
 
 test('blok chrome memoization uses React shallow comparison only', () => {
   const headSource = readSource('./BlokHead/BlokHead.tsx');
-  const topPanelSource = readSource('./BlokSidePanels/TopPanel.tsx');
   const sidePanelsSource = readSource('./BlokSidePanels/BlokSidePanels.tsx');
 
   assert.doesNotMatch(headSource, /haveProjectsChanged/);
   assert.match(headSource, /const BlokHead = memo\(BlokHeadComponent\);/);
-  assert.doesNotMatch(topPanelSource, /prevProps|nextProps/);
-  assert.match(topPanelSource, /const TopPanel = memo\(TopPanelComponent\);/);
   assert.doesNotMatch(sidePanelsSource, /prevProps|nextProps/);
+  assert.doesNotMatch(sidePanelsSource, /showTopPanelPortrait|showPortrait|calendly|href=/);
+  assert.doesNotMatch(sidePanelsSource, /from '\.\/(?:TopPanel|BottomPanel|BackPanel)'/);
   assert.match(sidePanelsSource, /const BlokSidePanels = memo\(BlokSidePanelsComponent\);/);
 });
 

@@ -1,25 +1,35 @@
 import { memo } from 'react';
-import TopPanel from './TopPanel';
-import BottomPanel from './BottomPanel';
-import BackPanel from './BackPanel';
+import GrainyGradient from '../GrainyGradient/GrainyGradient';
+import styles from './BlokSidePanels.module.sass';
+
+type TopPanelSurface = 'default' | 'transparent';
 
 interface BlokSidePanelsProps {
-  showTopPanelPortrait?: boolean;
-  topPanelSurface?: 'default' | 'transparent';
+  topPanelSurface?: TopPanelSurface;
 }
 
+interface PanelProps {
+  className: string;
+  surface?: TopPanelSurface;
+}
+
+const Panel = ({ className, surface }: PanelProps) => (
+  <div className={className} data-surface={surface}>
+    <GrainyGradient variant="blok" />
+  </div>
+);
+
 const BlokSidePanelsComponent = ({
-  showTopPanelPortrait = false,
   topPanelSurface = 'default',
 }: BlokSidePanelsProps) => {
   return (
     <>
-      <TopPanel
-        showPortrait={showTopPanelPortrait}
+      <Panel
+        className={`${styles.side} ${styles.side_Top} side side_Top`}
         surface={topPanelSurface}
       />
-      <BottomPanel />
-      <BackPanel />
+      <Panel className={`${styles.side} ${styles.side_Bottom} side side_Bottom`} />
+      <Panel className={`${styles.side} ${styles.side_Back} side side_Back`} />
     </>
   );
 };
