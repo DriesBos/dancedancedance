@@ -12,12 +12,12 @@
   &_Top
     left: calc(0px - 1.25 * #{var(--border-width)})
     top: 0
-    @media (max-width: 770px)
-      border-top-width: calc(var(--border-width) + 1px)
     height: var(--panel-height)
     width: calc(100% + 2.5 * #{var(--border-width)})
     transform: rotateX(90deg) rotateY(0deg) translateY(calc(var(--panel-height) * -1))
     transform-origin: 0 0
+    @media (max-width: 770px)
+      border-top-width: calc(var(--border-width) + 1px)
   &_Bottom
     left: calc(0px - #{var(--border-width)})
     top: 100%
