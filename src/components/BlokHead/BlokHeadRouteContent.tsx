@@ -12,6 +12,7 @@ import IconClose from '@/components/Icons/IconClose';
 import IconFullscreen from '@/components/Icons/IconFullscreen';
 import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import IconMail from '@/components/Icons/IconMail';
+import { getSafeExternalHref } from '@/lib/safe-url';
 import { vibrate } from '@/lib/vibration';
 import { useStore } from '@/store/store';
 import { t } from '@/lib/locale';
@@ -125,6 +126,7 @@ const BlokHeadRouteContent = ({
     return projects.find((project) => project.slug === currentSlug)
       ?.external_link;
   }, [pathName, projects, currentSlug]);
+  const externalHref = getSafeExternalHref(externalLink?.cached_url);
 
   const clickNext = useCallback(() => {
     if (!nextProjectHref) return false;
@@ -395,9 +397,9 @@ const BlokHeadRouteContent = ({
         )}
         {pathName === 'projects' && (
           <>
-            {externalLink?.cached_url && (
+            {externalHref && (
               <a
-                href={externalLink.cached_url}
+                href={externalHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="icon cursorMagnetic desktop"

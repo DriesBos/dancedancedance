@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { getSiteUrl } from '@/lib/site-url';
 
 const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY;
 const MAILCHIMP_AUDIENCE_ID = process.env.MAILCHIMP_AUDIENCE_ID;
@@ -16,6 +17,8 @@ const isValidEmail = (email: string) =>
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
+const SITE_ORIGIN = new URL(getSiteUrl()).origin;
+const MAX_REQUEST_BYTES = 2048;
 
 interface NewsletterPayload {
   email?: unknown;
@@ -50,8 +53,49 @@ const isRateLimited = (clientKey: string, now = Date.now()) => {
 const isBotSubmission = (payload: NewsletterPayload) =>
   typeof payload.company === 'string' && payload.company.trim().length > 0;
 
+const getOrigin = (value: string | null) => {
+  if (!value) return null;
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+};
+
+const getRequestOrigin = (request: Request) => {
+  const host =
+    request.headers.get('x-forwarded-host') || request.headers.get('host');
+  if (!host) return SITE_ORIGIN;
+
+  const protocol =
+    request.headers.get('x-forwarded-proto') ||
+    (host.startsWith('localhost') || host.startsWith('127.0.0.1')
+      ? 'http'
+      : 'https');
+
+  return `${protocol}://${host}`;
+};
+
+const isSameOriginRequest = (request: Request) => {
+  const requestOrigin = getRequestOrigin(request);
+  const origin = getOrigin(request.headers.get('origin'));
+  if (origin) return origin === requestOrigin;
+
+  const referer = getOrigin(request.headers.get('referer'));
+  return referer === requestOrigin;
+};
+
 export async function POST(request: Request) {
   try {
+    const contentLength = Number(request.headers.get('content-length') || 0);
+    if (contentLength > MAX_REQUEST_BYTES) {
+      return NextResponse.json({ error: 'Request is too large' }, { status: 413 });
+    }
+
+    if (!isSameOriginRequest(request)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const payload = toNewsletterPayload(await request.json());
     const email = normalizeEmail(payload.email);
 

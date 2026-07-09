@@ -9,6 +9,7 @@ import IconLinkOutside from './Icons/IconLinkOutside';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from './BlokSidePanels';
 import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
+import { getSafeExternalHref } from '@/lib/safe-url';
 
 interface Props {
   slug?: string;
@@ -59,6 +60,7 @@ const BlokProject = ({
   const href = slug ? `/projects/${slug}` : null;
   const cursorPreviewImage = getProjectThumbnailSrc(thumbnail);
   const hasCursorPreview = !!cursorPreviewImage && !disableCursorPreview;
+  const externalHref = getSafeExternalHref(external_link?.cached_url);
 
   const prefetchProject = useCallback(() => {
     if (!href || hasPrefetchedRef.current) return;
@@ -108,11 +110,11 @@ const BlokProject = ({
           <div className="column column-Icons">
             <a
               className="icon icon-ExternalLink cursorMagnetic"
-              href={external_link?.cached_url ? external_link.cached_url : '#'}
+              href={externalHref || '#'}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              data-active={external_link?.cached_url ? true : false}
+              data-active={externalHref ? true : false}
             >
               <IconLinkOutside />
             </a>

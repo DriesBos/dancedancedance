@@ -18,6 +18,16 @@
 
 # Handle Next.js rewrites properly
 [[redirects]]
+  from = "/api/newsletter/subscribe"
+  to = "/api/newsletter/subscribe"
+  status = 200
+  force = false
+  [redirects.rate_limit]
+    window_limit = 5
+    window_size = 60
+    aggregate_by = ["ip", "domain"]
+
+[[redirects]]
   from = "/*"
   to = "/:splat"
   status = 200
