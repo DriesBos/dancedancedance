@@ -1,7 +1,7 @@
 import BlokSidePanels from '@/components/BlokSidePanels';
 
 const BlokHeadSidePanels = () => {
-  return <BlokSidePanels topPanelSurface="transparent" />;
+  return <BlokSidePanels />;
 };
 
 export default BlokHeadSidePanels;

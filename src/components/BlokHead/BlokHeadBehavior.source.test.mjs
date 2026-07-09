@@ -73,10 +73,10 @@ test('BlokHead measures a stable frame while the inner visual surface moves', ()
   assert.match(headStyleSource, /\.row[\s\S]*height: 100%/);
 });
 
-test('head owns an explicit surface state separate from panel state', () => {
-  assert.match(headSource, /data-surface="transparent"/);
-  assert.match(behaviorSource, /type HeadSurface = 'transparent' \| 'solid'/);
-  assert.match(behaviorSource, /const setHeadSurface = useCallback/);
+test('head surface color is token-driven instead of data-surface-driven', () => {
+  assert.doesNotMatch(headSource, /data-surface/);
+  assert.doesNotMatch(behaviorSource, /HeadSurface|setHeadSurface|dataset\.surface/);
+  assert.match(headStyleSource, /background: var\(--theme-blok-head\)/);
 });
 
 test('fullscreen quiets selected borders by color without changing border widths', () => {
@@ -126,13 +126,19 @@ test('mobile has no separate timer replay controller', () => {
   assert.doesNotMatch(behaviorSource, /setTimeout/);
 });
 
-test('head surface CSS controls background without changing side panel transparency', () => {
-  assert.match(headStyleSource, /&\[data-surface='transparent'\][\s\S]*background: transparent/);
-  assert.match(headStyleSource, /&\[data-surface='solid'\][\s\S]*background: var\(--theme-blok\)/);
-  assert.match(headStyleSource, /&\[data-surface='solid'\][\s\S]*& > :global\(\.grainyGradient\)[\s\S]*opacity: var\(--theme-bg-gradient\)/);
+test('head and panel surface colors use scoped theme tokens', () => {
+  assert.match(varsStyleSource, /--theme-blok-head: var\(--theme-blok\)/);
+  assert.match(varsStyleSource, /--theme-blok-sidepanel-head: var\(--theme-blok-sidepanel\)/);
+  assert.match(varsStyleSource, /--theme-blok-sidepanel-footer: var\(--theme-blok-sidepanel\)/);
+  assert.match(varsStyleSource, /body\[data-theme='DARK'\][\s\S]*--theme-blok-head: transparent[\s\S]*--theme-blok-sidepanel-head: transparent/);
+  assert.match(varsStyleSource, /body\[data-theme='NIGHT'\][\s\S]*--theme-blok-head: transparent[\s\S]*--theme-blok-sidepanel-head: transparent/);
+  assert.match(varsStyleSource, /body\[data-fullscreen='true'\][\s\S]*--theme-blok-head: var\(--theme-blok\)/);
+  assert.match(globalStyleSource, /&-Head[\s\S]*\.side[\s\S]*background: var\(--theme-blok-sidepanel-head\)/);
+  assert.match(globalStyleSource, /&-Footer[\s\S]*\.side[\s\S]*background: var\(--theme-blok-sidepanel-footer\)/);
+  assert.doesNotMatch(sidePanelStyleSource, /data-surface|:global/);
 });
 
-test('fullscreen-off head keeps its transparent top panel visible for borders', () => {
+test('fullscreen-off head keeps its top panel visible for borders and light surface', () => {
   const fullscreenFalseHeadBlock =
     globalStyleSource.match(
       /&\[data-fullscreen="false"\][\s\S]*?&-Project/,

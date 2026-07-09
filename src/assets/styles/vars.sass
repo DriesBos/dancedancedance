@@ -12,8 +12,11 @@
   /* theme */
   --theme-bg: hsla(48, 10%, 82%, 1)
   --theme-blok: hsla(48, 10%, 90%, 1)
+  --theme-blok-head: var(--theme-blok)
   --theme-blok-hover: hsla(48, 10%, 100%, 1)
   --theme-blok-sidepanel: hsla(48, 10%, 86%, 1)
+  --theme-blok-sidepanel-head: var(--theme-blok-sidepanel)
+  --theme-blok-sidepanel-footer: var(--theme-blok-sidepanel)
   --theme-bg-gradient: 0
   --theme-type: hsla(20, 100%, 01%, 1)
   --theme-type-support: #339A62
@@ -78,8 +81,11 @@ body[data-fullscreen='false']
 body[data-theme='DARK']
   --theme-bg: hsla(0, 0%, 0%, 1)
   --theme-blok: hsla(0, 0%, 8%, 1)
+  --theme-blok-head: transparent
   --theme-blok-hover: hsla(0, 0%, 10%, 1)
   --theme-blok-sidepanel: hsla(0, 0%, 4%, 1)
+  --theme-blok-sidepanel-head: transparent
+  --theme-blok-sidepanel-footer: var(--theme-blok-sidepanel)
   --theme-type: white
   --theme-type-support: #339A62
   --theme-muted-opacity: .5
@@ -88,9 +94,15 @@ body[data-theme='DARK']
 body[data-theme='NIGHT']
   --theme-bg: black
   --theme-blok: black
+  --theme-blok-head: transparent
   --theme-blok-hover: hsla(0, 0%, 10%, 1)
   --theme-blok-sidepanel: black
+  --theme-blok-sidepanel-head: transparent
+  --theme-blok-sidepanel-footer: var(--theme-blok-sidepanel)
   --theme-type: hsla(0, 100%, 50%, 1)
   --theme-type-support: hsla(0, 100%, 50%, 1)
   --theme-muted-opacity: .6
   --theme-media-filter: grayscale(1) contrast(1.22) brightness(0.33) sepia(1) saturate(8) hue-rotate(-18deg)
+
+body[data-fullscreen='true']
+  --theme-blok-head: var(--theme-blok)
