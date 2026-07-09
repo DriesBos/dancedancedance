@@ -442,6 +442,7 @@ mux-player, .muxPlayer
     border-top: 0
     & > .blok
       border: 0
+      border-top: var(--border-width) solid currentColor
   &-Filter
     justify-content: flex-end
     padding-top: var(--blok-padding-extraTop)
@@ -462,7 +463,6 @@ mux-player, .muxPlayer
     opacity: 1
     color: inherit
     transition: background-color var(--theme-transition), box-shadow var(--theme-transition)
-    border-top: var(--border-width) solid currentColor !important
     background: var(--theme-blok)
     @media (hover: hover)
       &:hover

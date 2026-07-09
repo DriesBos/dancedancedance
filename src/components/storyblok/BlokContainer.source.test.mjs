@@ -209,3 +209,21 @@ test('project list does not reserve hover overlap', () => {
     /padding-bottom: calc\(3\.95rem \* 0\.5\)/,
   );
 });
+
+test('project list owns its frame while child bloks draw row dividers', () => {
+  const projectListBlock =
+    globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';
+  const projectBlock =
+    globalStyleSource.match(/&-Project\n[\s\S]*?&-Highlights/)?.[0] || '';
+
+  assert.match(projectListBlock, /& > \.blok\n\s+border: 0/);
+  assert.match(
+    projectListBlock,
+    /border-top: var\(--border-width\) solid currentColor/,
+  );
+  assert.doesNotMatch(projectListBlock, /margin-top: calc\(0px -/);
+  assert.doesNotMatch(
+    projectBlock,
+    /border-top: var\(--border-width\) solid currentColor !important/,
+  );
+});
