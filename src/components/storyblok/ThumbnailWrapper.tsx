@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import {
   parseStoryblokImageDimensions,
   transformStoryblokImageUrl,
+  warmStoryblokImage,
 } from '@/lib/storyblok-image';
 import type { ProjectData } from './projectsData';
 import styles from './ThumbnailWrapper.module.sass';
@@ -28,7 +29,14 @@ const HOVER_THUMBNAIL_EXIT_DURATION_MS = 300;
 const HOVER_THUMBNAIL_EXIT_DELAY_MS = 950;
 const HOVER_THUMBNAIL_LIFETIME_MS =
   HOVER_THUMBNAIL_EXIT_DELAY_MS + HOVER_THUMBNAIL_EXIT_DURATION_MS;
-const HOVER_THUMBNAIL_DELAY_MS = 50;
+const HOVER_THUMBNAIL_DELAY_MS = 75;
+const HOVER_THUMBNAIL_VIEWPORT_RATIO = 0.23;
+const HOVER_THUMBNAIL_QUALITY = 55;
+const HOVER_THUMBNAIL_FORMAT = 'webp';
+const HOVER_THUMBNAIL_MAX_DEVICE_PIXEL_RATIO = 2;
+const HOVER_THUMBNAIL_WARM_RESIZE_DELAY_MS = 150;
+const HOVER_THUMBNAIL_MEDIA_QUERY = '(hover: hover) and (pointer: fine)';
+const warmedHoverThumbnailSrcs = new Set<string>();
 
 type HoverThumbnail = {
   id: number;
@@ -76,14 +84,13 @@ const getProjectHoverThumbnail = (thumbnail?: ProjectData['thumbnail']) => {
   const aspectRatio = dimensions ? dimensions.width / dimensions.height : 4 / 3;
 
   return {
-    src: transformStoryblokImageUrl(filename, {
-      width: 1200,
-      quality: 70,
-      noUpscale: true,
-    }),
+    filename,
     aspectRatio,
   };
 };
+
+const canUseHoverThumbnails = () =>
+  window.matchMedia(HOVER_THUMBNAIL_MEDIA_QUERY).matches;
 
 const toMilliseconds = (cssTime: string, fallback: number) => {
   const value = cssTime.trim();
@@ -130,13 +137,13 @@ const getThumbnailSize = (
   );
   const preferredSize = Math.max(
     18 * remInPixels,
-    viewportWidth * 0.25 - padding,
+    viewportWidth * HOVER_THUMBNAIL_VIEWPORT_RATIO - padding,
   );
 
   return Math.min(viewportFit, 36 * remInPixels, preferredSize);
 };
 
-const getRandomThumbnailPosition = () => {
+const getThumbnailViewportState = () => {
   const rootStyle = getComputedStyle(document.documentElement);
   const remInPixels = parseFloat(rootStyle.fontSize) || 16;
   const rawPadding = toPixels(
@@ -154,14 +161,52 @@ const getRandomThumbnailPosition = () => {
     padding,
     remInPixels,
   );
-  const maxX = Math.max(padding, window.innerWidth - thumbnailSize - padding);
-  const maxY = Math.max(padding, window.innerHeight - thumbnailSize - padding);
+
+  return { padding, size: thumbnailSize };
+};
+
+const getRandomThumbnailPosition = () => {
+  const { padding, size } = getThumbnailViewportState();
+  const maxX = Math.max(padding, window.innerWidth - size - padding);
+  const maxY = Math.max(padding, window.innerHeight - size - padding);
 
   return {
     x: randomBetween(padding, maxX),
     y: randomBetween(padding, maxY),
-    size: thumbnailSize,
+    size,
   };
+};
+
+const getThumbnailFrameSize = (size: number, aspectRatio: number) => {
+  const isLandscapeThumbnail = aspectRatio >= 1;
+
+  return {
+    frameWidth: isLandscapeThumbnail ? size : size * aspectRatio,
+    frameHeight: isLandscapeThumbnail ? size / aspectRatio : size,
+  };
+};
+
+const getHoverThumbnailAssetWidth = (frameWidth: number) =>
+  Math.max(
+    1,
+    Math.ceil(
+      frameWidth *
+        Math.min(
+          HOVER_THUMBNAIL_MAX_DEVICE_PIXEL_RATIO,
+          Math.max(1, window.devicePixelRatio || 1),
+        ),
+    ),
+  );
+
+const getHoverThumbnailImageSrc = (filename: string, frameWidth: number) => {
+  const assetWidth = getHoverThumbnailAssetWidth(frameWidth);
+
+  return transformStoryblokImageUrl(filename, {
+    width: assetWidth,
+    quality: HOVER_THUMBNAIL_QUALITY,
+    format: HOVER_THUMBNAIL_FORMAT,
+    noUpscale: true,
+  });
 };
 
 export default function ThumbnailWrapper({
@@ -184,14 +229,14 @@ export default function ThumbnailWrapper({
   const thumbnailBySlug = useMemo(() => {
     const thumbnails = new Map<
       string,
-      { src: string; alt: string; aspectRatio: number }
+      { filename: string; alt: string; aspectRatio: number }
     >();
 
     projects.forEach((project) => {
       const thumbnail = getProjectHoverThumbnail(project.thumbnail);
       if (!thumbnail) return;
       thumbnails.set(project.slug, {
-        src: thumbnail.src,
+        filename: thumbnail.filename,
         alt: project.thumbnail?.alt || project.title || '',
         aspectRatio: thumbnail.aspectRatio,
       });
@@ -232,6 +277,57 @@ export default function ThumbnailWrapper({
   }, []);
 
   useEffect(() => {
+    if (!canUseHoverThumbnails() || thumbnailBySlug.size === 0) {
+      return undefined;
+    }
+
+    const warmThumbnails = () => {
+      const { size } = getThumbnailViewportState();
+
+      thumbnailBySlug.forEach((thumbnail) => {
+        const { frameWidth } = getThumbnailFrameSize(
+          size,
+          thumbnail.aspectRatio,
+        );
+        const assetWidth = getHoverThumbnailAssetWidth(frameWidth);
+
+        warmStoryblokImage(
+          thumbnail.filename,
+          {
+            width: assetWidth,
+            quality: HOVER_THUMBNAIL_QUALITY,
+            format: HOVER_THUMBNAIL_FORMAT,
+            noUpscale: true,
+          },
+          warmedHoverThumbnailSrcs,
+        );
+      });
+    };
+
+    let resizeTimer: number | null = null;
+    const scheduleWarmThumbnails = () => {
+      if (resizeTimer !== null) {
+        window.clearTimeout(resizeTimer);
+      }
+
+      resizeTimer = window.setTimeout(() => {
+        resizeTimer = null;
+        warmThumbnails();
+      }, HOVER_THUMBNAIL_WARM_RESIZE_DELAY_MS);
+    };
+
+    warmThumbnails();
+    window.addEventListener('resize', scheduleWarmThumbnails);
+
+    return () => {
+      if (resizeTimer !== null) {
+        window.clearTimeout(resizeTimer);
+      }
+      window.removeEventListener('resize', scheduleWarmThumbnails);
+    };
+  }, [thumbnailBySlug]);
+
+  useEffect(() => {
     return () => {
       if (pendingHoverTimerRef.current !== null) {
         window.clearTimeout(pendingHoverTimerRef.current);
@@ -261,20 +357,17 @@ export default function ThumbnailWrapper({
       const id = thumbnailIdRef.current + 1;
       thumbnailIdRef.current = id;
       const { x, y, size } = getRandomThumbnailPosition();
-      const isLandscapeThumbnail = thumbnail.aspectRatio >= 1;
-      const frameWidth = isLandscapeThumbnail
-        ? size
-        : size * thumbnail.aspectRatio;
-      const frameHeight = isLandscapeThumbnail
-        ? size / thumbnail.aspectRatio
-        : size;
+      const { frameWidth, frameHeight } = getThumbnailFrameSize(
+        size,
+        thumbnail.aspectRatio,
+      );
 
       setHoverThumbnails((items) => [
         ...items,
         {
           id,
           projectSlug: hoverEvent.projectSlug,
-          src: thumbnail.src,
+          src: getHoverThumbnailImageSrc(thumbnail.filename, frameWidth),
           alt: thumbnail.alt,
           x,
           y,
@@ -354,9 +447,9 @@ export default function ThumbnailWrapper({
                 src={thumbnail.src}
                 alt={thumbnail.alt}
                 fill
-                sizes="(max-width: 770px) calc(100vw - var(--spacing-base) * 2), 25vw"
+                sizes="(max-width: 770px) calc(100vw - var(--spacing-base) * 2), 23vw"
                 loading="eager"
-                quality={70}
+                fetchPriority="high"
                 unoptimized
                 onLoad={() => {
                   setHoverThumbnails((items) =>
