@@ -31,13 +31,13 @@
   --border-width: 2px
   --border-hyperlink: 1.5px
   --blok-padding: 1.25rem
-  --blok-height: calc(var(--blok-padding) * 2 + (var(--line-height) * 1rem))
+  --blok-height: calc((var(--blok-padding) * 2) + (var(--line-height) * 1rem) - (var(--border-width) * 2))
   --blok-padding-extraTop: var(--blok-height)
   --blok-padding-firstTop: calc(28vh - (var(--blok-height) + var(--blok-padding)))
   --filter-bottom-padding: 1rem
   --panel-height: 150px
   --panel-perspective-origin: 50% 0vh
-  --spacing-side: 1.25rem
+  --spacing-side: 1.5rem
   --spacing-side-image: var(--spacing-side)
   --spacing-base: 1.25rem
   --spacing-icons: 1.25rem
@@ -65,14 +65,14 @@ body[data-fullscreen='false']
   --spacing-containerTopDistance: calc(124px + var(--blok-height) + 25vh)
   --panel-perspective-origin: 50% -70rem
   @media (orientation: portrait)
-    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 10vh)
+    --spacing-containerTopDistance: calc(124px + var(--blok-height) + 12.5vh)
   @media (max-width: 770px)
     --panel-perspective-origin: 50% -38rem
     --blok-padding-extraTop: 1rem
     --blok-padding-firstTop: 1rem
     --spacing-side-image: 0
   @media (max-width: 450px)
-    --panel-perspective-origin: 50% -32rem
+    --panel-perspective-origin: 50% -35rem
 
 // THEMES
 body[data-theme='DARK']
