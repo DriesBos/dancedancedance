@@ -17,7 +17,7 @@ test('verification scripts and CI cover source tests, build, typecheck, and audi
   assert.match(packageJson.scripts.audit, /pnpm audit --prod --audit-level moderate/);
 
   assert.equal(packageJson.dependencies['react-swipeable'], undefined);
-  assert.match(workflow, /node-version: 20/);
+  assert.match(workflow, /node-version-file: \.node-version/);
   assert.match(workflow, /run: pnpm check/);
   assert.match(workflow, /run: pnpm run audit/);
 });
