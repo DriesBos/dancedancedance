@@ -276,7 +276,13 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.match(wrapperSource, /HOVER_THUMBNAIL_EXIT_DURATION_MS = 300/);
   assert.match(wrapperSource, /HOVER_THUMBNAIL_EXIT_DELAY_MS = 950/);
   assert.match(wrapperSource, /HOVER_THUMBNAIL_LIFETIME_MS =\n  HOVER_THUMBNAIL_EXIT_DELAY_MS \+ HOVER_THUMBNAIL_EXIT_DURATION_MS/);
-  assert.match(wrapperSource, /HOVER_THUMBNAIL_DELAY_MS = 100/);
+  assert.match(wrapperSource, /HOVER_THUMBNAIL_DELAY_MS = 50/);
+  assert.match(wrapperSource, /isLoaded: boolean;/);
+  assert.match(wrapperSource, /isLoaded: false/);
+  assert.match(wrapperSource, /thumbnail\.isLoaded \? styles\.thumbnailImageLoaded : ''/);
+  assert.match(wrapperSource, /onLoad=\{\(\) => \{/);
+  assert.match(wrapperSource, /item\.id === thumbnail\.id/);
+  assert.match(wrapperSource, /isLoaded: true/);
   assert.match(wrapperSource, /const toMilliseconds = /);
   assert.match(wrapperSource, /const getThumbnailDelayMs = /);
   assert.match(wrapperSource, /const getThumbnailLifetimeMs = /);
@@ -291,7 +297,7 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.match(wrapperSource, /getThumbnailDelayMs\(thumbnailWrapperRef\.current\)\)/);
   assert.match(wrapperSource, /getThumbnailLifetimeMs\(thumbnailWrapperRef\.current\)\)/);
   assert.match(wrapperStyleSource, /\.thumbnailWrapper/);
-  assert.match(wrapperStyleSource, /--thumb-delay:/);
+  assert.match(wrapperStyleSource, /--thumb-delay: 50ms/);
   assert.match(wrapperStyleSource, /--thumb-enter:/);
   assert.doesNotMatch(wrapperStyleSource, /--thumb-enter-start-scale/);
   assert.match(wrapperStyleSource, /--thumb-image-reveal:/);
@@ -331,11 +337,12 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.match(wrapperStyleSource, /height: var\(--thumb-frame-height\)/);
   assert.match(wrapperStyleSource, /max-width: 100%/);
   assert.match(wrapperStyleSource, /max-height: 100%/);
-  assert.match(wrapperStyleSource, /border: 1px solid color-mix\(in srgb, var\(--theme-type\) 20%, transparent\)/);
+  assert.match(wrapperStyleSource, /border: 1px solid transparent/);
+  assert.match(wrapperStyleSource, /\.thumbnailImageLoaded\n\s+opacity: 1\n\s+border-color: color-mix\(in srgb, var\(--theme-type\) 20%, transparent\)/);
   assert.match(wrapperStyleSource, /border-radius: 1\.1rem/);
   assert.doesNotMatch(thumbnailImageBlock, /border-radius: 1rem/);
   assert.match(wrapperStyleSource, /clip-path: inset\(var\(--thumb-image-reveal-start-y\) var\(--thumb-image-reveal-start-x\)\)/);
-  assert.match(wrapperStyleSource, /animation: thumbnailImageReveal var\(--thumb-image-reveal\) forwards/);
+  assert.match(wrapperStyleSource, /\.thumbnailImageLoaded[\s\S]*animation: thumbnailImageReveal var\(--thumb-image-reveal\) forwards/);
   assert.doesNotMatch(wrapperStyleSource, /border: var\(--border-width\) solid var\(--theme-type\)/);
   assert.doesNotMatch(wrapperStyleSource, /&::after/);
   assert.match(wrapperStyleSource, /@keyframes thumbnailImageReveal/);

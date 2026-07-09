@@ -28,7 +28,7 @@ const HOVER_THUMBNAIL_EXIT_DURATION_MS = 300;
 const HOVER_THUMBNAIL_EXIT_DELAY_MS = 950;
 const HOVER_THUMBNAIL_LIFETIME_MS =
   HOVER_THUMBNAIL_EXIT_DELAY_MS + HOVER_THUMBNAIL_EXIT_DURATION_MS;
-const HOVER_THUMBNAIL_DELAY_MS = 100;
+const HOVER_THUMBNAIL_DELAY_MS = 50;
 
 type HoverThumbnail = {
   id: number;
@@ -41,6 +41,7 @@ type HoverThumbnail = {
   frameWidth: number;
   frameHeight: number;
   isLeaving: boolean;
+  isLoaded: boolean;
   leaveEventId?: number;
 };
 
@@ -281,6 +282,7 @@ export default function ThumbnailWrapper({
           frameWidth,
           frameHeight,
           isLeaving: false,
+          isLoaded: false,
         },
       ]);
     }, getThumbnailDelayMs(thumbnailWrapperRef.current));
@@ -342,7 +344,11 @@ export default function ThumbnailWrapper({
             }`}
             style={thumbnailStyle}
           >
-            <div className={styles.thumbnailImage}>
+            <div
+              className={`${styles.thumbnailImage} ${
+                thumbnail.isLoaded ? styles.thumbnailImageLoaded : ''
+              }`}
+            >
               <Image
                 className="imageItem"
                 src={thumbnail.src}
@@ -352,6 +358,15 @@ export default function ThumbnailWrapper({
                 loading="eager"
                 quality={70}
                 unoptimized
+                onLoad={() => {
+                  setHoverThumbnails((items) =>
+                    items.map((item) =>
+                      item.id === thumbnail.id
+                        ? { ...item, isLoaded: true }
+                        : item,
+                    ),
+                  );
+                }}
               />
             </div>
           </div>
