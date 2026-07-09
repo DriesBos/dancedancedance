@@ -11,6 +11,10 @@ const globalStyleSource = readFileSync(
   new URL('../../assets/styles/global.sass', import.meta.url),
   'utf8',
 );
+const varsStyleSource = readFileSync(
+  new URL('../../assets/styles/vars.sass', import.meta.url),
+  'utf8',
+);
 
 test('BlokContainer exposes column behaviour while preserving wide columns fallback', () => {
   assert.match(
@@ -188,6 +192,12 @@ test('mobile media caption padding only applies outside fullscreen', () => {
     mediaColumnBlock,
     /@media \(max-width: 770px\)[\s\S]*\.column-Caption\s+padding: var\(--spacing-base\)/,
   );
+});
+
+test('caption font size tokens use valid rem units', () => {
+  assert.match(varsStyleSource, /--font-size-caption: 0\.66rem/);
+  assert.match(varsStyleSource, /--font-size-caption: 0\.8rem/);
+  assert.doesNotMatch(varsStyleSource, /--font-size-caption: [^\n]*reml/);
 });
 
 test('project list does not reserve hover overlap', () => {
