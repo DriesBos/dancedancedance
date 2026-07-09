@@ -1,6 +1,6 @@
 # Agents Notes
 
-- Tech stack: Next.js 15 App Router, React 19, TypeScript 5, pnpm, Storyblok, Sass/CSS Modules, Zustand, GSAP, Mux, and Netlify.
+- Tech stack: Next.js, App Router, React, TypeScript, pnpm, Storyblok, Sass/CSS Modules, Zustand, GSAP, Mux, and Netlify.
 - State management: keep shared UI state in the Zustand store at `src/store/store.tsx`; keep component-only interaction state local.
 - Theming/design: themes are explicit `LIGHT`/`DARK`/`NIGHT` tokens wired through `src/lib/theme.ts`, Sass variables/modules, Storyblok blok components, and motion-forward UI transitions.
 - Local skills: use the repo skills in `skills/` when working on Next/Storyblok/Sass, Zustand UI state, or theme/design behavior.
