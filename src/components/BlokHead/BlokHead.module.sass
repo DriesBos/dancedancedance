@@ -9,14 +9,6 @@
   background: transparent
   &[data-active='true'] .blokHead
     transform: translateY(-100%)
-  &[data-surface='transparent'] .blokHead
-    background: transparent
-    & > :global(.grainyGradient)
-      opacity: 0
-  &[data-surface='solid'] .blokHead
-    background: var(--theme-blok)
-    & > :global(.grainyGradient)
-      opacity: var(--theme-bg-gradient)
   :global(.side_Top)
     pointer-events: auto
 
@@ -27,7 +19,7 @@
   flex-direction: column
   isolation: isolate
   border: var(--border-width) solid currentColor
-  background: var(--theme-blok)
+  background: var(--theme-blok-head)
   perspective: 1000px
   perspective-origin: var(--panel-perspective-origin)
   transform: translateY(0)

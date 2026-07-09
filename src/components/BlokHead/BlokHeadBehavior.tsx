@@ -7,8 +7,6 @@ type Props = {
   headRef: RefObject<HTMLDivElement | null>;
 };
 
-type HeadSurface = 'transparent' | 'solid';
-
 const SCROLL_DIRECTION_THRESHOLD_RATIO = 0.1;
 
 const BlokHeadBehavior = ({ headRef }: Props) => {
@@ -24,17 +22,6 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
     activeRef.current = nextActive;
     setActiveState(nextActive);
   }, []);
-
-  const setHeadSurface = useCallback(
-    (surface: HeadSurface) => {
-      const head = headRef.current;
-      if (!head) return;
-      if (head.dataset.surface === surface) return;
-
-      head.dataset.surface = surface;
-    },
-    [headRef],
-  );
 
   const setHeadScrollStart = useCallback(() => {
     const head = headRef.current;
@@ -59,11 +46,10 @@ const BlokHeadBehavior = ({ headRef }: Props) => {
   const syncActive = useCallback(() => {
     const scrollOwnsActive = fullscreen || getIsSticky();
 
-    setHeadSurface(scrollOwnsActive ? 'solid' : 'transparent');
     setActive(
       scrollOwnsActive ? scrollActiveRef.current : interactionActiveRef.current,
     );
-  }, [fullscreen, getIsSticky, setActive, setHeadSurface]);
+  }, [fullscreen, getIsSticky, setActive]);
 
   const setInteractionActive = useCallback(
     (nextActive: boolean) => {
