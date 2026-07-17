@@ -27,6 +27,50 @@ import {
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
 import { DEFAULT_LOCALE } from '@/lib/locale';
 
+const SITE_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
+const SITE_DESCRIPTION =
+  'Dries Bos designs and develops high-end websites, ecommerce experiences and interactive products for creative agencies, studios and startups worldwide.';
+const siteUrl = getSiteUrl();
+const STRUCTURED_DATA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${siteUrl}/#person`,
+      name: 'Dries Bos',
+      url: siteUrl,
+      email: 'mailto:hello@driesbos.com',
+      jobTitle: 'Freelance Creative Developer and Web Designer',
+      description: SITE_DESCRIPTION,
+      sameAs: [
+        'https://www.instagram.com/dries_bos',
+        'https://www.linkedin.com/in/dries-bos/',
+        'https://www.behance.net/driesbos',
+        'https://github.com/DriesBos',
+      ],
+      knowsAbout: [
+        'Creative development',
+        'Web design',
+        'Frontend development',
+        'Web animation',
+        'Ecommerce development',
+        'React',
+        'Vue.js',
+        'Shopify',
+        'Sanity',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: siteUrl,
+      name: 'Dries Bos',
+      description: SITE_DESCRIPTION,
+      author: { '@id': `${siteUrl}/#person` },
+    },
+  ],
+};
+
 const INITIAL_UI_STATE_SCRIPT = `
   (function () {
     var pathname = window.location.pathname || '/';
@@ -115,8 +159,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   applicationName: 'Dries Bos',
   manifest: '/manifest.webmanifest',
-  title: 'Dries Bos — Creative Developer',
-  description: 'Dries Bos — Creative Developer',
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   icons: {
     apple: [
       {
@@ -135,22 +179,22 @@ export const metadata: Metadata = {
     url: '/',
     siteName: 'Dries Bos',
     locale: 'en_US',
-    title: 'Dries Bos — Creative Developer',
-    description: 'Dries Bos — Creative Developer',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
         type: 'image/png',
-        alt: 'Dries Bos — Creative Developer',
+        alt: SITE_TITLE,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Dries Bos — Creative Developer',
-    description: 'Dries Bos — Creative Developer',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: ['/og-image.png'],
   },
   other: {
@@ -207,6 +251,14 @@ export default async function RootLayout({
           suppressHydrationWarning
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }}
+        />
+        <script
+          id="person-structured-data"
+          type="application/ld+json"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, '\\u003c'),
+          }}
         />
         {/* Page background effects are temporarily disabled. */}
         <AppInitializer />

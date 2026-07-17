@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useRef, useCallback } from 'react';
 import type { MouseEvent } from 'react';
 import IconArrow from '@/components/Icons/IconArrow';
@@ -101,7 +102,17 @@ const BlokProject = ({
         <GrainyGradient variant="blok" className="grainyInRow" />
         <div className="column column-Left">
           {displayYear && <div className="column column-Year">{displayYear}</div>}
-          {title && <div className="column column-Project">{title}</div>}
+          {title && (
+            <div className="column column-Project">
+              {href ? (
+                <Link href={href} onClick={(event) => event.stopPropagation()}>
+                  {title}
+                </Link>
+              ) : (
+                title
+              )}
+            </div>
+          )}
         </div>
         <div className="column column-Right">
           {category && (
