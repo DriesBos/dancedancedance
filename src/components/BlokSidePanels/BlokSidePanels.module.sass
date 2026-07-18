@@ -4,8 +4,7 @@
   width: 100%
   height: 100%
   border: var(--border-width) solid currentColor
-  backdrop-filter: none
-  transition: height var(--theme-transition), background var(--theme-transition), backdrop-filter var(--theme-transition), opacity var(--theme-transition)
+  transition: background var(--theme-transition), opacity var(--theme-transition)
   pointer-events: none
   opacity: 0 // Gets opacity when fullscreen is off
   background: var(--theme-blok-sidepanel)
@@ -18,17 +17,3 @@
     transform-origin: 0 0
     @media (max-width: 770px)
       border-top-width: calc(var(--border-width) + 1px)
-  &_Bottom
-    left: calc(0px - #{var(--border-width)})
-    top: 100%
-    height: var(--panel-height)
-    width: calc(100% + 2 * #{var(--border-width)})
-    transform: rotateX(90deg) rotateY(0deg) translateY(calc(var(--panel-height) * -1))
-    transform-origin: 0 0
-  &_Back
-    left: calc(0px - #{var(--border-width)})
-    top: 0
-    width: calc(100% + 2 * #{var(--border-width)})
-    height: 100%
-    transform: translateZ(calc(var(--panel-height) * -1))
-    transform-origin: 0 0

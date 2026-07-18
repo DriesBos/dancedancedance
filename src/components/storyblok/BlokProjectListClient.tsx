@@ -244,7 +244,6 @@ export default function BlokProjectListClient({
         <BlokSidePanels />
         {hasNoSearchResults ? (
           <div className="blok blok-Project">
-            <BlokSidePanels />
             <GrainyGradient variant="blok" />
             <Row>
               <GrainyGradient variant="blok" className="grainyInRow" />

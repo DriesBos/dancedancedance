@@ -72,7 +72,7 @@ main
   height: calc-size(auto)
   max-height: auto
   max-height: calc-size(auto)
-  transition: width var(--transition-layout), max-width var(--transition-layout), height var(--transition-layout), max-height var(--transition-layout), transform var(--transition-layout)
+  transition: max-width var(--transition-layout), height var(--transition-layout), max-height var(--transition-layout), transform var(--transition-layout)
   // Safe envs
   padding-top: env(safe-area-inset-top)
   padding-right: env(safe-area-inset-right)
@@ -564,8 +564,6 @@ body
       z-index: 3
       .side_Top
         opacity: 1
-      .side_Bottom
-        z-index: -1
   .page
     &-Project, &-General, &-Error
       & > .blok
@@ -648,10 +646,9 @@ body
       @media (max-width: 770px)
         opacity: 0
     main
-      width: 88vw
-      max-width: 1150px
+      max-width: min(88vw, 1150px)
       @media (max-width: 770px)
-        width: calc(100% - 2 * var(--spacing-side))
+        max-width: calc(100% - 2 * var(--spacing-side))
       .page
         position: relative
         z-index: 2

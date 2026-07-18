@@ -56,6 +56,31 @@ test('global styles hide scrollbars across browser engines', () => {
   assert.match(globalStyleSource, /&::-webkit-scrollbar\n\s+display: none/);
 });
 
+test('fullscreen main width animates through one max-width constraint', () => {
+  const mainBlock =
+    globalStyleSource.match(/\nmain\n[\s\S]*?\n\.page\n/)?.[0] || '';
+  const fullscreenFalseMainBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="false"\][\s\S]*?\n    main\n([\s\S]*?)\n      \.page/,
+    )?.[1] || '';
+
+  assert.match(mainBlock, /width: 100%/);
+  assert.match(
+    mainBlock,
+    /transition: max-width var\(--transition-layout\), height var\(--transition-layout\), max-height var\(--transition-layout\), transform var\(--transition-layout\)/,
+  );
+  assert.doesNotMatch(
+    mainBlock,
+    /transition: width var\(--transition-layout\)/,
+  );
+  assert.match(fullscreenFalseMainBlock, /max-width: min\(88vw, 1150px\)/);
+  assert.match(
+    fullscreenFalseMainBlock,
+    /@media \(max-width: 770px\)\n\s+max-width: calc\(100% - 2 \* var\(--spacing-side\)\)/,
+  );
+  assert.doesNotMatch(fullscreenFalseMainBlock, /\n\s+width:/);
+});
+
 test('stacked rows keep desktop text columns visible on mobile', () => {
   const columnTextBlock =
     globalStyleSource.match(/&-Text\n[\s\S]*?&-TextExpandable/)?.[0] || '';

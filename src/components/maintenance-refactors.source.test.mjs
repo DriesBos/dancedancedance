@@ -366,7 +366,10 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
 
 test('blok chrome memoization uses React shallow comparison only', () => {
   const headSource = readSource('./BlokHead/BlokHead.tsx');
+  const projectSource = readSource('./BlokProject.tsx');
+  const projectListSource = readSource('./storyblok/BlokProjectListClient.tsx');
   const sidePanelsSource = readSource('./BlokSidePanels/BlokSidePanels.tsx');
+  const sidePanelsStyleSource = readSource('./BlokSidePanels/BlokSidePanels.module.sass');
 
   assert.doesNotMatch(headSource, /haveProjectsChanged/);
   assert.match(headSource, /const BlokHead = memo\(BlokHeadComponent\);/);
@@ -374,6 +377,15 @@ test('blok chrome memoization uses React shallow comparison only', () => {
   assert.doesNotMatch(sidePanelsSource, /showTopPanelPortrait|showPortrait|calendly|href=/);
   assert.doesNotMatch(sidePanelsSource, /from '\.\/(?:TopPanel|BottomPanel|BackPanel)'/);
   assert.match(sidePanelsSource, /const BlokSidePanels = memo\(BlokSidePanelsComponent\);/);
+  assert.match(sidePanelsSource, /side_Top/);
+  assert.doesNotMatch(sidePanelsSource, /side_(?:Bottom|Back)/);
+  assert.doesNotMatch(projectSource, /BlokSidePanels/);
+  assert.equal((projectListSource.match(/<BlokSidePanels \/>/g) ?? []).length, 1);
+  assert.match(
+    sidePanelsStyleSource,
+    /transition: background var\(--theme-transition\), opacity var\(--theme-transition\)/,
+  );
+  assert.doesNotMatch(sidePanelsStyleSource, /backdrop-filter|&_Bottom|&_Back/);
 });
 
 test('app initializer updates theme meta directly and observes body once', () => {

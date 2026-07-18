@@ -8,7 +8,6 @@ import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
 import GrainyGradient from '@/components/GrainyGradient';
-import BlokSidePanels from './BlokSidePanels';
 import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
 import { getSafeExternalHref } from '@/lib/safe-url';
 
@@ -96,7 +95,6 @@ const BlokProject = ({
       data-hide-copy={hideProjectCopy ? true : undefined}
       style={{ cursor: 'pointer', zIndex: isHoverActive ? 9998 : stackIndex }}
     >
-      <BlokSidePanels />
       <GrainyGradient variant="blok" />
       <Row>
         <GrainyGradient variant="blok" className="grainyInRow" />
