@@ -7,6 +7,10 @@ const behaviorSource = readFileSync(
   'utf8',
 );
 const headSource = readFileSync(new URL('./BlokHead.tsx', import.meta.url), 'utf8');
+const routeContentSource = readFileSync(
+  new URL('./BlokHeadRouteContent.tsx', import.meta.url),
+  'utf8',
+);
 const headStyleSource = readFileSync(
   new URL('./BlokHead.module.sass', import.meta.url),
   'utf8',
@@ -71,6 +75,44 @@ test('BlokHead measures a stable frame while the inner visual surface moves', ()
   assert.match(headStyleSource, /\.blokHead[\s\S]*position: absolute[\s\S]*inset: calc\(0px - var\(--border-width\)\)/);
   assert.match(headStyleSource, /\.blokHead[\s\S]*transform: translateY\(0\)/);
   assert.match(headStyleSource, /\.row[\s\S]*height: 100%/);
+});
+
+test('perspective origin only animates on the head and first page blok', () => {
+  assert.equal(
+    (globalStyleSource.match(/perspective-origin var\(--transition-layout\)/g) ?? [])
+      .length,
+    1,
+  );
+  assert.match(
+    globalStyleSource,
+    /\.page[\s\S]*& > \.blok:first-child\n\s+transition: [^\n]*perspective-origin var\(--transition-layout\)/,
+  );
+  assert.equal(
+    (headStyleSource.match(/perspective-origin var\(--transition-layout\)/g) ?? [])
+      .length,
+    1,
+  );
+  assert.match(
+    headStyleSource,
+    /\.blokHead[\s\S]*transition: [^\n]*perspective-origin var\(--transition-layout\)/,
+  );
+});
+
+test('title overflow measures on discrete layout changes', () => {
+  assert.doesNotMatch(routeContentSource, /ResizeObserver/);
+  assert.match(
+    routeContentSource,
+    /event\.target === main && event\.propertyName === 'max-width'/,
+  );
+  assert.match(
+    routeContentSource,
+    /main\?\.addEventListener\('transitionend', handleMainTransitionEnd\)/,
+  );
+  assert.match(
+    routeContentSource,
+    /window\.addEventListener\('resize', handleResize\)/,
+  );
+  assert.match(routeContentSource, /document\.fonts\?\.ready\.then\(scheduleMeasure\)/);
 });
 
 test('head surface color is token-driven instead of data-surface-driven', () => {

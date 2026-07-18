@@ -145,8 +145,10 @@ const BlokHeadRouteContent = ({
     const measure = titleMeasureRef.current;
     if (!viewport || !measure) return;
 
-    let resizeObserver: ResizeObserver | null = null;
+    const main = document.querySelector<HTMLElement>('main');
+    let active = true;
     let rafId: number | null = null;
+    let resizeTimerId: number | null = null;
 
     const updateOverflow = () => {
       const overflow = measure.scrollWidth - viewport.clientWidth > 1;
@@ -156,6 +158,7 @@ const BlokHeadRouteContent = ({
     };
 
     const scheduleMeasure = () => {
+      if (!active) return;
       if (rafId !== null) {
         window.cancelAnimationFrame(rafId);
       }
@@ -165,23 +168,37 @@ const BlokHeadRouteContent = ({
       });
     };
 
+    const handleResize = () => {
+      if (resizeTimerId !== null) {
+        window.clearTimeout(resizeTimerId);
+      }
+      resizeTimerId = window.setTimeout(() => {
+        resizeTimerId = null;
+        scheduleMeasure();
+      }, 100);
+    };
+
+    const handleMainTransitionEnd = (event: TransitionEvent) => {
+      if (event.target === main && event.propertyName === 'max-width') {
+        scheduleMeasure();
+      }
+    };
+
     scheduleMeasure();
     document.fonts?.ready.then(scheduleMeasure).catch(() => {});
-
-    if (typeof window.ResizeObserver === 'function') {
-      resizeObserver = new ResizeObserver(scheduleMeasure);
-      resizeObserver.observe(viewport);
-      resizeObserver.observe(measure);
-    }
-
-    window.addEventListener('resize', scheduleMeasure);
+    main?.addEventListener('transitionend', handleMainTransitionEnd);
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', scheduleMeasure);
+      active = false;
+      main?.removeEventListener('transitionend', handleMainTransitionEnd);
+      window.removeEventListener('resize', handleResize);
       if (rafId !== null) {
         window.cancelAnimationFrame(rafId);
       }
-      resizeObserver?.disconnect();
+      if (resizeTimerId !== null) {
+        window.clearTimeout(resizeTimerId);
+      }
     };
   }, [titleText]);
 

@@ -85,6 +85,8 @@ main
   transition: margin-top var(--transition-layout)
   display: flex
   flex-direction: column
+  & > .blok:first-child
+    transition: padding-top var(--theme-transition), background var(--theme-transition), perspective-origin var(--transition-layout)
   & > .blok
     margin-top: calc(0px - (#{var(--border-width)}))
   &-Thumbnail
@@ -127,7 +129,7 @@ mux-player, .muxPlayer
   perspective: 1000px
   perspective-origin: var(--panel-perspective-origin)
   opacity: 0
-  transition: padding-top var(--theme-transition), background var(--theme-transition), perspective var(--transition-layout), perspective-origin var(--transition-layout)
+  transition: padding-top var(--theme-transition), background var(--theme-transition)
   &.inactive
     display: none
   &-Head
