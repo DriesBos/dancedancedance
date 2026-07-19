@@ -9,9 +9,9 @@ const storyblokStoriesSource = readFileSync(
 
 test('published Storyblok story list fetch paginates past the first 100 stories', () => {
   assert.match(storyblokStoriesSource, /STORYBLOK_STORIES_PER_PAGE\s*=\s*100/);
-  assert.match(storyblokStoriesSource, /fetchStoryPage\(1\)/);
-  assert.match(storyblokStoriesSource, /Math\.ceil\([^)]*total[^)]*\)/s);
-  assert.match(storyblokStoriesSource, /fetchStoryPage\(currentPage\)/);
-  assert.match(storyblokStoriesSource, /Promise\.all/);
-  assert.match(storyblokStoriesSource, /\.flat\(\)/);
+  assert.match(storyblokStoriesSource, /for \(let page = 1; ; page \+= 1\)/);
+  assert.match(storyblokStoriesSource, /fetchStoryPage\(page\)/);
+  assert.match(storyblokStoriesSource, /stories\.push\(\.\.\.pageStories\)/);
+  assert.match(storyblokStoriesSource, /pageStories\.length < STORYBLOK_STORIES_PER_PAGE/);
+  assert.doesNotMatch(storyblokStoriesSource, /Promise\.all|PAGE_BATCH_SIZE/);
 });

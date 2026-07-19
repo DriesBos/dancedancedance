@@ -1,6 +1,5 @@
 export type Theme = 'LIGHT' | 'DARK' | 'NIGHT';
 
-export type ThemeOrientation = 'landscape' | 'portrait';
 export type ThemePreference = 'light' | 'dark';
 
 export const NIGHT_THEME_HOUR_END = 4;
@@ -10,34 +9,11 @@ export const DARK_THEME: Theme = 'DARK';
 export const NIGHT_THEME: Theme = 'NIGHT';
 export const FALLBACK_THEME_PREFERENCE: ThemePreference = 'light';
 
-export const LANDSCAPE_THEME_ORDER: Theme[] = [
+export const THEME_ORDER: Theme[] = [
   LIGHT_THEME,
   DARK_THEME,
   NIGHT_THEME,
 ];
-
-export const PORTRAIT_THEME_ORDER: Theme[] = [
-  LIGHT_THEME,
-  DARK_THEME,
-  NIGHT_THEME,
-];
-
-export const LANDSCAPE_DEFAULT_THEME: Theme = LIGHT_THEME;
-export const PORTRAIT_DEFAULT_THEME: Theme = LIGHT_THEME;
-
-const getViewportOrientation = (): ThemeOrientation => {
-  if (typeof window === 'undefined') {
-    return 'landscape';
-  }
-
-  if (typeof window.matchMedia === 'function') {
-    return window.matchMedia('(orientation: portrait)').matches
-      ? 'portrait'
-      : 'landscape';
-  }
-
-  return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
-};
 
 export const getPreferredColorScheme = (): ThemePreference => {
   if (
@@ -57,16 +33,6 @@ export const getThemeForPreference = (preference: ThemePreference): Theme =>
 export const isNightThemeHour = (hour: number) =>
   Number.isFinite(hour) && hour >= 0 && hour < NIGHT_THEME_HOUR_END;
 
-export const getThemeOrder = (
-  orientation = getViewportOrientation(),
-): Theme[] => {
-  if (orientation === 'portrait') {
-    return PORTRAIT_THEME_ORDER;
-  }
-
-  return LANDSCAPE_THEME_ORDER;
-};
-
 export const getDefaultTheme = (
   preference = getPreferredColorScheme(),
 ): Theme => getThemeForPreference(preference);
@@ -84,12 +50,10 @@ export const getInitialThemeForHour = (
 
 export const getNextThemeForButtonCycle = (
   currentTheme: Theme,
-  orientation = getViewportOrientation(),
 ): Theme => {
-  const themeOrder = getThemeOrder(orientation);
-  const currentIndex = themeOrder.indexOf(currentTheme);
+  const currentIndex = THEME_ORDER.indexOf(currentTheme);
   const safeCurrentIndex = currentIndex >= 0 ? currentIndex : 0;
-  const nextIndex = (safeCurrentIndex + 1) % themeOrder.length;
+  const nextIndex = (safeCurrentIndex + 1) % THEME_ORDER.length;
 
-  return themeOrder[nextIndex] ?? LIGHT_THEME;
+  return THEME_ORDER[nextIndex] ?? LIGHT_THEME;
 };

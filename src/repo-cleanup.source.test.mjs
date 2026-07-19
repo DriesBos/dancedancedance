@@ -80,19 +80,19 @@ test('Netlify headers do not target deleted static assets', () => {
   assert.doesNotMatch(netlifySource, /for = "\/\*\.eot"/);
   assert.doesNotMatch(netlifySource, /for = "\/favicon\.png"/);
   assert.doesNotMatch(netlifySource, /for = "\/icon\.png"/);
-  assert.match(netlifySource, /for = "\/\*\.woff2"/);
-  assert.match(netlifySource, /for = "\/og-image\.png"/);
+  assert.doesNotMatch(netlifySource, /for = "\/\*\.woff2"/);
+  assert.doesNotMatch(netlifySource, /for = "\/og-image\.png"/);
 });
 
 test('Content Security Policy is enforced with a script nonce', () => {
   const netlifySource = readRoot('netlify.toml');
-  const middlewareSource = readRoot('src/middleware.ts');
+  const proxySource = readRoot('src/proxy.ts');
   const layoutSource = readRoot('src/app/layout.tsx');
 
   assert.doesNotMatch(netlifySource, /Content-Security-Policy-Report-Only/);
-  assert.match(middlewareSource, /Content-Security-Policy/);
-  assert.match(middlewareSource, /'nonce-\$\{nonce\}'/);
-  assert.match(middlewareSource, /report-uri \/api\/csp-report/);
+  assert.match(proxySource, /Content-Security-Policy/);
+  assert.match(proxySource, /'nonce-\$\{nonce\}'/);
+  assert.doesNotMatch(proxySource, /report-uri|csp-report/);
   assert.match(layoutSource, /headers\(\)/);
   assert.match(layoutSource, /nonce=\{nonce\}/);
   assert.match(layoutSource, /<script[\s\S]*id="initial-ui-state"[\s\S]*suppressHydrationWarning[\s\S]*dangerouslySetInnerHTML/);
@@ -125,7 +125,7 @@ test('published Storyblok story lists are fetched through the shared helper', ()
   assert.match(helperSource, /export async function fetchPublishedStoryList/);
   assert.match(helperSource, /getOptionalStoryblokApi/);
   assert.match(helperSource, /withPublishedStoryblokCv/);
-  assert.match(pageSource, /fetchPublishedStoryList/);
+  assert.doesNotMatch(pageSource, /fetchPublishedStoryList|generateStaticParams/);
   assert.match(sitemapSource, /fetchPublishedStoryList/);
   assert.doesNotMatch(pageSource, /storyblokApi\.get\(\s*['"`]cdn\/stories/);
   assert.doesNotMatch(sitemapSource, /storyblokApi\.get\(\s*['"`]cdn\/stories/);
@@ -137,17 +137,14 @@ test('Mux player uses lightweight thumbnails instead of client BlurUp generation
   assert.doesNotMatch(source, /@mux\/blurup/);
   assert.doesNotMatch(source, /createBlurUp/);
   assert.doesNotMatch(source, /blurDataURL/);
-  assert.match(source, /const placeholderImage = poster/);
-  assert.match(source, /placeholder=\{placeholderImage\}/);
+  assert.match(source, /poster \|\| `https:\/\/image\.mux\.com/);
+  assert.match(source, /placeholder=/);
 });
 
-test('performance telemetry is only mounted when explicitly enabled', () => {
+test('unused performance telemetry is removed', () => {
   const layoutSource = readRoot('src/app/layout.tsx');
 
-  assert.match(
-    layoutSource,
-    /const performanceTelemetryEnabled =\s*process\.env\.NEXT_PUBLIC_ENABLE_PERF_TELEMETRY === 'true'/,
-  );
-  assert.match(layoutSource, /performanceTelemetryEnabled \? \(/);
-  assert.match(layoutSource, /<PerformanceTelemetry>/);
+  assert.doesNotMatch(layoutSource, /PerformanceTelemetry|ENABLE_PERF_TELEMETRY/);
+  assert.equal(existsRoot('src/components/PerformanceTelemetry.tsx'), false);
+  assert.equal(existsRoot('src/app/api/telemetry/performance/route.ts'), false);
 });

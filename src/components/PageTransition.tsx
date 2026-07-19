@@ -12,8 +12,6 @@ interface PageTransitionProps {
 export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const theme = useStore((state) => state.theme);
-  const pageContentVisible = useStore((state) => state.pageContentVisible);
-  const pageContentRevealKey = useStore((state) => state.pageContentRevealKey);
   const getBlockTargets = () =>
     Array.from(document.querySelectorAll<HTMLElement>('.blok-Animate'));
 
@@ -28,8 +26,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   useGSAP(
     () => {
-      if (!pageContentVisible) return;
-
       const blockTargets = getBlockTargets();
       if (blockTargets.length === 0) return;
 
@@ -48,7 +44,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
       });
     },
     {
-      dependencies: [pathname, theme, pageContentRevealKey, pageContentVisible],
+      dependencies: [pathname, theme],
       revertOnUpdate: true,
     }
   ); // Re-run animation on route and theme change

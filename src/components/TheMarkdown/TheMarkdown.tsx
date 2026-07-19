@@ -1,14 +1,11 @@
 import { createElement, type ReactNode } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { renderWordSwapChildren } from '@/components/InlineWordSwapText/renderWordSwap';
-import { t, type Locale } from '@/lib/locale';
 import styles from './TheMarkdown.module.sass';
 
 interface MarkdownProps {
   content: string;
   className?: string;
-  locale: Locale;
 }
 
 type WordSwapComponentKey =
@@ -69,7 +66,7 @@ const wordSwapComponents = Object.fromEntries(
   ]),
 ) as Components;
 
-const Markdown = ({ content, className = '', locale }: MarkdownProps) => {
+const Markdown = ({ content, className = '' }: MarkdownProps) => {
   if (!content) {
     return null;
   }
@@ -87,7 +84,7 @@ const Markdown = ({ content, className = '', locale }: MarkdownProps) => {
         <a
           href={href}
           className={linkClassName || undefined}
-          data-cursor-message={isMailto ? t('cursor.talk', locale) : undefined}
+          data-cursor-message={isMailto ? "Let's talk" : undefined}
           {...props}
         >
           {renderWordSwapChildren(children, 'md-link')}
@@ -98,11 +95,7 @@ const Markdown = ({ content, className = '', locale }: MarkdownProps) => {
 
   return (
     <div className={`${className} ${styles.markdown} markdown`}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        skipHtml
-        components={components}
-      >
+      <ReactMarkdown skipHtml components={components}>
         {content}
       </ReactMarkdown>
     </div>

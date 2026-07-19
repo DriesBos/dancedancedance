@@ -14,9 +14,6 @@ const normalizeEmail = (value: unknown) =>
 const isValidEmail = (email: string) =>
   email.length > 0 && email.length <= 254 && EMAIL_PATTERN.test(email);
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX_REQUESTS = 5;
-const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 const SITE_ORIGIN = new URL(getSiteUrl()).origin;
 const MAX_REQUEST_BYTES = 2048;
 
@@ -27,28 +24,6 @@ interface NewsletterPayload {
 
 const toNewsletterPayload = (value: unknown): NewsletterPayload =>
   value && typeof value === 'object' ? (value as NewsletterPayload) : {};
-
-const getClientKey = (request: Request) => {
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  const firstForwardedIp = forwardedFor?.split(',')[0]?.trim();
-
-  return firstForwardedIp || request.headers.get('x-real-ip') || 'unknown';
-};
-
-const isRateLimited = (clientKey: string, now = Date.now()) => {
-  const bucket = rateLimitBuckets.get(clientKey);
-
-  if (!bucket || bucket.resetAt <= now) {
-    rateLimitBuckets.set(clientKey, {
-      count: 1,
-      resetAt: now + RATE_LIMIT_WINDOW_MS,
-    });
-    return false;
-  }
-
-  bucket.count += 1;
-  return bucket.count > RATE_LIMIT_MAX_REQUESTS;
-};
 
 const isBotSubmission = (payload: NewsletterPayload) =>
   typeof payload.company === 'string' && payload.company.trim().length > 0;
@@ -114,13 +89,6 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { data: 'Successfully subscribed!' },
         { status: 200 }
-      );
-    }
-
-    if (isRateLimited(getClientKey(request))) {
-      return NextResponse.json(
-        { error: 'Too many requests. Try again later.' },
-        { status: 429 }
       );
     }
 

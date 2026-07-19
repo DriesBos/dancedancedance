@@ -14,3 +14,10 @@ test('newsletter text scrambling is owned by one reusable hook', () => {
   assert.match(newsletterSource, /useTextScramble\(messageRef, message\)/);
   assert.doesNotMatch(newsletterSource, /Playful scramble animation for message text/);
 });
+
+test('newsletter always exits loading after network and JSON failures', () => {
+  assert.match(newsletterSource, /try \{/);
+  assert.match(newsletterSource, /catch \{/);
+  assert.match(newsletterSource, /finally \{/);
+  assert.match(newsletterSource, /finally \{[\s\S]*setIsLoading\(false\)/);
+});

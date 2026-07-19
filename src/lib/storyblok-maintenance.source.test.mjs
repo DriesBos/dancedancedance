@@ -18,13 +18,11 @@ test('storyblok cv and cache helpers avoid redundant normalization noise', () =>
   assert.match(cacheSource, /`storyblok:slug:\$\{normalizedSlug\}`/);
 });
 
-test('storyblok revalidation uses call fallback instead of revalidateTag arity checks', () => {
+test('storyblok revalidation uses the Next 16 cache profile', () => {
   const source = readSource('../app/api/storyblok/revalidate/route.ts');
 
-  assert.doesNotMatch(source, /revalidateTag\.length/);
-  assert.match(source, /try \{/);
-  assert.match(source, /catch/);
-  assert.match(source, /revalidateTagWithProfile\(tag, 'max'\)/);
+  assert.match(source, /revalidateTag\(tag, 'max'\)/);
+  assert.doesNotMatch(source, /revalidateTagWithBestProfile/);
 });
 
 test('storyblok revalidation compares webhook secrets in constant time', () => {

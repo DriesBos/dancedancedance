@@ -2,9 +2,9 @@
 
 import { memo, useRef } from 'react';
 import GrainyGradient from '@/components/GrainyGradient';
+import BlokSidePanels from '@/components/BlokSidePanels';
 import BlokHeadBehavior from './BlokHeadBehavior';
 import BlokHeadRouteContentContainer from './BlokHeadRouteContentContainer';
-import BlokHeadSidePanels from './BlokHeadSidePanels';
 import styles from './BlokHead.module.sass';
 
 interface Props {
@@ -27,7 +27,7 @@ const BlokHeadComponent = ({ projects }: Props) => {
       <div className={styles.blokHead}>
         <GrainyGradient variant="blok" />
         <BlokHeadBehavior headRef={headRef} />
-        <BlokHeadSidePanels />
+        <BlokSidePanels />
         <BlokHeadRouteContentContainer projects={projects} />
       </div>
     </div>

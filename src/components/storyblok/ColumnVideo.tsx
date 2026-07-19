@@ -3,8 +3,7 @@ import MuxPlayer from '../MuxPlayer';
 import { storyblokVideoPosterUrl } from '@/lib/storyblok-image';
 
 interface SbPageData extends SbBlokData {
-  link?: string; // Legacy: direct video URL
-  mux_playback_id?: string; // New: Mux playback ID
+  mux_playback_id?: string;
   placeholder?: {
     filename: string;
     alt: string;
@@ -21,8 +20,6 @@ interface ColumnVideoProps {
 }
 
 const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
-  // Support both Mux playback ID and legacy direct video URLs
-  const useMux = !!blok.mux_playback_id;
   const optimizedPoster = storyblokVideoPosterUrl(blok.placeholder?.filename);
 
   return (
@@ -32,33 +29,14 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
       data-caption-side={blok.side_caption}
       data-caption={blok.caption ? true : false}
     >
-      {useMux ? (
+      {blok.mux_playback_id && (
         <MuxPlayer
-          playbackId={blok.mux_playback_id!}
+          playbackId={blok.mux_playback_id}
           poster={optimizedPoster}
           loop={blok.loop}
           className="muxPlayer imageItem"
           pause={blok.pause}
-          aspectRatio={blok.aspect_ratio || '16 / 9'}
-          dynamicAspectRatio={!blok.aspect_ratio} // Auto-detect if not manually set
-          noControls={true} // Hide video controls
-          muted
-          autoPlay
-          playsInline
-          preload="metadata"
-        />
-      ) : (
-        // Fallback for legacy direct video URLs
-        <video
-          src={blok.link}
-          muted
-          loop={blok.loop}
-          autoPlay
-          playsInline
-          preload="auto"
-          className="imageItem"
-          poster={optimizedPoster}
-          style={{ width: '100%', height: 'auto' }}
+          aspectRatio={blok.aspect_ratio}
         />
       )}
       {blok.caption && <div className="column-Caption">{blok.caption}</div>}

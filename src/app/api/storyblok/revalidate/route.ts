@@ -80,19 +80,6 @@ const flushStoryblokMemoryCache = () => {
   return flushedCaches;
 };
 
-const revalidateTagWithBestProfile = (tag: string) => {
-  const revalidateTagWithProfile = revalidateTag as unknown as (
-    cacheTag: string,
-    profile: 'max',
-  ) => void;
-
-  try {
-    revalidateTagWithProfile(tag, 'max');
-  } catch {
-    revalidateTag(tag);
-  }
-};
-
 export async function POST(request: NextRequest) {
   const configuredSecret = process.env.STORYBLOK_REVALIDATE_SECRET;
   if (!configuredSecret) {
@@ -129,7 +116,7 @@ export async function POST(request: NextRequest) {
   }
 
   for (const tag of tags) {
-    revalidateTagWithBestProfile(tag);
+    revalidateTag(tag, 'max');
   }
 
   const paths = new Set<string>(['/', '/projects']);

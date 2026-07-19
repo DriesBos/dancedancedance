@@ -1,209 +1,72 @@
 'use client';
 
 import MuxPlayerReact from '@mux/mux-player-react/lazy';
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import type { CSSProperties, ForwardedRef } from 'react';
-import type {
-  MuxPlayerProps as MuxPlayerReactProps,
-  MuxPlayerRefAttributes,
-} from '@mux/mux-player-react';
+import { useEffect, useRef, useState } from 'react';
+import type { MuxPlayerRefAttributes } from '@mux/mux-player-react';
 import '@/assets/styles/mux-player.css';
 
-export type MuxPlayerHandle = MuxPlayerRefAttributes;
-
-type MuxPlayerLoading = 'page' | 'viewport';
-
-interface MuxPlayerProps
-  extends Omit<
-    MuxPlayerReactProps,
-    | 'playbackId'
-    | 'poster'
-    | 'placeholder'
-    | 'loop'
-    | 'muted'
-    | 'autoPlay'
-    | 'playsInline'
-    | 'pause'
-    | 'preload'
-    | 'style'
-    | 'className'
-    | 'accentColor'
-    | 'primaryColor'
-    | 'secondaryColor'
-  > {
+interface MuxPlayerProps {
   playbackId: string;
   poster?: string;
-  placeholderTime?: number; // Time in seconds for Mux auto-generated placeholder (default: 0)
   loop?: boolean;
-  muted?: boolean;
-  autoPlay?: boolean;
-  playsInline?: boolean;
-  pause?: number; // Delay in seconds between loops (only works when loop is true)
-  preload?: 'auto' | 'metadata' | 'none';
-  aspectRatio?: string; // Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
-  dynamicAspectRatio?: boolean; // Auto-detect aspect ratio from video metadata (default: true)
-  noControls?: boolean; // Hide player controls (default: false)
-  loading?: MuxPlayerLoading; // When to load the player (default: 'viewport')
-  style?: CSSProperties;
+  pause?: number;
+  aspectRatio?: string;
   className?: string;
-  accentColor?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
 }
 
-const assignRef = (
-  ref: ForwardedRef<MuxPlayerHandle>,
-  value: MuxPlayerHandle | null,
-) => {
-  if (typeof ref === 'function') {
-    ref(value);
-    return;
-  }
+export default function MuxPlayer({
+  playbackId,
+  poster,
+  loop = false,
+  aspectRatio,
+  className,
+}: MuxPlayerProps) {
+  const playerRef = useRef<MuxPlayerRefAttributes | null>(null);
+  const [detectedAspectRatio, setDetectedAspectRatio] = useState<string>();
 
-  if (ref) {
-    ref.current = value;
-  }
-};
+  useEffect(() => {
+    if (aspectRatio) return;
+    const player = playerRef.current;
+    if (!player) return;
 
-/**
- * Reusable Mux Player component for Next.js + Storyblok
- *
- * @param playbackId - The Mux playback ID (required)
- * @param poster - URL for custom poster image (if not provided, Mux auto-generates one)
- * @param placeholderTime - Time in seconds for Mux auto-generated placeholder (default: 0)
- * @param loop - Whether to loop the video
- * @param muted - Whether to mute the video
- * @param autoPlay - Whether to autoplay the video
- * @param playsInline - Whether to play inline (important for mobile)
- * @param pause - Optional delay in seconds between loops (custom feature)
- * @param preload - Preload strategy: 'auto', 'metadata', or 'none'
- * @param aspectRatio - Custom aspect ratio from Storyblok (e.g., "16/9", "4/3", "1/1")
- * @param dynamicAspectRatio - Auto-detect aspect ratio from video metadata (default: true)
- * @param noControls - Hide player controls (default: false)
- * @param loading - When to load the player: 'page' (after page load) or 'viewport' (when visible)
- * @param style - Inline styles
- * @param className - CSS class name
- * @param accentColor - Mux Player accent color
- * @param primaryColor - Mux Player primary color
- * @param secondaryColor - Mux Player secondary color
- */
-const MuxPlayer = forwardRef<MuxPlayerHandle, MuxPlayerProps>(
-  (
-    {
-      playbackId,
-      poster,
-      placeholderTime = 0,
-      loop = false,
-      muted = true,
-      autoPlay = false,
-      playsInline = true,
-      pause,
-      preload = 'auto',
-      aspectRatio = '16 / 9',
-      dynamicAspectRatio = true,
-      noControls = true,
-      loading = 'viewport',
-      style,
-      className,
-      accentColor,
-      primaryColor,
-      secondaryColor,
-      ...rest
-    },
-    forwardedRef,
-  ) => {
-    const playerRef = useRef<MuxPlayerHandle | null>(null);
-    const [detectedAspectRatio, setDetectedAspectRatio] = useState<string | null>(
-      null
-    );
-    const setPlayerRef = useCallback(
-      (node: MuxPlayerHandle | null) => {
-        playerRef.current = node;
-        assignRef(forwardedRef, node);
-      },
-      [forwardedRef],
-    );
+    const detectAspectRatio = () => {
+      const video =
+        player.media instanceof HTMLVideoElement
+          ? player.media
+          : player.querySelector('video');
 
-    // Handle metadata loaded to detect aspect ratio
-    useEffect(() => {
-      if (!playerRef.current || !dynamicAspectRatio) return;
+      if (video?.videoWidth && video.videoHeight) {
+        setDetectedAspectRatio(`${video.videoWidth} / ${video.videoHeight}`);
+      }
+    };
 
-      const player = playerRef.current;
+    detectAspectRatio();
+    player.addEventListener('loadedmetadata', detectAspectRatio);
+    return () => player.removeEventListener('loadedmetadata', detectAspectRatio);
+  }, [aspectRatio, playbackId]);
 
-      const handleLoadedMetadata = () => {
-        const media = player.media;
-        const video =
-          media instanceof HTMLVideoElement ? media : player.querySelector('video');
-
-        if (video && video.videoWidth && video.videoHeight) {
-          const width = video.videoWidth;
-          const height = video.videoHeight;
-          const calculatedRatio = `${width} / ${height}`;
-
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Detected video dimensions:', {
-              width,
-              height,
-              ratio: calculatedRatio,
-            });
-          }
-          setDetectedAspectRatio(calculatedRatio);
-        }
-      };
-
-      // Try to get metadata immediately if already loaded
-      handleLoadedMetadata();
-
-      // Listen for loadedmetadata event
-      player.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-      return () => {
-        player.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      };
-    }, [dynamicAspectRatio, playbackId]);
-
-    // Use detected aspect ratio if available and dynamicAspectRatio is enabled, otherwise use provided aspectRatio
-    const finalAspectRatio =
-      dynamicAspectRatio && detectedAspectRatio
-        ? detectedAspectRatio
-        : aspectRatio;
-
-    const placeholderImage = poster
-      ? poster
-      : `https://image.mux.com/${playbackId}/thumbnail.jpg?time=${placeholderTime}`;
-
-    return (
-      <MuxPlayerReact
-        ref={setPlayerRef}
-        playbackId={playbackId}
-        poster={poster}
-        placeholder={placeholderImage}
-        loop={loop}
-        muted={muted}
-        autoPlay={autoPlay}
-        playsInline={playsInline}
-        preload={preload}
-        loading={loading}
-        streamType="on-demand"
-        nohotkeys={noControls}
-        style={{
-          width: '100%',
-          aspectRatio: finalAspectRatio,
-          display: 'block',
-          position: 'relative',
-          ...style,
-        }}
-        className={className}
-        accentColor={accentColor}
-        primaryColor={primaryColor}
-        secondaryColor={secondaryColor}
-        {...(noControls ? { controls: false } : {})}
-        {...rest}
-      />
-    );
-  },
-);
-
-MuxPlayer.displayName = 'MuxPlayer';
-
-export default MuxPlayer;
+  return (
+    <MuxPlayerReact
+      ref={playerRef}
+      playbackId={playbackId}
+      poster={poster}
+      placeholder={
+        poster || `https://image.mux.com/${playbackId}/thumbnail.jpg?time=0`
+      }
+      loop={loop}
+      muted
+      autoPlay
+      playsInline
+      preload="metadata"
+      loading="viewport"
+      streamType="on-demand"
+      nohotkeys
+      className={className}
+      {...{ controls: false }}
+      style={{
+        width: '100%',
+        aspectRatio: aspectRatio || detectedAspectRatio || '16 / 9',
+      }}
+    />
+  );
+}

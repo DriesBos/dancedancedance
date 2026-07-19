@@ -15,6 +15,10 @@ const projectCardSource = readFileSync(
   new URL('../components/BlokProject.tsx', import.meta.url),
   'utf8',
 );
+const projectNavigationSource = readFileSync(
+  new URL('../components/BlokHead/BlokHeadRouteContent.tsx', import.meta.url),
+  'utf8',
+);
 const projectPageSource = readFileSync(
   new URL('../components/storyblok/PageProject.tsx', import.meta.url),
   'utf8',
@@ -50,8 +54,12 @@ test('portfolio pages expose clear identity and crawl metadata', () => {
 });
 
 test('Storyblok routes use full slugs and project cards expose real links', () => {
-  assert.match(pageSource, /story\.full_slug \|\| story\.slug!/);
   assert.match(sitemapSource, /story\.full_slug \|\| story\.slug/);
   assert.doesNotMatch(sitemapSource, /lastModified: new Date\(\)/);
   assert.match(projectCardSource, /<Link href=\{href\}/);
+  assert.doesNotMatch(projectCardSource, /onClick=\{handleClick\}/);
+  assert.doesNotMatch(projectCardSource, /href=\{externalHref \|\| '#'\}/);
+  assert.equal((projectNavigationSource.match(/aria-label="Previous project"/g) || []).length, 2);
+  assert.equal((projectNavigationSource.match(/aria-label="Next project"/g) || []).length, 2);
+  assert.doesNotMatch(projectNavigationSource, /<div\s+onClick=\{click(?:Prev|Next)\}/);
 });

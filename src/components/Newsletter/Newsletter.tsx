@@ -9,12 +9,10 @@ import {
 } from 'react';
 import { useGSAP } from '@/lib/gsap';
 import { vibrate } from '@/lib/vibration';
-import { t, type Locale } from '@/lib/locale';
 import styles from './Newsletter.module.sass';
 
 interface NewsletterProps {
   className?: string;
-  locale: Locale;
 }
 
 const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz';
@@ -73,30 +71,24 @@ const useTextScramble = (
   );
 };
 
-export default function Newsletter({ className, locale }: NewsletterProps) {
+export default function Newsletter({ className }: NewsletterProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isActive, setIsActive] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [buttonText, setButtonText] = useState(() => t('newsletter.label', locale));
   const inputRef = useRef<HTMLInputElement>(null);
   const buttonTextRef = useRef<HTMLSpanElement>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const buttonText = !isActive && !isLoading
+    ? 'Newsletter'
+    : isLoading
+      ? 'Submitting..'
+      : 'Submit';
+
   useTextScramble(buttonTextRef, buttonText);
   useTextScramble(messageRef, message);
-
-  // Update button text based on state
-  useEffect(() => {
-    if (!isActive && !isLoading) {
-      setButtonText(t('newsletter.label', locale));
-    } else if (isLoading) {
-      setButtonText(t('newsletter.submitting', locale));
-    } else {
-      setButtonText(t('newsletter.submit', locale));
-    }
-  }, [isActive, isLoading, locale]);
 
   // Focus input when active becomes true
   useEffect(() => {
@@ -141,37 +133,34 @@ export default function Newsletter({ className, locale }: NewsletterProps) {
     const formData = new FormData(form);
     const email = formData.get('email');
 
-    const response = await fetch('/api/newsletter/subscribe', {
-      body: JSON.stringify({
-        email,
-        company: formData.get('company'),
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    });
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        body: JSON.stringify({
+          email,
+          company: formData.get('company'),
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+      const json = (await response.json()) as { error?: string };
 
-    const json = await response.json();
-    const { data, error } = json;
+      if (!response.ok || json.error) {
+        setMessage(json.error || 'Something went wrong. Try again.');
+        return;
+      }
 
-    if (error) {
+      vibrate();
+      setMessage('thank you!');
+    } catch {
+      setMessage('Something went wrong. Try again.');
+    } finally {
       setIsLoading(false);
-      setMessage(error);
       form.reset();
       setInputValue('');
       setIsActive(false);
-      return;
     }
-
-    vibrate();
-    setMessage('thank you!');
-    setIsLoading(false);
-    // Reset form and input value
-    form.reset();
-    setInputValue('');
-    setIsActive(false);
-    return data;
   };
 
   const handleButtonClick = () => {
@@ -186,7 +175,7 @@ export default function Newsletter({ className, locale }: NewsletterProps) {
     <div
       className={`${styles.newsletter} ${className || ''} ${showCursorMessage ? 'cursorMessage' : ''}`}
       data-cursor-message={
-        showCursorMessage ? t('cursor.mail', locale) : undefined
+        showCursorMessage ? 'infrequent but spirited mail' : undefined
       }
       data-active={isActive}
     >

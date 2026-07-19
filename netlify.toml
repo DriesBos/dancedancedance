@@ -3,18 +3,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "20.19.6"
   NEXT_TELEMETRY_DISABLED = "1"
-  # Force cache clear - update this date to clear cache
-  CACHE_BUST = "2025-12-19"
-
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["sharp"]
-  included_files = ["!.next/cache/**"]
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
 
 # Handle Next.js rewrites properly
 [[redirects]]
@@ -27,49 +16,6 @@
     window_size = 60
     aggregate_by = ["ip", "domain"]
 
-[[redirects]]
-  from = "/*"
-  to = "/:splat"
-  status = 200
-  force = false
-
-# Cache static assets (JS, CSS, images, fonts)
-[[headers]]
-  for = "/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/sw.js"
-  [headers.values]
-    Cache-Control = "no-store, max-age=0, must-revalidate"
-
-[[headers]]
-  for = "/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.woff2"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/og-image.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Cache HTML with revalidation
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
 # Security and compression headers for all pages
 [[headers]]
   for = "/*"
@@ -79,4 +25,4 @@
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    # Content-Security-Policy is enforced in src/middleware.ts so each response can nonce Next scripts.
+    # Content-Security-Policy is enforced in src/proxy.ts so each response can nonce Next scripts.

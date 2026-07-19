@@ -5,7 +5,6 @@ import GrainyGradient from '@/components/GrainyGradient';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from '@/components/Row';
 import SearchInput from '@/components/SearchInput';
-import { t, type Locale } from '@/lib/locale';
 import styles from './BlokFilter.module.sass';
 
 export type ProjectSortField = 'year' | 'title' | 'category';
@@ -16,7 +15,6 @@ interface BlokFilterProps {
   onSortChange: (field: ProjectSortField) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
-  locale: Locale;
 }
 
 export default function BlokFilter({
@@ -24,7 +22,6 @@ export default function BlokFilter({
   onSortChange,
   searchValue,
   onSearchChange,
-  locale,
 }: BlokFilterProps) {
   const isSortActive = (field: ProjectSortField) => sortField === field;
 
@@ -41,9 +38,9 @@ export default function BlokFilter({
             data-inactive={!isSortActive('year')}
             onClick={() => onSortChange('year')}
           >
-            {t('filter.year', locale)}
+            year
           </button>
-          <div className="column column-Title mobile">{t('filter.work.mobile', locale)}</div>
+          <div className="column column-Title mobile">Selected work</div>
           <button
             type="button"
             className={`column column-Project cursorInteract desktop ${styles.sortButton}`}
@@ -51,7 +48,7 @@ export default function BlokFilter({
             data-inactive={!isSortActive('title')}
             onClick={() => onSortChange('title')}
           >
-            {t('filter.work', locale)}
+            selected work
           </button>
         </div>
         <div className="column column-Right">
@@ -62,7 +59,7 @@ export default function BlokFilter({
             data-inactive={!isSortActive('category')}
             onClick={() => onSortChange('category')}
           >
-            {t('filter.type', locale)}
+            type of work
           </button>
           <div className={`column column-Icons ${styles.iconWrapper}`}>
             <div className={`icon ${styles.icon}`}>

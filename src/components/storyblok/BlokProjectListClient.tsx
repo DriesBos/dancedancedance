@@ -9,9 +9,8 @@ import BlokFilter, {
   ProjectSortDirection,
   ProjectSortField,
 } from '../BlokFilter';
-import type { ProjectData } from './projectsData';
+import type { ProjectData } from '@/lib/fetch-projects';
 import Row from '../Row';
-import type { Locale } from '@/lib/locale';
 import styles from './BlokProjectListClient.module.sass';
 import ThumbnailWrapper, {
   type ThumbnailWrapperEvent,
@@ -20,7 +19,6 @@ import ThumbnailWrapper, {
 interface BlokProjectListClientProps {
   projects: ProjectData[];
   editableProps?: HTMLAttributes<HTMLDivElement>;
-  locale: Locale;
 }
 
 type ActiveProjectOverlay = {
@@ -60,7 +58,6 @@ const canUseHoverThumbnails = () =>
 export default function BlokProjectListClient({
   projects,
   editableProps,
-  locale,
 }: BlokProjectListClientProps) {
   const [sortField, setSortField] = useState<ProjectSortField>('year');
   const [sortDirection, setSortDirection] =
@@ -212,8 +209,6 @@ export default function BlokProjectListClient({
             title={activeProjectOverlay.project.title}
             category={activeProjectOverlay.project.category}
             external_link={activeProjectOverlay.project.external_link}
-            thumbnail={activeProjectOverlay.project.thumbnail}
-            disableCursorPreview
           />
         </div>
       </div>
@@ -226,7 +221,6 @@ export default function BlokProjectListClient({
         onSortChange={handleSortChange}
         searchValue={searchValue}
         onSearchChange={setSearchValue}
-        locale={locale}
       />
       <ThumbnailWrapper
         projects={visibleProjects}
@@ -262,10 +256,8 @@ export default function BlokProjectListClient({
               title={item.title}
               category={item.category}
               external_link={item.external_link}
-              thumbnail={item.thumbnail}
               stackIndex={index}
               isHoverActive={activeProjectSlug === item.slug}
-              disableCursorPreview
               hideProjectCopy={activeProjectSlug === item.slug}
               onProjectHover={(element) => showProjectThumbnail(item, element)}
               onProjectLeave={() => clearActiveProject(item.slug)}

@@ -18,30 +18,10 @@ type StoryblokStoriesResponse<TStory> = {
   data?: {
     stories?: TStory[];
   };
-  total?: number | string;
-  headers?: {
-    total?: number | string;
-    get?: (name: string) => number | string | null | undefined;
-  };
 };
 
 const STORYBLOK_STORIES_PER_PAGE = 100;
-const STORYBLOK_STORIES_PAGE_BATCH_SIZE = 4;
 const STORYBLOK_STORIES_REVALIDATE_SECONDS = 3600;
-
-const readStoryblokTotal = <TStory extends PublishedStoryListItem>(
-  response: StoryblokStoriesResponse<TStory>,
-): number => {
-  const rawTotal =
-    response.total ??
-    response.headers?.total ??
-    response.headers?.get?.('total') ??
-    response.data?.stories?.length ??
-    0;
-  const total = Number(rawTotal);
-
-  return Number.isFinite(total) && total >= 0 ? total : 0;
-};
 
 export async function fetchPublishedStoryList<
   TStory extends PublishedStoryListItem = PublishedStoryListItem,
@@ -86,39 +66,14 @@ export async function fetchPublishedStoryList<
       cacheOptions,
     )) as StoryblokStoriesResponse<TStory>;
 
-  const firstResponse = await fetchStoryPage(1);
-  const firstStories = firstResponse.data?.stories ?? [];
-  const total = readStoryblokTotal(firstResponse);
-  const lastPage = Math.ceil(total / STORYBLOK_STORIES_PER_PAGE);
+  const stories: TStory[] = [];
 
-  if (lastPage <= 1) {
-    return firstStories as TStory[];
+  for (let page = 1; ; page += 1) {
+    const pageStories = (await fetchStoryPage(page)).data?.stories ?? [];
+    stories.push(...pageStories);
+
+    if (pageStories.length < STORYBLOK_STORIES_PER_PAGE) break;
   }
 
-  const remainingPages = Array.from(
-    { length: lastPage - 1 },
-    (_, index) => index + 2,
-  );
-  const remainingStories: TStory[][] = [];
-
-  for (
-    let index = 0;
-    index < remainingPages.length;
-    index += STORYBLOK_STORIES_PAGE_BATCH_SIZE
-  ) {
-    const pageBatch = remainingPages.slice(
-      index,
-      index + STORYBLOK_STORIES_PAGE_BATCH_SIZE,
-    );
-    const pageStories = await Promise.all(
-      pageBatch.map(async (currentPage) => {
-        const response = await fetchStoryPage(currentPage);
-        return response.data?.stories ?? [];
-      }),
-    );
-
-    remainingStories.push(...pageStories);
-  }
-
-  return [firstStories, ...remainingStories].flat() as TStory[];
+  return stories;
 }

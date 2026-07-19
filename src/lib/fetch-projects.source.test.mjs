@@ -6,10 +6,6 @@ const fetchProjectsSource = readFileSync(
   new URL('./fetch-projects.ts', import.meta.url),
   'utf8',
 );
-const projectsDataSource = readFileSync(
-  new URL('../components/storyblok/projectsData.ts', import.meta.url),
-  'utf8',
-);
 const storyblokStoriesSource = readFileSync(
   new URL('./storyblok-stories.ts', import.meta.url),
   'utf8',
@@ -27,8 +23,4 @@ test('project data has one Storyblok API caller and slug list derives from it', 
   assert.match(fetchProjectsSource, /await fetchProjectData\(\)/);
   assert.match(storyblokStoriesSource, /getOptionalStoryblokApi/);
   assert.match(storyblokStoriesSource, /if \(!storyblokApi\)/);
-
-  assert.doesNotMatch(projectsDataSource, /getStoryblokApi/);
-  assert.doesNotMatch(projectsDataSource, /storyblokApi\.get/);
-  assert.match(projectsDataSource, /from '@\/lib\/fetch-projects'/);
 });

@@ -11,13 +11,10 @@ import '@/assets/styles/icon-styles.sass';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import { getSiteUrl } from '@/lib/site-url';
 import AppInitializer from '@/components/AppInitStore';
-import LocaleInitializer from '@/components/LocaleInitializer';
 import BlokHead from '@/components/BlokHead';
 import BlokFooter from '@/components/BlokFooter';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
-import PageContentGate from '@/components/PageContentGate';
-import PerformanceTelemetry from '@/components/PerformanceTelemetry';
 import {
   DARK_THEME,
   LIGHT_THEME,
@@ -25,7 +22,6 @@ import {
   NIGHT_THEME_HOUR_END,
 } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
-import { DEFAULT_LOCALE } from '@/lib/locale';
 
 const SITE_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
 const SITE_DESCRIPTION =
@@ -91,7 +87,6 @@ const INITIAL_UI_STATE_SCRIPT = `
         ? window.matchMedia('(max-width: 770px)').matches
         : window.innerWidth < 770;
     var fullscreen = isMobile;
-    var pageContentVisible = true;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = themeMetaColors[theme] || '#FFFFFF';
 
@@ -104,7 +99,6 @@ const INITIAL_UI_STATE_SCRIPT = `
       document.body.setAttribute('data-theme', theme);
       document.body.setAttribute('data-fullscreen', String(fullscreen));
       document.body.setAttribute('data-page', routeSlug);
-      document.body.setAttribute('data-page-content-visible', pageContentVisible ? 'true' : 'false');
     }
     document.documentElement.style.overflow = '';
     document.body && (document.body.style.overflow = '');
@@ -221,28 +215,14 @@ export default async function RootLayout({
   const nonce = (await headers()).get('x-nonce') ?? undefined;
   const projects = await fetchProjectSlugs();
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  const locale = DEFAULT_LOCALE;
-  const performanceTelemetryEnabled =
-    process.env.NEXT_PUBLIC_ENABLE_PERF_TELEMETRY === 'true';
-  const pageShell = (
-    <PageContentGate>
-      <HeaderInitAnimation />
-      <main className="main">
-        <BlokHead projects={projects} />
-        {children}
-        <BlokFooter locale={locale} />
-      </main>
-    </PageContentGate>
-  );
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
         id="page-top"
         className={`body ${myFont.className}`}
         data-border="minimal"
         data-page="home"
-        data-page-content-visible="true"
         data-initializing="true"
         suppressHydrationWarning
       >
@@ -262,7 +242,6 @@ export default async function RootLayout({
         />
         {/* Page background effects are temporarily disabled. */}
         <AppInitializer />
-        <LocaleInitializer />
         <ClientEnhancements />
         {gaId && (
           <>
@@ -280,11 +259,12 @@ export default async function RootLayout({
             />
           </>
         )}
-        {performanceTelemetryEnabled ? (
-          <PerformanceTelemetry>{pageShell}</PerformanceTelemetry>
-        ) : (
-          pageShell
-        )}
+        <HeaderInitAnimation />
+        <main className="main">
+          <BlokHead projects={projects} />
+          {children}
+          <BlokFooter />
+        </main>
       </body>
     </html>
   );

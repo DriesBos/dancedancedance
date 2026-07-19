@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+};
+
 const generateNonce = () => {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
@@ -28,10 +36,9 @@ const buildContentSecurityPolicy = (nonce: string) =>
     "media-src 'self' blob: https://*.mux.com https://*.storyblok.com https://*.storyblokchina.cn",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
-    'report-uri /api/csp-report',
   ].join('; ');
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const nonce = generateNonce();
   const contentSecurityPolicy = buildContentSecurityPolicy(nonce);
   const requestHeaders = new Headers(request.headers);
@@ -45,6 +52,9 @@ export function middleware(request: NextRequest) {
   });
 
   response.headers.set('Content-Security-Policy', contentSecurityPolicy);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(name, value);
+  }
 
   return response;
 }

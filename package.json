@@ -2,15 +2,14 @@
   "name": "dries-bos",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.34.5",
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "preinstall": "node -e \"if (!/pnpm/.test(process.env.npm_execpath || '')) { console.error('This project uses pnpm. Run: pnpm install'); process.exit(1) }\"",
-    "dev": "NEXT_DIST_DIR=.next-dev __NEXT_DEV_INDICATOR=false next dev --turbopack --experimental-https",
-    "build": "next build --experimental-app-only",
+    "dev": "next dev --experimental-https",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "test:source": "node --test $(find src -name '*.source.test.mjs' -print | sort)",
@@ -21,29 +20,27 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@mux/mux-player-react": "^3.13.0",
-    "@storyblok/react": "^5.4.18",
-    "gsap": "^3.13.0",
-    "next": "^15.5.19",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "@storyblok/react": "^7.2.1",
+    "gsap": "^3.15.0",
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
-    "@types/node": "^20.12.7",
-    "@types/react": "19.1.6",
-    "@types/react-dom": "19.1.5",
-    "eslint": "^9",
-    "eslint-config-next": "^15.5.19",
+    "@types/node": "24.13.3",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.2.10",
     "sass": "^1.101.0",
     "typescript": "^5.9.3"
   },
   "pnpm": {
     "overrides": {
-      "@types/react": "19.1.6",
-      "@types/react-dom": "19.1.5",
+      "@types/react": "19.2.17",
+      "@types/react-dom": "19.2.3",
       "postcss@<8.5.10": "8.5.10",
       "markdown-it@<14.2.0": "14.2.0",
       "mdast-util-to-hast@<13.2.1": "13.2.1",

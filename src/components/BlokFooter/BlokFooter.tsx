@@ -6,14 +6,9 @@ import ScrollToTopLink from './ScrollToTopLink';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
 import FooterNav from './FooterNav';
-import { t, type Locale } from '@/lib/locale';
 import styles from './BlokFooter.module.sass';
 
-interface BlokFooterProps {
-  locale: Locale;
-}
-
-const BlokFooter = ({ locale }: BlokFooterProps) => {
+const BlokFooter = () => {
   return (
     <div className={`blok blok-Footer blok-Animate ${styles.blokFooter}`}>
       <GrainyGradient variant="blok" />
@@ -21,7 +16,7 @@ const BlokFooter = ({ locale }: BlokFooterProps) => {
       <Row>
         <div className={styles.footerColumnLeft}>
           <div className={`column column-FooterColumn ${styles.leftside}`}>
-            <FooterNav locale={locale} />
+            <FooterNav />
           </div>
         </div>
         <div className={styles.footerColumnRight}>
@@ -33,7 +28,7 @@ const BlokFooter = ({ locale }: BlokFooterProps) => {
               target="_blank"
               rel="noopener noreferrer"
               className="linkAnimation cursorMessage"
-              data-cursor-message={t('cursor.talk', locale)}
+              data-cursor-message="Let's talk"
             >
               <div className="hasExternalIcon">
                 <span className="mailMobile">Email</span>
@@ -60,7 +55,7 @@ const BlokFooter = ({ locale }: BlokFooterProps) => {
               <IconExternal />
             </a>
             <div className={`column-Subscribe ${styles.newsletter}`}>
-              <Newsletter className="cursorInteract" locale={locale} />
+              <Newsletter className="cursorInteract" />
             </div>
           </div>
           <div className={`column column-Icons ${styles.footerIcons}`}>

@@ -1,6 +1,5 @@
 import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
-import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 import PageTransition from '@/components/PageTransition';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -10,33 +9,6 @@ import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
 const HOME_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
 const HOME_DESCRIPTION =
   'Dries Bos designs and develops high-end websites, ecommerce experiences and interactive products for creative agencies, studios and startups worldwide.';
-
-// Enable dynamic params for catch-all route
-export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  try {
-    const stories = await fetchPublishedStoryList<{
-      slug?: string;
-      full_slug?: string;
-      is_folder?: boolean;
-    }>();
-
-    const staticParams = stories
-      .filter(
-        (story) => !story.is_folder && !!story.slug && story.slug !== 'home',
-      )
-      .map((story) => ({
-        slug: (story.full_slug || story.slug!).split('/').filter(Boolean),
-      }));
-
-    // Optional catch-all root route (`/`)
-    return [{}, ...staticParams];
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [{}];
-  }
-}
 
 type Params = Promise<{ slug?: string[] }>;
 

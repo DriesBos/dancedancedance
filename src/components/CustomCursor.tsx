@@ -18,35 +18,24 @@ type TextTweenSetters = {
   xTo: QuickToSetter;
   yTo: QuickToSetter;
 };
-type PositionBoundary = {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-};
 type ElementSize = {
   width: number;
   height: number;
 };
 type CursorRuntime = {
-  resetPreviewForRoute: () => void;
   updateCursorMeasurements: () => void;
   handlePointerMove: (event: MouseEvent | PointerEvent) => void;
   handleMouseLeaveWindow: () => void;
   handleClick: () => void;
   showProjectNavigationHint: () => void;
-  syncIntroMessageVisibility: () => void;
   destroy: () => void;
 };
 type CursorRuntimeOptions = {
   cursorRef: MutableRef<HTMLDivElement | null>;
   followerRef: MutableRef<HTMLDivElement | null>;
   messageRef: MutableRef<HTMLDivElement | null>;
-  previewRef: MutableRef<HTMLDivElement | null>;
-  previewImageRef: MutableRef<HTMLImageElement | null>;
   runtimeRef: MutableRef<CursorRuntime | null>;
   isVisible: MutableRef<boolean>;
-  isPreviewVisible: MutableRef<boolean>;
   cursorSurface: MutableRef<'bg' | 'blok'>;
   prevMousePos: MutableRef<{ x: number; y: number }>;
   hintShowTimeout: MutableRef<ReturnType<typeof setTimeout> | null>;
@@ -54,15 +43,6 @@ type CursorRuntimeOptions = {
   setMessage: Dispatch<SetStateAction<string>>;
 };
 
-const INTRO_MESSAGE_SELECTOR =
-  '.enterCursorLayer.cursorMessage[data-cursor-message]';
-const PREVIEW_HIDDEN_STATE = {
-  x: -1000,
-  y: -1000,
-  autoAlpha: 0,
-  scale: 0.96,
-  rotate: -1.5,
-};
 const FOLLOWER_DEFAULT_SIZE = '1rem';
 const FOLLOWER_INTERACT_SIZE = '2rem';
 const FOLLOWER_MAGNETIC_SIZE = '3rem';
@@ -79,32 +59,11 @@ const supportsHoverCursor = () =>
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
 
-const toPixels = (cssLength: string, remInPixels: number): number => {
-  if (!cssLength) return 0;
-  const value = cssLength.trim();
-
-  if (value.endsWith('rem')) {
-    const remValue = parseFloat(value.slice(0, -3));
-    return Number.isFinite(remValue) ? remValue * remInPixels : 0;
-  }
-
-  if (value.endsWith('px')) {
-    const pixelValue = parseFloat(value.slice(0, -2));
-    return Number.isFinite(pixelValue) ? pixelValue : 0;
-  }
-
-  const numericValue = parseFloat(value);
-  return Number.isFinite(numericValue) ? numericValue : 0;
-};
-
 const createCustomCursorRuntime = ({
   cursor,
   follower,
   messageContainer,
-  previewContainer,
-  previewImage,
   isVisible,
-  isPreviewVisible,
   cursorSurface,
   prevMousePos,
   hintShowTimeout,
@@ -114,12 +73,9 @@ const createCustomCursorRuntime = ({
   cursor: HTMLDivElement;
   follower: HTMLDivElement;
   messageContainer: HTMLDivElement;
-  previewContainer: HTMLDivElement;
-  previewImage: HTMLImageElement;
 } & Pick<
   CursorRuntimeOptions,
   | 'isVisible'
-  | 'isPreviewVisible'
   | 'cursorSurface'
   | 'prevMousePos'
   | 'hintShowTimeout'
@@ -145,14 +101,6 @@ const createCustomCursorRuntime = ({
     duration: 0.6,
     ease: 'power3',
   }) as QuickToSetter;
-  const xPreviewTo = gsap.quickTo(previewContainer, 'x', {
-    duration: 0.36,
-    ease: 'power3',
-  }) as QuickToSetter;
-  const yPreviewTo = gsap.quickTo(previewContainer, 'y', {
-    duration: 0.36,
-    ease: 'power3',
-  }) as QuickToSetter;
   const rotateMessageTo = gsap.quickTo(messageContainer, 'rotation', {
     duration: 0.6,
     ease: 'power3',
@@ -171,12 +119,10 @@ const createCustomCursorRuntime = ({
     })
     .pause();
 
-  const preloadedPreviewImages = new Map<string, HTMLImageElement>();
   const textTweenMap = new WeakMap<HTMLElement, TextTweenSetters>();
 
   let currentFollowerMode: FollowerMode = 'default';
   let activeMessageTarget: HTMLElement | null = null;
-  let activePreviewTarget: HTMLElement | null = null;
   let activeMagneticTarget: HTMLElement | null = null;
   let pointerFrameId: number | null = null;
   let latestPointerX = 0;
@@ -184,15 +130,7 @@ const createCustomCursorRuntime = ({
   let latestPointerTarget: EventTarget | null = null;
   let messageOffsetX = 0;
   let messageOffsetY = 0;
-  let previewRightInset = 0;
   let messageSize: ElementSize = { width: 220, height: 44 };
-  let previewSize: ElementSize = { width: 360, height: 270 };
-  let previewBoundary: PositionBoundary = {
-    left: 0,
-    top: 0,
-    right: window.innerWidth,
-    bottom: window.innerHeight,
-  };
   let activeMagneticRect: DOMRect | null = null;
 
   const getCachedElementSize = (
@@ -230,31 +168,10 @@ const createCustomCursorRuntime = ({
     messageOffsetY = MESSAGE_OFFSET_Y_REM * remInPixels;
   };
 
-  const updatePreviewBoundaryInset = () => {
-    const rootStyle = getComputedStyle(document.documentElement);
-    const remInPixels = parseFloat(rootStyle.fontSize) || 16;
-    const iconSize = toPixels(
-      rootStyle.getPropertyValue('--icon-size'),
-      remInPixels,
-    );
-    const iconSpacing = toPixels(
-      rootStyle.getPropertyValue('--spacing-icons'),
-      remInPixels,
-    );
-    previewRightInset = iconSize + iconSpacing;
-  };
-
   const refreshMessageSize = () => {
     messageSize = getCachedElementSize(messageContainer, {
       width: 220,
       height: 44,
-    });
-  };
-
-  const refreshPreviewSize = () => {
-    previewSize = getCachedElementSize(previewContainer, {
-      width: 360,
-      height: 270,
     });
   };
 
@@ -292,105 +209,14 @@ const createCustomCursorRuntime = ({
     refreshActiveMagneticRect();
   };
 
-  const preloadPreviewImage = (src: string) => {
-    if (!src || preloadedPreviewImages.has(src)) return;
-
-    const image = new Image();
-    image.decoding = 'async';
-    image.loading = 'eager';
-    image.src = src;
-    preloadedPreviewImages.set(src, image);
-
-    if (typeof image.decode === 'function') {
-      image.decode().catch(() => {});
-    }
-  };
-
-  const refreshPreviewBoundary = () => {
-    const viewportBoundary: PositionBoundary = {
-      left: 0,
-      top: 0,
-      right: window.innerWidth,
-      bottom: window.innerHeight,
-    };
-
-    const mainContainer =
-      document.querySelector<HTMLElement>('main.main') ??
-      document.querySelector<HTMLElement>('main');
-
-    if (!mainContainer) {
-      previewBoundary = viewportBoundary;
-      return;
-    }
-
-    const rect = mainContainer.getBoundingClientRect();
-    const mainBoundary: PositionBoundary = {
-      left: Math.max(0, rect.left),
-      top: Math.max(0, rect.top),
-      right: Math.min(window.innerWidth, rect.right) - previewRightInset,
-      bottom: Math.min(window.innerHeight, rect.bottom),
-    };
-
-    if (
-      mainBoundary.right <= mainBoundary.left ||
-      mainBoundary.bottom <= mainBoundary.top
-    ) {
-      previewBoundary = viewportBoundary;
-      return;
-    }
-
-    previewBoundary = mainBoundary;
-  };
-
   const refreshActiveMagneticRect = () => {
     activeMagneticRect = activeMagneticTarget?.getBoundingClientRect() ?? null;
   };
 
   const updateCursorMeasurements = () => {
     updateMessageOffsets();
-    updatePreviewBoundaryInset();
     refreshMessageSize();
-    refreshPreviewSize();
-    refreshPreviewBoundary();
     refreshActiveMagneticRect();
-  };
-
-  const clampPreviewPosition = (clientX: number, clientY: number) => {
-    const previewWidth = previewSize.width;
-    const previewHeight = previewSize.height;
-    const boundary = previewBoundary;
-    const padding = 16;
-    let x = clientX - previewWidth / 2;
-    let y = clientY - previewHeight / 2;
-    const minX = boundary.left + padding;
-    const minY = boundary.top + padding;
-    const maxX = boundary.right - previewWidth - padding;
-    const maxY = boundary.bottom - previewHeight - padding;
-
-    if (maxX < minX) {
-      x = boundary.left + (boundary.right - boundary.left - previewWidth) / 2;
-    } else {
-      x = clamp(x, minX, maxX);
-    }
-
-    if (maxY < minY) {
-      y = boundary.top + (boundary.bottom - boundary.top - previewHeight) / 2;
-    } else {
-      y = clamp(y, minY, maxY);
-    }
-
-    return { x, y };
-  };
-
-  const movePreviewToPointer = (clientX: number, clientY: number) => {
-    const { x, y } = clampPreviewPosition(clientX, clientY);
-    xPreviewTo(x);
-    yPreviewTo(y);
-  };
-
-  const setPreviewToPointerInstant = (clientX: number, clientY: number) => {
-    const { x, y } = clampPreviewPosition(clientX, clientY);
-    gsap.set(previewContainer, { x, y });
   };
 
   const clampMessagePosition = (clientX: number, clientY: number) => {
@@ -419,34 +245,6 @@ const createCustomCursorRuntime = ({
     window.requestAnimationFrame(refreshMessageSize);
   };
 
-  const showPreview = () => {
-    if (isPreviewVisible.current) return;
-    isPreviewVisible.current = true;
-    refreshPreviewSize();
-    refreshPreviewBoundary();
-    gsap.to(previewContainer, {
-      autoAlpha: 1,
-      scale: 1,
-      rotate: 0,
-      duration: 0.18,
-      ease: 'power3.out',
-      overwrite: 'auto',
-    });
-  };
-
-  const hidePreview = () => {
-    if (!isPreviewVisible.current) return;
-    isPreviewVisible.current = false;
-    gsap.to(previewContainer, {
-      autoAlpha: 0,
-      scale: 0.96,
-      rotate: -1.5,
-      duration: 0.42,
-      ease: 'power2.out',
-      overwrite: 'auto',
-    });
-  };
-
   const resolveFollowerMode = (
     hoveredElement: Element | null,
   ): FollowerMode => {
@@ -457,9 +255,7 @@ const createCustomCursorRuntime = ({
       '.cursorInteract, .markdown a',
     );
     if (
-      interactTarget &&
-      !interactTarget.hasAttribute('data-cursor-message') &&
-      !interactTarget.hasAttribute('data-cursor-preview')
+      interactTarget && !interactTarget.hasAttribute('data-cursor-message')
     ) {
       return 'interact';
     }
@@ -491,43 +287,6 @@ const createCustomCursorRuntime = ({
     }
   };
 
-  const updatePreviewTarget = (
-    hoveredElement: Element | null,
-    pointerX: number,
-    pointerY: number,
-  ) => {
-    const nextTarget = hoveredElement?.closest('.cursorPreview');
-    const resolvedTarget =
-      nextTarget instanceof HTMLElement ? nextTarget : null;
-    if (resolvedTarget === activePreviewTarget) return;
-
-    activePreviewTarget = resolvedTarget;
-    if (!resolvedTarget) {
-      hidePreview();
-      return;
-    }
-
-    const src = resolvedTarget.getAttribute('data-cursor-preview');
-    if (!src) {
-      hidePreview();
-      return;
-    }
-
-    const alt = resolvedTarget.getAttribute('data-cursor-preview-alt') || '';
-    preloadPreviewImage(src);
-    refreshPreviewSize();
-    refreshPreviewBoundary();
-
-    if (previewImage.getAttribute('src') !== src) {
-      previewImage.setAttribute('src', src);
-    }
-    previewImage.setAttribute('alt', alt);
-
-    prevMousePos.current = { x: pointerX, y: pointerY };
-    setPreviewToPointerInstant(pointerX, pointerY);
-    showPreview();
-  };
-
   const resolveHoveredElement = (): Element | null => {
     if (latestPointerTarget instanceof Element) return latestPointerTarget;
     return document.elementFromPoint(latestPointerX, latestPointerY);
@@ -557,7 +316,6 @@ const createCustomCursorRuntime = ({
 
     setFollowerMode(resolveFollowerMode(hoveredElement));
     updateMessageTarget(hoveredElement);
-    updatePreviewTarget(hoveredElement, cursorPosition.x, cursorPosition.y);
 
     const magneticTarget = hoveredElement?.closest('.cursorMagnetic');
     const resolvedMagneticTarget =
@@ -615,10 +373,6 @@ const createCustomCursorRuntime = ({
     xMessageTo(clampedMessageX);
     yMessageTo(clampedMessageY);
 
-    if (isPreviewVisible.current) {
-      movePreviewToPointer(cursorPosition.x, cursorPosition.y);
-    }
-
     const deltaY = cursorPosition.y - prevMousePos.current.y;
     const rotation = clamp(-deltaY * 0.5, -25, 25);
     rotateMessageTo(rotation);
@@ -630,35 +384,6 @@ const createCustomCursorRuntime = ({
   const schedulePointerFrame = () => {
     if (pointerFrameId !== null) return;
     pointerFrameId = window.requestAnimationFrame(runPointerFrame);
-  };
-
-  const syncIntroMessageVisibility = () => {
-    const introTarget =
-      document.querySelector<HTMLElement>(INTRO_MESSAGE_SELECTOR);
-
-    if (!introTarget) {
-      if (activeMessageTarget?.matches(INTRO_MESSAGE_SELECTOR)) {
-        activeMessageTarget = null;
-        messageFadeAnim.reverse();
-      }
-      return;
-    }
-
-    if (isVisible.current) return;
-
-    const messageText = introTarget.getAttribute('data-cursor-message');
-    if (!messageText) return;
-
-    latestPointerX = window.innerWidth / 2;
-    latestPointerY = window.innerHeight / 2;
-    latestPointerTarget = introTarget;
-    prevMousePos.current = { x: latestPointerX, y: latestPointerY };
-    activeMessageTarget = introTarget;
-    setMessage(messageText);
-    refreshMessageSizeAfterRender();
-    setMessageToPointerInstant(latestPointerX, latestPointerY);
-    rotateMessageTo(0);
-    messageFadeAnim.progress(1).pause();
   };
 
   const handlePointerMove = (event: MouseEvent | PointerEvent) => {
@@ -685,23 +410,13 @@ const createCustomCursorRuntime = ({
     activeMagneticTarget = null;
     activeMagneticRect = null;
     activeMessageTarget = null;
-    activePreviewTarget = null;
-
     rotationReset.pause(0);
     rotateMessageTo(0);
     messageFadeAnim.reverse();
-    hidePreview();
-    syncIntroMessageVisibility();
   };
 
   const handleClick = () => {
     setFollowerMode('default');
-    hidePreview();
-
-    if (activeMessageTarget?.matches(INTRO_MESSAGE_SELECTOR)) {
-      activeMessageTarget = null;
-      messageFadeAnim.reverse();
-    }
   };
 
   const showProjectNavigationHint = () => {
@@ -730,18 +445,6 @@ const createCustomCursorRuntime = ({
     }, 500);
   };
 
-  const resetPreviewForRoute = () => {
-    activePreviewTarget = null;
-    isPreviewVisible.current = false;
-    gsap.killTweensOf(previewContainer);
-    gsap.set(previewContainer, PREVIEW_HIDDEN_STATE);
-    previewImage.setAttribute('src', '');
-    previewImage.setAttribute('alt', '');
-    refreshPreviewSize();
-    refreshPreviewBoundary();
-    showProjectNavigationHint();
-  };
-
   const destroy = () => {
     if (pointerFrameId !== null) {
       window.cancelAnimationFrame(pointerFrameId);
@@ -758,31 +461,25 @@ const createCustomCursorRuntime = ({
     }
 
     rotationReset.kill();
-    preloadedPreviewImages.clear();
-    hidePreview();
     document.body.removeAttribute('data-cursor-surface');
   };
 
   document.body.setAttribute('data-cursor-surface', 'bg');
   gsap.set([cursor, follower], { opacity: 0, xPercent: -50, yPercent: -50 });
   gsap.set(messageContainer, { opacity: 0, xPercent: 0, yPercent: 0 });
-  gsap.set(previewContainer, PREVIEW_HIDDEN_STATE);
   gsap.set(follower, {
     width: FOLLOWER_DEFAULT_SIZE,
     height: FOLLOWER_DEFAULT_SIZE,
   });
   updateCursorMeasurements();
   showProjectNavigationHint();
-  syncIntroMessageVisibility();
 
   return {
-    resetPreviewForRoute,
     updateCursorMeasurements,
     handlePointerMove,
     handleMouseLeaveWindow,
     handleClick,
     showProjectNavigationHint,
-    syncIntroMessageVisibility,
     destroy,
   };
 };
@@ -791,11 +488,8 @@ const useCustomCursorRuntime = ({
   cursorRef,
   followerRef,
   messageRef,
-  previewRef,
-  previewImageRef,
   runtimeRef,
   isVisible,
-  isPreviewVisible,
   cursorSurface,
   prevMousePos,
   hintShowTimeout,
@@ -808,16 +502,8 @@ const useCustomCursorRuntime = ({
     const cursor = cursorRef.current;
     const follower = followerRef.current;
     const messageContainer = messageRef.current;
-    const previewContainer = previewRef.current;
-    const previewImage = previewImageRef.current;
 
-    if (
-      !cursor ||
-      !follower ||
-      !messageContainer ||
-      !previewContainer ||
-      !previewImage
-    ) {
+    if (!cursor || !follower || !messageContainer) {
       return;
     }
 
@@ -825,10 +511,7 @@ const useCustomCursorRuntime = ({
       cursor,
       follower,
       messageContainer,
-      previewContainer,
-      previewImage,
       isVisible,
-      isPreviewVisible,
       cursorSurface,
       prevMousePos,
       hintShowTimeout,
@@ -845,12 +528,12 @@ const useCustomCursorRuntime = ({
   });
 };
 
-const useCursorPreviewRouteReset = (
+const useCursorRouteHint = (
   pathname: string,
   runtimeRef: MutableRef<CursorRuntime | null>,
 ) => {
   useEffect(() => {
-    runtimeRef.current?.resetPreviewForRoute();
+    runtimeRef.current?.showProjectNavigationHint();
   }, [pathname, runtimeRef]);
 };
 
@@ -907,43 +590,13 @@ const useCursorEventListeners = (
   }, [runtimeRef]);
 };
 
-const useCursorIntroMessageObserver = (
-  runtimeRef: MutableRef<CursorRuntime | null>,
-) => {
-  useEffect(() => {
-    if (!supportsHoverCursor() || typeof MutationObserver === 'undefined') {
-      return;
-    }
-
-    const syncIntroMessageVisibility = () => {
-      runtimeRef.current?.syncIntroMessageVisibility();
-    };
-    const introMessageObserver = new MutationObserver(
-      syncIntroMessageVisibility,
-    );
-
-    syncIntroMessageVisibility();
-    introMessageObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      introMessageObserver.disconnect();
-    };
-  }, [runtimeRef]);
-};
-
 export default function CustomCursor() {
   const pathname = usePathname();
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
-  const previewImageRef = useRef<HTMLImageElement>(null);
   const runtimeRef = useRef<CursorRuntime | null>(null);
   const isVisible = useRef(false);
-  const isPreviewVisible = useRef(false);
   const cursorSurface = useRef<'bg' | 'blok'>('bg');
   const prevMousePos = useRef({ x: 0, y: 0 });
   const hintShowTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -954,32 +607,21 @@ export default function CustomCursor() {
     cursorRef,
     followerRef,
     messageRef,
-    previewRef,
-    previewImageRef,
     runtimeRef,
     isVisible,
-    isPreviewVisible,
     cursorSurface,
     prevMousePos,
     hintShowTimeout,
     hintHideTimeout,
     setMessage,
   });
-  useCursorPreviewRouteReset(pathname, runtimeRef);
+  useCursorRouteHint(pathname, runtimeRef);
   useCursorEventListeners(runtimeRef);
-  useCursorIntroMessageObserver(runtimeRef);
 
   return (
     <>
       <div ref={messageRef} className={`${styles.cursor} ${styles.message}`}>
         {message}
-      </div>
-      <div
-        ref={previewRef}
-        className={`${styles.preview} imageItem`}
-        aria-hidden="true"
-      >
-        <img ref={previewImageRef} src={undefined} alt="" />
       </div>
       <div
         ref={followerRef}

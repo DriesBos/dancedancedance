@@ -1,35 +1,18 @@
-/* Mux Player Custom Styles */
-
-/*
- * iOS Safari Black Line Fix
- * -------------------------
- * iOS Safari sometimes shows 1px black lines around videos due to
- * subpixel rendering and aspect ratio rounding issues.
- * 
- * Solution: Scale video elements by 1.002 (0.2% larger) with overflow: hidden
- * - transform: scale(1.002) = 2px larger on a 1000px video
- * - Imperceptible zoom, completely hides black lines
- * - Alternative values if needed: 1.001 (1px) or 1.003 (3px)
- */
-
-/* Ensure mux-player web component takes full width and maintains aspect ratio */
-mux-player {
-  display: block !important;
-  width: 100% !important;
-  aspect-ratio: 16 / 9; /* Default aspect ratio, will be overridden by video */
-  max-width: 100% !important;
-  background: transparent !important;
-  position: relative !important;
-  overflow: hidden !important; /* Prevent black lines from showing */
+mux-player,
+.muxPlayer {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background: transparent;
+  --loading-indicator: none;
 }
 
-/* Hide controls completely */
 mux-player[controls='false'],
 mux-player[nocontrols] {
   pointer-events: none;
 }
 
-/* Target control elements and hide them */
 mux-player::part(bottom),
 mux-player::part(center),
 mux-player::part(top),
@@ -42,66 +25,19 @@ mux-player::part(time-range),
 mux-player::part(time-display),
 mux-player::part(duration-display),
 mux-player::part(mute-button) {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
+  display: none;
 }
 
-/* Target the shadow DOM video element */
-mux-player::part(video) {
-  object-fit: cover !important;
-  width: 100% !important;
-  height: 100% !important;
-  /* Scale slightly larger to prevent 1px black lines on iOS Safari */
-  transform: scale(1.05) !important;
-  transform-origin: center center !important;
-}
-
-/* Alternative: Target via the player's internal structure */
-mux-player video {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  max-width: 100% !important;
-  /* Scale slightly larger to prevent 1px black lines on iOS Safari */
-  transform: scale(1.05) !important;
-  transform-origin: center center !important;
-}
-
-/* Ensure poster image also fills properly */
-mux-player img,
+mux-player::part(video),
 mux-player::part(poster) {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  /* Scale slightly larger to prevent 1px black lines on iOS Safari */
-  transform: scale(1.05) !important;
-  transform-origin: center center !important;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.002);
+  transform-origin: center;
 }
 
-/* Remove any default player container sizing */
-mux-player .player-container,
-mux-player [part~='layer'] {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Custom class for our implementation */
 .muxPlayer {
-  display: block !important;
-  width: 100% !important;
-  aspect-ratio: 16 / 9;
-  --loading-indicator: none;
-  overflow: hidden !important; /* Prevent black lines from showing */
-  /* iOS Safari specific fixes */
-  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
   transform: translateZ(0);
-}
-
-/* Remove pointer events from controls when hidden */
-.muxPlayer[controls='false'],
-.muxPlayer[nocontrols] {
-  pointer-events: none;
 }

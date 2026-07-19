@@ -9,7 +9,7 @@ import {
   transformStoryblokImageUrl,
   warmStoryblokImage,
 } from '@/lib/storyblok-image';
-import type { ProjectData } from './projectsData';
+import type { ProjectData } from '@/lib/fetch-projects';
 import styles from './ThumbnailWrapper.module.sass';
 
 export type ThumbnailWrapperEvent = {

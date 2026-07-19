@@ -239,7 +239,7 @@ test('project list owns its frame while child bloks draw row dividers', () => {
   const projectListBlock =
     globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';
   const projectBlock =
-    globalStyleSource.match(/&-Project\n[\s\S]*?&-Highlights/)?.[0] || '';
+    globalStyleSource.match(/&-Project\n[\s\S]*?&-Exp/)?.[0] || '';
 
   assert.match(projectListBlock, /& > \.blok\n\s+border: 0/);
   assert.match(
