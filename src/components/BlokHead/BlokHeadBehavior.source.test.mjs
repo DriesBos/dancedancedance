@@ -210,6 +210,7 @@ test('header row stays above the visible transparent top panel for clicks', () =
 test('theme foreground transition is body-owned and inherited by chrome', () => {
   assert.match(globalStyleSource, /body[\s\S]*color: var\(--theme-type\)/);
   assert.match(globalStyleSource, /body[\s\S]*transition: [^\n]*color var\(--theme-transition\)/);
+  assert.match(headStyleSource, /background: conic-gradient\(from -45deg, currentColor 0deg 180deg, transparent 180deg 360deg\)\n/);
   assert.doesNotMatch(globalStyleSource, /body :where\(\*\)[\s\S]*transition:/);
   assert.doesNotMatch(globalStyleSource, /color-mix\(in srgb, var\(--theme-type\)/);
   assert.doesNotMatch(headStyleSource, /transition: [^\n]*color var\(--theme-transition\)/);
