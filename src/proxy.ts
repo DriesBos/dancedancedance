@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
@@ -8,26 +8,14 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
-const generateNonce = () => {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  let binary = '';
-
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-
-  return btoa(binary);
-};
-
-const buildContentSecurityPolicy = (nonce: string) =>
+const CONTENT_SECURITY_POLICY =
   [
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://www.google-analytics.com`,
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
     "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.storyblok.com https://*.storyblokchina.cn https://image.mux.com https://www.google-analytics.com https://www.googletagmanager.com",
@@ -38,20 +26,10 @@ const buildContentSecurityPolicy = (nonce: string) =>
     "manifest-src 'self'",
   ].join('; ');
 
-export function proxy(request: NextRequest) {
-  const nonce = generateNonce();
-  const contentSecurityPolicy = buildContentSecurityPolicy(nonce);
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
-  requestHeaders.set('Content-Security-Policy', contentSecurityPolicy);
+export function proxy() {
+  const response = NextResponse.next();
 
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
-
-  response.headers.set('Content-Security-Policy', contentSecurityPolicy);
+  response.headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(name, value);
   }

@@ -84,20 +84,21 @@ test('Netlify headers do not target deleted static assets', () => {
   assert.doesNotMatch(netlifySource, /for = "\/og-image\.png"/);
 });
 
-test('Content Security Policy is enforced with a script nonce', () => {
+test('Content Security Policy is static so pages can prerender', () => {
   const netlifySource = readRoot('netlify.toml');
   const proxySource = readRoot('src/proxy.ts');
   const layoutSource = readRoot('src/app/layout.tsx');
 
   assert.doesNotMatch(netlifySource, /Content-Security-Policy-Report-Only/);
   assert.match(proxySource, /Content-Security-Policy/);
-  assert.match(proxySource, /'nonce-\$\{nonce\}'/);
+  assert.match(proxySource, /'unsafe-inline'/);
+  assert.doesNotMatch(proxySource, /nonce|x-nonce|crypto\.getRandomValues/);
   assert.doesNotMatch(proxySource, /report-uri|csp-report/);
-  assert.match(layoutSource, /headers\(\)/);
-  assert.match(layoutSource, /nonce=\{nonce\}/);
+  assert.doesNotMatch(layoutSource, /headers\(\)/);
+  assert.doesNotMatch(layoutSource, /nonce=\{nonce\}/);
   assert.match(layoutSource, /<script[\s\S]*id="initial-ui-state"[\s\S]*suppressHydrationWarning[\s\S]*dangerouslySetInnerHTML/);
   assert.doesNotMatch(layoutSource, /<Script[\s\S]*id="initial-ui-state"/);
-  assert.match(layoutSource, /export const dynamic = 'force-dynamic'/);
+  assert.doesNotMatch(layoutSource, /export const dynamic = 'force-dynamic'/);
 });
 
 test('project intentionally avoids reduced motion preference handling', () => {
@@ -125,7 +126,9 @@ test('published Storyblok story lists are fetched through the shared helper', ()
   assert.match(helperSource, /export async function fetchPublishedStoryList/);
   assert.match(helperSource, /getOptionalStoryblokApi/);
   assert.match(helperSource, /withPublishedStoryblokCv/);
-  assert.doesNotMatch(pageSource, /fetchPublishedStoryList|generateStaticParams/);
+  assert.match(pageSource, /fetchPublishedStoryList/);
+  assert.match(pageSource, /generateStaticParams/);
+  assert.match(pageSource, /export const dynamicParams = true/);
   assert.match(sitemapSource, /fetchPublishedStoryList/);
   assert.doesNotMatch(pageSource, /storyblokApi\.get\(\s*['"`]cdn\/stories/);
   assert.doesNotMatch(sitemapSource, /storyblokApi\.get\(\s*['"`]cdn\/stories/);

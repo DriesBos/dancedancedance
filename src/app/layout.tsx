@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import Script from 'next/script';
-import { headers } from 'next/headers';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
 import '@/assets/styles/vars.sass';
@@ -205,14 +204,11 @@ export const viewport: Viewport = {
   interactiveWidget: 'overlays-content',
 };
 
-export const dynamic = 'force-dynamic';
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nonce = (await headers()).get('x-nonce') ?? undefined;
   const projects = await fetchProjectSlugs();
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -229,13 +225,11 @@ export default async function RootLayout({
         <script
           id="initial-ui-state"
           suppressHydrationWarning
-          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: INITIAL_UI_STATE_SCRIPT }}
         />
         <script
           id="person-structured-data"
           type="application/ld+json"
-          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, '\\u003c'),
           }}
@@ -247,13 +241,11 @@ export default async function RootLayout({
           <>
             <Script
               id="google-analytics-bootstrap"
-              nonce={nonce}
               src={`/api/google-analytics/bootstrap?measurementId=${encodeURIComponent(gaId)}`}
               strategy="lazyOnload"
             />
             <Script
               id="google-analytics-loader"
-              nonce={nonce}
               src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
               strategy="lazyOnload"
             />

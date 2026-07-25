@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
+import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 
 const HOME_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
 const HOME_DESCRIPTION =
@@ -24,6 +25,12 @@ type MetadataStory = {
       alt?: string;
     };
   };
+};
+
+type StaticParamStory = {
+  slug?: string;
+  full_slug?: string;
+  is_folder?: boolean;
 };
 
 const buildPageMetadata = ({
@@ -76,6 +83,29 @@ const getPageData = cache(
     return fetchStory(version, slug);
   },
 );
+
+export const dynamicParams = true;
+
+export async function generateStaticParams(): Promise<Array<{ slug: string[] }>> {
+  try {
+    const stories = await fetchPublishedStoryList<StaticParamStory>();
+    const paths = new Set<string>(['']);
+
+    for (const story of stories) {
+      if (story.is_folder) continue;
+      const path = (story.full_slug || story.slug || '').replace(/^\/+|\/+$/g, '');
+      if (!path || path === 'home') continue;
+      paths.add(path);
+    }
+
+    return Array.from(paths, (path) => ({
+      slug: path ? path.split('/') : [],
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [{ slug: [] }];
+  }
+}
 
 export async function generateMetadata({
   params,
