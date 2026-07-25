@@ -20,6 +20,7 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
   return (
     <Link
       href="/about"
+      prefetch={true}
       className={`blok blok-Intro blok-Animate ${styles.blokIntro} ${styles.blokIntroLink} cursorInteract`}
       {...storyblokEditable(blok)}
     >

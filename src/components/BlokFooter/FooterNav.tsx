@@ -3,10 +3,10 @@ import Link from 'next/link';
 const FooterNav = () => {
   return (
     <>
-      <Link href="/" className="cursorInteract linkAnimation">
+      <Link href="/" prefetch={true} className="cursorInteract linkAnimation">
         Work
       </Link>
-      <Link href="/about" className="cursorInteract linkAnimation">
+      <Link href="/about" prefetch={true} className="cursorInteract linkAnimation">
         About
       </Link>
     </>

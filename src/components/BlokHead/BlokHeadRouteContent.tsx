@@ -329,7 +329,11 @@ const BlokHeadRouteContent = ({
     <Row className={styles.row}>
       <div className={`column column-Title ${styles.title}`}>
         <div ref={titleViewportRef} className={styles.titleMarqueeViewport}>
-          <Link href="/" className={`cursorInteract ${styles.titleMarqueeTrack}`}>
+          <Link
+            href="/"
+            prefetch={true}
+            className={`cursorInteract ${styles.titleMarqueeTrack}`}
+          >
             {shouldSwapTitleText ? (
               <InlineWordSwapText
                 text={titleText}
@@ -382,6 +386,7 @@ const BlokHeadRouteContent = ({
             </button>
             <Link
               href="/about"
+              prefetch={true}
               className="icon cursorMagnetic"
               aria-label="About (mixed animation test)"
               onMouseEnter={() => onAboutMixedHoverChange(true)}
@@ -404,7 +409,7 @@ const BlokHeadRouteContent = ({
                 <IconMail />
               </Link>
             </div>
-            <Link href="/" className="icon cursorMagnetic">
+            <Link href="/" prefetch={true} className="icon cursorMagnetic">
               <IconClose />
             </Link>
           </>
@@ -471,7 +476,7 @@ const BlokHeadRouteContent = ({
                 <IconArrow />
               </button>
             </div>
-            <Link href="/" className="icon cursorMagnetic">
+            <Link href="/" prefetch={true} className="icon cursorMagnetic">
               <IconClose />
             </Link>
           </>

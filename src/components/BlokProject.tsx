@@ -71,7 +71,11 @@ const BlokProject = ({
           {title && (
             <div className="column column-Project">
               {href ? (
-                <Link href={href} className="cursorInteract">
+                <Link
+                  href={href}
+                  className="cursorInteract"
+                  onFocus={prefetchProject}
+                >
                   {title}
                 </Link>
               ) : (
@@ -102,6 +106,7 @@ const BlokProject = ({
                 href={href}
                 className="icon cursorMagnetic"
                 aria-label={`View ${title || 'project'}`}
+                onFocus={prefetchProject}
               >
                 <IconArrow />
               </Link>

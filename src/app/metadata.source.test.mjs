@@ -19,6 +19,14 @@ const projectNavigationSource = readFileSync(
   new URL('../components/BlokHead/BlokHeadRouteContent.tsx', import.meta.url),
   'utf8',
 );
+const footerNavSource = readFileSync(
+  new URL('../components/BlokFooter/FooterNav.tsx', import.meta.url),
+  'utf8',
+);
+const introSource = readFileSync(
+  new URL('../components/storyblok/BlokIntro/BlokIntro.tsx', import.meta.url),
+  'utf8',
+);
 const projectPageSource = readFileSync(
   new URL('../components/storyblok/PageProject.tsx', import.meta.url),
   'utf8',
@@ -56,10 +64,19 @@ test('portfolio pages expose clear identity and crawl metadata', () => {
 test('Storyblok routes use full slugs and project cards expose real links', () => {
   assert.match(sitemapSource, /story\.full_slug \|\| story\.slug/);
   assert.doesNotMatch(sitemapSource, /lastModified: new Date\(\)/);
-  assert.match(projectCardSource, /<Link href=\{href\}/);
+  assert.match(projectCardSource, /<Link[\s\S]*href=\{href\}/);
   assert.doesNotMatch(projectCardSource, /onClick=\{handleClick\}/);
   assert.doesNotMatch(projectCardSource, /href=\{externalHref \|\| '#'\}/);
   assert.equal((projectNavigationSource.match(/aria-label="Previous project"/g) || []).length, 2);
   assert.equal((projectNavigationSource.match(/aria-label="Next project"/g) || []).length, 2);
   assert.doesNotMatch(projectNavigationSource, /<div\s+onClick=\{click(?:Prev|Next)\}/);
+});
+
+test('primary internal navigation warms dynamic routes', () => {
+  assert.match(projectNavigationSource, /href="\/"[\s\S]*prefetch=\{true\}/);
+  assert.match(projectNavigationSource, /href="\/about"[\s\S]*prefetch=\{true\}/);
+  assert.match(footerNavSource, /href="\/" prefetch=\{true\}/);
+  assert.match(footerNavSource, /href="\/about" prefetch=\{true\}/);
+  assert.match(introSource, /href="\/about"[\s\S]*prefetch=\{true\}/);
+  assert.match(projectCardSource, /onFocus=\{prefetchProject\}/);
 });
