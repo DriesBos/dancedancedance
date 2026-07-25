@@ -39,6 +39,7 @@ const BlokProject = ({
   const hasPrefetchedRef = useRef(false);
   const href = slug ? `/projects/${slug}` : null;
   const externalHref = getSafeExternalHref(external_link?.cached_url);
+  const projectLabel = title || 'project';
 
   const prefetchProject = useCallback(() => {
     if (!href || hasPrefetchedRef.current) return;
@@ -64,25 +65,19 @@ const BlokProject = ({
       style={{ zIndex: isHoverActive ? 9998 : stackIndex }}
     >
       <GrainyGradient variant="blok" />
+      {href && (
+        <Link
+          href={href}
+          className="projectCardLink cursorInteract"
+          aria-label={`View ${projectLabel}`}
+          onFocus={prefetchProject}
+        />
+      )}
       <Row>
         <GrainyGradient variant="blok" className="grainyInRow" />
         <div className="column column-Left">
           {displayYear && <div className="column column-Year">{displayYear}</div>}
-          {title && (
-            <div className="column column-Project">
-              {href ? (
-                <Link
-                  href={href}
-                  className="cursorInteract"
-                  onFocus={prefetchProject}
-                >
-                  {title}
-                </Link>
-              ) : (
-                title
-              )}
-            </div>
-          )}
+          {title && <div className="column column-Project">{title}</div>}
         </div>
         <div className="column column-Right">
           {category && (
@@ -95,26 +90,15 @@ const BlokProject = ({
                 href={externalHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Visit ${title || 'project'} website`}
+                aria-label={`Visit ${projectLabel} website`}
                 data-active="true"
               >
                 <IconLinkOutside />
               </a>
             )}
-            {href ? (
-              <Link
-                href={href}
-                className="icon cursorMagnetic"
-                aria-label={`View ${title || 'project'}`}
-                onFocus={prefetchProject}
-              >
-                <IconArrow />
-              </Link>
-            ) : (
-              <div className="icon">
-                <IconArrow />
-              </div>
-            )}
+            <div className="icon" aria-hidden="true">
+              <IconArrow />
+            </div>
           </div>
         </div>
       </Row>

@@ -65,6 +65,8 @@ test('Storyblok routes use full slugs and project cards expose real links', () =
   assert.match(sitemapSource, /story\.full_slug \|\| story\.slug/);
   assert.doesNotMatch(sitemapSource, /lastModified: new Date\(\)/);
   assert.match(projectCardSource, /<Link[\s\S]*href=\{href\}/);
+  assert.match(projectCardSource, /className="projectCardLink cursorInteract"/);
+  assert.match(projectCardSource, /aria-label=\{`View \$\{projectLabel\}`\}/);
   assert.doesNotMatch(projectCardSource, /onClick=\{handleClick\}/);
   assert.doesNotMatch(projectCardSource, /href=\{externalHref \|\| '#'\}/);
   assert.equal((projectNavigationSource.match(/aria-label="Previous project"/g) || []).length, 2);

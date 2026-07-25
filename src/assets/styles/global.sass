@@ -444,6 +444,15 @@ mux-player, .muxPlayer
     color: inherit
     transition: background-color var(--theme-transition), box-shadow var(--theme-transition)
     background: var(--theme-blok)
+    & > .projectCardLink
+      position: absolute
+      inset: 0
+      z-index: 2
+      color: inherit
+      text-decoration: none
+      &:focus-visible
+        outline: var(--border-width) solid currentColor
+        outline-offset: calc(0px - var(--border-width))
     @media (hover: hover)
       &:hover
         background: var(--theme-blok-hover)
@@ -455,7 +464,12 @@ mux-player, .muxPlayer
       display: flex
       min-width: 0
     .column-Icons
-      & > div:first-child
+      position: relative
+      z-index: 3
+      pointer-events: none
+      .icon-ExternalLink
+        pointer-events: auto
+      & > div:first-child:not(:last-child)
         opacity: 0
       .icon:last-child svg
         transition: transform var(--transition-button)
