@@ -32,12 +32,19 @@ const headerInitSource = readFileSync(
   new URL('../HeaderInitAnimation.tsx', import.meta.url),
   'utf8',
 );
+const pageTransitionSource = readFileSync(
+  new URL('../PageTransition.tsx', import.meta.url),
+  'utf8',
+);
 
 test('head active state is local and CSS-driven', () => {
   assert.match(headSource, /data-active="false"/);
   assert.doesNotMatch(headSource, /data-forced-closed/);
   assert.doesNotMatch(headSource, /data-scrollborder/);
-  assert.match(headStyleSource, /&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/);
+  assert.match(
+    headStyleSource,
+    /body\[data-fullscreen='true'\][^\n]*&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/,
+  );
   assert.doesNotMatch(behaviorSource, /gsap\.to\(headRef\.current/);
   assert.doesNotMatch(behaviorSource, /gsap\.set\(headRef\.current/);
   assert.doesNotMatch(behaviorSource, /yPercent/);
@@ -46,12 +53,51 @@ test('head active state is local and CSS-driven', () => {
   assert.doesNotMatch(storeSource, /topPanel/);
 });
 
-test('header intro animation is opacity-only and independent from active movement', () => {
+test('entry animations keep blok surfaces opaque and fade only their content', () => {
   assert.doesNotMatch(headStyleSource, /--head-intro-y/);
   assert.match(headStyleSource, /transform: translateY\(0\)/);
-  assert.match(headStyleSource, /&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/);
+  assert.doesNotMatch(
+    headStyleSource,
+    /^\s*&\[data-active='true'\] \.blokHead/m,
+  );
   assert.match(headerInitSource, /opacity: 0/);
   assert.match(headerInitSource, /opacity: 1/);
+  assert.match(headerInitSource, /gsap\.set\(headerTargets, \{ opacity: 1 \}\)/);
+  assert.match(
+    headerInitSource,
+    /gsap\.to\(headerContentTargets, \{[\s\S]*opacity: 1/,
+  );
+  assert.doesNotMatch(
+    headerInitSource,
+    /gsap\.to\(headerTargets, \{[\s\S]*opacity:/,
+  );
+  assert.match(
+    pageTransitionSource,
+    /:not\(\.side_Top\):not\(\.grainyGradient\)/,
+  );
+  assert.match(
+    pageTransitionSource,
+    /gsap\.set\(blockTargets, \{[\s\S]*opacity: 1,[\s\S]*y: '5vh'/,
+  );
+  const blockTween =
+    pageTransitionSource.match(/gsap\.to\(blockTargets, \{[\s\S]*?\n      \}\);/)?.[0] || '';
+  assert.doesNotMatch(blockTween, /opacity:/);
+  assert.match(
+    pageTransitionSource,
+    /gsap\.to\(targets, \{[\s\S]*opacity: 1/,
+  );
+  assert.match(
+    headerInitSource,
+    /const completeHeaderIntro = \(\) => \{[\s\S]*hasAnimatedHeader\.current = true;[\s\S]*markHeaderInitCompleted\(\);[\s\S]*markHeaderIntroVisible\(\);[\s\S]*onComplete: completeHeaderIntro/,
+  );
+  assert.match(
+    headerInitSource,
+    /hasAnimatedHeader\.current \|\| hasHeaderInitCompleted\(\)[\s\S]*gsap\.set\(headerTargets, \{ opacity: 1 \}\)/,
+  );
+  assert.doesNotMatch(
+    headerInitSource,
+    /markHeaderInitCompleted\(\);[\s\S]*gsap\.set\(headerTargets/,
+  );
   assert.doesNotMatch(headerInitSource, /--head-intro-y/);
   assert.doesNotMatch(headerInitSource, /\by:\s*'5vh'/);
   assert.doesNotMatch(headerInitSource, /\by:\s*0/);
@@ -71,7 +117,10 @@ test('BlokHead measures a stable frame while the inner visual surface moves', ()
   assert.match(headSource, /<div className=\{styles\.blokHead\}>[\s\S]*<GrainyGradient variant="blok" \/>/);
   assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*height: var\(--blok-height\)/);
   assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*border-color: transparent/);
-  assert.match(headStyleSource, /\.blokHeadFrame[\s\S]*&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/);
+  assert.match(
+    headStyleSource,
+    /\.blokHeadFrame[\s\S]*body\[data-fullscreen='true'\][^\n]*&\[data-active='true'\] \.blokHead[\s\S]*transform: translateY\(-100%\)/,
+  );
   assert.match(headStyleSource, /\.blokHead[\s\S]*position: absolute[\s\S]*inset: calc\(0px - var\(--border-width\)\)/);
   assert.match(headStyleSource, /\.blokHead[\s\S]*transform: translateY\(0\)/);
   assert.match(headStyleSource, /\.row[\s\S]*height: 100%/);
@@ -161,11 +210,21 @@ test('sticky scroll controller keeps a symmetric 10vh threshold', () => {
   assert.match(behaviorSource, /!scrollingDown[\s\S]*setScrollActive\(false\)/);
 });
 
-test('mobile has no separate timer replay controller', () => {
-  assert.doesNotMatch(behaviorSource, /MOBILE_HEAD_ANIMATION/);
-  assert.doesNotMatch(behaviorSource, /visibilitychange/);
-  assert.doesNotMatch(behaviorSource, /window\.addEventListener\('focus'/);
-  assert.doesNotMatch(behaviorSource, /setTimeout/);
+test('fullscreen-off header uses the shared stack-ready state without its own controller', () => {
+  assert.doesNotMatch(behaviorSource, /usePathname|pathname/);
+  assert.doesNotMatch(behaviorSource, /isStackGapPage|MOBILE_STACK_ACTIVE_DELAY/);
+  assert.doesNotMatch(behaviorSource, /animation-timeline: view\(\)/);
+  assert.doesNotMatch(behaviorSource, /matchMedia|hasFineHoverPointer/);
+  assert.doesNotMatch(behaviorSource, /mobileActivationTimer|setTimeout|clearTimeout/);
+  assert.match(
+    headStyleSource,
+    /body\[data-fullscreen='true'\][^\n]*&\[data-active='true'\] \.blokHead/,
+  );
+  assert.match(
+    headStyleSource,
+    /body\[data-fullscreen='false'\]\[data-header-intro-visible='true'\] main\[data-stack-timeline-ready='true'\][^\n]*& \.blokHead[\s\S]*transform: translateY\(-100%\)/,
+  );
+  assert.doesNotMatch(headStyleSource, /^\s*&\[data-active='true'\] \.blokHead/m);
 });
 
 test('head and panel surface colors use scoped theme tokens', () => {
@@ -181,12 +240,12 @@ test('head and panel surface colors use scoped theme tokens', () => {
 });
 
 test('fullscreen-off head keeps its top panel visible for borders and light surface', () => {
-  const fullscreenFalseHeadBlock =
+  const fullscreenFalseBlock =
     globalStyleSource.match(
-      /&\[data-fullscreen="false"\][\s\S]*?&-Project/,
+      /&\[data-fullscreen="false"\][\s\S]*?&\[data-theme='NIGHT'\]/,
     )?.[0] || '';
 
-  assert.match(fullscreenFalseHeadBlock, /&-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
+  assert.match(fullscreenFalseBlock, /main[\s\S]*\.side_Top\n\s+opacity: 1/);
 });
 
 test('mobile top panel compensates its skewed top border without moving the panel', () => {
@@ -197,8 +256,14 @@ test('mobile top panel compensates its skewed top border without moving the pane
   assert.doesNotMatch(sidePanelStyleSource, /@media \(max-width: 770px\)\n\s+top: -1px/);
 });
 
-test('layout targets the head blok explicitly instead of by child index', () => {
-  assert.match(globalStyleSource, /& > \.blok-Head[\s\S]*\.side_Top[\s\S]*opacity: 1/);
+test('layout only exposes top panels outside fullscreen', () => {
+  const fullscreenTrueBlock =
+    globalStyleSource.match(
+      /&\[data-fullscreen="true"\][\s\S]*?&\[data-fullscreen="false"\]/,
+    )?.[0] || '';
+
+  assert.doesNotMatch(fullscreenTrueBlock, /\.side_Top[\s\S]*opacity: 1/);
+  assert.match(globalStyleSource, /&\[data-fullscreen="false"\][\s\S]*main[\s\S]*\.side_Top\n\s+opacity: 1/);
   assert.doesNotMatch(globalStyleSource, /&:nth-child\(2\)[\s\S]*z-index: -1/);
 });
 

@@ -3,14 +3,11 @@
 import type { CSSProperties, HTMLAttributes } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BlokProject from '../BlokProject';
-import GrainyGradient from '../GrainyGradient';
-import BlokSidePanels from '../BlokSidePanels';
 import BlokFilter, {
   ProjectSortDirection,
   ProjectSortField,
 } from '../BlokFilter';
 import type { ProjectData } from '@/lib/fetch-projects';
-import Row from '../Row';
 import styles from './BlokProjectListClient.module.sass';
 import ThumbnailWrapper, {
   type ThumbnailWrapperEvent,
@@ -231,22 +228,11 @@ export default function BlokProjectListClient({
         {renderActiveProjectOverlay()}
       </ThumbnailWrapper>
       <div
-        className={`blok blok-Animate blok-ProjectList ${styles.projectList}`}
+        className={`blok-Animate blok-ProjectList ${styles.projectList}`}
         {...editableProps}
       >
-        <GrainyGradient variant="blok" />
-        <BlokSidePanels />
         {hasNoSearchResults ? (
-          <div className="blok blok-Project">
-            <GrainyGradient variant="blok" />
-            <Row>
-              <GrainyGradient variant="blok" className="grainyInRow" />
-              <div className="column column-Year"></div>
-              <div className="column column-Project">No work found..</div>
-              <div className="column column-Category"></div>
-              <div className="column column-Icons"></div>
-            </Row>
-          </div>
+          <BlokProject title="No work found.." stackIndex={1} />
         ) : (
           visibleProjects.map((item, index) => (
             <BlokProject
@@ -256,8 +242,7 @@ export default function BlokProjectListClient({
               title={item.title}
               category={item.category}
               external_link={item.external_link}
-              stackIndex={index}
-              isHoverActive={activeProjectSlug === item.slug}
+              stackIndex={visibleProjects.length - index}
               hideProjectCopy={activeProjectSlug === item.slug}
               onProjectHover={(element) => showProjectThumbnail(item, element)}
               onProjectLeave={() => clearActiveProject(item.slug)}

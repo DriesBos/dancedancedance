@@ -148,6 +148,14 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.match(projectSource, /onProjectHover\?: \(element: HTMLDivElement\) => void;/);
   assert.match(projectSource, /onProjectHover\?\.\(event\.currentTarget\);/);
   assert.match(projectSource, /data-hide-copy=\{hideProjectCopy \? true : undefined\}/);
+  assert.match(
+    projectSource,
+    /data-stack-item=\{stackIndex !== undefined \? true : undefined\}/,
+  );
+  assert.match(
+    projectSource,
+    /\{stackIndex !== undefined && <BlokSidePanels \/>\}/,
+  );
   assert.doesNotMatch(projectSource, /cursorPreview|data-cursor-preview|disableCursorPreview/);
   assert.doesNotMatch(listSource, /disableCursorPreview/);
   assert.match(listSource, /hideProjectCopy=\{activeProjectSlug === item\.slug\}/);
@@ -177,8 +185,12 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.doesNotMatch(listStyleSource, /transform: translateY\(-1\.8rem\)/);
   assert.match(activeProjectLayerBlock, /display: contents/);
   assert.doesNotMatch(activeProjectLayerBlock, /z-index: 1/);
-  assert.match(projectSource, /zIndex: isHoverActive \? 9998 : stackIndex/);
+  assert.match(projectSource, /style=\{\{ zIndex: stackIndex \}\}/);
+  assert.doesNotMatch(projectSource, /9998|isHoverActive/);
   assert.doesNotMatch(projectSource, /stackIndex \?\? 0/);
+  assert.match(listSource, /stackIndex=\{visibleProjects\.length - index\}/);
+  assert.match(listSource, /<BlokProject title="No work found\.\." stackIndex=\{1\} \/>/);
+  assert.doesNotMatch(listSource, /isHoverActive/);
   assert.match(listStyleSource, /isolation: auto !important/);
   assert.match(listStyleSource, /font-weight: 400/);
   assert.match(listStyleSource, /:global\(\.blok-Project \.column-Year\),/);
@@ -216,7 +228,7 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
     '<ThumbnailWrapper\n        projects={visibleProjects}',
   );
   const projectListIndex = listSource.indexOf(
-    '<div\n        className={`blok blok-Animate blok-ProjectList',
+    '<div\n        className={`blok-Animate blok-ProjectList',
   );
 
   assert.notEqual(thumbnailWrapperIndex, -1);
@@ -368,13 +380,73 @@ test('blok chrome memoization uses React shallow comparison only', () => {
   assert.match(sidePanelsSource, /const BlokSidePanels = memo\(BlokSidePanelsComponent\);/);
   assert.match(sidePanelsSource, /side_Top/);
   assert.doesNotMatch(sidePanelsSource, /side_(?:Bottom|Back)/);
-  assert.doesNotMatch(projectSource, /BlokSidePanels/);
-  assert.equal((projectListSource.match(/<BlokSidePanels \/>/g) ?? []).length, 1);
+  assert.match(projectSource, /import BlokSidePanels/);
+  assert.doesNotMatch(projectListSource, /BlokSidePanels|GrainyGradient|<Row>/);
   assert.match(
     sidePanelsStyleSource,
     /transition: background var\(--theme-transition\), opacity var\(--theme-transition\)/,
   );
   assert.doesNotMatch(sidePanelsStyleSource, /backdrop-filter|&_Bottom|&_Back/);
+});
+
+test('page stack gap follows content rows without animating head or footer', () => {
+  const source = readSource('../assets/styles/global.sass');
+  const pageSource = readSource('./storyblok/Page.tsx');
+  const projectPageSource = readSource('./storyblok/PageProject.tsx');
+  const containerSource = readSource('./storyblok/BlokContainer.tsx');
+  const experienceSource = readSource('./storyblok/BlokExperience/BlokExperience.tsx');
+  const experiment =
+    source.match(/@supports \(animation-timeline: scroll\(root block\)\)[\s\S]*?\n  &\[data-theme=/)?.[0] || '';
+
+  assert.match(source, /@supports \(animation-timeline: scroll\(root block\)\)/);
+  assert.doesNotMatch(source, /animation-timeline: view\(/);
+  assert.match(
+    experiment,
+    /&:is\(\[data-page='home'\], \[data-page='about'\], \[data-page='projects'\]\)/,
+  );
+  assert.match(
+    experiment,
+    /main\[data-stack-timeline-ready='true'\]/,
+  );
+  assert.match(experiment, /\[data-stack-timeline='true'\]/);
+  assert.match(experiment, /animation-timeline: scroll\(root block\)/);
+  assert.match(
+    experiment,
+    /animation-range: var\(--stack-range-start\) var\(--stack-range-end\)/,
+  );
+  assert.match(experiment, /translate: 0 var\(--stack-lift\) !important/);
+  assert.match(experiment, /z-index: var\(--stack-z\) !important/);
+  assert.match(experiment, /\[data-stack-timeline='true'\] > \.side_Top/);
+  assert.match(
+    experiment,
+    /\.blok-Footer > \.side_Top\n\s+transition: background var\(--theme-transition\)/,
+  );
+  assert.doesNotMatch(experiment, /first-child > \.side_Top/);
+  assert.doesNotMatch(source, /stackPanelVisibility|--stack-panel-range|data-stack-panel-receiver/);
+  assert.match(experiment, /\.blok-Footer\n\s+margin-top: 0/);
+  assert.doesNotMatch(experiment, /nth-last-child|:last-child|:not\(:last-child\)/);
+  assert.doesNotMatch(experiment, /data-stack-active|--stack-open|--stack-toggle-transition/);
+  assert.match(pageSource, /stackIndex=\{blok\.body\.length - index\}/);
+  assert.match(projectPageSource, /stackIndex=\{blok\.body\.length - index\}/);
+  assert.match(
+    containerSource,
+    /data-stack-item=\{stackIndex !== undefined \? true : undefined\}/,
+  );
+  assert.match(experienceSource, /style=\{\{ zIndex: stackIndex \}\}/);
+  assert.doesNotMatch(experiment, /\.blok-Head/);
+  assert.doesNotMatch(experiment, /\.blok-Footer\n(?:\s+.*\n){0,4}\s+animation:/);
+
+  assert.match(
+    source,
+    /@property --stack-lift[\s\S]*syntax: '<length>'[\s\S]*inherits: false[\s\S]*initial-value: 0px/,
+  );
+  const keyframes = source.match(/@keyframes stackLift[\s\S]*?@keyframes hyperLink/)?.[0] || '';
+  assert.match(keyframes, /--stack-lift: 0px/);
+  assert.match(keyframes, /--stack-lift: calc\(var\(--blok-height\) \* -1\)/);
+  assert.doesNotMatch(keyframes, /translate:/);
+  assert.doesNotMatch(keyframes, /transform:/);
+  assert.doesNotMatch(experiment, /@media \([^\n]*hover/);
+  assert.doesNotMatch(source, /prefers-reduced-motion/);
 });
 
 test('app initializer updates theme meta directly and observes body once', () => {

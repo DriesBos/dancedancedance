@@ -7,7 +7,9 @@
   z-index: 3
   border-color: transparent
   background: transparent
-  &[data-active='true'] .blokHead
+  :global(body[data-fullscreen='true']) &[data-active='true'] .blokHead
+    transform: translateY(-100%)
+  :global(body[data-fullscreen='false'][data-header-intro-visible='true'] main[data-stack-timeline-ready='true']) & .blokHead
     transform: translateY(-100%)
   :global(.side_Top)
     pointer-events: auto

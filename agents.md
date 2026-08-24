@@ -19,3 +19,14 @@
   - `gh api repos/DriesBos/dancedancedance/commits/<sha>/status --jq '{state: .state, statuses: [.statuses[] | {context, state, target_url, description}]}'`
 - If GitHub points to a Netlify deploy id, inspect that deploy next with the Netlify connector: `get-deploy-for-site` using the site id above and the deploy id from GitHub/Netlify.
 - GitHub Actions deploys require repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID`; branch protection expects required checks `check`, `deploy-preview`, and `netlify/dries-bos/deploy-preview`.
+- For Next.js runtime verification, use `skills/next-dev-loop/SKILL.md` and invoke the project-local browser CLI with `pnpm exec agent-browser`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

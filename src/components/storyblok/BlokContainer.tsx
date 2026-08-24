@@ -17,13 +17,19 @@ interface SbPageData extends SbBlokData {
 
 interface BlokProps {
   blok: SbPageData;
+  stackIndex?: number;
 }
 
-const BlokContainer = ({ blok }: BlokProps) => {
+const BlokContainer = ({ blok, stackIndex }: BlokProps) => {
   const columnBehaviour = blok.columnBehaviour || (blok.wideColumns ? 'stack' : 'none');
 
   return (
-    <div className="blok blok-Animate" {...storyblokEditable(blok)}>
+    <div
+      className="blok blok-Animate"
+      data-stack-item={stackIndex !== undefined ? true : undefined}
+      style={{ zIndex: stackIndex }}
+      {...storyblokEditable(blok)}
+    >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <Row columnBehaviour={columnBehaviour}>

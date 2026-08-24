@@ -33,11 +33,17 @@ const experienceItems = [
 
 interface BlokProps {
   blok: SbBlokData;
+  stackIndex?: number;
 }
 
-const BlokExperience = ({ blok }: BlokProps) => {
+const BlokExperience = ({ blok, stackIndex }: BlokProps) => {
   return (
-    <div className="blok blok-Exp blok-Animate" {...storyblokEditable(blok)}>
+    <div
+      className="blok blok-Exp blok-Animate"
+      data-stack-item={stackIndex !== undefined ? true : undefined}
+      style={{ zIndex: stackIndex }}
+      {...storyblokEditable(blok)}
+    >
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <div className={styles.blokName}>

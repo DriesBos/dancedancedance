@@ -8,6 +8,7 @@ import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
 import GrainyGradient from '@/components/GrainyGradient';
+import BlokSidePanels from '@/components/BlokSidePanels';
 import { getSafeExternalHref } from '@/lib/safe-url';
 
 interface Props {
@@ -17,7 +18,6 @@ interface Props {
   category?: string[];
   external_link?: { cached_url: string };
   stackIndex?: number;
-  isHoverActive?: boolean;
   hideProjectCopy?: boolean;
   onProjectHover?: (element: HTMLDivElement) => void;
   onProjectLeave?: () => void;
@@ -30,7 +30,6 @@ const BlokProject = ({
   category,
   external_link,
   stackIndex,
-  isHoverActive,
   hideProjectCopy,
   onProjectHover,
   onProjectLeave,
@@ -62,9 +61,11 @@ const BlokProject = ({
       onMouseLeave={onProjectLeave}
       onTouchStart={prefetchProject}
       data-hide-copy={hideProjectCopy ? true : undefined}
-      style={{ zIndex: isHoverActive ? 9998 : stackIndex }}
+      data-stack-item={stackIndex !== undefined ? true : undefined}
+      style={{ zIndex: stackIndex }}
     >
       <GrainyGradient variant="blok" />
+      {stackIndex !== undefined && <BlokSidePanels />}
       {href && (
         <Link
           href={href}

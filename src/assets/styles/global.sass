@@ -418,11 +418,19 @@ mux-player, .muxPlayer
     opacity: 0
   &-ProjectList
     position: relative
+    display: flex
+    flex-direction: column
     overflow: visible
-    border-top: 0
-    & > .blok
-      border: 0
-      border-top: var(--border-width) solid currentColor
+    isolation: auto
+    border: 0
+    background: transparent
+    perspective: none
+    .blok-Filter + &
+      margin-top: calc(0px - (#{var(--border-width)}))
+    & > .blok-Project
+      margin-top: calc(0px - (#{var(--border-width)}))
+      &:first-child
+        margin-top: 0
   &-Filter
     justify-content: flex-end
     padding-top: var(--blok-padding-extraTop)
@@ -527,16 +535,6 @@ body
   main
     & > .blok-Head
       z-index: 3
-      .side_Top
-        opacity: 1
-  .page
-    &-Project, &-General, &-Error
-      & > .blok
-        .side_Top
-          opacity: 0
-        &:first-child
-          .side_Top
-            opacity: 1
   &[data-fullscreen="true"]
     padding-left: 0
     padding-right: 0
@@ -610,13 +608,12 @@ body
       max-width: min(88vw, 1150px)
       @media (max-width: 770px)
         max-width: calc(100% - 2 * var(--spacing-side))
+      .side_Top
+        opacity: 1
       .page
         position: relative
         z-index: 2
       .blok
-        &-Head
-          .side_Top
-            opacity: 1
         // &-ProjectList
         //   border-top-width: 0
         &-Project
@@ -624,8 +621,27 @@ body
         &-Footer
           z-index: 1
           margin-top: var(--blok-height)
-          .side_Top
-            opacity: 1
+    @supports (animation-timeline: scroll(root block))
+      &:is([data-page='home'], [data-page='about'], [data-page='projects'])
+        main[data-stack-timeline-ready='true']
+          .blok-Footer
+            margin-top: 0
+          [data-stack-timeline='true']
+            --stack-lift: 0px
+            // Reverse order keeps every always-visible top panel behind the
+            // preceding blok until that blok lifts away from it.
+            z-index: var(--stack-z) !important
+            // GSAP writes `translate: none` inline after the page entry animation.
+            // Keep the stack's independent translate channel authoritative here.
+            translate: 0 var(--stack-lift) !important
+            animation: stackLift linear both
+            animation-timeline: scroll(root block)
+            animation-range: var(--stack-range-start) var(--stack-range-end)
+            transition: padding-top var(--theme-transition), background var(--theme-transition), background-color var(--theme-transition), box-shadow var(--theme-transition)
+            will-change: translate
+          [data-stack-timeline='true'] > .side_Top,
+          .blok-Footer > .side_Top
+            transition: background var(--theme-transition)
   &[data-theme='NIGHT']
     @media (hover: hover)
       :where(.blok-Project, .column-Image, a, button):hover .imageItem,
@@ -635,6 +651,17 @@ body
 .imageItem
   filter: var(--theme-media-filter)
   transition: opacity var(--theme-transition), filter var(--theme-transition)
+
+@property --stack-lift
+  syntax: '<length>'
+  inherits: false
+  initial-value: 0px
+
+@keyframes stackLift
+  from
+    --stack-lift: 0px
+  to
+    --stack-lift: calc(var(--blok-height) * -1)
 
 @keyframes hyperLink
   0%

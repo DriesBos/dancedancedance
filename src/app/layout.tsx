@@ -14,6 +14,7 @@ import BlokHead from '@/components/BlokHead';
 import BlokFooter from '@/components/BlokFooter';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
+import StackTimelineBehavior from '@/components/StackTimelineBehavior';
 import {
   DARK_THEME,
   LIGHT_THEME,
@@ -237,6 +238,7 @@ export default async function RootLayout({
         {/* Page background effects are temporarily disabled. */}
         <AppInitializer />
         <ClientEnhancements />
+        <StackTimelineBehavior />
         {gaId && (
           <>
             <Script

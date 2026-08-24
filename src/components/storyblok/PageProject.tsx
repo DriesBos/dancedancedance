@@ -16,8 +16,12 @@ interface ProjectProps {
 const PageProject = ({ blok }: ProjectProps) => {
   return (
     <article className="page page-Project" {...storyblokEditable(blok)}>
-      {blok.body.map((nestedBlok) => (
-        <StoryblokServerComponent blok={nestedBlok} key={nestedBlok._uid} />
+      {blok.body.map((nestedBlok, index) => (
+        <StoryblokServerComponent
+          blok={nestedBlok}
+          key={nestedBlok._uid}
+          stackIndex={blok.body.length - index}
+        />
       ))}
     </article>
   );
