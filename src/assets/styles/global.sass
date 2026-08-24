@@ -608,8 +608,6 @@ body
       max-width: min(88vw, 1150px)
       @media (max-width: 770px)
         max-width: calc(100% - 2 * var(--spacing-side))
-      .side_Top
-        opacity: 1
       .page
         position: relative
         z-index: 2
@@ -621,27 +619,25 @@ body
         &-Footer
           z-index: 1
           margin-top: var(--blok-height)
-    @supports (animation-timeline: scroll(root block))
-      &:is([data-page='home'], [data-page='about'], [data-page='projects'])
-        main[data-stack-timeline-ready='true']
-          .blok-Footer
-            margin-top: 0
-          [data-stack-timeline='true']
-            --stack-lift: 0px
-            // Reverse order keeps every always-visible top panel behind the
-            // preceding blok until that blok lifts away from it.
-            z-index: var(--stack-z) !important
-            // GSAP writes `translate: none` inline after the page entry animation.
-            // Keep the stack's independent translate channel authoritative here.
-            translate: 0 var(--stack-lift) !important
-            animation: stackLift linear both
-            animation-timeline: scroll(root block)
-            animation-range: var(--stack-range-start) var(--stack-range-end)
-            transition: padding-top var(--theme-transition), background var(--theme-transition), background-color var(--theme-transition), box-shadow var(--theme-transition)
-            will-change: translate
-          [data-stack-timeline='true'] > .side_Top,
-          .blok-Footer > .side_Top
-            transition: background var(--theme-transition)
+    &:is([data-page='home'], [data-page='about'], [data-page='projects'])
+      main[data-stack-timeline-ready='true']
+        .side_Top
+          opacity: 1
+        .blok-Footer
+          margin-top: 0
+        [data-stack-timeline='true']
+          --stack-lift: 0px
+          // Reverse order keeps every always-visible top panel behind the
+          // preceding blok until that blok lifts away from it.
+          z-index: var(--stack-z) !important
+          // GSAP writes `translate: none` inline after the page entry animation.
+          // Keep the stack's independent translate channel authoritative here.
+          translate: 0 var(--stack-lift) !important
+          transition: padding-top var(--theme-transition), background var(--theme-transition), background-color var(--theme-transition), box-shadow var(--theme-transition)
+          will-change: translate
+        [data-stack-timeline='true'] > .side_Top,
+        .blok-Footer > .side_Top
+          transition: background var(--theme-transition)
   &[data-theme='NIGHT']
     @media (hover: hover)
       :where(.blok-Project, .column-Image, a, button):hover .imageItem,
@@ -651,17 +647,6 @@ body
 .imageItem
   filter: var(--theme-media-filter)
   transition: opacity var(--theme-transition), filter var(--theme-transition)
-
-@property --stack-lift
-  syntax: '<length>'
-  inherits: false
-  initial-value: 0px
-
-@keyframes stackLift
-  from
-    --stack-lift: 0px
-  to
-    --stack-lift: calc(var(--blok-height) * -1)
 
 @keyframes hyperLink
   0%

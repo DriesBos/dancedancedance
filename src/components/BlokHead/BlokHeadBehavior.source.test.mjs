@@ -103,6 +103,13 @@ test('entry animations keep blok surfaces opaque and fade only their content', (
   assert.doesNotMatch(headerInitSource, /\by:\s*0/);
 });
 
+test('page reset temporarily disables smooth scrolling', () => {
+  assert.match(pageTransitionSource, /html\.style\.scrollBehavior = 'auto'/);
+  assert.match(pageTransitionSource, /html\.getClientRects\(\)/);
+  assert.match(pageTransitionSource, /window\.scrollTo\(0, 0\)/);
+  assert.match(pageTransitionSource, /html\.style\.scrollBehavior = scrollBehavior/);
+});
+
 test('BlokHead renders one direct main child without a sentinel sibling', () => {
   assert.doesNotMatch(behaviorSource, /headSentinelRef/);
   assert.doesNotMatch(behaviorSource, /new IntersectionObserver/);
@@ -239,13 +246,16 @@ test('head and panel surface colors use scoped theme tokens', () => {
   assert.doesNotMatch(sidePanelStyleSource, /data-surface|:global/);
 });
 
-test('fullscreen-off head keeps its top panel visible for borders and light surface', () => {
+test('fullscreen-off ready stack keeps its top panel visible for borders and light surface', () => {
   const fullscreenFalseBlock =
     globalStyleSource.match(
       /&\[data-fullscreen="false"\][\s\S]*?&\[data-theme='NIGHT'\]/,
     )?.[0] || '';
 
-  assert.match(fullscreenFalseBlock, /main[\s\S]*\.side_Top\n\s+opacity: 1/);
+  assert.match(
+    fullscreenFalseBlock,
+    /main\[data-stack-timeline-ready='true'\][\s\S]*\.side_Top\n\s+opacity: 1/,
+  );
 });
 
 test('mobile top panel compensates its skewed top border without moving the panel', () => {
@@ -263,7 +273,10 @@ test('layout only exposes top panels outside fullscreen', () => {
     )?.[0] || '';
 
   assert.doesNotMatch(fullscreenTrueBlock, /\.side_Top[\s\S]*opacity: 1/);
-  assert.match(globalStyleSource, /&\[data-fullscreen="false"\][\s\S]*main[\s\S]*\.side_Top\n\s+opacity: 1/);
+  assert.match(
+    globalStyleSource,
+    /&\[data-fullscreen="false"\][\s\S]*main\[data-stack-timeline-ready='true'\][\s\S]*\.side_Top\n\s+opacity: 1/,
+  );
   assert.doesNotMatch(globalStyleSource, /&:nth-child\(2\)[\s\S]*z-index: -1/);
 });
 

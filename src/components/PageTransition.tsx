@@ -25,11 +25,12 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
   // Force top on every client-side route change.
   useLayoutEffect(() => {
-    try {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    } catch {
-      window.scrollTo(0, 0);
-    }
+    const html = document.documentElement;
+    const scrollBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    html.getClientRects();
+    window.scrollTo(0, 0);
+    html.style.scrollBehavior = scrollBehavior;
   }, [pathname]);
 
   useGSAP(

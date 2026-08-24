@@ -1,17 +1,21 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { usePathname } from 'next/navigation';
+import { gsap } from '@/lib/gsap';
 import { useStore } from '@/store/store';
 
-const STACK_RANGE_START = '--stack-range-start';
-const STACK_RANGE_END = '--stack-range-end';
+gsap.registerPlugin(ScrollTrigger);
+
+const STACK_LIFT = '--stack-lift';
 const STACK_Z = '--stack-z';
+const STACK_SCRUB_SECONDS = 0.8;
 
 const isStackTimelinePath = (pathname: string | null) =>
-  pathname === '/' || pathname === '/about' || pathname?.startsWith('/projects/') === true;
-
-const toPercent = (value: number) => `${value.toFixed(4)}%`;
+  pathname === '/' ||
+  pathname === '/about' ||
+  pathname?.startsWith('/projects/') === true;
 
 const getParticipants = (pathname: string | null) => {
   const page = document.querySelector<HTMLElement>(
@@ -22,7 +26,9 @@ const getParticipants = (pathname: string | null) => {
 
   if (pathname === '/') {
     const introAndFilter = Array.from(
-      page.querySelectorAll<HTMLElement>(':scope > .blok-Intro, :scope > .blok-Filter'),
+      page.querySelectorAll<HTMLElement>(
+        ':scope > .blok-Intro, :scope > .blok-Filter',
+      ),
     );
     const projectRows = Array.from(
       page.querySelectorAll<HTMLElement>(
@@ -33,18 +39,23 @@ const getParticipants = (pathname: string | null) => {
     return [...introAndFilter, ...projectRows];
   }
 
-  return Array.from(page.querySelectorAll<HTMLElement>(':scope > .blok[data-stack-item="true"]'));
+  return Array.from(
+    page.querySelectorAll<HTMLElement>(
+      ':scope > .blok[data-stack-item="true"]',
+    ),
+  );
 };
 
 const clearParticipant = (participant: HTMLElement) => {
   participant.removeAttribute('data-stack-timeline');
-  participant.style.removeProperty(STACK_RANGE_START);
-  participant.style.removeProperty(STACK_RANGE_END);
+  participant.style.removeProperty(STACK_LIFT);
   participant.style.removeProperty(STACK_Z);
 };
 
 const clearAssignments = (main: HTMLElement) => {
-  main.querySelectorAll<HTMLElement>('[data-stack-timeline="true"]').forEach(clearParticipant);
+  main
+    .querySelectorAll<HTMLElement>('[data-stack-timeline="true"]')
+    .forEach(clearParticipant);
 };
 
 const clearTimeline = (main: HTMLElement | null) => {
@@ -56,50 +67,73 @@ const clearTimeline = (main: HTMLElement | null) => {
 
 const setupTimeline = (pathname: string | null) => {
   const main = document.querySelector<HTMLElement>('main.main');
-  if (!main || !isStackTimelinePath(pathname)) return false;
+  if (!main || !isStackTimelinePath(pathname)) return null;
 
   clearAssignments(main);
 
   const participants = getParticipants(pathname);
   if (participants.length === 0) {
     main.removeAttribute('data-stack-timeline-ready');
-    return false;
+    return null;
   }
 
   // The ready state removes the legacy footer margin. Measure the actual
   // experiment geometry so recalculation cannot alternate between two heights.
   main.dataset.stackTimelineReady = 'true';
-  const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const maxScroll = Math.max(
+    0,
+    document.documentElement.scrollHeight - window.innerHeight,
+  );
   if (maxScroll === 0) {
     main.removeAttribute('data-stack-timeline-ready');
-    return false;
+    return null;
   }
 
   const startPx = Math.min(window.innerHeight * 0.2, maxScroll * 0.08);
-  const start = (startPx / maxScroll) * 100;
-  const availableRange = 100 - start;
-  const weights = participants.map((participant) => Math.max(1, participant.getBoundingClientRect().height));
+  const availableRange = maxScroll - startPx;
+  const weights = participants.map((participant) =>
+    Math.max(1, participant.getBoundingClientRect().height),
+  );
   const weightTotal = weights.reduce((total, weight) => total + weight, 0);
-  let rangeStart = start;
+  const lift =
+    document.querySelector<HTMLElement>('.blok-Head')?.getBoundingClientRect()
+      .height ?? 0;
+  const timeline = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: {
+      trigger: document.documentElement,
+      start: 0,
+      end: 'max',
+      scrub: STACK_SCRUB_SECONDS,
+    },
+  });
+  const duration = { progress: 0 };
+  let rangeStart = startPx;
+
+  timeline.to(duration, { progress: 1, duration: maxScroll }, 0);
 
   participants.forEach((participant, index) => {
-    const rangeEnd = index === participants.length - 1
-      ? 100
-      : rangeStart + (availableRange * (weights[index] ?? 1)) / weightTotal;
+    const rangeEnd =
+      index === participants.length - 1
+        ? maxScroll
+        : rangeStart + (availableRange * (weights[index] ?? 1)) / weightTotal;
 
     participant.dataset.stackTimeline = 'true';
-    participant.style.setProperty(STACK_RANGE_START, toPercent(rangeStart));
-    participant.style.setProperty(STACK_RANGE_END, toPercent(rangeEnd));
     participant.style.setProperty(STACK_Z, String(participants.length - index));
+    timeline.to(
+      participant,
+      { [STACK_LIFT]: `${-lift}px`, duration: rangeEnd - rangeStart },
+      rangeStart,
+    );
 
     rangeStart = rangeEnd;
   });
 
-  return true;
+  return timeline;
 };
 
 /**
- * Assigns static CSS animation ranges. Scrolling itself remains entirely CSS-owned.
+ * Runs one weighted stack timeline across every participating blok.
  */
 const StackTimelineBehavior = () => {
   const pathname = usePathname();
@@ -108,28 +142,40 @@ const StackTimelineBehavior = () => {
 
   useEffect(() => {
     const main = document.querySelector<HTMLElement>('main.main');
-    const supportsRootScrollTimeline = CSS.supports('animation-timeline: scroll(root block)');
-    if (!main || fullscreen || !isStackTimelinePath(pathname) || !supportsRootScrollTimeline) {
+    if (!main || fullscreen || !isStackTimelinePath(pathname)) {
       clearTimeline(main);
       return;
     }
 
     let cancelled = false;
+    let timeline: ReturnType<typeof gsap.timeline> | null = null;
+
+    const killTimeline = () => {
+      timeline?.scrollTrigger?.kill();
+      timeline?.kill();
+      timeline = null;
+    };
 
     const refresh = () => {
       if (frameRef.current !== null) return;
       frameRef.current = window.requestAnimationFrame(() => {
         frameRef.current = null;
         if (cancelled) return;
-        setupTimeline(pathname);
+        killTimeline();
+        timeline = setupTimeline(pathname);
       });
     };
 
+    const page = document.querySelector<HTMLElement>(
+      '.page-General, .page-Project',
+    );
+    const projectList = page?.querySelector<HTMLElement>(
+      ':scope > .blok-ProjectList',
+    );
     const observer = new MutationObserver(refresh);
-    observer.observe(main, { childList: true, subtree: true });
+    if (projectList) observer.observe(projectList, { childList: true });
 
     const resizeObserver = new ResizeObserver(refresh);
-    const page = document.querySelector<HTMLElement>('.page-General, .page-Project');
     if (page) resizeObserver.observe(page);
 
     window.addEventListener('resize', refresh);
@@ -141,6 +187,7 @@ const StackTimelineBehavior = () => {
       observer.disconnect();
       resizeObserver.disconnect();
       window.removeEventListener('resize', refresh);
+      killTimeline();
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);
         frameRef.current = null;

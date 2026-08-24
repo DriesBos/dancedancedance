@@ -396,10 +396,9 @@ test('page stack gap follows content rows without animating head or footer', () 
   const containerSource = readSource('./storyblok/BlokContainer.tsx');
   const experienceSource = readSource('./storyblok/BlokExperience/BlokExperience.tsx');
   const experiment =
-    source.match(/@supports \(animation-timeline: scroll\(root block\)\)[\s\S]*?\n  &\[data-theme=/)?.[0] || '';
+    source.match(/&:is\(\[data-page='home'\], \[data-page='about'\], \[data-page='projects'\]\)[\s\S]*?\n  &\[data-theme=/)?.[0] || '';
 
-  assert.match(source, /@supports \(animation-timeline: scroll\(root block\)\)/);
-  assert.doesNotMatch(source, /animation-timeline: view\(/);
+  assert.doesNotMatch(source, /animation-timeline:/);
   assert.match(
     experiment,
     /&:is\(\[data-page='home'\], \[data-page='about'\], \[data-page='projects'\]\)/,
@@ -409,11 +408,6 @@ test('page stack gap follows content rows without animating head or footer', () 
     /main\[data-stack-timeline-ready='true'\]/,
   );
   assert.match(experiment, /\[data-stack-timeline='true'\]/);
-  assert.match(experiment, /animation-timeline: scroll\(root block\)/);
-  assert.match(
-    experiment,
-    /animation-range: var\(--stack-range-start\) var\(--stack-range-end\)/,
-  );
   assert.match(experiment, /translate: 0 var\(--stack-lift\) !important/);
   assert.match(experiment, /z-index: var\(--stack-z\) !important/);
   assert.match(experiment, /\[data-stack-timeline='true'\] > \.side_Top/);
@@ -436,15 +430,7 @@ test('page stack gap follows content rows without animating head or footer', () 
   assert.doesNotMatch(experiment, /\.blok-Head/);
   assert.doesNotMatch(experiment, /\.blok-Footer\n(?:\s+.*\n){0,4}\s+animation:/);
 
-  assert.match(
-    source,
-    /@property --stack-lift[\s\S]*syntax: '<length>'[\s\S]*inherits: false[\s\S]*initial-value: 0px/,
-  );
-  const keyframes = source.match(/@keyframes stackLift[\s\S]*?@keyframes hyperLink/)?.[0] || '';
-  assert.match(keyframes, /--stack-lift: 0px/);
-  assert.match(keyframes, /--stack-lift: calc\(var\(--blok-height\) \* -1\)/);
-  assert.doesNotMatch(keyframes, /translate:/);
-  assert.doesNotMatch(keyframes, /transform:/);
+  assert.doesNotMatch(source, /@property --stack-lift|@keyframes stackLift/);
   assert.doesNotMatch(experiment, /@media \([^\n]*hover/);
   assert.doesNotMatch(source, /prefers-reduced-motion/);
 });
