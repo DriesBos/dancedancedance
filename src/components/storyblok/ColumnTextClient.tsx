@@ -23,6 +23,7 @@ const ColumnTextClient = ({
   return (
     <div
       className="column column-Text"
+      data-color-burst="true"
       data-display={display}
       data-color={color}
       ref={container}

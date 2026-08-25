@@ -25,18 +25,11 @@ const getParticipants = (pathname: string | null) => {
   if (!page) return [];
 
   if (pathname === '/') {
-    const introAndFilter = Array.from(
+    return Array.from(
       page.querySelectorAll<HTMLElement>(
-        ':scope > .blok-Intro, :scope > .blok-Filter',
+        ':scope > .blok-Intro, :scope > .blok-Filter, :scope > .blok-ProjectList',
       ),
     );
-    const projectRows = Array.from(
-      page.querySelectorAll<HTMLElement>(
-        ':scope > .blok-ProjectList > .blok-Project[data-stack-item="true"]',
-      ),
-    ).filter((item) => item.offsetParent !== null);
-
-    return [...introAndFilter, ...projectRows];
   }
 
   return Array.from(
@@ -169,12 +162,6 @@ const StackTimelineBehavior = () => {
     const page = document.querySelector<HTMLElement>(
       '.page-General, .page-Project',
     );
-    const projectList = page?.querySelector<HTMLElement>(
-      ':scope > .blok-ProjectList',
-    );
-    const observer = new MutationObserver(refresh);
-    if (projectList) observer.observe(projectList, { childList: true });
-
     const resizeObserver = new ResizeObserver(refresh);
     if (page) resizeObserver.observe(page);
 
@@ -184,7 +171,6 @@ const StackTimelineBehavior = () => {
 
     return () => {
       cancelled = true;
-      observer.disconnect();
       resizeObserver.disconnect();
       window.removeEventListener('resize', refresh);
       killTimeline();

@@ -24,7 +24,10 @@ test('mobile experience title keeps the same padding rhythm as stacked titles', 
 
 test('experience blok is code-owned and uses Storyblok only for placement', () => {
   assert.match(componentSource, /storyblokEditable/);
-  assert.match(componentSource, /<h2[^>]*>Experience<\/h2>/);
+  assert.match(
+    componentSource,
+    /<h2[^>]*>[\s\S]*<ColorBurstText>Experience<\/ColorBurstText>[\s\S]*<\/h2>/,
+  );
   assert.match(componentSource, /experienceItems\.map/);
   assert.match(componentSource, /Dries Bos Studio|Mmerch|Anatha|Fotomat|Close My Eyes/);
   assert.doesNotMatch(componentSource, /StoryblokServerComponent/);

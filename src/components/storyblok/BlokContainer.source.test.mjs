@@ -235,26 +235,19 @@ test('project list does not reserve hover overlap', () => {
   );
 });
 
-test('project items own their frames while the structural list collapses borders', () => {
+test('project list uses its shared blok frame while child bloks draw interior dividers', () => {
   const projectListBlock =
     globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';
   const projectBlock =
     globalStyleSource.match(/&-Project\n[\s\S]*?&-Exp/)?.[0] || '';
 
-  assert.match(projectListBlock, /display: flex/);
-  assert.match(projectListBlock, /flex-direction: column/);
-  assert.match(projectListBlock, /border: 0/);
-  assert.match(projectListBlock, /background: transparent/);
-  assert.match(projectListBlock, /perspective: none/);
   assert.match(
     projectListBlock,
-    /\.blok-Filter \+ &[\s\S]*margin-top: calc\(0px - \(#{var\(--border-width\)}\)\)/,
+    /& > \.blok\n\s+border: 0[\s\S]*& > \.blok \+ \.blok\n\s+border-top: var\(--border-width\) solid currentColor/,
   );
-  assert.match(
-    projectListBlock,
-    /& > \.blok-Project[\s\S]*margin-top: calc\(0px - \(#{var\(--border-width\)}\)\)/,
-  );
-  assert.doesNotMatch(projectListBlock, /& > \.blok\n\s+border: 0/);
+  assert.doesNotMatch(projectListBlock, /border-top: 0|\.blok-Filter \+ &/);
+  assert.doesNotMatch(projectListBlock, /perspective: none|background: transparent/);
+  assert.doesNotMatch(projectListBlock, /& > \.blok-Project[\s\S]*margin-top:/);
   assert.doesNotMatch(
     projectBlock,
     /border-top: var\(--border-width\) solid currentColor !important/,

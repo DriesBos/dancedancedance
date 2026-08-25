@@ -119,7 +119,7 @@ test('project list sort/search helpers stay hoisted outside the client component
   }
 });
 
-test('home project thumbnail wrapper owns irregular hover thumbnails without cursor preview', () => {
+test('home project thumbnail wrapper owns irregular hover thumbnails without duplicate project copy', () => {
   const projectSource = readSource('./BlokProject.tsx');
   const listSource = readSource('./storyblok/BlokProjectListClient.tsx');
   const listStyleSource = readSource('./storyblok/BlokProjectListClient.module.sass');
@@ -130,83 +130,34 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
     globalStyleSource.match(/&-ProjectList\n[\s\S]*?&-Filter/)?.[0] || '';
   const globalProjectBlock =
     globalStyleSource.match(/&-Project\n[\s\S]*?&-Exp/)?.[0] || '';
-  const activeProjectLayerBlock =
-    listStyleSource.match(/\.activeProjectLayer\n[\s\S]*?\.activeProjectRow/)?.[0] || '';
   const thumbnailItemBlock =
     wrapperStyleSource.match(/\.thumbnailItem\n[\s\S]*?\.thumbnailItemLeaving/)?.[0] || '';
-  const thumbnailBlendOverlayBlock =
-    wrapperStyleSource.match(/\.thumbnailBlendOverlay\n[\s\S]*?\.thumbnailItemLeaving/)?.[0] || '';
   const thumbnailImageBlock =
     wrapperStyleSource.match(/\.thumbnailImage\n[\s\S]*?@keyframes/)?.[0] || '';
-  const thumbnailBaseChildrenIndex = wrapperSource.indexOf('      {children}');
-  const thumbnailMapIndex = wrapperSource.indexOf('{hoverThumbnails.map');
-  const thumbnailBlendOverlayIndex = wrapperSource.indexOf(
-    '{blendChildren && thumbnailMaskStyle && (',
-  );
 
-  assert.match(projectSource, /hideProjectCopy\?: boolean;/);
-  assert.match(projectSource, /onProjectHover\?: \(element: HTMLDivElement\) => void;/);
-  assert.match(projectSource, /onProjectHover\?\.\(event\.currentTarget\);/);
-  assert.match(projectSource, /data-hide-copy=\{hideProjectCopy \? true : undefined\}/);
-  assert.match(
-    projectSource,
-    /data-stack-item=\{stackIndex !== undefined \? true : undefined\}/,
-  );
-  assert.match(
-    projectSource,
-    /\{stackIndex !== undefined && <BlokSidePanels \/>\}/,
-  );
+  assert.match(projectSource, /onProjectHover\?: \(\) => void;/);
+  assert.match(projectSource, /onProjectHover\?\.\(\);/);
+  assert.doesNotMatch(projectSource, /hideProjectCopy|data-hide-copy/);
+  assert.doesNotMatch(projectSource, /data-stack-item/);
+  assert.doesNotMatch(projectSource, /BlokSidePanels/);
   assert.doesNotMatch(projectSource, /cursorPreview|data-cursor-preview|disableCursorPreview/);
   assert.doesNotMatch(listSource, /disableCursorPreview/);
-  assert.match(listSource, /hideProjectCopy=\{activeProjectSlug === item\.slug\}/);
-  assert.match(listSource, /activeProjectOverlay/);
-  assert.match(listSource, /activeProjectElementRef/);
-  assert.match(listSource, /activeProjectElementRef\.current = element;/);
-  assert.match(listSource, /window\.requestAnimationFrame/);
-  assert.match(listSource, /window\.addEventListener\('scroll', updateOverlayPosition, \{ passive: true \}\)/);
-  assert.match(listSource, /window\.addEventListener\('resize', updateOverlayPosition\)/);
-  assert.match(listSource, /getBoundingClientRect\(\)/);
+  assert.doesNotMatch(
+    listSource,
+    /activeProjectOverlay|activeProjectElementRef|renderActiveProjectOverlay|hideProjectCopy|getBoundingClientRect|requestAnimationFrame|addEventListener\('scroll'/,
+  );
   assert.match(listSource, /const canUseHoverThumbnails = \(\) =>/);
   assert.match(listSource, /window\.matchMedia\('\(hover: hover\) and \(pointer: fine\)'\)\.matches/);
   assert.match(listSource, /if \(!canUseHoverThumbnails\(\)\) return;/);
-  assert.match(listSource, /const renderActiveProjectOverlay = \(isBlendLayer = false\) =>/);
-  assert.match(listSource, /isBlendLayer \? styles\.activeProjectRowBlend : ''/);
-  assert.match(listSource, /className=\{styles\.activeProjectLayer\} aria-hidden="true" inert/);
-  assert.match(listSource, /style=\{activeProjectOverlayStyle\}/);
   assert.doesNotMatch(listStyleSource, /:global\(\.blok-Project:hover\)/);
-  assert.match(listStyleSource, /:global\(\.blok-Project\[data-hide-copy='true'\] \.row > \.column\)/);
-  assert.match(listStyleSource, /opacity: 0/);
-  assert.match(listStyleSource, /\.activeProjectLayer/);
-  assert.match(listStyleSource, /pointer-events: none/);
-  assert.match(listStyleSource, /\.activeProjectRow/);
-  assert.match(listStyleSource, /\.activeProjectRow[\s\S]*z-index: 1/);
-  assert.match(listStyleSource, /color: var\(--theme-type\)/);
-  assert.doesNotMatch(listStyleSource, /color: var\(--theme-type-support\)/);
+  assert.doesNotMatch(listStyleSource, /data-hide-copy|activeProjectLayer|activeProjectRow/);
   assert.doesNotMatch(listStyleSource, /transform: translateY\(-1\.8rem\)/);
-  assert.match(activeProjectLayerBlock, /display: contents/);
-  assert.doesNotMatch(activeProjectLayerBlock, /z-index: 1/);
-  assert.match(projectSource, /style=\{\{ zIndex: stackIndex \}\}/);
+  assert.doesNotMatch(projectSource, /style=\{\{ zIndex: stackIndex \}\}/);
   assert.doesNotMatch(projectSource, /9998|isHoverActive/);
   assert.doesNotMatch(projectSource, /stackIndex \?\? 0/);
-  assert.match(listSource, /stackIndex=\{visibleProjects\.length - index\}/);
-  assert.match(listSource, /<BlokProject title="No work found\.\." stackIndex=\{1\} \/>/);
+  assert.doesNotMatch(listSource, /stackIndex=\{visibleProjects\.length - index\}/);
+  assert.doesNotMatch(listSource, /<BlokProject title="No work found\.\." stackIndex=\{1\} \/>/);
   assert.doesNotMatch(listSource, /isHoverActive/);
-  assert.match(listStyleSource, /isolation: auto !important/);
-  assert.match(listStyleSource, /font-weight: 400/);
-  assert.match(listStyleSource, /:global\(\.blok-Project \.column-Year\),/);
-  assert.match(listStyleSource, /:global\(\.blok-Project \.column-Project\),/);
-  assert.match(listStyleSource, /:global\(\.blok-Project \.column-Category\)[\s\S]*font-weight: 400/);
-  assert.match(listStyleSource, /\.activeProjectRowBlend/);
-  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*display: none/);
-  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*@supports \(mix-blend-mode: difference\)[\s\S]*display: block/);
-  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*color: #fff/);
-  assert.match(listStyleSource, /\.activeProjectRowBlend[\s\S]*mix-blend-mode: difference/);
-  assert.match(listStyleSource, /background: transparent !important/);
-  assert.match(listStyleSource, /border-color: transparent !important/);
-  assert.match(listStyleSource, /border-left-width: 0 !important/);
-  assert.match(listStyleSource, /border-right-width: 0 !important/);
-  assert.match(listStyleSource, /:global\(\.blok-Project \.column-Icons\)/);
-  assert.match(listStyleSource, /opacity: 0 !important/);
   assert.doesNotMatch(globalProjectListBlock, /\.blok-Project:hover[\s\S]*transform: translateY\(-1\.8rem\) !important/);
   assert.doesNotMatch(globalProjectListBlock, /padding-bottom: calc\(3\.95rem \* 0\.5\)/);
   assert.doesNotMatch(globalProjectBlock, /padding-bottom: calc\(3\.95rem \* 0\.5\)/);
@@ -217,18 +168,17 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.match(listSource, /import ThumbnailWrapper/);
   assert.match(listSource, /from '\.\/ThumbnailWrapper';/);
   assert.match(listSource, /<ThumbnailWrapper/);
-  assert.match(listSource, /<\/ThumbnailWrapper>/);
+  assert.match(listSource, /leaveEvent=\{leaveEvent\}\n\s+\/>/);
   assert.doesNotMatch(listSource, /GridThumbnailWrapper/);
   assert.match(listSource, /projects=\{visibleProjects\}/);
   assert.match(listSource, /hoverEvent=\{hoverEvent\}/);
   assert.match(listSource, /leaveEvent=\{leaveEvent\}/);
-  assert.match(listSource, /blendChildren=\{renderActiveProjectOverlay\(true\)\}/);
-  assert.match(listSource, /\{renderActiveProjectOverlay\(\)\}/);
+  assert.doesNotMatch(listSource, /blendChildren|renderActiveProjectOverlay/);
   const thumbnailWrapperIndex = listSource.indexOf(
     '<ThumbnailWrapper\n        projects={visibleProjects}',
   );
   const projectListIndex = listSource.indexOf(
-    '<div\n        className={`blok-Animate blok-ProjectList',
+    '<div\n        className={`blok blok-Animate blok-ProjectList',
   );
 
   assert.notEqual(thumbnailWrapperIndex, -1);
@@ -238,10 +188,10 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
     'thumbnail wrapper must render outside the animated project list container',
   );
   assert.match(wrapperSource, /projects: ProjectData\[\];/);
-  assert.match(wrapperSource, /children\?: ReactNode;/);
-  assert.match(wrapperSource, /blendChildren\?: ReactNode;/);
-  assert.match(wrapperSource, /\{children\}/);
-  assert.match(wrapperSource, /type ThumbnailMaskStyle = CSSProperties &/);
+  assert.doesNotMatch(
+    wrapperSource,
+    /children\?: ReactNode|blendChildren|ThumbnailMaskStyle|thumbnailBlendOverlay|thumb-mask/,
+  );
   assert.match(wrapperSource, /parseStoryblokImageDimensions/);
   assert.match(wrapperSource, /transformStoryblokImageUrl/);
   assert.match(wrapperSource, /warmStoryblokImage/);
@@ -260,19 +210,6 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.doesNotMatch(wrapperSource, /width: 1200/);
   assert.doesNotMatch(wrapperSource, /quality: 70/);
   assert.doesNotMatch(wrapperSource, /getProjectThumbnailSrc/);
-  assert.match(wrapperSource, /const thumbnailMaskStyle = useMemo<ThumbnailMaskStyle \| undefined>/);
-  assert.match(wrapperSource, /'--thumb-mask-image': maskImage/);
-  assert.match(wrapperSource, /'--thumb-mask-position': maskPosition/);
-  assert.match(wrapperSource, /'--thumb-mask-size': maskSize/);
-  assert.match(wrapperSource, /thumbnail\.x \+ \(thumbnail\.size - thumbnail\.frameWidth\) \/ 2/);
-  assert.match(wrapperSource, /thumbnail\.y \+ \(thumbnail\.size - thumbnail\.frameHeight\) \/ 2/);
-  assert.match(wrapperSource, /`\$\{thumbnail\.frameWidth\}px \$\{thumbnail\.frameHeight\}px`/);
-  assert.match(wrapperSource, /className=\{styles\.thumbnailBlendOverlay\}/);
-  assert.notEqual(thumbnailBaseChildrenIndex, -1);
-  assert.notEqual(thumbnailMapIndex, -1);
-  assert.notEqual(thumbnailBlendOverlayIndex, -1);
-  assert.ok(thumbnailBaseChildrenIndex < thumbnailMapIndex);
-  assert.ok(thumbnailMapIndex < thumbnailBlendOverlayIndex);
   assert.match(wrapperSource, /import \{ createPortal \} from 'react-dom';/);
   assert.match(wrapperSource, /const \[portalTarget, setPortalTarget\] = useState<HTMLElement \| null>\(null\);/);
   assert.match(wrapperSource, /setPortalTarget\(document\.body\);/);
@@ -337,11 +274,7 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without cur
   assert.match(thumbnailItemBlock, /z-index: 2/);
   assert.doesNotMatch(thumbnailItemBlock, /filter: var\(--thumb-shadow\)/);
   assert.doesNotMatch(thumbnailItemBlock, /scale\(/);
-  assert.match(thumbnailBlendOverlayBlock, /z-index: 3/);
-  assert.match(thumbnailBlendOverlayBlock, /-webkit-mask-image: var\(--thumb-mask-image\)/);
-  assert.match(thumbnailBlendOverlayBlock, /mask-image: var\(--thumb-mask-image\)/);
-  assert.match(thumbnailBlendOverlayBlock, /mask-position: var\(--thumb-mask-position\)/);
-  assert.match(thumbnailBlendOverlayBlock, /mask-size: var\(--thumb-mask-size\)/);
+  assert.doesNotMatch(wrapperStyleSource, /thumbnailBlendOverlay|thumb-mask/);
   assert.doesNotMatch(thumbnailImageBlock, /filter: var\(--thumb-shadow\)/);
   assert.match(wrapperStyleSource, /transform: translate3d\(var\(--thumbnail-x\), var\(--thumbnail-y\), 0\)/);
   assert.doesNotMatch(wrapperStyleSource, /scale\(/);
@@ -380,8 +313,11 @@ test('blok chrome memoization uses React shallow comparison only', () => {
   assert.match(sidePanelsSource, /const BlokSidePanels = memo\(BlokSidePanelsComponent\);/);
   assert.match(sidePanelsSource, /side_Top/);
   assert.doesNotMatch(sidePanelsSource, /side_(?:Bottom|Back)/);
-  assert.match(projectSource, /import BlokSidePanels/);
-  assert.doesNotMatch(projectListSource, /BlokSidePanels|GrainyGradient|<Row>/);
+  assert.doesNotMatch(projectSource, /import BlokSidePanels/);
+  assert.match(projectListSource, /BlokSidePanels/);
+  assert.equal((projectListSource.match(/<BlokSidePanels \/>/g) ?? []).length, 1);
+  assert.match(projectListSource, /GrainyGradient/);
+  assert.doesNotMatch(projectListSource, /<Row>/);
   assert.match(
     sidePanelsStyleSource,
     /transition: background var\(--theme-transition\), opacity var\(--theme-transition\)/,

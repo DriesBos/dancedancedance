@@ -34,20 +34,6 @@
   animation: thumbnailItemEnter var(--thumb-enter) forwards
   will-change: opacity
 
-.thumbnailBlendOverlay
-  position: fixed
-  inset: 0
-  pointer-events: none
-  z-index: 3
-  -webkit-mask-image: var(--thumb-mask-image)
-  mask-image: var(--thumb-mask-image)
-  -webkit-mask-position: var(--thumb-mask-position)
-  mask-position: var(--thumb-mask-position)
-  -webkit-mask-repeat: no-repeat
-  mask-repeat: no-repeat
-  -webkit-mask-size: var(--thumb-mask-size)
-  mask-size: var(--thumb-mask-size)
-
 .thumbnailItemLeaving
   animation: thumbnailItemExit var(--thumb-exit) both
 

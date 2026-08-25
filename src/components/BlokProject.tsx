@@ -3,12 +3,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useCallback } from 'react';
-import type { MouseEvent } from 'react';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
 import GrainyGradient from '@/components/GrainyGradient';
-import BlokSidePanels from '@/components/BlokSidePanels';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import { getSafeExternalHref } from '@/lib/safe-url';
 
 interface Props {
@@ -17,9 +16,7 @@ interface Props {
   title?: string;
   category?: string[];
   external_link?: { cached_url: string };
-  stackIndex?: number;
-  hideProjectCopy?: boolean;
-  onProjectHover?: (element: HTMLDivElement) => void;
+  onProjectHover?: () => void;
   onProjectLeave?: () => void;
 }
 
@@ -29,8 +26,6 @@ const BlokProject = ({
   title,
   category,
   external_link,
-  stackIndex,
-  hideProjectCopy,
   onProjectHover,
   onProjectLeave,
 }: Props) => {
@@ -46,13 +41,14 @@ const BlokProject = ({
     hasPrefetchedRef.current = true;
   }, [href, router]);
 
-  const handleMouseEnter = (event: MouseEvent<HTMLDivElement>) => {
+  const handleMouseEnter = () => {
     prefetchProject();
-    onProjectHover?.(event.currentTarget);
+    onProjectHover?.();
   };
 
   // Extract just the year from the date value
   const displayYear = year ? new Date(year).getFullYear() : null;
+  const categoryLabel = category?.map((item) => item.toLowerCase()).join(', ');
 
   return (
     <div
@@ -60,12 +56,8 @@ const BlokProject = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={onProjectLeave}
       onTouchStart={prefetchProject}
-      data-hide-copy={hideProjectCopy ? true : undefined}
-      data-stack-item={stackIndex !== undefined ? true : undefined}
-      style={{ zIndex: stackIndex }}
     >
       <GrainyGradient variant="blok" />
-      {stackIndex !== undefined && <BlokSidePanels />}
       {href && (
         <Link
           href={href}
@@ -77,12 +69,22 @@ const BlokProject = ({
       <Row>
         <GrainyGradient variant="blok" className="grainyInRow" />
         <div className="column column-Left">
-          {displayYear && <div className="column column-Year">{displayYear}</div>}
-          {title && <div className="column column-Project">{title}</div>}
+          {displayYear && (
+            <div className="column column-Year">
+              <ColorBurstText>{displayYear.toString()}</ColorBurstText>
+            </div>
+          )}
+          {title && (
+            <div className="column column-Project">
+              <ColorBurstText>{title}</ColorBurstText>
+            </div>
+          )}
         </div>
         <div className="column column-Right">
-          {category && (
-            <div className="column column-Category">{category.map((c) => c.toLowerCase()).join(', ')}</div>
+          {categoryLabel && (
+            <div className="column column-Category">
+              <ColorBurstText>{categoryLabel}</ColorBurstText>
+            </div>
           )}
           <div className="column column-Icons">
             {externalHref && (

@@ -12,6 +12,9 @@ test('newsletter text scrambling is owned by one reusable hook', () => {
   assert.equal((newsletterSource.match(/useGSAP\(/g) || []).length, 1);
   assert.match(newsletterSource, /useTextScramble\(buttonTextRef, buttonText\)/);
   assert.match(newsletterSource, /useTextScramble\(messageRef, message\)/);
+  assert.match(newsletterSource, /<ColorBurstText>\{buttonText\}<\/ColorBurstText>/);
+  assert.match(newsletterSource, /querySelectorAll<HTMLElement>\('\[data-color-burst-character\]'\)/);
+  assert.match(newsletterSource, /setScrambleText\(\s*currentElement,\s*targetText/);
   assert.doesNotMatch(newsletterSource, /Playful scramble animation for message text/);
 });
 

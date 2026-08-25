@@ -1,6 +1,7 @@
 'use client';
 
 import BlokSidePanels from '@/components/BlokSidePanels';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import GrainyGradient from '@/components/GrainyGradient';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from '@/components/Row';
@@ -38,9 +39,11 @@ export default function BlokFilter({
             data-inactive={!isSortActive('year')}
             onClick={() => onSortChange('year')}
           >
-            year
+            <ColorBurstText>year</ColorBurstText>
           </button>
-          <div className="column column-Title mobile">Selected work</div>
+          <div className="column column-Title mobile">
+            <ColorBurstText>Selected work</ColorBurstText>
+          </div>
           <button
             type="button"
             className={`column column-Project cursorInteract desktop ${styles.sortButton}`}
@@ -48,7 +51,7 @@ export default function BlokFilter({
             data-inactive={!isSortActive('title')}
             onClick={() => onSortChange('title')}
           >
-            selected work
+            <ColorBurstText>selected work</ColorBurstText>
           </button>
         </div>
         <div className="column column-Right">
@@ -59,7 +62,7 @@ export default function BlokFilter({
             data-inactive={!isSortActive('category')}
             onClick={() => onSortChange('category')}
           >
-            type of work
+            <ColorBurstText>type of work</ColorBurstText>
           </button>
           <div className={`column column-Icons ${styles.iconWrapper}`}>
             <div className={`icon ${styles.icon}`}>

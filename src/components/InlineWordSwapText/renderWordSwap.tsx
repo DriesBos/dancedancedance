@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import type { ReactNode } from 'react';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import WordSwapRotatorClient from './WordSwapRotatorClient';
 import {
   parseTextSegments,
@@ -16,7 +17,9 @@ export const renderWordSwapText = (
     (segment, index) => {
       if (segment.type === 'text') {
         return (
-          <Fragment key={`${keyPrefix}-text-${index}`}>{segment.value}</Fragment>
+          <ColorBurstText key={`${keyPrefix}-text-${index}`}>
+            {segment.value}
+          </ColorBurstText>
         );
       }
 

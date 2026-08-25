@@ -2,6 +2,7 @@
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import { useEffect, useMemo, useState } from 'react';
 import {
   parseStoryblokImageDimensions,
@@ -149,7 +150,11 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
                   style={{ width: '100%', height: 'auto' }}
                 />
               </div>
-              {image.name && <div className="column-Caption">{image.name}</div>}
+              {image.name && (
+                <div className="column-Caption">
+                  <ColorBurstText>{image.name}</ColorBurstText>
+                </div>
+              )}
             </div>
           );
         })}
@@ -158,7 +163,11 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           activeIndex={activeIndex}
         />
       </div>
-      {blok.caption && <div className="column-Caption">{blok.caption}</div>}
+      {blok.caption && (
+        <div className="column-Caption">
+          <ColorBurstText>{blok.caption}</ColorBurstText>
+        </div>
+      )}
     </div>
   );
 };

@@ -8,12 +8,6 @@ const HEADER_INTRO_VISIBLE_ATTR = 'data-header-intro-visible';
 
 const getHeaderTargets = () =>
   Array.from(document.querySelectorAll<HTMLElement>('.blok-AnimateHead'));
-const getHeaderContentTargets = () =>
-  Array.from(
-    document.querySelectorAll<HTMLElement>(
-      '.blok-AnimateHead > div > :not(.side_Top):not(.grainyGradient)',
-    ),
-  );
 
 const hasHeaderInitCompleted = () =>
   document.body?.getAttribute(HEADER_INIT_COMPLETE_ATTR) === 'true';
@@ -32,17 +26,14 @@ export default function HeaderInitAnimation() {
   useGSAP(() => {
     const headerTargets = getHeaderTargets();
     if (headerTargets.length === 0) return;
-    const headerContentTargets = getHeaderContentTargets();
 
     if (hasAnimatedHeader.current || hasHeaderInitCompleted()) {
       gsap.set(headerTargets, { opacity: 1 });
-      gsap.set(headerContentTargets, { opacity: 1 });
       markHeaderIntroVisible();
       return;
     }
 
-    gsap.set(headerTargets, { opacity: 1 });
-    gsap.set(headerContentTargets, { opacity: 0 });
+    gsap.set(headerTargets, { opacity: 0 });
 
     const completeHeaderIntro = () => {
       hasAnimatedHeader.current = true;
@@ -50,12 +41,11 @@ export default function HeaderInitAnimation() {
       markHeaderIntroVisible();
     };
 
-    gsap.to(headerContentTargets, {
+    gsap.to(headerTargets, {
       opacity: 1,
       duration: 1,
       ease: 'expo.out',
       overwrite: 'auto',
-      clearProps: 'opacity',
       onComplete: completeHeaderIntro,
     });
   });

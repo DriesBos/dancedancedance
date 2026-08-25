@@ -13,6 +13,7 @@ import AppInitializer from '@/components/AppInitStore';
 import BlokHead from '@/components/BlokHead';
 import BlokFooter from '@/components/BlokFooter';
 import ClientEnhancements from '@/components/ClientEnhancements';
+import ColorBurstTypography from '@/components/ColorBurstTypography/ColorBurstTypography';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
 import StackTimelineBehavior from '@/components/StackTimelineBehavior';
 import {
@@ -238,6 +239,7 @@ export default async function RootLayout({
         {/* Page background effects are temporarily disabled. */}
         <AppInitializer />
         <ClientEnhancements />
+        <ColorBurstTypography />
         <StackTimelineBehavior />
         {gaId && (
           <>

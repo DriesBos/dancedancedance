@@ -15,7 +15,7 @@ const CONTENT_SECURITY_POLICY =
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+    `script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
     "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.storyblok.com https://*.storyblokchina.cn https://image.mux.com https://www.google-analytics.com https://www.googletagmanager.com",

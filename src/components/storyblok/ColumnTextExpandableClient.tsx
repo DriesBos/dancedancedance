@@ -23,6 +23,7 @@ const ColumnTextExpandableClient = ({
   return (
     <div
       className="column column-Text column-TextExpandable"
+      data-color-burst="true"
       ref={container}
       {...editableAttributes}
     >

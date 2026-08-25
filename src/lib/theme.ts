@@ -57,3 +57,5 @@ export const getNextThemeForButtonCycle = (
 
   return THEME_ORDER[nextIndex] ?? LIGHT_THEME;
 };
+
+export const isColorBurstTheme = (theme: Theme) => theme !== NIGHT_THEME;

@@ -19,7 +19,14 @@
   - `gh api repos/DriesBos/dancedancedance/commits/<sha>/status --jq '{state: .state, statuses: [.statuses[] | {context, state, target_url, description}]}'`
 - If GitHub points to a Netlify deploy id, inspect that deploy next with the Netlify connector: `get-deploy-for-site` using the site id above and the deploy id from GitHub/Netlify.
 - GitHub Actions deploys require repository secrets `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID`; branch protection expects required checks `check`, `deploy-preview`, and `netlify/dries-bos/deploy-preview`.
-- For Next.js runtime verification, use `skills/next-dev-loop/SKILL.md` and invoke the project-local browser CLI with `pnpm exec agent-browser`.
+
+## Browser Checks
+
+- Use the `/_next/mcp` checks from `skills/next-dev-loop/SKILL.md` for Next.js runtime verification.
+- In Codex Desktop, use the in-app browser for isolated localhost checks by default. Use connected Chrome when the user explicitly requests it or existing Chrome state/extensions matter. Check visible behavior and browser console output, then cross-check `get_compilation_issues`, `get_errors`, and `get_page_metadata` through `/_next/mcp`.
+- Do not launch `pnpm exec agent-browser` from the Codex Desktop sandbox. Its Chrome for Testing child cannot register with macOS and causes crash notifications. Do not retry the launch or misdiagnose it as an app failure.
+- Use the full `agent-browser` path from `next-dev-loop` only outside the app sandbox or against an externally started Chrome CDP endpoint. Reserve it for React fiber/render-count or vitals checks that managed browser control cannot provide.
+- Fall back to source inspection only when both managed browser surfaces are unavailable, and state that live browser proof is missing.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

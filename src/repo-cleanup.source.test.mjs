@@ -92,6 +92,10 @@ test('Content Security Policy is static so pages can prerender', () => {
   assert.doesNotMatch(netlifySource, /Content-Security-Policy-Report-Only/);
   assert.match(proxySource, /Content-Security-Policy/);
   assert.match(proxySource, /'unsafe-inline'/);
+  assert.match(
+    proxySource,
+    /process\.env\.NODE_ENV === 'development'[\s\S]*'unsafe-eval'/,
+  );
   assert.doesNotMatch(proxySource, /nonce|x-nonce|crypto\.getRandomValues/);
   assert.doesNotMatch(proxySource, /report-uri|csp-report/);
   assert.doesNotMatch(layoutSource, /headers\(\)/);

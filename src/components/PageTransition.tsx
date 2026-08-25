@@ -14,14 +14,6 @@ export default function PageTransition({ children }: PageTransitionProps) {
   const theme = useStore((state) => state.theme);
   const getBlockTargets = () =>
     Array.from(document.querySelectorAll<HTMLElement>('.blok-Animate'));
-  const getBlockContentTargets = (block: HTMLElement) =>
-    Array.from(
-      block.querySelectorAll<HTMLElement>(
-        block.matches('.blok-ProjectList')
-          ? ':scope > .blok-Project > :not(.side_Top):not(.grainyGradient)'
-          : ':scope > :not(.side_Top):not(.grainyGradient)',
-      ),
-    );
 
   // Force top on every client-side route change.
   useLayoutEffect(() => {
@@ -37,31 +29,20 @@ export default function PageTransition({ children }: PageTransitionProps) {
     () => {
       const blockTargets = getBlockTargets();
       if (blockTargets.length === 0) return;
-      const contentTargets = blockTargets.map(getBlockContentTargets);
 
       gsap.set(blockTargets, {
-        opacity: 1,
+        opacity: 0,
         y: '5vh',
       });
-      contentTargets.forEach((targets) => gsap.set(targets, { opacity: 0 }));
 
       gsap.to(blockTargets, {
+        opacity: 1,
         y: 0,
         duration: 1,
         ease: 'expo.out',
         overwrite: 'auto',
         stagger: 0.15,
       });
-      contentTargets.forEach((targets, index) =>
-        gsap.to(targets, {
-          opacity: 1,
-          duration: 1,
-          delay: index * 0.15,
-          ease: 'expo.out',
-          overwrite: 'auto',
-          clearProps: 'opacity',
-        }),
-      );
     },
     {
       dependencies: [pathname, theme],

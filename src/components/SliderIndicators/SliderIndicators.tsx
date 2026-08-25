@@ -14,11 +14,15 @@ const SliderIndicators = ({
   if (total <= 1) return null;
 
   return (
-    <div className={`${styles.sliderIndicator} ${className}`.trim()}>
+    <div
+      className={`${styles.sliderIndicator} ${className}`.trim()}
+      data-color-burst-indicators
+    >
       {Array.from({ length: total }).map((_, index) => (
         <div
           key={index}
           className={styles.sliderIndicator_Item}
+          data-color-burst-shape
           data-active={index === activeIndex}
         />
       ))}

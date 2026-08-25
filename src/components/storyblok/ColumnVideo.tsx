@@ -1,5 +1,6 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import MuxPlayer from '../MuxPlayer';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import { storyblokVideoPosterUrl } from '@/lib/storyblok-image';
 
 interface SbPageData extends SbBlokData {
@@ -39,7 +40,11 @@ const ColumnVideo: React.FunctionComponent<ColumnVideoProps> = ({ blok }) => {
           aspectRatio={blok.aspect_ratio}
         />
       )}
-      {blok.caption && <div className="column-Caption">{blok.caption}</div>}
+      {blok.caption && (
+        <div className="column-Caption">
+          <ColorBurstText>{blok.caption}</ColorBurstText>
+        </div>
+      )}
     </div>
   );
 };

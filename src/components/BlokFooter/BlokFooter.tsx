@@ -5,6 +5,7 @@ import IconArrowLongUp from '@/components/Icons/IconArrowLongUp';
 import ScrollToTopLink from './ScrollToTopLink';
 import GrainyGradient from '@/components/GrainyGradient';
 import BlokSidePanels from '@/components/BlokSidePanels';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import FooterNav from './FooterNav';
 import styles from './BlokFooter.module.sass';
 
@@ -31,8 +32,12 @@ const BlokFooter = () => {
               data-cursor-message="Let's talk"
             >
               <div className="hasExternalIcon">
-                <span className="mailMobile">Email</span>
-                <span className="mailDesktop">hello@driesbos.com</span>
+                <span className="mailMobile">
+                  <ColorBurstText>Email</ColorBurstText>
+                </span>
+                <span className="mailDesktop">
+                  <ColorBurstText>hello@driesbos.com</ColorBurstText>
+                </span>
                 <IconExternal />
               </div>
             </a>
@@ -42,7 +47,7 @@ const BlokFooter = () => {
               rel="noopener noreferrer"
               className="cursorInteract linkAnimation hasExternalIcon"
             >
-              Instagram
+              <ColorBurstText>Instagram</ColorBurstText>
               <IconExternal />
             </a>
             <a
@@ -51,7 +56,7 @@ const BlokFooter = () => {
               rel="noopener noreferrer"
               className="cursorInteract linkAnimation hasExternalIcon"
             >
-              LinkedIn
+              <ColorBurstText>LinkedIn</ColorBurstText>
               <IconExternal />
             </a>
             <div className={`column-Subscribe ${styles.newsletter}`}>

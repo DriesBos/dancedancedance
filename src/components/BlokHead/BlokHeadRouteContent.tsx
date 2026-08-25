@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import Row from '@/components/Row';
 import InlineWordSwapText from '@/components/InlineWordSwapText';
 import IconAbout from '@/components/Icons/IconAbout';
@@ -341,8 +342,15 @@ const BlokHeadRouteContent = ({
                 tokenFormat={titleTokenFormat}
                 durationSeconds={TITLE_SWAP_DURATION_SECONDS}
               />
+            ) : pathName === 'projects' ? (
+              <ColorBurstText>{titleText}</ColorBurstText>
             ) : (
-              titleText
+              <>
+                <ColorBurstText>Dries Bos —</ColorBurstText>
+                <span className={styles.timedTitle} data-color-burst-timed>
+                  <ColorBurstText> Creative Developer</ColorBurstText>
+                </span>
+              </>
             )}
           </Link>
           <span
@@ -451,7 +459,9 @@ const BlokHeadRouteContent = ({
                 <IconArrow />
               </button>
               <div className="projectNumber headerDesktop">
-                {currentProjectIndex + 1}/{projectSlugs.length}
+                <ColorBurstText>
+                  {`${currentProjectIndex + 1}/${projectSlugs.length}`}
+                </ColorBurstText>
               </div>
               <button
                 type="button"

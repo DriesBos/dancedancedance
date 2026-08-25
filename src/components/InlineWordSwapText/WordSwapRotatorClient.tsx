@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { CSSProperties, PointerEvent } from 'react';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import { SWAP_TRANSITION_MS } from './wordSwapShared';
 import styles from './InlineWordSwapText.module.sass';
 
@@ -23,8 +24,8 @@ const WordSwapRotatorClient = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [phase, setPhase] = useState<'hold' | 'slide'>('hold');
   const nextIndex = (currentIndex + 1) % normalizedWords.length;
-  const currentWord = normalizedWords[currentIndex];
-  const nextWord = normalizedWords[nextIndex];
+  const currentWord = normalizedWords[currentIndex] ?? '';
+  const nextWord = normalizedWords[nextIndex] ?? '';
   const holdDurationMs = Math.max(
     400,
     ((durationSeconds * 1000 -
@@ -89,7 +90,7 @@ const WordSwapRotatorClient = ({
       <span className={styles.rotatorSizer} aria-hidden="true">
         {normalizedWords.map((word, index) => (
           <span className={styles.rotatorWord} key={`sizer-${index}-${word}`}>
-            {word}
+            <ColorBurstText>{word}</ColorBurstText>
           </span>
         ))}
       </span>
@@ -98,10 +99,14 @@ const WordSwapRotatorClient = ({
           className={`${styles.rotatorTrack} ${phase === 'slide' ? styles.isAnimating : ''}`}
           style={style}
         >
-          <span className={styles.rotatorWord}>{currentWord}</span>
-          <span className={styles.rotatorWord}>{nextWord}</span>
+          <span className={styles.rotatorWord}>
+            <ColorBurstText>{currentWord}</ColorBurstText>
+          </span>
+          <span className={styles.rotatorWord}>
+            <ColorBurstText>{nextWord}</ColorBurstText>
+          </span>
           <span className={styles.rotatorWord} aria-hidden="true">
-            {currentWord}
+            <ColorBurstText>{currentWord}</ColorBurstText>
           </span>
         </span>
       </span>

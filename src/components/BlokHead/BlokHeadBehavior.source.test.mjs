@@ -53,7 +53,7 @@ test('head active state is local and CSS-driven', () => {
   assert.doesNotMatch(storeSource, /topPanel/);
 });
 
-test('entry animations keep blok surfaces opaque and fade only their content', () => {
+test('entry animations fade complete blok surfaces and move page bloks up', () => {
   assert.doesNotMatch(headStyleSource, /--head-intro-y/);
   assert.match(headStyleSource, /transform: translateY\(0\)/);
   assert.doesNotMatch(
@@ -62,30 +62,23 @@ test('entry animations keep blok surfaces opaque and fade only their content', (
   );
   assert.match(headerInitSource, /opacity: 0/);
   assert.match(headerInitSource, /opacity: 1/);
-  assert.match(headerInitSource, /gsap\.set\(headerTargets, \{ opacity: 1 \}\)/);
+  assert.match(headerInitSource, /gsap\.set\(headerTargets, \{ opacity: 0 \}\)/);
   assert.match(
     headerInitSource,
-    /gsap\.to\(headerContentTargets, \{[\s\S]*opacity: 1/,
+    /gsap\.to\(headerTargets, \{[\s\S]*opacity: 1/,
   );
-  assert.doesNotMatch(
-    headerInitSource,
-    /gsap\.to\(headerTargets, \{[\s\S]*opacity:/,
-  );
+  assert.doesNotMatch(headerInitSource, /headerContentTargets/);
+  assert.doesNotMatch(headerInitSource, /clearProps: 'opacity'/);
   assert.match(
     pageTransitionSource,
-    /:not\(\.side_Top\):not\(\.grainyGradient\)/,
-  );
-  assert.match(
-    pageTransitionSource,
-    /gsap\.set\(blockTargets, \{[\s\S]*opacity: 1,[\s\S]*y: '5vh'/,
+    /gsap\.set\(blockTargets, \{[\s\S]*opacity: 0,[\s\S]*y: '5vh'/,
   );
   const blockTween =
     pageTransitionSource.match(/gsap\.to\(blockTargets, \{[\s\S]*?\n      \}\);/)?.[0] || '';
-  assert.doesNotMatch(blockTween, /opacity:/);
-  assert.match(
-    pageTransitionSource,
-    /gsap\.to\(targets, \{[\s\S]*opacity: 1/,
-  );
+  assert.match(blockTween, /opacity: 1/);
+  assert.match(blockTween, /y: 0/);
+  assert.match(blockTween, /stagger: 0\.15/);
+  assert.doesNotMatch(pageTransitionSource, /getBlockContentTargets|contentTargets/);
   assert.match(
     headerInitSource,
     /const completeHeaderIntro = \(\) => \{[\s\S]*hasAnimatedHeader\.current = true;[\s\S]*markHeaderInitCompleted\(\);[\s\S]*markHeaderIntroVisible\(\);[\s\S]*onComplete: completeHeaderIntro/,
@@ -297,11 +290,31 @@ test('theme foreground transition is body-owned and inherited by chrome', () => 
   assert.match(headStyleSource, /border: 1\.5px solid currentColor/);
 });
 
-test('muted text inherits theme color and changes only opacity', () => {
-  assert.match(varsStyleSource, /--theme-muted-opacity: \.5/);
-  assert.match(varsStyleSource, /body\[data-theme='DARK'\][\s\S]*--theme-muted-opacity: \.6/);
-  assert.match(varsStyleSource, /body\[data-theme='NIGHT'\][\s\S]*--theme-muted-opacity: \.6/);
-  assert.match(globalStyleSource, /\.u-muted[\s\S]*color: inherit[\s\S]*opacity: var\(--theme-muted-opacity\)/);
+test('muted text is computed from the active body theme without parent opacity', () => {
+  const darkThemeSource = varsStyleSource.slice(
+    varsStyleSource.indexOf("body[data-theme='DARK']"),
+    varsStyleSource.indexOf("body[data-theme='NIGHT']"),
+  );
+  const nightThemeSource = varsStyleSource.slice(
+    varsStyleSource.indexOf("body[data-theme='NIGHT']"),
+    varsStyleSource.indexOf("body[data-fullscreen='true']"),
+  );
+
+  assert.match(
+    varsStyleSource,
+    /--theme-type-muted: rgba\(5, 2, 0, 0\.35\)/,
+  );
+  assert.match(darkThemeSource, /--theme-type: white/);
+  assert.match(darkThemeSource, /--theme-type-muted: rgba\(255, 255, 255, 0\.5\)/);
+  assert.match(darkThemeSource, /--theme-muted-opacity: \.5/);
+  assert.match(nightThemeSource, /--theme-type: hsla\(0, 100%, 50%, 1\)/);
+  assert.match(nightThemeSource, /--theme-type-muted: rgba\(255, 0, 0, 0\.6\)/);
+  assert.match(nightThemeSource, /--theme-muted-opacity: \.6/);
+  assert.doesNotMatch(varsStyleSource, /--theme-type-muted: color-mix/);
+  assert.match(
+    globalStyleSource,
+    /\.u-muted\n\s+color: var\(--theme-type-muted\)\n\s+opacity: 1/,
+  );
   assert.doesNotMatch(varsStyleSource, /--theme-muted-alpha/);
   assert.doesNotMatch(globalStyleSource, /--theme-muted-alpha/);
 });

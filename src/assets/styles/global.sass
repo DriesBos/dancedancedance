@@ -48,8 +48,8 @@ body[data-initializing='true'] *::after
   transition: none !important
 
 .u-muted
-  color: inherit
-  opacity: var(--theme-muted-opacity)
+  color: var(--theme-type-muted)
+  opacity: 1
 
 .visuallyHidden
   position: absolute
@@ -179,9 +179,8 @@ mux-player, .muxPlayer
       padding: var(--blok-padding) var(--spacing-side)
       // For showing unpublished stories
       &[data-inactive='true']
-        color: inherit
-        opacity: var(--theme-muted-opacity)
-        will-change: opacity
+        color: var(--theme-type-muted)
+        opacity: 1
       &-Empty
         @media (max-width: 770px)
           display: none
@@ -205,8 +204,8 @@ mux-player, .muxPlayer
         &-Item
           width: 100%
       &-Caption
-        color: inherit
-        opacity: var(--theme-muted-opacity)
+        color: var(--theme-type-muted)
+        opacity: 1
         font-size: var(--font-size-caption)
         letter-spacing: 0.02em
         line-height: 1.32
@@ -224,8 +223,8 @@ mux-player, .muxPlayer
         // @media (min-width: 770px)
         //   text-align: justify
         &[data-display='desktop']
-          color: inherit
-          opacity: var(--theme-muted-opacity)
+          color: var(--theme-type-muted)
+          opacity: 1
         &[data-display='mobile']
           @media (min-width: 770px)
             display: none
@@ -233,20 +232,20 @@ mux-player, .muxPlayer
           color: inherit
           opacity: 1
         &[data-color='secondary']
-          color: inherit
-          opacity: var(--theme-muted-opacity)
+          color: var(--theme-type-muted)
+          opacity: 1
         p
           display: block
         em
-          color: inherit
-          opacity: var(--theme-muted-opacity)
+          color: var(--theme-type-muted)
+          opacity: 1
       &-TextExpandable
         display: flex
         flex-direction: column
         gap: var(--spacing-base)
         &-More, &-Details
-          color: inherit
-          opacity: var(--theme-muted-opacity)
+          color: var(--theme-type-muted)
+          opacity: 1
         &-Details
           @media (min-width: 770px)
             display: none
@@ -313,8 +312,8 @@ mux-player, .muxPlayer
           min-width: auto
           max-width: none
           overflow: visible
-          color: inherit
-          opacity: var(--theme-muted-opacity)
+          color: var(--theme-type-muted)
+          opacity: 1
           @media (max-width: 770px)
             display: none
           .icon
@@ -370,8 +369,8 @@ mux-player, .muxPlayer
           user-select: none
           .projectNumber
             font-size: 0.66rem
-            color: inherit
-            opacity: var(--theme-muted-opacity)
+            color: var(--theme-type-muted)
+            opacity: 1
             position: absolute
             top: 0.56rem
             left: 5.95rem
@@ -418,19 +417,11 @@ mux-player, .muxPlayer
     opacity: 0
   &-ProjectList
     position: relative
-    display: flex
-    flex-direction: column
     overflow: visible
-    isolation: auto
-    border: 0
-    background: transparent
-    perspective: none
-    .blok-Filter + &
-      margin-top: calc(0px - (#{var(--border-width)}))
-    & > .blok-Project
-      margin-top: calc(0px - (#{var(--border-width)}))
-      &:first-child
-        margin-top: 0
+    & > .blok
+      border: 0
+    & > .blok + .blok
+      border-top: var(--border-width) solid currentColor
   &-Filter
     justify-content: flex-end
     padding-top: var(--blok-padding-extraTop)
@@ -444,8 +435,8 @@ mux-player, .muxPlayer
     .icon
       opacity: 0 !important
     .mobile
-      color: inherit
-      opacity: var(--theme-muted-opacity)
+      color: var(--theme-type-muted)
+      opacity: 1
   &-Project
     position: relative
     opacity: 1

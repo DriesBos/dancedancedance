@@ -2,6 +2,7 @@ import styles from './BlokExperience.module.sass';
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import BlokSidePanels from '../../BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 
 const experienceItems = [
   {
@@ -47,17 +48,25 @@ const BlokExperience = ({ blok, stackIndex }: BlokProps) => {
       <GrainyGradient variant="blok" />
       <BlokSidePanels />
       <div className={styles.blokName}>
-        <h2>Experience</h2>
+        <h2>
+          <ColorBurstText>Experience</ColorBurstText>
+        </h2>
       </div>
       <div className={styles.content}>
         {experienceItems.map(({ period, name, role }) => (
           <div className={styles.row} key={name}>
             <div className={styles.rowItem}>
-              <span className={styles.rowPeriod}>{period}</span>
+              <span className={styles.rowPeriod}>
+                <ColorBurstText>{period}</ColorBurstText>
+              </span>
             </div>
             <div className={styles.rowItem}>
-              <span className={styles.rowName}>{name}</span>
-              <span className={styles.rowRole}>{role}</span>
+              <span className={styles.rowName}>
+                <ColorBurstText>{name}</ColorBurstText>
+              </span>
+              <span className={styles.rowRole}>
+                <ColorBurstText>{role}</ColorBurstText>
+              </span>
             </div>
           </div>
         ))}

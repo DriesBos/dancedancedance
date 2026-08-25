@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { useGSAP } from '@/lib/gsap';
 import { vibrate } from '@/lib/vibration';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import styles from './Newsletter.module.sass';
 
 interface NewsletterProps {
@@ -22,6 +23,21 @@ const SCRAMBLE_FRAME_MS = 30;
 const shouldPreserveScrambleCharacter = (char: string) =>
   char === ' ' || char === '!' || char === '.';
 
+const setScrambleText = (element: HTMLElement, text: string) => {
+  const characters = [
+    ...element.querySelectorAll<HTMLElement>('[data-color-burst-character]'),
+  ];
+
+  if (characters.length === text.length) {
+    characters.forEach((character, index) => {
+      character.textContent = text[index] ?? '';
+    });
+    return;
+  }
+
+  element.textContent = text;
+};
+
 const useTextScramble = (
   textRef: RefObject<HTMLElement | null>,
   targetText: string,
@@ -32,7 +48,7 @@ const useTextScramble = (
       if (!element || !targetText) return;
 
       if (!/^[\x00-\x7F]*$/.test(targetText)) {
-        element.textContent = targetText;
+        setScrambleText(element, targetText);
         return;
       }
 
@@ -41,27 +57,30 @@ const useTextScramble = (
         const currentElement = textRef.current;
         if (!currentElement) return;
 
-        currentElement.textContent = targetText
-          .split('')
-          .map((char, index) => {
-            if (shouldPreserveScrambleCharacter(char)) return char;
-            if (
-              index <
-              (iteration / SCRAMBLE_ITERATIONS_PER_CHARACTER) * targetText.length
-            ) {
-              return targetText[index];
-            }
-            return SCRAMBLE_CHARS[
-              Math.floor(Math.random() * SCRAMBLE_CHARS.length)
-            ];
-          })
-          .join('');
+        setScrambleText(
+          currentElement,
+          targetText
+            .split('')
+            .map((char, index) => {
+              if (shouldPreserveScrambleCharacter(char)) return char;
+              if (
+                index <
+                (iteration / SCRAMBLE_ITERATIONS_PER_CHARACTER) * targetText.length
+              ) {
+                return targetText[index];
+              }
+              return SCRAMBLE_CHARS[
+                Math.floor(Math.random() * SCRAMBLE_CHARS.length)
+              ];
+            })
+            .join(''),
+        );
 
         iteration += 1;
 
         if (iteration > targetText.length * SCRAMBLE_ITERATIONS_PER_CHARACTER) {
           window.clearInterval(interval);
-          currentElement.textContent = targetText;
+          setScrambleText(currentElement, targetText);
         }
       }, SCRAMBLE_FRAME_MS);
 
@@ -220,7 +239,9 @@ export default function Newsletter({ className }: NewsletterProps) {
           className={styles.button}
           disabled={isLoading}
         >
-          <span ref={buttonTextRef}>{buttonText}</span>
+          <span ref={buttonTextRef}>
+            <ColorBurstText>{buttonText}</ColorBurstText>
+          </span>
         </button>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Image from 'next/image';
+import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import {
   parseStoryblokImageDimensions,
   STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
@@ -48,7 +49,11 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
         unoptimized
         style={{ width: '100%', height: 'auto' }}
       />
-      {blok.caption && <div className="column-Caption">{blok.caption}</div>}
+      {blok.caption && (
+        <div className="column-Caption">
+          <ColorBurstText>{blok.caption}</ColorBurstText>
+        </div>
+      )}
     </div>
   );
 };
