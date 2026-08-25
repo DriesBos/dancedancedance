@@ -95,7 +95,7 @@ test('stacked rows keep desktop text columns visible on mobile', () => {
   );
 });
 
-test('fullscreen page border quieting only targets first-level page bloks', () => {
+test('fullscreen page chrome only targets first-level page bloks', () => {
   const fullscreenTrueBlock =
     globalStyleSource.match(
       /&\[data-fullscreen="true"\][\s\S]*?&\[data-fullscreen="false"\]/,
@@ -103,7 +103,7 @@ test('fullscreen page border quieting only targets first-level page bloks', () =
 
   assert.match(
     fullscreenTrueBlock,
-    /\.page\n\s+&-Project,\n\s+&-General\n\s+& > \.blok\n\s+border-top-color: transparent\n\s+border-bottom-color: transparent/,
+    /\.page\n\s+&-Project,\n\s+&-General\n\s+& > \.blok\n\s+border-top-color: transparent\n\s+border-bottom-color: transparent\n\s+z-index: auto !important/,
   );
   assert.doesNotMatch(
     fullscreenTrueBlock,

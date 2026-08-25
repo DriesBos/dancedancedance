@@ -21,6 +21,7 @@ const REPLACEMENTS: Record<string, string> = {
 const CORE_RADIUS = 75;
 const SATELLITE_DISTANCE = 150;
 const CORE_ACTIVATION_CHANCE = 0.9;
+const TEXT_HOLD_MAX_SECONDS = 0.45;
 const LINGER_CHANCE = 0.35;
 const LINGER_MIN_MS = 250;
 const LINGER_MAX_MS = 700;
@@ -105,6 +106,7 @@ const ColorBurstTypography = () => {
       if (timeout === undefined) return;
       window.clearTimeout(timeout);
       lingerTimeouts.delete(character);
+      activeCharacters.delete(character);
     };
 
     const finishDeactivation = (character: HTMLElement) => {
@@ -145,6 +147,7 @@ const ColorBurstTypography = () => {
         return;
       }
 
+      gsap.killTweensOf(character);
       const delay =
         LINGER_MIN_MS +
         getStableWeight(character) * (LINGER_MAX_MS - LINGER_MIN_MS);
@@ -165,6 +168,9 @@ const ColorBurstTypography = () => {
       const original = character.textContent ?? '';
       const color = getBurstColor(character);
       const replacement = REPLACEMENTS[original.toUpperCase()];
+      const holdDuration = isColorOnly
+        ? 0
+        : Math.random() * TEXT_HOLD_MAX_SECONDS;
 
       timedCharacters.delete(character);
       activeCharacters.add(character);
@@ -179,11 +185,18 @@ const ColorBurstTypography = () => {
         duration: 0.3,
         delay: Math.floor(distance / 18) * 0.03,
         ease: 'power3.out',
+        repeat: 1,
+        repeatDelay: holdDuration,
+        yoyo: true,
         overwrite: true,
         onStart: () => {
           if (replacement && Math.random() < 0.5) {
             character.textContent = replacement;
           }
+        },
+        onComplete: () => {
+          activeCharacters.delete(character);
+          restoreCharacter(character);
         },
       });
     };

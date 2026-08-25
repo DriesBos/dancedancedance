@@ -72,7 +72,7 @@ const surfaceSources = [
   '../InlineWordSwapText/WordSwapRotatorClient.tsx',
 ].map((path) => readFileSync(new URL(path, import.meta.url), 'utf8'));
 
-test('color burst uses only a sparse 75px core, dispersed satellites, and lingering real glyphs', () => {
+test('color burst uses a one-shot 75px core, dispersed satellites, and lingering real glyphs', () => {
   assert.doesNotMatch(componentSource, /SplitText/);
   assert.match(textSource, /styles\.character/);
   assert.match(textSource, /Array\.from\(children\)/);
@@ -85,6 +85,7 @@ test('color burst uses only a sparse 75px core, dispersed satellites, and linger
   assert.match(componentSource, /CORE_RADIUS\s*=\s*75/);
   assert.match(componentSource, /SATELLITE_DISTANCE\s*=\s*150/);
   assert.match(componentSource, /CORE_ACTIVATION_CHANCE\s*=\s*0\.9/);
+  assert.match(componentSource, /TEXT_HOLD_MAX_SECONDS\s*=\s*0\.45/);
   assert.doesNotMatch(componentSource, /OUTER_RADIUS|OUTER_NEAR_CHANCE|OUTER_FAR_CHANCE|getActivationChance/);
   assert.match(componentSource, /new WeakMap<HTMLElement, number>\(\)/);
   assert.match(componentSource, /getStableWeight\(character\) > activationChance/);
@@ -104,8 +105,17 @@ test('color burst uses only a sparse 75px core, dispersed satellites, and linger
   assert.match(componentSource, /requestAnimationFrame/);
   assert.match(componentSource, /0\.03/);
   assert.match(componentSource, /duration:\s*0\.3/);
-  assert.doesNotMatch(activationSource, /repeat:\s*1/);
-  assert.doesNotMatch(activationSource, /yoyo:\s*true/);
+  assert.match(activationSource, /repeat:\s*1/);
+  assert.match(
+    activationSource,
+    /const holdDuration = isColorOnly[\s\S]*\? 0[\s\S]*Math\.random\(\) \* TEXT_HOLD_MAX_SECONDS/,
+  );
+  assert.match(activationSource, /repeatDelay:\s*holdDuration/);
+  assert.match(activationSource, /yoyo:\s*true/);
+  assert.match(
+    activationSource,
+    /onComplete:\s*\(\) => \{[\s\S]*activeCharacters\.delete\(character\)[\s\S]*restoreCharacter\(character\)/,
+  );
   assert.match(componentSource, /power3\.out/);
   assert.match(componentSource, /#85AF00/);
   assert.match(componentSource, /#FFCC00/);
