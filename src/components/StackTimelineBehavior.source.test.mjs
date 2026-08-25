@@ -31,6 +31,17 @@ test('stack timeline rebuilds without observing Home project items', () => {
   assert.doesNotMatch(source, /resizeObserver\.observe\(document\.documentElement\)/);
 });
 
+test('stack timeline preserves its rendered progress across rebuilds', () => {
+  assert.match(
+    source,
+    /const progress = timeline\?\.progress\(\);[\s\S]*killTimeline\(\);[\s\S]*setupTimeline\(pathname, progress\)/,
+  );
+  assert.match(
+    source,
+    /if \(initialProgress !== undefined\) \{\s*timeline\.progress\(initialProgress, true\);\s*\}/,
+  );
+});
+
 test('eligible route changes keep the ready state while ranges rebuild', () => {
   const cleanup = source.match(/return \(\) => \{[\s\S]*?\n    \};/)?.[0] || '';
 

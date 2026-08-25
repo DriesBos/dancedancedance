@@ -58,7 +58,10 @@ const clearTimeline = (main: HTMLElement | null) => {
   clearAssignments(main);
 };
 
-const setupTimeline = (pathname: string | null) => {
+const setupTimeline = (
+  pathname: string | null,
+  initialProgress?: number,
+) => {
   const main = document.querySelector<HTMLElement>('main.main');
   if (!main || !isStackTimelinePath(pathname)) return null;
 
@@ -122,6 +125,10 @@ const setupTimeline = (pathname: string | null) => {
     rangeStart = rangeEnd;
   });
 
+  if (initialProgress !== undefined) {
+    timeline.progress(initialProgress, true);
+  }
+
   return timeline;
 };
 
@@ -154,8 +161,9 @@ const StackTimelineBehavior = () => {
       frameRef.current = window.requestAnimationFrame(() => {
         frameRef.current = null;
         if (cancelled) return;
+        const progress = timeline?.progress();
         killTimeline();
-        timeline = setupTimeline(pathname);
+        timeline = setupTimeline(pathname, progress);
       });
     };
 
