@@ -225,10 +225,10 @@ test('slider indicators use the contrast-safe color-only burst path', () => {
   assert.match(sliderIndicatorSource, /data-color-burst-shape/);
 });
 
-test('Creative Developer bursts left to right at a random 30 to 60 second cadence', () => {
+test('Creative Developer bursts left to right at a random 15 to 30 second cadence', () => {
   assert.match(componentSource, /const burstTimedCharacters/);
-  assert.match(componentSource, /TIMED_BURST_MIN_MS\s*=\s*30_000/);
-  assert.match(componentSource, /TIMED_BURST_MAX_MS\s*=\s*60_000/);
+  assert.match(componentSource, /TIMED_BURST_MIN_MS\s*=\s*15_000/);
+  assert.match(componentSource, /TIMED_BURST_MAX_MS\s*=\s*30_000/);
   assert.match(componentSource, /const scheduleTimedBurst/);
   assert.match(componentSource, /setTimeout\([\s\S]*burstTimedCharacters/);
   assert.match(
