@@ -1,8 +1,8 @@
 'use client';
 
-import BlokSidePanels from '@/components/BlokSidePanels';
+import BlokSidePanels from '@/components/BlokSidePanels/BlokSidePanels';
 import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
-import GrainyGradient from '@/components/GrainyGradient';
+import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from '@/components/Row';
 import SearchInput from '@/components/SearchInput';

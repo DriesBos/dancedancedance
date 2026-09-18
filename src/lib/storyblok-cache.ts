@@ -19,9 +19,6 @@ export const normalizeStorySlug = (slug?: string | null): string => {
   return normalized.length > 0 ? normalized : 'home';
 };
 
-export const getStoryblokSlugTag = (slug?: string | null): string =>
-  `storyblok:slug:${normalizeStorySlug(slug)}`;
-
 export const getStoryblokTagsForSlug = (slug?: string | null): string[] => {
   const normalizedSlug = normalizeStorySlug(slug);
   const tags = new Set<string>([

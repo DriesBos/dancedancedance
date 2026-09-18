@@ -1,7 +1,7 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
 import Link from 'next/link';
-import BlokSidePanels from '@/components/BlokSidePanels';
-import GrainyGradient from '@/components/GrainyGradient';
+import BlokSidePanels from '@/components/BlokSidePanels/BlokSidePanels';
+import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
 import InlineWordSwapText from '@/components/InlineWordSwapText';
 import IconArrow from '@/components/Icons/IconArrow';
 import styles from './BlokIntro.module.sass';

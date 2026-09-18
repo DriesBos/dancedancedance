@@ -102,7 +102,6 @@ button:focus {
 *:focus {
   outline: none;
 }
-
 /* HTML5 display-role reset for older browsers */
 article,
 aside,

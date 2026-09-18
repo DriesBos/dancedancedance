@@ -1,4 +1,4 @@
-import BlokError from '@/components/BlokError';
+import BlokError from '@/components/BlokError/BlokError';
 import PageTransition from '@/components/PageTransition';
 
 export default function NotFound() {

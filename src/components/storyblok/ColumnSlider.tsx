@@ -8,7 +8,7 @@ import {
   parseStoryblokImageDimensions,
   STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
 } from '@/lib/storyblok-image';
-import SliderIndicators from '../SliderIndicators';
+import SliderIndicators from '../SliderIndicators/SliderIndicators';
 
 interface SbPageData extends SbBlokData {
   images?: {

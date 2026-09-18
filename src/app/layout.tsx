@@ -9,10 +9,9 @@ import '@/assets/styles/icon-styles.sass';
 import { fetchProjectSlugs } from '@/lib/fetch-projects';
 import { getSiteUrl } from '@/lib/site-url';
 import AppInitializer from '@/components/AppInitStore';
-import BlokHead from '@/components/BlokHead';
-import BlokFooter from '@/components/BlokFooter';
+import BlokHead from '@/components/BlokHead/BlokHead';
+import BlokFooter from '@/components/BlokFooter/BlokFooter';
 import ClientEnhancements from '@/components/ClientEnhancements';
-import ColorBurstTypography from '@/components/ColorBurstTypography/ColorBurstTypography';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
 import {
   DARK_THEME,
@@ -234,7 +233,6 @@ export default async function RootLayout({
         {/* Page background effects are temporarily disabled. */}
         <AppInitializer />
         <ClientEnhancements />
-        <ColorBurstTypography />
         <HeaderInitAnimation />
         <main className="main">
           <BlokHead projects={projects} />

@@ -9,6 +9,11 @@ const TitleSwitcher = dynamic(() => import('@/components/TitleSwitcher'), {
 const FaviconSwitcher = dynamic(() => import('@/components/FaviconSwitcher'), {
   ssr: false,
 });
+// Renders nothing and bails on touch devices; keep its GSAP code out of first-load JS.
+const ColorBurstTypography = dynamic(
+  () => import('@/components/ColorBurstTypography/ColorBurstTypography'),
+  { ssr: false },
+);
 
 export default function ClientEnhancements() {
   return (
@@ -16,6 +21,7 @@ export default function ClientEnhancements() {
       <CursorLoader />
       <TitleSwitcher />
       <FaviconSwitcher />
+      <ColorBurstTypography />
     </>
   );
 }

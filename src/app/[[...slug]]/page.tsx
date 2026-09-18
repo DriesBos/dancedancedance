@@ -1,6 +1,8 @@
 import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import PageTransition from '@/components/PageTransition';
+// Static on purpose: it sets `data-stack-timeline-ready`, which gates the side
+// panels' opacity. Loading it lazily makes the panels pop in after first paint.
 import StackTimelineBehavior from '@/components/StackTimelineBehavior';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';

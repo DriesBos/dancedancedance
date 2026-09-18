@@ -433,6 +433,7 @@ const BlokHeadRouteContent = ({
                 rel="noopener noreferrer"
                 className="icon cursorMagnetic desktop"
                 data-external-link="true"
+                aria-label="Visit project website"
               >
                 <IconLinkOutside />
               </a>

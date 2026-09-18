@@ -1,15 +1,17 @@
 'use client';
 
 import { useStore } from '@/store/store';
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
-
-type Props = {
-  headRef: RefObject<HTMLDivElement | null>;
-};
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const SCROLL_DIRECTION_THRESHOLD_RATIO = 0.1;
 
-const BlokHeadBehavior = ({ headRef }: Props) => {
+const BlokHeadBehavior = () => {
+  // Resolved by class so BlokHead can stay a server component. Declared first
+  // so it is set before any effect below reads it.
+  const headRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    headRef.current = document.querySelector<HTMLDivElement>('.blok-AnimateHead');
+  }, []);
   const fullscreen = useStore((state) => state.fullscreen);
   const [active, setActiveState] = useState(false);
   const activeRef = useRef(false);

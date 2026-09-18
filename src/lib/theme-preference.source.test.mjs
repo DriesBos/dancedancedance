@@ -33,8 +33,10 @@ test('preferred color scheme is read from matchMedia with light fallback', () =>
     }),
   };
 
-  assert.equal(theme.getPreferredColorScheme(), 'dark');
-
-  delete globalThis.window;
+  try {
+    assert.equal(theme.getPreferredColorScheme(), 'dark');
+  } finally {
+    delete globalThis.window;
+  }
   assert.equal(theme.getPreferredColorScheme(), 'light');
 });

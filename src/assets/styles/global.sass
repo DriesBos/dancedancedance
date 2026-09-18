@@ -1,6 +1,12 @@
 :root
   overscroll-behavior: none
 
+// Keyboard focus only; the resets remove mouse/touch focus outlines. :is()
+// lifts specificity to match `input:focus` in form-reset.css.
+:is(a, button, input, select, textarea, [tabindex]):focus-visible
+  outline: var(--border-width) solid currentColor
+  outline-offset: 2px
+
 *
   cursor: none !important
   scrollbar-width: none
@@ -63,6 +69,13 @@ body[data-initializing='true'] *,
 body[data-initializing='true'] *::before,
 body[data-initializing='true'] *::after
   transition: none !important
+
+// ColorBurstText character span (short on purpose: ~1000 per page, 2x in RSC).
+.cbc
+  display: inline
+  &[data-color-burst-border='true']
+    outline: 1px solid currentColor
+    outline-offset: 1px
 
 .u-muted
   color: var(--theme-type-muted)

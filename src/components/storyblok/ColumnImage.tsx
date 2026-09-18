@@ -19,9 +19,14 @@ interface SbPageData extends SbBlokData {
 interface ColumnImageProps {
   blok: SbPageData;
   imageSizes?: string;
+  imagePriority?: boolean;
 }
 
-const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok, imageSizes = '100vw' }) => {
+const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({
+  blok,
+  imageSizes = '100vw',
+  imagePriority = false,
+}) => {
   if (!blok.image?.filename) return null;
   const imageDimensions =
     parseStoryblokImageDimensions(blok.image.filename) ??
@@ -42,7 +47,9 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok, imageSiz
         sizes={imageSizes}
         className="imageItem"
         quality={70}
-        loading="lazy"
+        // priority = eager + fetchpriority=high + <link rel=preload>; only the
+        // first image of the first blok, everything else stays lazy.
+        {...(imagePriority ? { priority: true } : { loading: 'lazy' })}
         blurDataURL={blok.image.blurDataURL}
         style={{ width: '100%', height: 'auto' }}
       />

@@ -5,13 +5,6 @@ import {
   type Theme,
 } from '@/lib/theme';
 
-export type { Theme } from '@/lib/theme';
-export {
-  THEME_ORDER,
-  getDefaultTheme,
-  getInitialThemeForHour,
-} from '@/lib/theme';
-
 export type Props = {
   theme: Theme;
   fullscreen: boolean;

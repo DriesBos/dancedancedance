@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { gsap } from '@/lib/gsap';
 import { isColorBurstTheme, LIGHT_THEME } from '@/lib/theme';
 import { useStore } from '@/store/store';
-import styles from './ColorBurstTypography.module.sass';
 
 const COLORS = ['#85AF00', '#FFCC00', '#FB9CFD', '#A19BFF', '#FF4C00'] as const;
 const ICON_COLORS = ['#85AF00', '#FFCC00', '#FB9CFD', '#A19BFF'] as const;
@@ -215,7 +214,7 @@ const ColorBurstTypography = () => {
     const burstTimedCharacters = () => {
       const characters = [
         ...source.querySelectorAll<HTMLElement>(
-          `[data-color-burst-timed] .${styles.character}`,
+          '[data-color-burst-timed] .cbc',
         ),
       ].filter((character) => !activeCharacters.has(character));
 
@@ -327,7 +326,7 @@ const ColorBurstTypography = () => {
         ? [
             ...(activeSurface.matches(COLOR_ONLY_TARGETS) ? [activeSurface] : []),
             ...activeSurface.querySelectorAll<HTMLElement>(
-              `.${styles.character}, ${COLOR_ONLY_TARGETS}`,
+              `.cbc, ${COLOR_ONLY_TARGETS}`,
             ),
           ]
         : [];

@@ -1,7 +1,7 @@
 import styles from './BlokExperience.module.sass';
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
-import BlokSidePanels from '../../BlokSidePanels';
-import GrainyGradient from '@/components/GrainyGradient';
+import BlokSidePanels from '../../BlokSidePanels/BlokSidePanels';
+import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
 import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 
 const experienceItems = [

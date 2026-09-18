@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { getInitialThemeForHour, type Theme } from '@/lib/theme';
 import { useStore } from '@/store/store';
-import { getThemeMetaColor } from '@/lib/theme-meta-color';
+import { THEME_META_COLORS } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 type InitialUIState = {
@@ -56,7 +56,7 @@ const applyThemeMetaColor = (theme: Theme) => {
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (!metaThemeColor) return;
 
-  metaThemeColor.setAttribute('content', getThemeMetaColor(theme));
+  metaThemeColor.setAttribute('content', THEME_META_COLORS[theme]);
 };
 
 const AppInitializer = () => {

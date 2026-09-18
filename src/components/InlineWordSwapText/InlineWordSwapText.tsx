@@ -1,5 +1,3 @@
-'use client';
-
 import { renderWordSwapText } from './renderWordSwap';
 import type { TokenFormat } from './wordSwapShared';
 

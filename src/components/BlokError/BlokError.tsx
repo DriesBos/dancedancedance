@@ -1,7 +1,7 @@
 
 import Row from '@/components/Row';
-import GrainyGradient from '@/components/GrainyGradient';
-import BlokSidePanels from '@/components/BlokSidePanels';
+import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
+import BlokSidePanels from '@/components/BlokSidePanels/BlokSidePanels';
 import Link from 'next/link';
 
 const BlokError = () => {

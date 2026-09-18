@@ -25,7 +25,7 @@ const shouldPreserveScrambleCharacter = (char: string) =>
 
 const setScrambleText = (element: HTMLElement, text: string) => {
   const characters = [
-    ...element.querySelectorAll<HTMLElement>('[data-color-burst-character]'),
+    ...element.querySelectorAll<HTMLElement>('.cbc'),
   ];
 
   if (characters.length === text.length) {
@@ -228,7 +228,7 @@ export default function Newsletter({ className }: NewsletterProps) {
         />
       </form>
       {message ? (
-        <p ref={messageRef} className={styles.message}>
+        <p ref={messageRef} className={styles.message} role="status" aria-live="polite">
           {message}
         </p>
       ) : (

@@ -6,7 +6,7 @@ import { useRef, useCallback } from 'react';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
-import GrainyGradient from '@/components/GrainyGradient';
+import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
 import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import { getSafeExternalHref } from '@/lib/safe-url';
 

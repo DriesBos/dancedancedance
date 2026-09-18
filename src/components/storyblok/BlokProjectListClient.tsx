@@ -8,8 +8,8 @@ import BlokFilter, {
   ProjectSortField,
 } from '../BlokFilter';
 import type { ProjectData } from '@/lib/fetch-projects';
-import GrainyGradient from '@/components/GrainyGradient';
-import BlokSidePanels from '@/components/BlokSidePanels';
+import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
+import BlokSidePanels from '@/components/BlokSidePanels/BlokSidePanels';
 import styles from './BlokProjectListClient.module.sass';
 import ThumbnailWrapper, {
   type ThumbnailWrapperEvent,

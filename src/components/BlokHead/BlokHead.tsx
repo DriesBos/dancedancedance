@@ -1,8 +1,5 @@
-'use client';
-
-import { memo, useRef } from 'react';
-import GrainyGradient from '@/components/GrainyGradient';
-import BlokSidePanels from '@/components/BlokSidePanels';
+import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
+import BlokSidePanels from '@/components/BlokSidePanels/BlokSidePanels';
 import BlokHeadBehavior from './BlokHeadBehavior';
 import BlokHeadRouteContentContainer from './BlokHeadRouteContentContainer';
 import styles from './BlokHead.module.sass';
@@ -14,28 +11,21 @@ interface Props {
   }>;
 }
 
-const BlokHeadComponent = ({ projects }: Props) => {
-  const headRef = useRef<HTMLDivElement>(null);
-
-  return (
-    <div
-      ref={headRef}
-      className={`${styles.blokHeadFrame} blok blok-Head blok-AnimateHead`}
-      data-active="false"
-      data-scroll-start="true"
-    >
-      <div className={styles.blokHead}>
-        <GrainyGradient variant="blok" />
-        <BlokHeadBehavior headRef={headRef} />
-        <BlokSidePanels />
-        <BlokHeadRouteContentContainer projects={projects} />
-      </div>
+// Server component: the frame is static markup. BlokHeadBehavior finds it by
+// class, so nothing here needs a ref or the client bundle.
+const BlokHead = ({ projects }: Props) => (
+  <div
+    className={`${styles.blokHeadFrame} blok blok-Head blok-AnimateHead`}
+    data-active="false"
+    data-scroll-start="true"
+  >
+    <div className={styles.blokHead}>
+      <GrainyGradient variant="blok" />
+      <BlokHeadBehavior />
+      <BlokSidePanels />
+      <BlokHeadRouteContentContainer projects={projects} />
     </div>
-  );
-};
-
-const BlokHead = memo(BlokHeadComponent);
-
-BlokHead.displayName = 'BlokHead';
+  </div>
+);
 
 export default BlokHead;

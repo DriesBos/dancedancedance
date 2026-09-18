@@ -4,6 +4,7 @@ import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { usePathname } from 'next/navigation';
 import {
   parseStoryblokImageDimensions,
   transformStoryblokImageUrl,
@@ -308,6 +309,25 @@ export default function ThumbnailWrapper({
       removeTimersRef.current.forEach((timer) => window.clearTimeout(timer));
     };
   }, []);
+
+  // The home route tree stays mounted (hidden) across navigation and this layer
+  // portals into <body>, so thumbnails left active when the user clicked
+  // through would stay visible on the next page and replay their entrance on
+  // return. React runs effect cleanups when a tree is hidden, so clearing in
+  // the cleanup covers hide, unmount and route change alike.
+  const pathname = usePathname();
+  useEffect(() => {
+    return () => {
+      if (pendingHoverTimerRef.current !== null) {
+        window.clearTimeout(pendingHoverTimerRef.current);
+        pendingHoverTimerRef.current = null;
+        pendingHoverSlugRef.current = null;
+      }
+      removeTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      removeTimersRef.current = [];
+      setHoverThumbnails([]);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     if (!hoverEvent || handledHoverEventIdRef.current === hoverEvent.id) return;

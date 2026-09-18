@@ -3,6 +3,7 @@ import {
   storyblokEditable,
   StoryblokServerComponent,
 } from '@storyblok/react/rsc';
+import { findFirstImageBlok } from './Page';
 
 interface SbPageProjectData extends SbBlokData {
   body: SbBlokData[];
@@ -14,6 +15,7 @@ interface ProjectProps {
 }
 
 const PageProject = ({ blok }: ProjectProps) => {
+  const firstImageBlok = findFirstImageBlok(blok.body);
   return (
     <article className="page page-Project" {...storyblokEditable(blok)}>
       {blok.body.map((nestedBlok, index) => (
@@ -21,6 +23,7 @@ const PageProject = ({ blok }: ProjectProps) => {
           blok={nestedBlok}
           key={nestedBlok._uid}
           stackIndex={blok.body.length - index}
+          imagePriority={index === firstImageBlok}
         />
       ))}
     </article>
