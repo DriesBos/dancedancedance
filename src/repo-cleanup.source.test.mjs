@@ -134,7 +134,10 @@ test('published Storyblok story lists are fetched through the shared helper', ()
   assert.match(helperSource, /withPublishedStoryblokCv/);
   assert.match(pageSource, /fetchPublishedStoryList/);
   assert.match(pageSource, /generateStaticParams/);
-  assert.match(pageSource, /export const dynamicParams = true/);
+  // Cache Components (next.config.mjs `cacheComponents: true`) rejects the
+  // `dynamicParams` route segment config outright, so it can no longer be
+  // exported here; unresolved params fall through to notFound() instead.
+  assert.doesNotMatch(pageSource, /export const dynamicParams/);
   assert.match(sitemapSource, /fetchPublishedStoryList/);
   assert.doesNotMatch(pageSource, /storyblokApi\.get\(\s*['"`]cdn\/stories/);
   assert.doesNotMatch(sitemapSource, /storyblokApi\.get\(\s*['"`]cdn\/stories/);

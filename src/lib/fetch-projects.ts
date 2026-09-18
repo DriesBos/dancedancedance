@@ -1,5 +1,6 @@
 import type { ISbStoriesParams } from '@storyblok/react/rsc';
-import { STORYBLOK_TAG_PROJECTS } from '@/lib/storyblok-cache';
+import { cacheLife, cacheTag } from 'next/cache';
+import { STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS } from '@/lib/storyblok-cache';
 import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 
 export interface ProjectData {
@@ -31,6 +32,10 @@ type StoryblokProjectStory = {
 };
 
 export async function fetchProjectData(): Promise<ProjectData[]> {
+  'use cache';
+  cacheLife('max');
+  cacheTag(STORYBLOK_TAG_ALL, STORYBLOK_TAG_PROJECTS);
+
   const sbParams: ISbStoriesParams = {
     starts_with: 'projects',
     sort_by: 'content.year:desc',

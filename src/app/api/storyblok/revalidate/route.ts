@@ -10,8 +10,6 @@ import {
   normalizeStorySlug,
 } from '@/lib/storyblok-cache';
 
-export const runtime = 'nodejs';
-
 type StoryblokWebhookPayload = {
   action?: string;
   full_slug?: string;

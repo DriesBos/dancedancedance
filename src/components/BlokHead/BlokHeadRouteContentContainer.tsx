@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore } from '@/store/store';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import BlokHeadRouteContent from './BlokHeadRouteContent';
 
@@ -119,17 +119,23 @@ const BlokHeadRouteContentContainer = ({ projects }: Props) => {
   }, []);
 
   return (
-    <BlokHeadRouteContent
-      projects={projects}
-      themeLabel={themeLabel}
-      fullscreen={fullscreen}
-      fullscreenLabel={fullscreenLabel}
-      isThemeSpinning={isThemeSpinning}
-      isAboutMixedHovered={isAboutMixedHovered}
-      onAboutMixedHoverChange={setIsAboutMixedHovered}
-      onCycleTheme={handleCycleTheme}
-      onToggleFullscreen={toggleFullscreen}
-    />
+    // BlokHeadRouteContent reads usePathname, which suspends while the App
+    // Shell for unknown slugs is prerendered. Its title/nav output is fully
+    // route-derived, so there's no trivial header-visible fallback — null
+    // until the route is known.
+    <Suspense fallback={null}>
+      <BlokHeadRouteContent
+        projects={projects}
+        themeLabel={themeLabel}
+        fullscreen={fullscreen}
+        fullscreenLabel={fullscreenLabel}
+        isThemeSpinning={isThemeSpinning}
+        isAboutMixedHovered={isAboutMixedHovered}
+        onAboutMixedHoverChange={setIsAboutMixedHovered}
+        onCycleTheme={handleCycleTheme}
+        onToggleFullscreen={toggleFullscreen}
+      />
+    </Suspense>
   );
 };
 

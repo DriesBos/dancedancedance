@@ -3,10 +3,12 @@ import { fetchStory } from '@/utils/fetchstory';
 import PageTransition from '@/components/PageTransition';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { cache } from 'react';
+import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
 import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 import { addStoryblokImageBlurs } from '@/lib/storyblok-image-blur';
+import { getStoryblokTagsForSlug } from '@/lib/storyblok-cache';
 
 const HOME_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
 const HOME_DESCRIPTION =
@@ -78,14 +80,53 @@ const getStoryVersion = (): 'draft' | 'published' => {
 const getSlugPath = (slug?: string[]) =>
   slug && slug.length > 0 ? slug.join('/') : '';
 
-const getPageData = cache(
-  async (version: 'draft' | 'published', slugPath: string) => {
-    const slug = slugPath ? slugPath.split('/') : undefined;
-    return fetchStory(version, slug);
-  },
-);
+// While prerendering the App Shell for unresolved slugs, `params` never
+// resolves and Next rejects it (HANGING_PROMISE_REJECTION) to mark the
+// metadata as request-time. That signal must reach Next, so rethrow it.
+const isPrerenderInterrupt = (error: unknown): boolean =>
+  typeof error === 'object' &&
+  error !== null &&
+  (error as { digest?: unknown }).digest === 'HANGING_PROMISE_REJECTION';
 
-export const dynamicParams = true;
+// 'use cache' caches the whole function call keyed on its arguments, so a
+// draft call would get cached too if this branched internally. Keep the
+// published path here (cached, tagged for the Storyblok webhook) and let the
+// plain getPageData() below call fetchStory directly, uncached, for draft.
+async function getCachedPageData(slugPath: string) {
+  'use cache';
+  cacheLife('max');
+  cacheTag(...getStoryblokTagsForSlug(slugPath || 'home'));
+
+  const slug = slugPath ? slugPath.split('/') : undefined;
+  const pageData = await fetchStory('published', slug);
+  if (!pageData?.story) return pageData;
+
+  return {
+    ...pageData,
+    story: {
+      ...pageData.story,
+      content: await addStoryblokImageBlurs(pageData.story.content, true),
+    },
+  };
+}
+
+const getPageData = async (version: 'draft' | 'published', slugPath: string) => {
+  if (version === 'published') {
+    return getCachedPageData(slugPath);
+  }
+
+  const slug = slugPath ? slugPath.split('/') : undefined;
+  const pageData = await fetchStory('draft', slug);
+  if (!pageData?.story) return pageData;
+
+  return {
+    ...pageData,
+    story: {
+      ...pageData.story,
+      content: await addStoryblokImageBlurs(pageData.story.content, false),
+    },
+  };
+};
 
 export async function generateStaticParams(): Promise<Array<{ slug: string[] }>> {
   try {
@@ -187,6 +228,7 @@ export async function generateMetadata({
       canonical,
     });
   } catch (error) {
+    if (isPrerenderInterrupt(error)) throw error;
     console.error('Error generating metadata:', error);
     return {
       title: 'Dries Bos',
@@ -194,7 +236,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function Home({ params }: { params: Params }) {
+async function PageContent({ params }: { params: Params }) {
   const slug = (await params).slug;
   const version = getStoryVersion();
   const slugPath = getSlugPath(slug);
@@ -218,7 +260,15 @@ export default async function Home({ params }: { params: Params }) {
   return (
     <PageTransition>
       <h1 className="visuallyHidden">{pageHeading}</h1>
-      <StoryblokStory story={{ ...pageData.story, content: await addStoryblokImageBlurs(pageData.story.content, version === 'published') }} />
+      <StoryblokStory story={pageData.story} />
     </PageTransition>
+  );
+}
+
+export default function Home({ params }: { params: Params }) {
+  return (
+    <Suspense fallback={null}>
+      <PageContent params={params} />
+    </Suspense>
   );
 }

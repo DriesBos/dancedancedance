@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
+import { Suspense } from 'react';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
 import '@/assets/styles/vars.sass';
@@ -233,10 +234,14 @@ export default async function RootLayout({
           }}
         />
         {/* Page background effects are temporarily disabled. */}
-        <AppInitializer />
+        <Suspense fallback={null}>
+          <AppInitializer />
+        </Suspense>
         <ClientEnhancements />
         <ColorBurstTypography />
-        <StackTimelineBehavior />
+        <Suspense fallback={null}>
+          <StackTimelineBehavior />
+        </Suspense>
         <HeaderInitAnimation />
         <main className="main">
           <BlokHead projects={projects} />

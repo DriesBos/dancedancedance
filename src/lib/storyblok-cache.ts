@@ -1,7 +1,9 @@
 // Every Storyblok fetch rendered by a page carries the tags below, and the
-// Storyblok webhook purges them (see src/app/api/storyblok/revalidate/route.ts).
+// `'use cache'` functions in page.tsx and fetch-projects.ts cacheTag the same
+// names; the Storyblok webhook purges them (see src/app/api/storyblok/revalidate/route.ts).
 // Next derives a route's `s-maxage` from the lowest `revalidate` of the fetches
-// it renders, and the Netlify adapter turns that into
+// and `cacheLife` profiles it renders (`max` is redefined to one year in
+// next.config.mjs), and the Netlify adapter turns that into
 // `Netlify-CDN-Cache-Control: s-maxage=<n>, stale-while-revalidate=..., durable`.
 // Keeping this at one year lets the Netlify edge serve pages without a round
 // trip to the durable cache; freshness comes from the webhook purge, not the clock.
