@@ -44,7 +44,10 @@ const fetchStoryByPath = async (
   if (version === 'published' && typeof cv === 'number') {
     params.set('cv', `${cv}`);
   }
-  const url = `https://api.storyblok.com/v2/cdn/stories/${path}?${params.toString()}`;
+  // Encode each segment; a decoded route param like "?version=draft" must not
+  // become extra query parameters upstream.
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const url = `https://api.storyblok.com/v2/cdn/stories/${encodedPath}?${params.toString()}`;
 
   const response = await fetch(url, {
     next: {

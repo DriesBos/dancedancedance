@@ -306,6 +306,8 @@ const BlokHeadRouteContent = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Intentional: Escape always returns home, even with focus in an input
+      // (search/newsletter). Global "exit" gesture; do not gate on activeElement.
       if (e.key === 'Escape') {
         router.push('/');
         return;

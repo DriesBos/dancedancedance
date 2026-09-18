@@ -16,12 +16,26 @@ const ENTRANCE_ANIMATION = 'blokEnter';
 // per document, so a full page load always starts from null.
 let lastEntrance: { pathname: string; theme: string } | null = null;
 
+// Set by popstate, consumed by the next scroll-reset effect run. Module scope
+// for the same remount reason as above.
+let isPopNavigation = false;
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', () => {
+    isPopNavigation = true;
+  });
+}
+
 export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const theme = useStore((state) => state.theme);
 
-  // Force top on every client-side route change.
+  // Force top on every client-side route change, except back/forward, where
+  // the browser restores the previous scroll position and must win.
   useLayoutEffect(() => {
+    if (isPopNavigation) {
+      isPopNavigation = false;
+      return;
+    }
     const html = document.documentElement;
     const scrollBehavior = html.style.scrollBehavior;
     html.style.scrollBehavior = 'auto';

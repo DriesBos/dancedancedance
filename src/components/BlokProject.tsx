@@ -46,8 +46,9 @@ const BlokProject = ({
     onProjectHover?.();
   };
 
-  // Extract just the year from the date value
-  const displayYear = year ? new Date(year).getFullYear() : null;
+  // Leading four digits, not Date: "2023" parses as UTC midnight and reads as
+  // 2022 in negative offsets, which also mismatched the UTC-rendered server HTML.
+  const displayYear = year ? year.slice(0, 4) : null;
   const categoryLabel = category?.map((item) => item.toLowerCase()).join(', ');
 
   return (
