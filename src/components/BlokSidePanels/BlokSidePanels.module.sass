@@ -10,7 +10,10 @@
   background: var(--theme-blok-sidepanel)
   &_Top
     left: calc(0px - 1.25 * #{var(--border-width)})
-    top: 0
+    // Fold at the blok's outer edge so the blok's own crisp border is the seam.
+    // The panel's bottom border lives in the depth axis and projects to ~3px.
+    top: calc(0px - #{var(--border-width)})
+    border-bottom: 0
     height: var(--panel-height)
     width: calc(100% + 2.5 * #{var(--border-width)})
     transform: rotateX(90deg) rotateY(0deg) translateY(calc(var(--panel-height) * -1))
