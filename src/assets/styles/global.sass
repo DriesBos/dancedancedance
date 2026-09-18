@@ -411,6 +411,9 @@ mux-player, .muxPlayer
 
   // Specific Bloks
   &-Intro
+    // Painted on first render: base .blok is opacity 0 and only .blok-Animate
+    // targets get revealed by GSAP. The intro is the LCP element and opts out.
+    opacity: 1
     .column-Icons
       position: absolute
       right: 0
