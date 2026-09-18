@@ -2,15 +2,15 @@
   display: inline-flex
   flex: none
   margin-left: auto
+  height: 1lh
+  transform: translateY(1px)
   align-items: flex-end
-  gap: 6px
+  gap: 4px
   color: var(--theme-type)
-  @media (max-width: 770px)
-    gap: 5px
   &_Item
     width: 1.5px
     height: 1ex
     background: currentColor
     transition: height 0.33s ease
     &[data-active='true']
-      height: 1cap
+      height: 100%
