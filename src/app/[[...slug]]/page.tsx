@@ -1,6 +1,7 @@
 import { StoryblokStory } from '@storyblok/react/rsc';
 import { fetchStory } from '@/utils/fetchstory';
 import PageTransition from '@/components/PageTransition';
+import StackTimelineBehavior from '@/components/StackTimelineBehavior';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { cacheLife, cacheTag } from 'next/cache';
@@ -262,6 +263,9 @@ export default async function Home({ params }: { params: Params }) {
 
   return (
     <PageTransition>
+      {/* Mounted inside the page's Suspense boundary so its DOM writes
+          (data-stack-timeline, --stack-z) land after the bloks have hydrated. */}
+      <StackTimelineBehavior />
       <h1 className="visuallyHidden">{pageHeading}</h1>
       <StoryblokStory story={pageData.story} />
     </PageTransition>

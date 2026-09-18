@@ -14,7 +14,6 @@ import BlokFooter from '@/components/BlokFooter';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import ColorBurstTypography from '@/components/ColorBurstTypography/ColorBurstTypography';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
-import StackTimelineBehavior from '@/components/StackTimelineBehavior';
 import {
   DARK_THEME,
   LIGHT_THEME,
@@ -236,7 +235,6 @@ export default async function RootLayout({
         <AppInitializer />
         <ClientEnhancements />
         <ColorBurstTypography />
-        <StackTimelineBehavior />
         <HeaderInitAnimation />
         <main className="main">
           <BlokHead projects={projects} />
