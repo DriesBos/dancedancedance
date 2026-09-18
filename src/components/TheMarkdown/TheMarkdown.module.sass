@@ -1,6 +1,7 @@
 .markdown
   min-width: 0 // Ellipsis hack
   white-space: pre-line // Listens to line breaks in markdown
+  line-height: 1.5
   a
     --markdown-underline-progress: 100%
     text-decoration: none
@@ -11,8 +12,6 @@
     -webkit-box-decoration-break: clone
     box-decoration-break: clone
     will-change: background-size
-    padding-block: 3px
-    margin-block: -3px
     &:hover
       @media ( hover: hover )
         animation: markdownLinkUnderline .66s ease

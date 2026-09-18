@@ -60,36 +60,88 @@ test('entry animations fade complete blok surfaces and move page bloks up', () =
     headStyleSource,
     /^\s*&\[data-active='true'\] \.blokHead/m,
   );
-  assert.match(headerInitSource, /opacity: 0/);
-  assert.match(headerInitSource, /opacity: 1/);
-  assert.match(headerInitSource, /gsap\.set\(headerTargets, \{ opacity: 0 \}\)/);
+  assert.doesNotMatch(headerInitSource, /gsap/);
+  // Page bloks fade in and move up from CSS, so the entrance starts at first
+  // paint rather than at hydration. PageTransition only replays it.
   assert.match(
-    headerInitSource,
-    /gsap\.to\(headerTargets, \{[\s\S]*opacity: 1/,
+    globalStyleSource,
+    /@keyframes blokEnter\n\s+from\n\s+opacity: \.001\n\s+transform: translateY\(5vh\)\n\s+to\n\s+opacity: 1\n\s+transform: none/,
   );
-  assert.doesNotMatch(headerInitSource, /headerContentTargets/);
-  assert.doesNotMatch(headerInitSource, /clearProps: 'opacity'/);
+  assert.match(
+    globalStyleSource,
+    /&-Animate\n\s+opacity: 0\n(?:\s+\/\/[^\n]*\n)*\s+--blok-enter-delay: \.35s\n\s+animation: blokEnter 1s cubic-bezier\(\.16, 1, \.3, 1\) both\n\s+animation-delay: var\(--blok-enter-delay\)/,
+  );
+  // The header is slot 0 of the same shared entrance keyframe.
+  assert.match(
+    globalStyleSource,
+    /&-AnimateHead\n\s+opacity: 0\n(?:\s+\/\/[^\n]*\n)*\s+animation: blokEnter 1s cubic-bezier\(\.16, 1, \.3, 1\) both\n\s+animation-delay: \.2s/,
+  );
+  assert.match(
+    globalStyleSource,
+    /body\[data-entrance-done='true'\] \.blok-Animate\n\s+--blok-enter-delay: 0s/,
+  );
+  assert.match(
+    globalStyleSource,
+    /\.page > \.blok-Animate:nth-child\(#\{\$i\} of \.blok-Animate\)\n\s+animation-delay: calc\(var\(--blok-enter-delay\) \+ #\{\(\$i - 1\) \* 0\.15\}s\)/,
+  );
+  assert.match(
+    globalStyleSource,
+    /\.page:not\(\[style\*='display: none'\]\):has\(> \.blok-Animate:nth-child\(#\{\$i\} of \.blok-Animate\)\) ~ \.blok-Animate\n\s+animation-delay: calc\(var\(--blok-enter-delay\) \+ #\{\$i \* 0\.15\}s\)/,
+  );
+  assert.doesNotMatch(pageTransitionSource, /gsap/);
   assert.match(
     pageTransitionSource,
-    /gsap\.set\(blockTargets, \{[\s\S]*opacity: 0,[\s\S]*y: '5vh'/,
+    /querySelectorAll<HTMLElement>\('\.blok-Animate'\)/,
   );
-  const blockTween =
-    pageTransitionSource.match(/gsap\.to\(blockTargets, \{[\s\S]*?\n      \}\);/)?.[0] || '';
-  assert.match(blockTween, /opacity: 1/);
-  assert.match(blockTween, /y: 0/);
-  assert.match(blockTween, /stagger: 0\.15/);
+  assert.match(
+    pageTransitionSource,
+    /animationName !== ENTRANCE_ANIMATION[\s\S]*animation\.cancel\(\);\n\s+animation\.play\(\);/,
+  );
+  assert.match(pageTransitionSource, /\}, \[pathname, theme\]\);/);
+  // The entrance must not replay while hydration is still settling: guard on
+  // the last committed route and the theme that <body> already painted with.
+  assert.doesNotMatch(pageTransitionSource, /hasPlayedInitialEntrance/);
+  assert.match(
+    pageTransitionSource,
+    /let lastEntrance: \{ pathname: string; theme: string \} \| null = null/,
+  );
+  assert.match(
+    pageTransitionSource,
+    /const committed = \{ pathname, theme: document\.body\?\.dataset\.theme \?\? '' \};\n\s+const previous = lastEntrance;\n\s+lastEntrance = committed;/,
+  );
+  assert.match(
+    pageTransitionSource,
+    /!previous \|\|\n\s+\(previous\.pathname === committed\.pathname && previous\.theme === committed\.theme\)/,
+  );
+  // On a real replay (not the initial run), flag <body> so global.sass can
+  // drop the header's base delay for the new page's bloks and footer — that
+  // delay only exists to give the header slot 0 on initial load.
+  assert.match(
+    pageTransitionSource,
+    /return;\n\s+\}\n\n\s+document\.body\.dataset\.entranceDone = 'true';\n\n\s+const blockTargets/,
+  );
   assert.doesNotMatch(pageTransitionSource, /getBlockContentTargets|contentTargets/);
+  // HeaderInitAnimation no longer animates anything itself: it waits for the
+  // CSS-driven `blokEnter` animation on the header frame to finish, then
+  // flips the body flags. The promise-based `.finished` handshake (not an
+  // `animationend` listener) covers hydration landing after the animation
+  // already ended.
+  assert.match(headerInitSource, /const ENTRANCE_ANIMATION = 'blokEnter'/);
   assert.match(
     headerInitSource,
-    /const completeHeaderIntro = \(\) => \{[\s\S]*hasAnimatedHeader\.current = true;[\s\S]*markHeaderInitCompleted\(\);[\s\S]*markHeaderIntroVisible\(\);[\s\S]*onComplete: completeHeaderIntro/,
+    /\.getAnimations\(\)\s*\n\s*\.find\(\(a\)[\s\S]*?a as CSSAnimation\)\.animationName === ENTRANCE_ANIMATION\)/,
   );
   assert.match(
     headerInitSource,
-    /hasAnimatedHeader\.current \|\| hasHeaderInitCompleted\(\)[\s\S]*gsap\.set\(headerTargets, \{ opacity: 1 \}\)/,
+    /animation\.finished\.then\(complete\)\.catch\(\(\) => \{\}\);/,
   );
-  assert.doesNotMatch(
+  assert.match(
     headerInitSource,
-    /markHeaderInitCompleted\(\);[\s\S]*gsap\.set\(headerTargets/,
+    /const complete = \(\) => \{[\s\S]*markHeaderInitCompleted\(\);[\s\S]*markHeaderIntroVisible\(\);[\s\S]*\};/,
+  );
+  assert.match(
+    headerInitSource,
+    /if \(hasHeaderInitCompleted\(\)\) \{\s*\n\s*markHeaderIntroVisible\(\);/,
   );
   assert.doesNotMatch(headerInitSource, /--head-intro-y/);
   assert.doesNotMatch(headerInitSource, /\by:\s*'5vh'/);

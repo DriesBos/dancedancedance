@@ -3,7 +3,6 @@ import { fetchStory } from '@/utils/fetchstory';
 import PageTransition from '@/components/PageTransition';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 import { cacheLife, cacheTag } from 'next/cache';
 import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
 import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
@@ -236,7 +235,11 @@ export async function generateMetadata({
   }
 }
 
-async function PageContent({ params }: { params: Params }) {
+// Unknown slugs are 404s or freshly published stories; block instead of
+// serving an App Shell so the header and page ship inline in the HTML.
+export const instant = false;
+
+export default async function Home({ params }: { params: Params }) {
   const slug = (await params).slug;
   const version = getStoryVersion();
   const slugPath = getSlugPath(slug);
@@ -262,13 +265,5 @@ async function PageContent({ params }: { params: Params }) {
       <h1 className="visuallyHidden">{pageHeading}</h1>
       <StoryblokStory story={pageData.story} />
     </PageTransition>
-  );
-}
-
-export default function Home({ params }: { params: Params }) {
-  return (
-    <Suspense fallback={null}>
-      <PageContent params={params} />
-    </Suspense>
   );
 }

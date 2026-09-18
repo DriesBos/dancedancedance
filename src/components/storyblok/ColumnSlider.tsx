@@ -1,7 +1,7 @@
 'use client';
 
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
-import Image from 'next/image';
+import BlurImage from '@/components/BlurImage';
 import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -112,7 +112,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({
               data-active={isActive}
             >
               <div className="column-Slider-ImageWrapper">
-                <Image
+                <BlurImage
                   src={image.filename}
                   alt={image.alt || image.name || 'Project image'}
                   width={imageDimensions.width}
@@ -122,9 +122,7 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({
                   className="imageItem"
                   loading={index === 0 || isActive || isNext ? 'eager' : 'lazy'}
                   fetchPriority={isActive ? 'high' : isNext ? 'auto' : 'low'}
-                  {...(image.blurDataURL
-                    ? { placeholder: 'blur' as const, blurDataURL: image.blurDataURL }
-                    : {})}
+                  blurDataURL={image.blurDataURL}
                   style={{ width: '100%', height: 'auto' }}
                 />
               </div>

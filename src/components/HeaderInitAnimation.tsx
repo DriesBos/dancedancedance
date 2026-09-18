@@ -1,13 +1,13 @@
 'use client';
 
-import { useRef } from 'react';
-import { gsap, useGSAP } from '@/lib/gsap';
+import { useLayoutEffect } from 'react';
 
 const HEADER_INIT_COMPLETE_ATTR = 'data-header-init-complete';
 const HEADER_INTRO_VISIBLE_ATTR = 'data-header-intro-visible';
+const ENTRANCE_ANIMATION = 'blokEnter';
 
-const getHeaderTargets = () =>
-  Array.from(document.querySelectorAll<HTMLElement>('.blok-AnimateHead'));
+const getHeaderTarget = () =>
+  document.querySelector<HTMLElement>('.blok-AnimateHead');
 
 const hasHeaderInitCompleted = () =>
   document.body?.getAttribute(HEADER_INIT_COMPLETE_ATTR) === 'true';
@@ -21,34 +21,38 @@ const markHeaderIntroVisible = () => {
 };
 
 export default function HeaderInitAnimation() {
-  const hasAnimatedHeader = useRef(false);
-
-  useGSAP(() => {
-    const headerTargets = getHeaderTargets();
-    if (headerTargets.length === 0) return;
-
-    if (hasAnimatedHeader.current || hasHeaderInitCompleted()) {
-      gsap.set(headerTargets, { opacity: 1 });
-      markHeaderIntroVisible();
-      return;
-    }
-
-    gsap.set(headerTargets, { opacity: 0 });
-
-    const completeHeaderIntro = () => {
-      hasAnimatedHeader.current = true;
+  useLayoutEffect(() => {
+    // The header's fade/slide runs from CSS (`.blok-AnimateHead`, slot 0 of
+    // the shared entrance) so it starts at first paint. This effect only
+    // waits for that animation to finish and then flips the body flags that
+    // gate the header's scroll-lift behavior.
+    const complete = () => {
       markHeaderInitCompleted();
       markHeaderIntroVisible();
     };
 
-    gsap.to(headerTargets, {
-      opacity: 1,
-      duration: 1,
-      ease: 'expo.out',
-      overwrite: 'auto',
-      onComplete: completeHeaderIntro,
-    });
-  });
+    if (hasHeaderInitCompleted()) {
+      markHeaderIntroVisible();
+      return;
+    }
+
+    const headerTarget = getHeaderTarget();
+    if (!headerTarget) {
+      complete();
+      return;
+    }
+
+    const animation = headerTarget
+      .getAnimations()
+      .find((a): a is CSSAnimation => (a as CSSAnimation).animationName === ENTRANCE_ANIMATION);
+
+    if (!animation || animation.playState === 'finished') {
+      complete();
+      return;
+    }
+
+    animation.finished.then(complete).catch(() => {});
+  }, []);
 
   return null;
 }

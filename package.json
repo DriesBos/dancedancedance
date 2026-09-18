@@ -13,8 +13,9 @@
     "start": "next start",
     "lint": "eslint .",
     "test:source": "node --test $(find src -name '*.source.test.mjs' -print | sort)",
+    "test:render": "node scripts/check-entrance.mjs",
     "typecheck": "tsc --noEmit --pretty false",
-    "check": "pnpm test:source && pnpm lint && pnpm build && pnpm typecheck",
+    "check": "pnpm test:source && pnpm lint && pnpm build && pnpm test:render && pnpm typecheck",
     "audit": "pnpm audit --prod --audit-level moderate"
   },
   "dependencies": {

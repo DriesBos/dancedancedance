@@ -128,6 +128,7 @@ mux-player, .muxPlayer
   background: var(--theme-blok)
   perspective: 1000px
   perspective-origin: var(--panel-perspective-origin)
+  // For the blok's own entrance animation, not the stack timeline
   opacity: 0
   transition: padding-top var(--theme-transition), background var(--theme-transition)
   &.inactive
@@ -411,9 +412,6 @@ mux-player, .muxPlayer
 
   // Specific Bloks
   &-Intro
-    // Painted on first render: base .blok is opacity 0 and only .blok-Animate
-    // targets get revealed by GSAP. The intro is the LCP element and opts out.
-    opacity: 1
     .column-Icons
       position: absolute
       right: 0
@@ -427,6 +425,18 @@ mux-player, .muxPlayer
           transform: translateX(2px)
   &-Animate
     opacity: 0
+    // Entrance runs from CSS so it starts at first paint instead of waiting
+    // for hydration. Keyframes and stagger live at the end of this file.
+    // Slot 0 of the stagger is the header (see &-AnimateHead below); page
+    // bloks pick up at slot 1, one slot later.
+    --blok-enter-delay: .35s
+    animation: blokEnter 1s cubic-bezier(.16, 1, .3, 1) both
+    animation-delay: var(--blok-enter-delay)
+  &-AnimateHead
+    opacity: 0
+    // Slot 0 of the shared entrance; HeaderInitAnimation only sets the body flags.
+    animation: blokEnter 1s cubic-bezier(.16, 1, .3, 1) both
+    animation-delay: .2s
   &-ProjectList
     position: relative
     overflow: visible
@@ -648,9 +658,67 @@ body
       .imageItem:hover
         filter: brightness(.78) contrast(1.04) saturate(.9)
 
+.blurImage
+  display: block
+  background-size: cover
+  background-position: center
+
 .imageItem
   filter: var(--theme-media-filter)
   transition: opacity var(--theme-transition), filter var(--theme-transition)
+
+.blurImage .imageItem
+  opacity: 0
+  transition: opacity 250ms ease-out, filter var(--theme-transition)
+
+  &[data-loaded]
+    opacity: 1
+
+  @media (prefers-reduced-motion: reduce)
+    transition: filter var(--theme-transition)
+
+
+// Blok entrance. `both` holds the `from` state through the stagger delay, so
+// the base `.blok` opacity: 0 never flashes and the end state persists.
+// The fade starts at .001 rather than 0 because Chrome drops anything painted
+// at exactly opacity 0 from Largest Contentful Paint and only reconsiders it
+// on a later repaint; with 0 the home intro copy was credited to the word
+// rotator's swap at ~2.7s instead of to its real first paint. .001 is
+// visually identical to 0.
+@keyframes blokEnter
+  from
+    opacity: .001
+    transform: translateY(5vh)
+  to
+    opacity: 1
+    transform: none
+
+// On a client-side route change the header never replays (it only runs on
+// initial load), so its .35s base delay is pure lag for the new page's
+// bloks. PageTransition.tsx sets this flag on <body> the first time it
+// replays the entrance, and every entrance after that starts at 0s instead.
+// `.blok-AnimateHead` is untouched, since it never matches `.blok-Animate`.
+body[data-entrance-done='true'] .blok-Animate
+  --blok-enter-delay: 0s
+
+// Stagger in DOM order. `of .blok-Animate` counts only animated bloks, so a
+// non-animated sibling inside .page cannot shift the sequence.
+@for $i from 2 through 30
+  .page > .blok-Animate:nth-child(#{$i} of .blok-Animate)
+    animation-delay: calc(var(--blok-enter-delay) + #{($i - 1) * 0.15}s)
+
+// The footer sits outside .page as a sibling in <main>, so it continues the
+// sequence from however many animated bloks the page rendered. On a
+// client-side route change Next keeps the previous route's .page in the DOM
+// too, hidden with inline `display: none !important` — measured DOM order
+// puts it after the live one, but that is not guaranteed, and `:last-of-type`
+// can't be used to pick it out either (`.blok-Footer` is also a `div` and
+// sits after both, so it — not either `.page` — is what `:last-of-type`
+// would match). Filter on the inline hidden style instead, which provably
+// selects the one live `.page` regardless of DOM order.
+@for $i from 1 through 30
+  .page:not([style*='display: none']):has(> .blok-Animate:nth-child(#{$i} of .blok-Animate)) ~ .blok-Animate
+    animation-delay: calc(var(--blok-enter-delay) + #{$i * 0.15}s)
 
 @keyframes hyperLink
   0%

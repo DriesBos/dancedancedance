@@ -1,5 +1,5 @@
 import { SbBlokData, storyblokEditable } from '@storyblok/react/rsc';
-import Image from 'next/image';
+import BlurImage from '@/components/BlurImage';
 import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import {
   parseStoryblokImageDimensions,
@@ -34,7 +34,7 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok, imageSiz
       data-caption-side={blok.side_caption}
       data-caption={blok.caption ? true : false}
     >
-      <Image
+      <BlurImage
         src={blok.image.filename}
         alt={blok.image.alt || blok.caption || 'Image'}
         width={imageDimensions.width}
@@ -43,7 +43,6 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok, imageSiz
         className="imageItem"
         quality={70}
         loading="lazy"
-        placeholder={blok.image.blurDataURL ? 'blur' : 'empty'}
         blurDataURL={blok.image.blurDataURL}
         style={{ width: '100%', height: 'auto' }}
       />

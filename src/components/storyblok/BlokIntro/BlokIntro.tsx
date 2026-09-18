@@ -21,7 +21,7 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
     <Link
       href="/about"
       prefetch={true}
-      className={`blok blok-Intro ${styles.blokIntro} ${styles.blokIntroLink} cursorInteract`}
+      className={`blok blok-Intro blok-Animate ${styles.blokIntro} ${styles.blokIntroLink} cursorInteract`}
       {...storyblokEditable(blok)}
     >
       <GrainyGradient variant="blok" />

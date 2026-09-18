@@ -7,9 +7,6 @@
   text-decoration: none
   color: inherit
   cursor: pointer
-  // Painted visible immediately (no blok-Animate/JS gate) so the LCP text
-  // isn't hidden behind hydration; CSS-only slide keeps the entrance motion.
-  animation: blokIntroReveal 1s cubic-bezier(0.16, 1, 0.3, 1) both
 
 .copy
   display: flex
@@ -19,9 +16,3 @@
 .line
   margin: 0
   white-space: pre-wrap
-
-@keyframes blokIntroReveal
-  from
-    transform: translateY(5vh)
-  to
-    transform: translateY(0)

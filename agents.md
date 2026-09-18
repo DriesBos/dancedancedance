@@ -28,6 +28,16 @@
 - Use the full `agent-browser` path from `next-dev-loop` only outside the app sandbox or against an externally started Chrome CDP endpoint. Reserve it for React fiber/render-count or vitals checks that managed browser control cannot provide.
 - Fall back to source inspection only when both managed browser surfaces are unavailable, and state that live browser proof is missing.
 
+## Entrance animation contract
+
+- Files that own the blok entrance: `src/assets/styles/global.sass` (`.blok`/`.blok-Animate`/`.blok-AnimateHead` rules), `src/components/PageTransition.tsx`, and `src/components/HeaderInitAnimation.tsx`. The reveal mechanism inside these files may change (GSAP, CSS keyframes, etc.); the invariants below must not.
+- `.blok { opacity: 0 }` in `global.sass` must never be removed without something else reliably driving it back to `opacity: 1` on load/route change — a blok stuck at `opacity: 0` ships an invisible page.
+- `.blok-Animate` must stay on every page blok so the entrance targets it: `BlokIntro`, `BlokFilter`, `BlokContainer`, `BlokExperience`, `BlokProjectListClient`, `BlokFooter`, `BlokError`.
+- The header flags `data-header-init-complete` and `data-header-intro-visible` (set on `<body>` by `HeaderInitAnimation.tsx`) are load-bearing for BlokHead CSS; don't rename or drop them without updating both sides.
+- Source-regex tests are not enough to catch a stuck reveal — run `pnpm test:render` (`scripts/check-entrance.mjs`) after touching any of the above; it does a real headless-Chrome render check.
+- The header is slot 0 of the CSS entrance (`.blok-AnimateHead`, `animation-delay: .2s`), body bloks start at slot 1 (`.blok-Animate`, `--blok-enter-delay: .35s`); `HeaderInitAnimation.tsx` no longer animates, it only sets the two body flags after the header's own `blokEnter` animation finishes.
+- On a client-side route change `PageTransition.tsx` sets `data-entrance-done` on `<body>` so page bloks start at 0s instead of waiting out the header's slot-0 delay (the header never replays on navigation); the footer's stagger in `global.sass` is keyed off the `.page` that isn't hidden (`:not([style*='display: none'])`), since Next keeps the previous route's `.page` in the DOM as a hidden sibling.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
