@@ -13,7 +13,7 @@ const experienceItems = [
   {
     period: '2022—2025',
     name: 'Mmerch',
-    role: 'Senior Frontend Developer',
+    role: 'Founding Developer',
   },
   {
     period: '2020—2022',
@@ -23,12 +23,12 @@ const experienceItems = [
   {
     period: '2017—2019',
     name: 'Fotomat',
-    role: 'Frontend Developer',
+    role: 'Founding Developer',
   },
   {
     period: '2011—2015',
     name: 'Close My Eyes',
-    role: 'E-Commerce Developer, Founder',
+    role: 'E-Commerce, Founder',
   },
 ];
 
