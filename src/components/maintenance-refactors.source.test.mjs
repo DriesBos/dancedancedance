@@ -224,6 +224,7 @@ test('home project thumbnail wrapper owns irregular hover thumbnails without dup
   assert.match(wrapperSource, /<Image/);
   assert.match(wrapperSource, /fill/);
   assert.match(wrapperSource, /unoptimized/);
+  assert.match(wrapperSource, /requestIdleCallback/);
   assert.match(wrapperSource, /sizes="\(max-width: 770px\) calc\(100vw - var\(--spacing-base\) \* 2\), 23vw"/);
   assert.match(wrapperSource, /HOVER_THUMBNAIL_EXIT_DURATION_MS = 300/);
   assert.match(wrapperSource, /HOVER_THUMBNAIL_EXIT_DELAY_MS = 950/);

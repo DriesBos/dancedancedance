@@ -7,8 +7,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   parseStoryblokImageDimensions,
   STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
-  transformStoryblokImageUrl,
-  warmStoryblokImage,
 } from '@/lib/storyblok-image';
 import SliderIndicators from '../SliderIndicators';
 
@@ -18,12 +16,14 @@ interface SbPageData extends SbBlokData {
     filename?: string;
     alt?: string;
     name?: string;
+    blurDataURL?: string;
   }[];
   images_mobile?: {
     id?: string;
     filename?: string;
     alt?: string;
     name?: string;
+    blurDataURL?: string;
   }[];
   caption?: string;
   caption_side?: boolean;
@@ -32,11 +32,13 @@ interface SbPageData extends SbBlokData {
 
 interface ColumnSliderProps {
   blok: SbPageData;
+  imageSizes?: string;
 }
 
-const warmedColumnSliderImageSrcs = new Set<string>();
-
-const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
+const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({
+  blok,
+  imageSizes = '(max-width: 770px) 100vw, 50vw',
+}) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -67,10 +69,6 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
     );
   }, [blok.images, blok.images_mobile, isMobile]);
   const currentImage = activeImages[activeIndex];
-  const nextImage =
-    activeImages.length > 1
-      ? activeImages[(activeIndex + 1) % activeImages.length]
-      : null;
 
   useEffect(() => {
     if (activeImages.length === 0) {
@@ -80,20 +78,6 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
 
     setActiveIndex((prevIndex) => prevIndex % activeImages.length);
   }, [activeImages.length]);
-
-  useEffect(() => {
-    if (!nextImage?.filename) return;
-
-    warmStoryblokImage(
-      nextImage.filename,
-      {
-        width: 1600,
-        quality: 70,
-        noUpscale: true,
-      },
-      warmedColumnSliderImageSrcs,
-    );
-  }, [nextImage?.filename]);
 
   useEffect(() => {
     if (activeImages.length <= 1) return;
@@ -121,11 +105,6 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
           const imageDimensions =
             parseStoryblokImageDimensions(image.filename) ??
             STORYBLOK_FALLBACK_IMAGE_DIMENSIONS;
-          const imageSrc = transformStoryblokImageUrl(image.filename, {
-            width: imageDimensions.width,
-            quality: 70,
-          });
-
           return (
             <div
               key={image.id || image.filename || index}
@@ -134,19 +113,18 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({ blok }) => {
             >
               <div className="column-Slider-ImageWrapper">
                 <Image
-                  src={imageSrc}
+                  src={image.filename}
                   alt={image.alt || image.name || 'Project image'}
                   width={imageDimensions.width}
                   height={imageDimensions.height}
-                  sizes="(max-width: 770px) 100vw, 50vw"
+                  sizes={imageSizes}
                   quality={70}
                   className="imageItem"
-                  priority={index === 0}
                   loading={index === 0 || isActive || isNext ? 'eager' : 'lazy'}
-                  fetchPriority={
-                    index === 0 || isActive || isNext ? 'high' : 'low'
-                  }
-                  unoptimized
+                  fetchPriority={isActive ? 'high' : isNext ? 'auto' : 'low'}
+                  {...(image.blurDataURL
+                    ? { placeholder: 'blur' as const, blurDataURL: image.blurDataURL }
+                    : {})}
                   style={{ width: '100%', height: 'auto' }}
                 />
               </div>

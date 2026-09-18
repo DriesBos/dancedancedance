@@ -261,6 +261,7 @@ export default function ThumbnailWrapper({
             quality: HOVER_THUMBNAIL_QUALITY,
             format: HOVER_THUMBNAIL_FORMAT,
             noUpscale: true,
+            fetchPriority: 'low',
           },
           warmedHoverThumbnailSrcs,
         );
@@ -279,13 +280,22 @@ export default function ThumbnailWrapper({
       }, HOVER_THUMBNAIL_WARM_RESIZE_DELAY_MS);
     };
 
-    warmThumbnails();
+    const idleCallback =
+      'requestIdleCallback' in window
+        ? (window.requestIdleCallback as (callback: () => void) => number)
+        : (callback: () => void) => window.setTimeout(callback, 1);
+    let idleTimer = idleCallback(warmThumbnails);
     window.addEventListener('resize', scheduleWarmThumbnails);
 
     return () => {
       if (resizeTimer !== null) {
         window.clearTimeout(resizeTimer);
       }
+      const cancelIdleCallback = (
+        window as Window & { cancelIdleCallback?: (id: number) => void }
+      ).cancelIdleCallback;
+      if (cancelIdleCallback) cancelIdleCallback(idleTimer);
+      else window.clearTimeout(idleTimer);
       window.removeEventListener('resize', scheduleWarmThumbnails);
     };
   }, [thumbnailBySlug]);

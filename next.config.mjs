@@ -3,6 +3,8 @@ const nextConfig = {
   devIndicators: false,
   poweredByHeader: false,
   images: {
+    loader: 'custom',
+    loaderFile: './src/lib/storyblok-image-loader.ts',
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {

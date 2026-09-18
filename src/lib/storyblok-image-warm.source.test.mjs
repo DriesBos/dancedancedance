@@ -16,10 +16,8 @@ test('storyblok image prewarming is centralized and cache capped', () => {
   assert.match(imageSource, /capped/i);
   assert.match(imageSource, /new window\.Image\(\)/);
 
-  assert.match(
-    columnSliderSource,
-    /warmStoryblokImage\([^,]+,[\s\S]*warmed[A-Za-z]+ImageSrcs,?\s*\)/,
-  );
+  assert.doesNotMatch(columnSliderSource, /warmStoryblokImage/);
+  assert.doesNotMatch(columnSliderSource, /1600/);
   assert.doesNotMatch(columnSliderSource, /new window\.Image\(\)/);
   assert.doesNotMatch(columnSliderSource, /image\.decode\?\.\(\)\.catch/);
 });

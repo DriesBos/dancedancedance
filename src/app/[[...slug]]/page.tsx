@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { transformStoryblokImageUrl } from '@/lib/storyblok-image';
 import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
+import { addStoryblokImageBlurs } from '@/lib/storyblok-image-blur';
 
 const HOME_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
 const HOME_DESCRIPTION =
@@ -217,7 +218,7 @@ export default async function Home({ params }: { params: Params }) {
   return (
     <PageTransition>
       <h1 className="visuallyHidden">{pageHeading}</h1>
-      <StoryblokStory story={pageData.story} />
+      <StoryblokStory story={{ ...pageData.story, content: await addStoryblokImageBlurs(pageData.story.content, version === 'published') }} />
     </PageTransition>
   );
 }

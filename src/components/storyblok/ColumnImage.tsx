@@ -4,13 +4,13 @@ import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import {
   parseStoryblokImageDimensions,
   STORYBLOK_FALLBACK_IMAGE_DIMENSIONS,
-  transformStoryblokImageUrl,
 } from '@/lib/storyblok-image';
 
 interface SbPageData extends SbBlokData {
   image?: {
     filename: string;
     alt: string;
+    blurDataURL?: string;
   };
   caption?: string;
   side_caption?: boolean;
@@ -18,17 +18,14 @@ interface SbPageData extends SbBlokData {
 
 interface ColumnImageProps {
   blok: SbPageData;
+  imageSizes?: string;
 }
 
-const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
+const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok, imageSizes = '100vw' }) => {
   if (!blok.image?.filename) return null;
   const imageDimensions =
     parseStoryblokImageDimensions(blok.image.filename) ??
     STORYBLOK_FALLBACK_IMAGE_DIMENSIONS;
-  const imageSrc = transformStoryblokImageUrl(blok.image.filename, {
-    width: imageDimensions.width,
-    quality: 70,
-  });
 
   return (
     <div
@@ -38,15 +35,16 @@ const ColumnImage: React.FunctionComponent<ColumnImageProps> = ({ blok }) => {
       data-caption={blok.caption ? true : false}
     >
       <Image
-        src={imageSrc}
+        src={blok.image.filename}
         alt={blok.image.alt || blok.caption || 'Image'}
         width={imageDimensions.width}
         height={imageDimensions.height}
-        sizes="(max-width: 770px) 100vw, 50vw"
+        sizes={imageSizes}
         className="imageItem"
         quality={70}
         loading="lazy"
-        unoptimized
+        placeholder={blok.image.blurDataURL ? 'blur' : 'empty'}
+        blurDataURL={blok.image.blurDataURL}
         style={{ width: '100%', height: 'auto' }}
       />
       {blok.caption && (
