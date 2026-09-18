@@ -21,7 +21,7 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
     <Link
       href="/about"
       prefetch={true}
-      className={`blok blok-Intro blok-Animate ${styles.blokIntro} ${styles.blokIntroLink} cursorInteract`}
+      className={`blok blok-Intro ${styles.blokIntro} ${styles.blokIntroLink} cursorInteract`}
       {...storyblokEditable(blok)}
     >
       <GrainyGradient variant="blok" />
@@ -29,17 +29,17 @@ const BlokIntro = ({ blok }: BlokIntroProps) => {
 
       <div className={`${styles.copy} copy`}>
         {blok.line_one ? (
-          <p className={`${styles.line} ${styles.lineOne} desktop`}>
+          <p className={`${styles.line} desktop`}>
             <InlineWordSwapText text={blok.line_one} keyPrefix="line-one" />
           </p>
         ) : null}
         {blok.line_two ? (
-          <p className={`${styles.line} ${styles.lineTwo} desktop`}>
+          <p className={`${styles.line} desktop`}>
             <InlineWordSwapText text={blok.line_two} keyPrefix="line-two" />
           </p>
         ) : null}
         {blok.line_combined ? (
-          <p className={`${styles.line} ${styles.lineCombined} mobile`}>
+          <p className={`${styles.line} mobile`}>
             <InlineWordSwapText text={blok.line_combined} keyPrefix="line-combined" />
           </p>
         ) : null}

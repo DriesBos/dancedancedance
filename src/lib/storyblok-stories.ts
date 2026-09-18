@@ -1,5 +1,5 @@
 import type { ISbStoriesParams } from '@storyblok/react/rsc';
-import { STORYBLOK_TAG_ALL } from '@/lib/storyblok-cache';
+import { STORYBLOK_REVALIDATE_SECONDS, STORYBLOK_TAG_ALL } from '@/lib/storyblok-cache';
 import { withPublishedStoryblokCv } from '@/lib/storyblok-cv';
 import { getOptionalStoryblokApi, getStoryblokAccessToken } from '@/lib/storyblok';
 
@@ -21,7 +21,6 @@ type StoryblokStoriesResponse<TStory> = {
 };
 
 const STORYBLOK_STORIES_PER_PAGE = 100;
-const STORYBLOK_STORIES_REVALIDATE_SECONDS = 3600;
 
 export async function fetchPublishedStoryList<
   TStory extends PublishedStoryListItem = PublishedStoryListItem,
@@ -48,7 +47,7 @@ export async function fetchPublishedStoryList<
   const cacheOptions = {
     cache: 'force-cache' as const,
     next: {
-      revalidate: STORYBLOK_STORIES_REVALIDATE_SECONDS,
+      revalidate: STORYBLOK_REVALIDATE_SECONDS,
       tags: [STORYBLOK_TAG_ALL, ...tags],
     },
   };

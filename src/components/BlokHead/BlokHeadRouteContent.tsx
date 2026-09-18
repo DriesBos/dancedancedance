@@ -417,7 +417,7 @@ const BlokHeadRouteContent = ({
                 <IconMail />
               </Link>
             </div>
-            <Link href="/" prefetch={true} className="icon cursorMagnetic">
+            <Link href="/" prefetch={true} className="icon cursorMagnetic" aria-label="Close and go home">
               <IconClose />
             </Link>
           </>
@@ -486,7 +486,7 @@ const BlokHeadRouteContent = ({
                 <IconArrow />
               </button>
             </div>
-            <Link href="/" prefetch={true} className="icon cursorMagnetic">
+            <Link href="/" prefetch={true} className="icon cursorMagnetic" aria-label="Close and go home">
               <IconClose />
             </Link>
           </>

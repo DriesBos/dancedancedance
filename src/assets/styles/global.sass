@@ -281,9 +281,18 @@ mux-player, .muxPlayer
               // min-width: 8rem
               // flex-shrink: 0
       &-Slider
+        &-Caption
+          display: flex
+          align-items: last baseline
+          gap: 1rem
+        &-CaptionText
+          flex: 1
+          min-width: 0
+          overflow-wrap: anywhere
         &-Stack
           display: grid
           width: 100%
+          min-width: 0
         &-ImageWrapper
           position: relative
         &-Item

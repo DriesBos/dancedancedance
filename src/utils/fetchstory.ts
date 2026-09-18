@@ -1,5 +1,9 @@
 import { getStoryblokAccessToken, getStoryblokApi } from '@/lib/storyblok';
-import { STORYBLOK_TAG_ALL, getStoryblokTagsForSlug } from '@/lib/storyblok-cache';
+import {
+  STORYBLOK_REVALIDATE_SECONDS,
+  STORYBLOK_TAG_ALL,
+  getStoryblokTagsForSlug,
+} from '@/lib/storyblok-cache';
 import { getPublishedStoryblokCv } from '@/lib/storyblok-cv';
 import type { ISbStoryData } from '@storyblok/react/rsc';
 
@@ -45,7 +49,7 @@ const fetchStoryByPath = async (
   const response = await fetch(url, {
     next: {
       tags: [STORYBLOK_TAG_ALL, ...getStoryblokTagsForSlug(path)],
-      revalidate: version === 'published' ? 3600 : 0,
+      revalidate: version === 'published' ? STORYBLOK_REVALIDATE_SECONDS : 0,
     },
     cache: version === 'published' ? 'force-cache' : 'no-store',
   });
@@ -86,7 +90,7 @@ const fetchStartpageStory = async (
   const response = await fetch(url, {
     next: {
       tags: [STORYBLOK_TAG_ALL, ...getStoryblokTagsForSlug('home')],
-      revalidate: version === 'published' ? 3600 : 0,
+      revalidate: version === 'published' ? STORYBLOK_REVALIDATE_SECONDS : 0,
     },
     cache: version === 'published' ? 'force-cache' : 'no-store',
   });

@@ -1,5 +1,9 @@
 import type { ISbStoriesParams } from '@storyblok/react/rsc';
-import { STORYBLOK_TAG_ALL, STORYBLOK_TAG_CV } from '@/lib/storyblok-cache';
+import {
+  STORYBLOK_REVALIDATE_SECONDS,
+  STORYBLOK_TAG_ALL,
+  STORYBLOK_TAG_CV,
+} from '@/lib/storyblok-cache';
 
 type StoryblokSpaceResponse = {
   cv?: number;
@@ -7,8 +11,6 @@ type StoryblokSpaceResponse = {
     version?: number;
   };
 };
-
-const STORYBLOK_CV_REVALIDATE_SECONDS = 3600;
 
 const readStoryblokCv = (payload: StoryblokSpaceResponse): number | null => {
   const candidate = payload.cv ?? payload.space?.version;
@@ -29,7 +31,7 @@ const fetchPublishedStoryblokCv = async (
     const response = await fetch(url, {
       cache: 'force-cache',
       next: {
-        revalidate: STORYBLOK_CV_REVALIDATE_SECONDS,
+        revalidate: STORYBLOK_REVALIDATE_SECONDS,
         tags: [STORYBLOK_TAG_ALL, STORYBLOK_TAG_CV],
       },
     });

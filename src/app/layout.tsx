@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
-import Script from 'next/script';
 import '@/assets/styles/reset.css';
 import '@/assets/styles/form-reset.css';
 import '@/assets/styles/vars.sass';
@@ -200,8 +199,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: 'cover',
   interactiveWidget: 'overlays-content',
 };
@@ -212,7 +209,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const projects = await fetchProjectSlugs();
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
@@ -241,20 +237,6 @@ export default async function RootLayout({
         <ClientEnhancements />
         <ColorBurstTypography />
         <StackTimelineBehavior />
-        {gaId && (
-          <>
-            <Script
-              id="google-analytics-bootstrap"
-              src={`/api/google-analytics/bootstrap?measurementId=${encodeURIComponent(gaId)}`}
-              strategy="lazyOnload"
-            />
-            <Script
-              id="google-analytics-loader"
-              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-              strategy="lazyOnload"
-            />
-          </>
-        )}
         <HeaderInitAnimation />
         <main className="main">
           <BlokHead projects={projects} />

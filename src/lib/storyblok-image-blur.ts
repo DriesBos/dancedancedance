@@ -16,7 +16,7 @@ export async function addStoryblokImageBlurs<T>(content: T, published = true): P
             redirect: 'error',
             signal: AbortSignal.timeout(3000),
             cache: published ? 'force-cache' : 'no-store',
-            ...(published ? { next: { revalidate: 3600 } } : {}),
+            ...(published ? { next: { revalidate: false } } : {}),
           });
           if (!response.ok || !response.headers.get('content-type')?.startsWith('image/webp')) return;
           const bytes = await response.arrayBuffer();

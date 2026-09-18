@@ -403,9 +403,13 @@ test('column slider memoizes active images and renders indicators once', () => {
     'SliderIndicators should be rendered once per slider',
   );
   assert.ok(
-    indicatorsIndex > source.lastIndexOf('})}', source.indexOf('{blok.caption')),
-    'SliderIndicators should be outside the activeImages.map render loop',
+    source.indexOf('className="column-Caption column-Slider-Caption"') > source.indexOf('})}', mapIndex),
+    'Shared caption should follow the image stack',
   );
+  assert.ok(indicatorsIndex > source.indexOf('className="column-Slider-CaptionText"'));
+  assert.match(source, /currentImage\.name \|\| blok\.caption \|\| activeImages\.length > 1/);
+  assert.match(source, /<ColorBurstText>\{currentImage\.name\}<\/ColorBurstText>/);
+  assert.match(source, /<ColorBurstText>\{blok\.caption\}<\/ColorBurstText>/);
 });
 
 test('static English labels do not depend on locale state', () => {

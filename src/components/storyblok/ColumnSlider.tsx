@@ -128,22 +128,24 @@ const ColumnSlider: React.FunctionComponent<ColumnSliderProps> = ({
                   style={{ width: '100%', height: 'auto' }}
                 />
               </div>
-              {image.name && (
-                <div className="column-Caption">
-                  <ColorBurstText>{image.name}</ColorBurstText>
-                </div>
-              )}
             </div>
           );
         })}
-        <SliderIndicators
-          total={activeImages.length}
-          activeIndex={activeIndex}
-        />
       </div>
-      {blok.caption && (
-        <div className="column-Caption">
-          <ColorBurstText>{blok.caption}</ColorBurstText>
+      {(currentImage.name || blok.caption || activeImages.length > 1) && (
+        <div className="column-Caption column-Slider-Caption">
+          <div className="column-Slider-CaptionText">
+            {currentImage.name && (
+              <div><ColorBurstText>{currentImage.name}</ColorBurstText></div>
+            )}
+            {blok.caption && (
+              <div><ColorBurstText>{blok.caption}</ColorBurstText></div>
+            )}
+          </div>
+          <SliderIndicators
+            total={activeImages.length}
+            activeIndex={activeIndex}
+          />
         </div>
       )}
     </div>

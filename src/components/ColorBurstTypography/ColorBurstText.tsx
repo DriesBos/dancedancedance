@@ -5,7 +5,8 @@ interface ColorBurstTextProps {
 }
 
 const ColorBurstText = ({ children }: ColorBurstTextProps) => (
-  <span aria-label={children}>
+  <span>
+    <span className="visuallyHidden">{children}</span>
     {Array.from(children).map((character, index) =>
       character === ' ' ? (
         ' '
