@@ -31,6 +31,23 @@ body
   min-height: 100vh
   min-height: 100lvh
   transition: padding-top var(--transition-layout), padding-bottom var(--transition-layout), color var(--theme-transition), background var(--theme-transition)
+  // Fullscreen State: bloks fill the viewport, so anything that fades in
+  // (route change, footer replay) would flash the general background through.
+  // A fixed layer in the blok colour switches on instantly once the layout
+  // collapse has finished, and off instantly before the margins reopen.
+  &::before
+    content: ''
+    position: fixed
+    inset: 0
+    z-index: -1
+    pointer-events: none
+    background: var(--theme-blok)
+    opacity: 0
+    transition: opacity 0s linear var(--transition-layout-duration), background var(--theme-transition)
+  &[data-fullscreen='true']::before
+    opacity: 1
+  &[data-fullscreen='false']::before
+    transition-delay: 0s
 
 @media (hover: none)
   body[data-page='projects']
