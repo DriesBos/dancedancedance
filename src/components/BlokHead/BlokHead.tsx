@@ -16,8 +16,7 @@ interface Props {
 const BlokHead = ({ projects }: Props) => (
   <div
     className={`${styles.blokHeadFrame} blok blok-Head blok-AnimateHead`}
-    data-active="false"
-    data-scroll-start="true"
+    data-active="true"
   >
     <div className={styles.blokHead}>
       <GrainyGradient variant="blok" />

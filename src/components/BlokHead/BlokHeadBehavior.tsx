@@ -2,8 +2,16 @@
 
 import { useStore } from '@/store/store';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { gsap } from '@/lib/gsap';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const SCROLL_DIRECTION_THRESHOLD_RATIO = 0.1;
+// Fullscreen only: the bottom border (`.blokHead::after`) fades in between
+// header height and 20vh of scroll, scrubbed by ScrollTrigger, so it is gone
+// while the in-flow header is still in view.
+const BORDER_FADE_RATIO = 0.2;
 
 const BlokHeadBehavior = () => {
   // Resolved by class so BlokHead can stay a server component. Declared first
@@ -13,10 +21,12 @@ const BlokHeadBehavior = () => {
     headRef.current = document.querySelector<HTMLDivElement>('.blok-AnimateHead');
   }, []);
   const fullscreen = useStore((state) => state.fullscreen);
-  const [active, setActiveState] = useState(false);
-  const activeRef = useRef(false);
+  // `active` = hidden. Starts hidden: in fullscreen that is the in-flow state
+  // (see BlokHead.module.sass), so the header scrolls away with the content.
+  const [active, setActiveState] = useState(true);
+  const activeRef = useRef(true);
   const interactionActiveRef = useRef(false);
-  const scrollActiveRef = useRef(false);
+  const scrollActiveRef = useRef(true);
 
   const setActive = useCallback((nextActive: boolean) => {
     if (activeRef.current === nextActive) return;
@@ -24,16 +34,6 @@ const BlokHeadBehavior = () => {
     activeRef.current = nextActive;
     setActiveState(nextActive);
   }, []);
-
-  const setHeadScrollStart = useCallback(() => {
-    const head = headRef.current;
-    if (!head) return;
-
-    const nextScrollStart = String(window.scrollY <= 10);
-    if (head.dataset.scrollStart === nextScrollStart) return;
-
-    head.dataset.scrollStart = nextScrollStart;
-  }, [headRef]);
 
   const getIsSticky = useCallback(() => {
     const head = headRef.current;
@@ -79,6 +79,33 @@ const BlokHeadBehavior = () => {
   useEffect(() => {
     syncActive();
   }, [syncActive]);
+
+  useEffect(() => {
+    const head = headRef.current;
+    if (!head || !fullscreen) return;
+
+    const tween = gsap.fromTo(
+      head,
+      { '--head-border': 0 },
+      {
+        '--head-border': 1,
+        ease: 'none',
+        scrollTrigger: {
+          // Fade starts once the in-flow header has fully scrolled out.
+          start: () => head.offsetHeight,
+          end: () => window.innerHeight * BORDER_FADE_RATIO,
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      },
+    );
+
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+      head.style.removeProperty('--head-border');
+    };
+  }, [fullscreen, headRef]);
 
   useEffect(() => {
     const getMain = () => document.querySelector('main');
@@ -146,7 +173,6 @@ const BlokHeadBehavior = () => {
     const syncScrollController = () => {
       const currentScrollY = window.scrollY;
       const scrollOwnsActive = fullscreen || getIsSticky();
-      setHeadScrollStart();
 
       if (!scrollOwnsActive) {
         scrollActiveRef.current = false;
@@ -158,8 +184,11 @@ const BlokHeadBehavior = () => {
       const scrollThreshold =
         window.innerHeight * SCROLL_DIRECTION_THRESHOLD_RATIO;
 
-      if (currentScrollY < scrollThreshold) {
-        scrollActiveRef.current = false;
+      // At the top, hidden and shown coincide (the frame sits at its flow
+      // position either way), so reset to hidden here without any movement.
+      // Then the next scroll down carries it away with the content.
+      if (currentScrollY <= 0) {
+        scrollActiveRef.current = true;
         resetScrollDirection(currentScrollY);
         syncActive();
         return;
@@ -210,7 +239,7 @@ const BlokHeadBehavior = () => {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [fullscreen, getIsSticky, setHeadScrollStart, setScrollActive, syncActive]);
+  }, [fullscreen, getIsSticky, setScrollActive, syncActive]);
 
   return null;
 };
