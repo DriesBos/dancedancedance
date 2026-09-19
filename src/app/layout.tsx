@@ -86,7 +86,7 @@ const INITIAL_UI_STATE_SCRIPT = `
         : window.innerWidth < 770;
     var fullscreen = isMobile;
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
-    var themeColor = themeMetaColors[theme] || '#FFFFFF';
+    var themeColor = (themeMetaColors[theme] || themeMetaColors.LIGHT)[fullscreen ? 'blok' : 'bg'];
 
     window.__DDD_INITIAL_STATE__ = {
       theme: theme,
@@ -190,7 +190,7 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   other: {
-    'theme-color': '#0D111A',
+    'theme-color': THEME_META_COLORS.LIGHT.bg,
   },
 };
 

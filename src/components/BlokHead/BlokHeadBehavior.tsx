@@ -8,6 +8,8 @@ import { gsap } from '@/lib/gsap';
 gsap.registerPlugin(ScrollTrigger);
 
 const SCROLL_DIRECTION_THRESHOLD_RATIO = 0.1;
+// Matches the `.blokHead` transform transition in BlokHead.module.sass.
+const HEAD_SLIDE_MS = 500;
 // Fullscreen only: the bottom border (`.blokHead::after`) fades in between
 // header height and 20vh of scroll, scrubbed by ScrollTrigger, so it is gone
 // while the in-flow header is still in view.
@@ -69,12 +71,46 @@ const BlokHeadBehavior = () => {
     [syncActive],
   );
 
+  // Maps `active` (= hidden) onto the fullscreen `data-head` states, see
+  // BlokHead.module.sass. Reveal goes parked → hidden (no transition, still
+  // off-screen) → shown, so the inner slides in from -100%. Hide goes shown →
+  // hidden (slides out) → parked once the slide has finished.
   useEffect(() => {
     const head = headRef.current;
     if (!head) return;
 
     head.dataset.active = String(active);
-  }, [active, headRef]);
+
+    if (!fullscreen) {
+      delete head.dataset.head;
+      return;
+    }
+
+    const inner = head.firstElementChild as HTMLElement;
+
+    if (!active) {
+      if (head.dataset.head !== 'hidden') {
+        inner.style.transition = 'none';
+        head.dataset.head = 'hidden';
+        void inner.offsetHeight;
+        inner.style.transition = '';
+      }
+      head.dataset.head = 'shown';
+      return;
+    }
+
+    if (head.dataset.head !== 'shown' || window.scrollY <= 0) {
+      head.dataset.head = 'parked';
+      return;
+    }
+
+    head.dataset.head = 'hidden';
+    const park = window.setTimeout(() => {
+      head.dataset.head = 'parked';
+    }, HEAD_SLIDE_MS);
+
+    return () => window.clearTimeout(park);
+  }, [active, fullscreen, headRef]);
 
   useEffect(() => {
     syncActive();

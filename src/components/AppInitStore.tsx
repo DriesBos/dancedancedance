@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { getInitialThemeForHour, type Theme } from '@/lib/theme';
 import { useStore } from '@/store/store';
-import { THEME_META_COLORS } from '@/lib/theme-meta-color';
+import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 type InitialUIState = {
@@ -52,11 +52,11 @@ const applyBodyState = (theme: Theme, fullscreen: boolean, slug: string) => {
   body.setAttribute('data-border', 'minimal');
 };
 
-const applyThemeMetaColor = (theme: Theme) => {
+const applyThemeMetaColor = (theme: Theme, fullscreen: boolean) => {
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (!metaThemeColor) return;
 
-  metaThemeColor.setAttribute('content', THEME_META_COLORS[theme]);
+  metaThemeColor.setAttribute('content', getThemeMetaColor(theme, fullscreen));
 };
 
 const AppInitializer = () => {
@@ -136,8 +136,8 @@ const AppInitializer = () => {
   }, []);
 
   useEffect(() => {
-    applyThemeMetaColor(theme);
-  }, [theme]);
+    applyThemeMetaColor(theme, fullscreen);
+  }, [theme, fullscreen]);
 
   useEffect(() => {
     const body = document.body;
@@ -147,7 +147,10 @@ const AppInitializer = () => {
       const themeAttribute = document.body.getAttribute('data-theme');
       if (!themeAttribute) return;
 
-      applyThemeMetaColor(themeAttribute as Theme);
+      applyThemeMetaColor(
+        themeAttribute as Theme,
+        document.body.getAttribute('data-fullscreen') === 'true',
+      );
     };
 
     updateMetaThemeColor();
@@ -155,7 +158,7 @@ const AppInitializer = () => {
     const observer = new MutationObserver(updateMetaThemeColor);
     observer.observe(body, {
       attributes: true,
-      attributeFilter: ['data-theme'],
+      attributeFilter: ['data-theme', 'data-fullscreen'],
     });
 
     return () => {

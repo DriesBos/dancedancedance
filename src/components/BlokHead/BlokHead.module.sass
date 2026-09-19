@@ -7,13 +7,20 @@
   z-index: 3
   border-color: transparent
   background: transparent
-  // Fullscreen: hide/show by moving the sticky offset, not the inner. With a
-  // negative `top` the frame scrolls away in flow from scroll 0 and only pins
-  // once fully out of view; `top: 0` (scroll-up reveal) slides it back in.
+  // Fullscreen states (`data-head`, set by BlokHeadBehavior):
+  // - parked (default): negative sticky `top`, so the frame scrolls away in
+  //   flow from scroll 0 and pins fully out of view. Also the state at top.
+  // - hidden: pinned at 0, inner translated out. Transient before shown, and
+  //   the slide-out target when scrolling down.
+  // - shown: pinned at 0, inner at rest.
+  // The slide is a transform on the inner (composited), never the sticky
+  // `top`: Safari applies sticky offsets outside CSS transitions.
   :global(body[data-fullscreen='true']) &
-    transition: top .5s cubic-bezier(.16, 1, .3, 1), padding-top var(--theme-transition), background var(--theme-transition), perspective-origin var(--transition-layout-duration), border-color 0s linear var(--transition-layout-duration), border-width 0s linear var(--transition-layout-duration)
-  :global(body[data-fullscreen='true']) &[data-active='true']
     top: calc(-1 * (var(--blok-height) + var(--border-width)))
+    &[data-head='hidden'], &[data-head='shown']
+      top: env(safe-area-inset-top, 0px)
+    &[data-head='hidden'] .blokHead
+      transform: translateY(-100%)
   :global(body[data-fullscreen='false'][data-header-intro-visible='true'] main[data-stack-timeline-ready='true']) & .blokHead
     transform: translateY(-100%)
   :global(.side_Top)
@@ -38,7 +45,8 @@
     border-right-width: 0
     // Borders and the overhang (left/right) hold through the fullscreen expand
     // and snap off at its end (see global.sass LAYOUT).
-    transition: transform var(--transition-button), background var(--theme-transition), perspective-origin var(--transition-layout-duration), border-color 0s linear var(--transition-layout-duration), border-width 0s linear var(--transition-layout-duration), left 0s linear var(--transition-layout-duration), right 0s linear var(--transition-layout-duration)
+    // Slide duration must match HEAD_SLIDE_MS in BlokHeadBehavior.
+    transition: transform .5s cubic-bezier(.16, 1, .3, 1), background var(--theme-transition), perspective-origin var(--transition-layout-duration), border-color 0s linear var(--transition-layout-duration), border-width 0s linear var(--transition-layout-duration), left 0s linear var(--transition-layout-duration), right 0s linear var(--transition-layout-duration)
     // Scroll-scrubbed bottom border. Sits where the real (transparent in
     // fullscreen) bottom border is; `--head-border` 0..1 set by BlokHeadBehavior.
     &::after
