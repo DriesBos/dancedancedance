@@ -8,7 +8,8 @@ interface PageTransitionProps {
   children: React.ReactNode;
 }
 
-const ENTRANCE_ANIMATION = 'blokEnter';
+// Transform and opacity run as separate CSS animations; replay must restart both.
+const ENTRANCE_ANIMATIONS = new Set(['blokEnter', 'blokFade']);
 
 // The route and theme the entrance last ran for. Module scope rather than a
 // ref, because this component remounts on a client-side route change and a ref
@@ -71,7 +72,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
 
     for (const blockTarget of blockTargets) {
       for (const animation of blockTarget.getAnimations()) {
-        if ((animation as CSSAnimation).animationName !== ENTRANCE_ANIMATION) {
+        if (!ENTRANCE_ANIMATIONS.has((animation as CSSAnimation).animationName)) {
           continue;
         }
         animation.cancel();

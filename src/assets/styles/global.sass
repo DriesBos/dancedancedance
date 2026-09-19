@@ -115,7 +115,7 @@ main
   display: flex
   flex-direction: column
   & > .blok:first-child
-    transition: padding-top var(--theme-transition), background var(--theme-transition), perspective-origin var(--transition-layout)
+    transition: padding-top var(--theme-transition), background var(--theme-transition), perspective-origin var(--transition-layout-duration)
   & > .blok
     margin-top: calc(0px - (#{var(--border-width)}))
   &-Thumbnail
@@ -159,7 +159,7 @@ mux-player, .muxPlayer
   perspective-origin: var(--panel-perspective-origin)
   // For the blok's own entrance animation, not the stack timeline
   opacity: 0
-  transition: padding-top var(--theme-transition), background var(--theme-transition)
+  transition: padding-top var(--theme-transition), background var(--theme-transition), perspective-origin var(--transition-layout-duration)
   &.inactive
     display: none
   &-Head
@@ -459,12 +459,14 @@ mux-player, .muxPlayer
     // Slot 0 of the stagger is the header (see &-AnimateHead below); page
     // bloks pick up at slot 1, one slot later.
     --blok-enter-delay: .35s
-    animation: blokEnter 1s cubic-bezier(.16, 1, .3, 1) both
+    // Two animations, one delay: opacity on its own gentler ease so the fade
+    // stays visible through the travel instead of finishing in the first ~200ms.
+    animation: blokEnter 1s cubic-bezier(.16, 1, .3, 1) both, blokFade 1s ease-out both
     animation-delay: var(--blok-enter-delay)
   &-AnimateHead
     opacity: 0
     // Slot 0 of the shared entrance; HeaderInitAnimation only sets the body flags.
-    animation: blokEnter 1s cubic-bezier(.16, 1, .3, 1) both
+    animation: blokEnter 1s cubic-bezier(.16, 1, .3, 1) both, blokFade 1s ease-out both
     animation-delay: .2s
   &-ProjectList
     position: relative
@@ -581,6 +583,28 @@ body
     padding-left: 0
     padding-right: 0
     padding-bottom: 0
+    // Entering fullscreen: keep the borders through the layout expand and
+    // snap them off once it has finished (0s transition, delay = layout
+    // duration). Leaving fullscreen keeps the instant snap back: the base
+    // `transition` lists below carry no border entry, and transitions
+    // resolve from the incoming rule set.
+    $border-snap: border-color 0s linear var(--transition-layout-duration), border-width 0s linear var(--transition-layout-duration)
+    .blok
+      transition: padding-top var(--theme-transition), background var(--theme-transition), perspective-origin var(--transition-layout-duration), $border-snap
+    .page > .blok:first-child
+      transition: padding-top var(--theme-transition), background var(--theme-transition), perspective-origin var(--transition-layout-duration), $border-snap
+    // Header and first-blok top panels stay visible through the expand and
+    // disappear with the borders. Every other top panel was only hidden by
+    // the stack z-index (a fullscreen=false rule), so it snaps off at once.
+    .side_Top
+      transition: background var(--theme-transition), opacity 0s
+    .blok-Head .side_Top, .page > .blok:first-child > .side_Top
+      transition: background var(--theme-transition), opacity 0s linear var(--transition-layout-duration)
+    .blok-Footer
+      transition: margin-top var(--theme-transition), $border-snap
+    @media (max-width: 770px)
+      .page-Project .row > :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider)
+        transition: $border-snap
     .page-Project, .page-General
       & > div:nth-child(1)
         border-top-color: transparent !important
@@ -621,7 +645,6 @@ body
       &-Project
         overflow: hidden
       &-Footer
-        transition: margin-top var(--theme-transition)
         border-top-color: transparent
         border-bottom-color: transparent
         padding-top: var(--blok-padding-extraTop)
@@ -661,9 +684,12 @@ body
           z-index: 1
           margin-top: var(--blok-height)
     &:is([data-page='home'], [data-page='about'], [data-page='projects'])
+      // Not gated on the stack timeline: the panel is a static transform and
+      // fades in with its blok's own entrance. Gating it on the JS ready flag
+      // (set after hydration, ~700ms) made it pop in after the entrance ended.
+      .side_Top
+        opacity: 1
       main[data-stack-timeline-ready='true']
-        .side_Top
-          opacity: 1
         .blok-Footer
           margin-top: 0
         [data-stack-timeline='true']
@@ -714,11 +740,15 @@ body
 // visually identical to 0.
 @keyframes blokEnter
   from
-    opacity: .001
     transform: translateY(5vh)
   to
-    opacity: 1
     transform: none
+
+@keyframes blokFade
+  from
+    opacity: .001
+  to
+    opacity: 1
 
 // On a client-side route change the header never replays (it only runs on
 // initial load), so its .35s base delay is pure lag for the new page's
@@ -732,7 +762,7 @@ body[data-entrance-done='true'] .blok-Animate
 // non-animated sibling inside .page cannot shift the sequence.
 @for $i from 2 through 30
   .page > .blok-Animate:nth-child(#{$i} of .blok-Animate)
-    animation-delay: calc(var(--blok-enter-delay) + #{($i - 1) * 0.15}s)
+    animation-delay: calc(var(--blok-enter-delay) + #{($i - 1) * 0.165}s)
 
 // The footer sits outside .page as a sibling in <main>, so it continues the
 // sequence from however many animated bloks the page rendered. On a
@@ -745,7 +775,7 @@ body[data-entrance-done='true'] .blok-Animate
 // selects the one live `.page` regardless of DOM order.
 @for $i from 1 through 30
   .page:not([style*='display: none']):has(> .blok-Animate:nth-child(#{$i} of .blok-Animate)) ~ .blok-Animate
-    animation-delay: calc(var(--blok-enter-delay) + #{$i * 0.15}s)
+    animation-delay: calc(var(--blok-enter-delay) + #{$i * 0.165}s)
 
 @keyframes hyperLink
   0%
