@@ -53,6 +53,9 @@
   width: 100%
   max-width: 0
   transition: max-width 0.165s ease
+  // Keep the underline and caret; override the global keyboard-focus box.
+  &:focus-visible
+    outline: none
   &::placeholder
     padding-left: 2px
     color: inherit

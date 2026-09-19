@@ -27,11 +27,17 @@ const EVAL_SCRIPT = `
     .map((el) => el.className || el.tagName)
     .slice(0, 10);
   const firstAnimate = document.querySelector('.blok-Animate');
+  const email = document.querySelector('#newsletter-form input[type="email"]');
+  email?.focus();
+  const emailStyle = email && getComputedStyle(email);
   return JSON.stringify({
     blokCount: bloks.length,
     failing,
     firstAnimateText: firstAnimate ? firstAnimate.textContent.trim() : null,
     headerIntroVisible: document.body.dataset.headerIntroVisible === 'true',
+    newsletterFocusValid: Boolean(email?.matches(':focus-visible') &&
+      emailStyle.outlineStyle === 'none' && emailStyle.borderWidth === '0px' &&
+      parseFloat(getComputedStyle(email.parentElement, '::after').height) > 0),
   });
 })()
 `;
@@ -82,6 +88,7 @@ async function checkPage(url) {
   if (data.failing.length > 0) problems.push(`invisible .blok elements: ${data.failing.join(', ')}`);
   if (!data.firstAnimateText) problems.push('first .blok-Animate has empty text content');
   if (!data.headerIntroVisible) problems.push('body[data-header-intro-visible] is not "true"');
+  if (!data.newsletterFocusValid) problems.push('newsletter focus must keep its underline without a border or outline');
 
   return { url, pass: problems.length === 0, problems, data };
 }

@@ -21,9 +21,9 @@ import {
 } from '@/lib/theme';
 import { THEME_META_COLORS } from '@/lib/theme-meta-color';
 
-const SITE_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
+const SITE_TITLE = 'Dries Bos — Freelance Creative Developer and Web Designer';
 const SITE_DESCRIPTION =
-  'Dries Bos designs and develops high-end websites, ecommerce experiences and interactive products for creative agencies, studios and startups worldwide.';
+  'Dries Bos is an experienced developer and designer crafting award winning interactions. And dependable sidekick for startups and ambitious agencies.';
 const siteUrl = getSiteUrl();
 const STRUCTURED_DATA = {
   '@context': 'https://schema.org',

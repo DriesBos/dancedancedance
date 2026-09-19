@@ -1,7 +1,7 @@
 'use client';
 
 import type { HTMLAttributes } from 'react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import BlokProject from '../BlokProject';
 import BlokFilter, {
   ProjectSortDirection,
@@ -39,6 +39,7 @@ export default function BlokProjectListClient({
   projects,
   editableProps,
 }: BlokProjectListClientProps) {
+  const headingId = useId();
   const [sortField, setSortField] = useState<ProjectSortField>('year');
   const [sortDirection, setSortDirection] =
     useState<ProjectSortDirection>('desc');
@@ -123,10 +124,12 @@ export default function BlokProjectListClient({
         hoverEvent={hoverEvent}
         leaveEvent={leaveEvent}
       />
-      <div
+      <section
         className={`blok blok-Animate blok-ProjectList ${styles.projectList}`}
         {...editableProps}
+        aria-labelledby={headingId}
       >
+        <h2 id={headingId} className="visuallyHidden">Selected work</h2>
         <GrainyGradient variant="blok" />
         <BlokSidePanels />
         {hasNoSearchResults ? (
@@ -145,7 +148,7 @@ export default function BlokProjectListClient({
             />
           ))
         )}
-      </div>
+      </section>
     </>
   );
 }

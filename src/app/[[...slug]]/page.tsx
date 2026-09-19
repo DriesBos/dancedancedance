@@ -12,9 +12,9 @@ import { fetchPublishedStoryList } from '@/lib/storyblok-stories';
 import { addStoryblokImageBlurs } from '@/lib/storyblok-image-blur';
 import { getStoryblokTagsForSlug } from '@/lib/storyblok-cache';
 
-const HOME_TITLE = 'Freelance Creative Developer & Web Designer | Dries Bos';
+const HOME_TITLE = 'Dries Bos — Freelance Creative Developer and Web Designer';
 const HOME_DESCRIPTION =
-  'Dries Bos designs and develops high-end websites, ecommerce experiences and interactive products for creative agencies, studios and startups worldwide.';
+  'Dries Bos is an experienced developer and designer crafting award winning interactions. And dependable sidekick for startups and ambitious agencies.';
 
 type Params = Promise<{ slug?: string[] }>;
 
@@ -256,7 +256,7 @@ export default async function Home({ params }: { params: Params }) {
   const isHome = !slug || slug.length === 0 || slugPath === 'home';
   const storyTitle = story.content?.title || story.name || 'Dries Bos';
   const pageHeading = isHome
-    ? 'Dries Bos — Freelance Creative Developer and Web Designer'
+    ? 'Dries Bos is a freelance creative developer and web designer crafting award-winning digital experiences'
     : slugPath === 'about'
       ? 'About Dries Bos — Freelance Creative Developer and Web Designer'
       : story.content?.component === 'Page Project'
