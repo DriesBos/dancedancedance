@@ -583,6 +583,13 @@ body
     padding-left: 0
     padding-right: 0
     padding-bottom: 0
+    // iOS Safari tints its bottom bar from the canvas colour, i.e. the
+    // propagated body background, not from theme-color or rendered pixels.
+    // So the real body background has to become the blok colour too. It is
+    // hidden in-viewport behind ::before, and snaps together with the borders
+    // at the end of the expand. Leaving fullscreen uses the base .33s fade.
+    background: var(--theme-blok)
+    transition: padding-top var(--transition-layout), padding-bottom var(--transition-layout), color var(--theme-transition), background 0s linear var(--transition-layout-duration)
     // Entering fullscreen: keep the borders through the layout expand and
     // snap them off once it has finished (0s transition, delay = layout
     // duration). Leaving fullscreen keeps the instant snap back: the base
