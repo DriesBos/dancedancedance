@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
   type FormEvent,
-  type RefObject,
 } from 'react';
 import { useGSAP } from '@/lib/gsap';
 import { vibrate } from '@/lib/vibration';
@@ -15,6 +14,8 @@ import styles from './Newsletter.module.sass';
 interface NewsletterProps {
   className?: string;
 }
+
+type SubmissionStatus = 'idle' | 'submitting' | 'success' | 'error';
 
 const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const SCRAMBLE_ITERATIONS_PER_CHARACTER = 8;
@@ -36,42 +37,24 @@ const encodeFormData = (formData: FormData) => {
 const shouldPreserveScrambleCharacter = (char: string) =>
   char === ' ' || char === '!' || char === '.';
 
-const setScrambleText = (element: HTMLElement, text: string) => {
-  const characters = [
-    ...element.querySelectorAll<HTMLElement>('.cbc'),
-  ];
+const useTextScramble = (targetText: string) => {
+  const [displayText, setDisplayText] = useState(targetText);
 
-  if (characters.length === text.length) {
-    characters.forEach((character, index) => {
-      character.textContent = text[index] ?? '';
-    });
-    return;
-  }
-
-  element.textContent = text;
-};
-
-const useTextScramble = (
-  textRef: RefObject<HTMLElement | null>,
-  targetText: string,
-) => {
   useGSAP(
     () => {
-      const element = textRef.current;
-      if (!element || !targetText) return;
+      if (!targetText) {
+        setDisplayText('');
+        return;
+      }
 
       if (!/^[\x00-\x7F]*$/.test(targetText)) {
-        setScrambleText(element, targetText);
+        setDisplayText(targetText);
         return;
       }
 
       let iteration = 0;
       const interval = window.setInterval(() => {
-        const currentElement = textRef.current;
-        if (!currentElement) return;
-
-        setScrambleText(
-          currentElement,
+        setDisplayText(
           targetText
             .split('')
             .map((char, index) => {
@@ -93,7 +76,7 @@ const useTextScramble = (
 
         if (iteration > targetText.length * SCRAMBLE_ITERATIONS_PER_CHARACTER) {
           window.clearInterval(interval);
-          setScrambleText(currentElement, targetText);
+          setDisplayText(targetText);
         }
       }, SCRAMBLE_FRAME_MS);
 
@@ -101,26 +84,37 @@ const useTextScramble = (
     },
     { dependencies: [targetText] },
   );
+
+  return displayText;
+};
+
+const ScrambledColorBurstText = ({ text }: { text: string }) => {
+  const displayText = useTextScramble(text);
+
+  return (
+    <ColorBurstText accessibleText={text}>{displayText}</ColorBurstText>
+  );
 };
 
 export default function Newsletter({ className }: NewsletterProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [submissionStatus, setSubmissionStatus] =
+    useState<SubmissionStatus>('idle');
   const [isActive, setIsActive] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const buttonTextRef = useRef<HTMLSpanElement>(null);
-  const messageRef = useRef<HTMLParagraphElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const buttonText = !isActive && !isLoading
-    ? 'Newsletter'
-    : isLoading
-      ? 'Submitting..'
-      : 'Submit';
-
-  useTextScramble(buttonTextRef, buttonText);
-  useTextScramble(messageRef, message);
+  const isLoading = submissionStatus === 'submitting';
+  const message = submissionStatus === 'success'
+    ? 'Thank you!'
+    : submissionStatus === 'error'
+      ? 'Something went wrong. Try again.'
+      : '';
+  const buttonText = isLoading
+    ? 'Submitting...'
+    : isActive
+      ? 'Submit'
+      : 'Newsletter';
 
   // Focus input when active becomes true
   useEffect(() => {
@@ -133,7 +127,7 @@ export default function Newsletter({ className }: NewsletterProps) {
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
-        setMessage('');
+        setSubmissionStatus('idle');
         setIsActive(false);
       }, 5000);
 
@@ -141,7 +135,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     }
   }, [message]);
 
-  // Reset to initial state if active and no message for 5 seconds
+  // Reset to initial state if active and empty for 10 seconds
   useEffect(() => {
     if (isActive && !inputValue && !message) {
       const timer = setTimeout(() => {
@@ -157,8 +151,7 @@ export default function Newsletter({ className }: NewsletterProps) {
     const form = formRef.current;
     if (!form) return;
 
-    setIsLoading(true);
-    setMessage('');
+    setSubmissionStatus('submitting');
 
     const formData = new FormData(form);
 
@@ -172,19 +165,17 @@ export default function Newsletter({ className }: NewsletterProps) {
       });
 
       if (!response.ok) {
-        setMessage('Something went wrong. Try again.');
+        setSubmissionStatus('error');
         return;
       }
 
       vibrate();
-      setMessage('thank you!');
+      setSubmissionStatus('success');
       form.reset();
       setInputValue('');
       setIsActive(false);
     } catch {
-      setMessage('Something went wrong. Try again.');
-    } finally {
-      setIsLoading(false);
+      setSubmissionStatus('error');
     }
   };
 
@@ -216,8 +207,12 @@ export default function Newsletter({ className }: NewsletterProps) {
       >
         <input type="hidden" name="form-name" value={NETLIFY_FORM_NAME} />
         <div className={styles.inputWrapper}>
+          <label className="visuallyHidden" htmlFor="newsletter-email">
+            Email address
+          </label>
           <input
             ref={inputRef}
+            id="newsletter-email"
             name="email"
             type="email"
             placeholder="Enter your email"
@@ -228,6 +223,14 @@ export default function Newsletter({ className }: NewsletterProps) {
             disabled={isLoading}
             data-active={isActive}
           />
+          <span
+            className={styles.placeholder}
+            data-active={isActive}
+            data-empty={!inputValue}
+            aria-hidden="true"
+          >
+            <ColorBurstText>Enter your email</ColorBurstText>
+          </span>
         </div>
         <input
           type="text"
@@ -239,8 +242,8 @@ export default function Newsletter({ className }: NewsletterProps) {
         />
       </form>
       {message ? (
-        <p ref={messageRef} className={styles.message} role="status" aria-live="polite">
-          {message}
+        <p className={styles.message} role="status" aria-live="polite">
+          <ScrambledColorBurstText text={message} />
         </p>
       ) : (
         <button
@@ -250,9 +253,7 @@ export default function Newsletter({ className }: NewsletterProps) {
           className={styles.button}
           disabled={isLoading}
         >
-          <span ref={buttonTextRef}>
-            <ColorBurstText>{buttonText}</ColorBurstText>
-          </span>
+          <ScrambledColorBurstText text={buttonText} />
         </button>
       )}
     </div>

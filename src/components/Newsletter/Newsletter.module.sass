@@ -46,6 +46,20 @@
     height: var(--border-hyperlink)
     background: currentColor
 
+.placeholder
+  position: absolute
+  left: 2px
+  bottom: 2px
+  width: calc(100% - 2px)
+  overflow: hidden
+  color: inherit
+  opacity: 0
+  pointer-events: none
+  white-space: nowrap
+  transition: opacity 0.5s ease-in
+  &[data-active="true"][data-empty="true"]
+    opacity: 0.66
+
 .input
   all: unset
   outline: none
@@ -57,17 +71,13 @@
   &:focus-visible
     outline: none
   &::placeholder
-    padding-left: 2px
-    color: inherit
+    color: transparent
     opacity: 0
-    transition: opacity 0.5s ease-in
   &:disabled
     pointer-events: none
   &[data-active="true"]
     transition: max-width 0.5s ease-out
     max-width: 333px
-    &::placeholder
-      opacity: 0.66
 
 .button
   all: unset
