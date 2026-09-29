@@ -47,6 +47,7 @@ test('newsletter submission returns to idle after terminal feedback', () => {
     /setTimeout\(\(\) => \{\s*setSubmissionStatus\('idle'\)/,
   );
   assert.match(newsletterSource, /\? 'Thank you!'/);
+  assert.match(newsletterSource, /\? 'Oops! Try again\'/);
   assert.match(newsletterSource, /\? 'Submitting\.\.\.'/);
   assert.doesNotMatch(newsletterSource, /setIsLoading/);
 });

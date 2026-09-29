@@ -108,7 +108,7 @@ export default function Newsletter({ className }: NewsletterProps) {
   const message = submissionStatus === 'success'
     ? 'Thank you!'
     : submissionStatus === 'error'
-      ? 'Something went wrong. Try again.'
+      ? 'Oops! Try again'
       : '';
   const buttonText = isLoading
     ? 'Submitting...'
