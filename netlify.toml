@@ -5,17 +5,6 @@
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
 
-# Handle Next.js rewrites properly
-[[redirects]]
-  from = "/api/newsletter/subscribe"
-  to = "/api/newsletter/subscribe"
-  status = 200
-  force = false
-  [redirects.rate_limit]
-    window_limit = 5
-    window_size = 60
-    aggregate_by = ["ip", "domain"]
-
 # Security and compression headers for all pages
 [[headers]]
   for = "/*"

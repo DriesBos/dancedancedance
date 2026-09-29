@@ -19,6 +19,19 @@ interface NewsletterProps {
 const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 const SCRAMBLE_ITERATIONS_PER_CHARACTER = 8;
 const SCRAMBLE_FRAME_MS = 30;
+const NETLIFY_FORM_NAME = 'newsletter';
+
+const encodeFormData = (formData: FormData) => {
+  const searchParams = new URLSearchParams();
+
+  formData.forEach((value, key) => {
+    if (typeof value === 'string') {
+      searchParams.append(key, value);
+    }
+  });
+
+  return searchParams.toString();
+};
 
 const shouldPreserveScrambleCharacter = (char: string) =>
   char === ' ' || char === '!' || char === '.';
@@ -146,39 +159,32 @@ export default function Newsletter({ className }: NewsletterProps) {
 
     setIsLoading(true);
     setMessage('');
-    setIsActive(false);
-    setInputValue('');
 
     const formData = new FormData(form);
-    const email = formData.get('email');
 
     try {
-      const response = await fetch('/api/newsletter/subscribe', {
-        body: JSON.stringify({
-          email,
-          company: formData.get('company'),
-        }),
+      const response = await fetch('/__forms.html', {
+        body: encodeFormData(formData),
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         method: 'POST',
       });
-      const json = (await response.json()) as { error?: string };
 
-      if (!response.ok || json.error) {
-        setMessage(json.error || 'Something went wrong. Try again.');
+      if (!response.ok) {
+        setMessage('Something went wrong. Try again.');
         return;
       }
 
       vibrate();
       setMessage('thank you!');
+      form.reset();
+      setInputValue('');
+      setIsActive(false);
     } catch {
       setMessage('Something went wrong. Try again.');
     } finally {
       setIsLoading(false);
-      form.reset();
-      setInputValue('');
-      setIsActive(false);
     }
   };
 
@@ -201,9 +207,14 @@ export default function Newsletter({ className }: NewsletterProps) {
       <form
         ref={formRef}
         id="newsletter-form"
+        name={NETLIFY_FORM_NAME}
+        method="POST"
+        data-netlify="true"
+        data-netlify-honeypot="company"
         onSubmit={subscribeUser}
         className={styles.form}
       >
+        <input type="hidden" name="form-name" value={NETLIFY_FORM_NAME} />
         <div className={styles.inputWrapper}>
           <input
             ref={inputRef}

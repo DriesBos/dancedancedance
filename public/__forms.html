@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Netlify Forms</title>
+  </head>
+  <body>
+    <form
+      name="newsletter"
+      method="POST"
+      data-netlify="true"
+      netlify-honeypot="company"
+      hidden
+    >
+      <input type="hidden" name="form-name" value="newsletter" />
+      <input type="email" name="email" />
+      <input type="text" name="company" />
+    </form>
+  </body>
+</html>
