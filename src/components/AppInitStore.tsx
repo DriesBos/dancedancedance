@@ -3,13 +3,13 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { getInitialThemeForHour, type Theme } from '@/lib/theme';
-import { useStore } from '@/store/store';
+import { useStore, type CameraTrack } from '@/store/store';
 import { getThemeMetaColor } from '@/lib/theme-meta-color';
 import { useShallow } from 'zustand/react/shallow';
 
 type InitialUIState = {
   theme: Theme;
-  fullscreen: boolean;
+  cameraTrack: CameraTrack;
 };
 
 const getIsMobileViewport = () => {
@@ -17,11 +17,11 @@ const getIsMobileViewport = () => {
     return window.matchMedia('(max-width: 770px)').matches;
   }
 
-  return window.innerWidth < 770;
+  return window.innerWidth < 771;
 };
 
-const getInitialFullscreen = () =>
-  getIsMobileViewport();
+const getInitialCameraTrack = (): CameraTrack =>
+  getIsMobileViewport() ? 'FULLSCREEN' : 'STRUCTURE';
 
 const getFallbackInitialUIState = (): InitialUIState => {
   const hour = new Date().getHours();
@@ -29,7 +29,7 @@ const getFallbackInitialUIState = (): InitialUIState => {
 
   return {
     theme,
-    fullscreen: getInitialFullscreen(),
+    cameraTrack: getInitialCameraTrack(),
   };
 };
 
@@ -42,12 +42,13 @@ const getInitialUIState = (): InitialUIState => {
   return getFallbackInitialUIState();
 };
 
-const applyBodyState = (theme: Theme, fullscreen: boolean, slug: string) => {
+const applyBodyState = (theme: Theme, cameraTrack: CameraTrack, slug: string) => {
   const body = document.body;
   if (!body) return;
 
   body.setAttribute('data-theme', theme);
-  body.setAttribute('data-fullscreen', String(fullscreen));
+  body.setAttribute('data-camera-track', cameraTrack.toLowerCase());
+  body.setAttribute('data-fullscreen', String(cameraTrack === 'FULLSCREEN'));
   body.setAttribute('data-page', slug);
   body.setAttribute('data-border', 'minimal');
 };
@@ -66,12 +67,12 @@ const AppInitializer = () => {
   const {
     initializeUiState,
     theme,
-    fullscreen,
+    cameraTrack,
   } = useStore(
     useShallow((state) => ({
       initializeUiState: state.initializeUiState,
       theme: state.theme,
-      fullscreen: state.fullscreen,
+      cameraTrack: state.cameraTrack,
     })),
   );
   const path = usePathname();
@@ -85,11 +86,11 @@ const AppInitializer = () => {
       hasInitializedUIRef.current = true;
 
       const initialState = getInitialUIState();
-      applyBodyState(initialState.theme, initialState.fullscreen, slug);
+      applyBodyState(initialState.theme, initialState.cameraTrack, slug);
 
       initializeUiState(
         initialState.theme,
-        initialState.fullscreen,
+        initialState.cameraTrack,
       );
 
       if (readyFrameRef.current === null) {
@@ -116,11 +117,11 @@ const AppInitializer = () => {
       return;
     }
 
-    applyBodyState(theme, fullscreen, slug);
+    applyBodyState(theme, cameraTrack, slug);
   }, [
     initializeUiState,
     slug,
-    fullscreen,
+    cameraTrack,
     theme,
   ]);
 
@@ -136,8 +137,8 @@ const AppInitializer = () => {
   }, []);
 
   useEffect(() => {
-    applyThemeMetaColor(theme, fullscreen);
-  }, [theme, fullscreen]);
+    applyThemeMetaColor(theme, cameraTrack === 'FULLSCREEN');
+  }, [theme, cameraTrack]);
 
   useEffect(() => {
     const body = document.body;

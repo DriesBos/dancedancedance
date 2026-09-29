@@ -142,7 +142,8 @@ const StackTimelineBehavior = () => {
 
   useEffect(() => {
     const main = document.querySelector<HTMLElement>('main.main');
-    if (!main || fullscreen || !isStackTimelinePath(pathname)) {
+    const isDesktopScene = window.matchMedia('(min-width: 771px)').matches;
+    if (!main || isDesktopScene || fullscreen || !isStackTimelinePath(pathname)) {
       clearTimeline(main);
       return;
     }

@@ -732,6 +732,142 @@ body
   filter: var(--theme-media-filter)
   transition: opacity var(--theme-transition), filter var(--theme-transition)
 
+// The desktop portfolio is one measured HTML document inside the Three scene.
+// Native flow remains authoritative below 771px.
+body[data-scene='true']
+  display: block
+  justify-content: initial
+  align-items: initial
+  padding: 0 !important
+  min-height: 100vh
+  min-height: 100lvh
+  overflow-x: clip
+  background: var(--theme-bg)
+
+  &::before
+    opacity: 0 !important
+
+  main
+    max-width: none
+    min-height: 0
+
+  .blok-Head .side_Top,
+  .page > .blok:first-child > .side_Top
+    transition-delay: 0s
+
+.portfolioScene
+  position: relative
+  width: 100%
+  min-height: 100vh
+  min-height: 100lvh
+  background: var(--theme-bg)
+
+  &_Canvas
+    position: fixed
+    inset: 0
+    z-index: 1
+    width: 100vw
+    height: 100vh
+    height: 100lvh
+    overflow: hidden
+    background: var(--theme-bg)
+    transition: background var(--theme-transition)
+
+    canvas
+      display: block
+
+  &_ScrollExtent
+    position: relative
+    z-index: 0
+    width: 1px
+    min-height: 100vh
+    min-height: 100lvh
+    pointer-events: none
+
+  &_Document
+    position: relative
+    color: var(--theme-type)
+    pointer-events: auto
+    transform-origin: center center
+
+  &_Main
+    display: flex
+    flex-direction: column
+    gap: clamp(2.5rem, 5vw, 5rem)
+    width: 100%
+    max-width: none
+    min-height: 0
+    padding: 0
+    overflow: visible
+
+    .page
+      display: contents
+
+    .blok
+      position: relative
+      top: auto
+      flex: 0 0 auto
+      width: 100%
+      margin: 0 !important
+      opacity: 1 !important
+      animation: none !important
+      transform: none
+      perspective: none
+      border-color: currentColor
+      border-width: var(--border-width)
+
+    .blok-Head
+      position: relative !important
+      top: auto !important
+      z-index: auto
+
+      & > div
+        transform: none !important
+
+    .blok-ProjectList
+      display: contents
+
+      & > :not(.blok-Project)
+        display: none
+
+    .side_Top
+      display: none
+
+  &_Hud
+    position: fixed
+    z-index: 30
+    top: max(1rem, env(safe-area-inset-top))
+    left: 50%
+    display: flex
+    gap: 0
+    padding: .25rem
+    transform: translateX(-50%)
+    border: var(--border-width) solid currentColor
+    border-radius: 999px
+    color: var(--theme-type)
+    background: color-mix(in srgb, var(--theme-bg) 82%, transparent)
+    backdrop-filter: blur(12px)
+    transition: color var(--theme-transition), background var(--theme-transition)
+
+  &_Button
+    min-height: 2.25rem
+    padding: .35rem .8rem
+    border: 0
+    border-radius: 999px
+    color: inherit
+    background: transparent
+    white-space: nowrap
+
+    &[data-active='true']
+      color: var(--theme-blok)
+      background: var(--theme-type)
+
+    &:focus-visible
+      outline-offset: -2px
+
+  &_PortalBootstrap
+    display: none
+
 .blurImage .imageItem
   opacity: 0
   transition: opacity 250ms ease-out, filter var(--theme-transition)
@@ -788,6 +924,12 @@ body[data-entrance-done='true'] .blok-Animate
 @for $i from 1 through 30
   .page:not([style*='display: none']):has(> .blok-Animate:nth-child(#{$i} of .blok-Animate)) ~ .blok-Animate
     animation-delay: calc(var(--blok-enter-delay) + #{$i * 0.165}s)
+
+// Keep the mobile footer within the real-render regression window even on
+// content-heavy pages. Desktop scene fronts skip the legacy entrance entirely.
+@media (max-width: 770px)
+  .main > .blok-Footer.blok-Animate
+    animation-delay: calc(var(--blok-enter-delay) + .66s) !important
 
 @keyframes hyperLink
   0%

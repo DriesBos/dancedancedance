@@ -15,6 +15,7 @@ import IconLinkOutside from '@/components/Icons/IconLinkOutside';
 import IconMail from '@/components/Icons/IconMail';
 import { getSafeExternalHref } from '@/lib/safe-url';
 import { vibrate } from '@/lib/vibration';
+import { getNextCameraTrack, type CameraTrack } from '@/store/store';
 import styles from './BlokHead.module.sass';
 
 interface Props {
@@ -23,13 +24,13 @@ interface Props {
     external_link?: { cached_url: string };
   }>;
   themeLabel: string;
-  fullscreen: boolean;
-  fullscreenLabel: string;
+  cameraTrack: CameraTrack;
+  cameraTrackLabel: string;
   isThemeSpinning: boolean;
   isAboutMixedHovered: boolean;
   onAboutMixedHoverChange: (value: boolean) => void;
   onCycleTheme: () => void;
-  onToggleFullscreen: () => void;
+  onCycleCameraTrack: () => void;
 }
 
 const TITLE_SWAP_DURATION_SECONDS = 4.8;
@@ -37,13 +38,13 @@ const TITLE_SWAP_DURATION_SECONDS = 4.8;
 const BlokHeadRouteContent = ({
   projects,
   themeLabel,
-  fullscreen,
-  fullscreenLabel,
+  cameraTrack,
+  cameraTrackLabel,
   isThemeSpinning,
   isAboutMixedHovered,
   onAboutMixedHoverChange,
   onCycleTheme,
-  onToggleFullscreen,
+  onCycleCameraTrack,
 }: Props) => {
   const path = usePathname();
   const currentPath = path || '/';
@@ -384,13 +385,13 @@ const BlokHeadRouteContent = ({
             <button
               type="button"
               className={`icon cursorMagnetic ${styles.layoutButton}`}
-              onClick={onToggleFullscreen}
-              aria-label={`Toggle fullscreen. Fullscreen is ${fullscreenLabel.toLowerCase()}`}
-              title={`Fullscreen: ${fullscreenLabel.toUpperCase()}`}
+              onClick={onCycleCameraTrack}
+              aria-label={`Camera track: ${cameraTrackLabel}. Switch to ${getNextCameraTrack(cameraTrack).toLowerCase()}`}
+              title={`Camera: ${cameraTrackLabel}`}
             >
               <span className={styles.layoutIconWrap}>
-                <span className={styles.layoutIcon} data-active={!fullscreen}>
-                  <IconFullscreen active={!fullscreen} />
+                <span className={styles.layoutIcon} data-active={cameraTrack !== 'FULLSCREEN'}>
+                  <IconFullscreen active={cameraTrack !== 'FULLSCREEN'} />
                 </span>
               </span>
             </button>

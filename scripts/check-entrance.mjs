@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// ponytail: fixed 2.5s wait (no real "animation settled" signal) and only 3
-// pages (/, /about, first /projects/...) — not a full-site crawl.
+// ponytail: fixed waits (no real "animation settled" signal) and only 3
+// mobile pages plus the desktop home scene — not a full-site crawl.
 //
 // Real-render check for the blok entrance animation. Source-regex tests can
 // pass while the site ships with `.blok` stuck at `opacity: 0` — this starts
@@ -18,6 +18,8 @@ const BASE_URL = `http://localhost:${PORT}`;
 const AGENT_BROWSER = path.join(ROOT, 'node_modules', '.bin', 'agent-browser');
 const SESSION = `check-entrance-${process.pid}`;
 const WAIT_MS = 2500;
+const DESKTOP_WIDTH = 1440;
+const DESKTOP_HEIGHT = 1000;
 
 const EVAL_SCRIPT = `
 (() => {
@@ -93,6 +95,90 @@ async function checkPage(url) {
   return { url, pass: problems.length === 0, problems, data };
 }
 
+async function checkDesktopScene() {
+  ab(['open']);
+  ab(['set', 'viewport', String(DESKTOP_WIDTH), String(DESKTOP_HEIGHT)]);
+  ab(['errors', '--clear']);
+  ab(['console', '--clear']);
+  ab(['navigate', BASE_URL]);
+  ab(['wait', String(WAIT_MS)]);
+
+  const initial = JSON.parse(ab(['eval', '--stdin'], `
+    (() => {
+      const canvas = document.querySelector('.portfolioScene_Canvas canvas');
+      const canvasHost = document.querySelector('.portfolioScene_Canvas');
+      const rect = canvas?.getBoundingClientRect();
+      const hostRect = canvasHost?.getBoundingClientRect();
+      return JSON.stringify({
+      scene: document.body.dataset.scene === 'true',
+      cameraTrack: document.body.dataset.cameraTrack,
+      canvasCount: document.querySelectorAll('.portfolioScene_Canvas canvas').length,
+      canvasRect: rect && { width: rect.width, height: rect.height },
+      canvasHostRect: hostRect && { width: hostRect.width, height: hostRect.height },
+      canvasHostDisplay: canvasHost && getComputedStyle(canvasHost).display,
+      documentCount: document.querySelectorAll('.portfolioScene_Document').length,
+      portalBootstrapCount: document.querySelectorAll('.portfolioScene_PortalBootstrap').length,
+      blokCount: document.querySelectorAll('.portfolioScene_Document .blok').length,
+      hudButtons: document.querySelectorAll('.portfolioScene_Button').length,
+      errorBoundary: document.body.innerText.includes('Application error') ||
+        Boolean(document.querySelector('nextjs-portal')),
+      })
+    })()
+  `).result);
+
+  ab(['eval', '--stdin'], `
+    document.querySelector('.portfolioScene_Button:nth-child(1)')?.click()
+  `);
+  ab(['wait', '500']);
+  const fullscreenTrack = ab(['eval', '--stdin'], 'document.body.dataset.cameraTrack').result;
+
+  ab(['eval', '--stdin'], `
+    document.querySelector('.portfolioScene_Button:nth-child(3)')?.click()
+  `);
+  ab(['wait', '1000']);
+  const angledTrack = ab(['eval', '--stdin'], 'document.body.dataset.cameraTrack').result;
+
+  ab(['eval', '--stdin'], `
+    document.querySelector('.portfolioScene_Document a[href="/about"]')?.click()
+  `);
+  ab(['wait', '1500']);
+  const navigation = JSON.parse(ab(['eval', '--stdin'], `
+    (() => JSON.stringify({
+      pathname: window.location.pathname,
+      scene: document.body.dataset.scene === 'true',
+      errorBoundary: document.body.innerText.includes('Application error') ||
+        Boolean(document.querySelector('nextjs-portal')),
+    }))()
+  `).result);
+  const browserErrors = ab(['errors']);
+  const browserConsole = ab(['console']);
+  const browserErrorCount = Array.isArray(browserErrors)
+    ? browserErrors.length
+    : browserErrors?.errors?.length || 0;
+
+  const problems = [];
+  if (!initial.scene) problems.push('body[data-scene] is not active');
+  if (initial.cameraTrack !== 'structure') problems.push(`initial track is ${initial.cameraTrack}`);
+  if (initial.canvasCount !== 1) problems.push(`found ${initial.canvasCount} canvases`);
+  if (initial.documentCount !== 1) problems.push(`found ${initial.documentCount} scene documents`);
+  if (initial.blokCount < 3) problems.push(`only ${initial.blokCount} scene bloks`);
+  if (initial.hudButtons !== 3) problems.push(`found ${initial.hudButtons} camera buttons`);
+  if (initial.errorBoundary) problems.push('Next.js error boundary is visible');
+  if (fullscreenTrack !== 'fullscreen') problems.push(`fullscreen button selected ${fullscreenTrack}`);
+  if (angledTrack !== 'angled') problems.push(`angled button selected ${angledTrack}`);
+  if (navigation.pathname !== '/about') problems.push(`scene link stayed on ${navigation.pathname}`);
+  if (!navigation.scene) problems.push('scene did not survive route navigation');
+  if (navigation.errorBoundary) problems.push('route navigation showed an error boundary');
+  if (browserErrorCount > 0) problems.push(`${browserErrorCount} browser errors`);
+
+  return {
+    url: BASE_URL,
+    pass: problems.length === 0,
+    problems,
+    data: { initial, fullscreenTrack, angledTrack, navigation, browserErrors, browserConsole },
+  };
+}
+
 async function main() {
   let server;
   let exitCode = 0;
@@ -118,6 +204,19 @@ async function main() {
         console.error(`FAIL ${url}`);
         for (const problem of result.problems) console.error(`  - ${problem}`);
       }
+    }
+
+    const desktopResult = await checkDesktopScene();
+    if (desktopResult.pass) {
+      console.log(`PASS ${desktopResult.url} desktop Three scene`);
+    } else {
+      exitCode = 1;
+      console.error(`FAIL ${desktopResult.url} desktop Three scene`);
+      for (const problem of desktopResult.problems) console.error(`  - ${problem}`);
+      console.error(JSON.stringify(desktopResult.data, null, 2));
+      try {
+        ab(['screenshot', '/tmp/dancedancedance-scene-failure.png']);
+      } catch {}
     }
   } catch (err) {
     exitCode = 1;

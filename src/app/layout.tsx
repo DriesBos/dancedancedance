@@ -13,6 +13,7 @@ import BlokHead from '@/components/BlokHead/BlokHead';
 import BlokFooter from '@/components/BlokFooter/BlokFooter';
 import ClientEnhancements from '@/components/ClientEnhancements';
 import HeaderInitAnimation from '@/components/HeaderInitAnimation';
+import PortfolioViewport from '@/components/PortfolioScene/PortfolioViewport';
 import {
   DARK_THEME,
   LIGHT_THEME,
@@ -83,18 +84,20 @@ const INITIAL_UI_STATE_SCRIPT = `
     var isMobile =
       typeof window.matchMedia === 'function'
         ? window.matchMedia('(max-width: 770px)').matches
-        : window.innerWidth < 770;
-    var fullscreen = isMobile;
+        : window.innerWidth < 771;
+    var cameraTrack = isMobile ? 'FULLSCREEN' : 'STRUCTURE';
+    var fullscreen = cameraTrack === 'FULLSCREEN';
     var themeMetaColors = ${JSON.stringify(THEME_META_COLORS)};
     var themeColor = (themeMetaColors[theme] || themeMetaColors.LIGHT)[fullscreen ? 'blok' : 'bg'];
 
     window.__DDD_INITIAL_STATE__ = {
       theme: theme,
-      fullscreen: fullscreen
+      cameraTrack: cameraTrack
     };
 
     if (document.body) {
       document.body.setAttribute('data-theme', theme);
+      document.body.setAttribute('data-camera-track', cameraTrack.toLowerCase());
       document.body.setAttribute('data-fullscreen', String(fullscreen));
       document.body.setAttribute('data-page', routeSlug);
     }
@@ -234,11 +237,12 @@ export default async function RootLayout({
         <AppInitializer />
         <ClientEnhancements />
         <HeaderInitAnimation />
-        <main className="main">
-          <BlokHead projects={projects} />
+        <PortfolioViewport
+          header={<BlokHead projects={projects} />}
+          footer={<BlokFooter />}
+        >
           {children}
-          <BlokFooter />
-        </main>
+        </PortfolioViewport>
       </body>
     </html>
   );

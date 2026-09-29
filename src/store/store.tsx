@@ -7,24 +7,41 @@ import {
 
 export type Props = {
   theme: Theme;
+  cameraTrack: CameraTrack;
   fullscreen: boolean;
 };
 
+export type CameraTrack = 'FULLSCREEN' | 'STRUCTURE' | 'ANGLED';
+
+export const getNextCameraTrack = (track: CameraTrack): CameraTrack => {
+  switch (track) {
+    case 'FULLSCREEN':
+      return 'STRUCTURE';
+    case 'STRUCTURE':
+      return 'ANGLED';
+    case 'ANGLED':
+      return 'FULLSCREEN';
+  }
+};
+
 export type Actions = {
-  initializeUiState: (theme: Theme, fullscreen: boolean) => void;
+  initializeUiState: (theme: Theme, cameraTrack: CameraTrack) => void;
   setTheme: (theme: Theme) => void;
   cycleTheme: () => void;
-  setFullscreen: (fullscreen: boolean) => void;
+  setCameraTrack: (cameraTrack: CameraTrack) => void;
+  cycleCameraTrack: () => void;
 };
 
 export const useStore = create<Props & Actions>()((set) => ({
   // initial state
   theme: LIGHT_THEME,
+  cameraTrack: 'STRUCTURE',
   fullscreen: false,
-  initializeUiState: (theme, fullscreen) =>
+  initializeUiState: (theme, cameraTrack) =>
     set({
       theme,
-      fullscreen,
+      cameraTrack,
+      fullscreen: cameraTrack === 'FULLSCREEN',
     }),
   setTheme: (theme: Theme) => set({ theme }),
   cycleTheme: () =>
@@ -33,5 +50,11 @@ export const useStore = create<Props & Actions>()((set) => ({
 
       return { theme: nextTheme };
     }),
-  setFullscreen: (fullscreen) => set({ fullscreen }),
+  setCameraTrack: (cameraTrack) =>
+    set({ cameraTrack, fullscreen: cameraTrack === 'FULLSCREEN' }),
+  cycleCameraTrack: () =>
+    set((state) => {
+      const cameraTrack = getNextCameraTrack(state.cameraTrack);
+      return { cameraTrack, fullscreen: cameraTrack === 'FULLSCREEN' };
+    }),
 }));

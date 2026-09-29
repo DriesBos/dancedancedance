@@ -1,6 +1,6 @@
 'use client';
 
-import { useStore } from '@/store/store';
+import { useStore, type CameraTrack } from '@/store/store';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import BlokHeadRouteContent from './BlokHeadRouteContent';
@@ -19,72 +19,30 @@ const formatThemeLabel = (theme: string) =>
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
     .join(' ');
 
+const CAMERA_TRACK_LABELS: Record<CameraTrack, string> = {
+  FULLSCREEN: 'Fullscreen',
+  STRUCTURE: '3D structure',
+  ANGLED: 'Angled overview',
+};
+
 const BlokHeadRouteContentContainer = ({ projects }: Props) => {
-  const { theme, cycleTheme, fullscreen, setFullscreen } = useStore(
+  const { theme, cycleTheme, cameraTrack, cycleCameraTrack } = useStore(
     useShallow((state) => ({
       theme: state.theme,
       cycleTheme: state.cycleTheme,
-      fullscreen: state.fullscreen,
-      setFullscreen: state.setFullscreen,
+      cameraTrack: state.cameraTrack,
+      cycleCameraTrack: state.cycleCameraTrack,
     })),
   );
   const themeLabel = formatThemeLabel(theme);
-  const fullscreenLabel = fullscreen ? 'ON' : 'OFF';
+  const cameraTrackLabel = CAMERA_TRACK_LABELS[cameraTrack];
   const [isThemeSpinning, setIsThemeSpinning] = useState(false);
   const [isAboutMixedHovered, setIsAboutMixedHovered] = useState(false);
   const themeSpinTimeoutRef = useRef<number | null>(null);
-  const layoutToggleRafRef = useRef<number | null>(null);
-  const layoutToggleTimeoutRef = useRef<number | null>(null);
-
-  const toggleFullscreen = useCallback(() => {
-    const applyNextMode = () => {
-      setFullscreen(!fullscreen);
-    };
-
-    if (layoutToggleRafRef.current !== null) {
-      window.cancelAnimationFrame(layoutToggleRafRef.current);
-      layoutToggleRafRef.current = null;
-    }
-    if (layoutToggleTimeoutRef.current !== null) {
-      window.clearTimeout(layoutToggleTimeoutRef.current);
-      layoutToggleTimeoutRef.current = null;
-    }
-
-    if (window.scrollY <= 1) {
-      applyNextMode();
-      return;
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    let settled = false;
-    const settle = () => {
-      if (settled) return;
-      settled = true;
-
-      if (layoutToggleRafRef.current !== null) {
-        window.cancelAnimationFrame(layoutToggleRafRef.current);
-        layoutToggleRafRef.current = null;
-      }
-      if (layoutToggleTimeoutRef.current !== null) {
-        window.clearTimeout(layoutToggleTimeoutRef.current);
-        layoutToggleTimeoutRef.current = null;
-      }
-
-      applyNextMode();
-    };
-
-    const checkTop = () => {
-      if (window.scrollY <= 1) {
-        settle();
-        return;
-      }
-      layoutToggleRafRef.current = window.requestAnimationFrame(checkTop);
-    };
-
-    layoutToggleRafRef.current = window.requestAnimationFrame(checkTop);
-    layoutToggleTimeoutRef.current = window.setTimeout(settle, 1200);
-  }, [fullscreen, setFullscreen]);
+  const handleCycleCameraTrack = useCallback(() => {
+    if (window.matchMedia('(max-width: 770px)').matches) return;
+    cycleCameraTrack();
+  }, [cycleCameraTrack]);
 
   const handleCycleTheme = useCallback(() => {
     cycleTheme();
@@ -109,12 +67,6 @@ const BlokHeadRouteContentContainer = ({ projects }: Props) => {
       if (themeSpinTimeoutRef.current !== null) {
         window.clearTimeout(themeSpinTimeoutRef.current);
       }
-      if (layoutToggleRafRef.current !== null) {
-        window.cancelAnimationFrame(layoutToggleRafRef.current);
-      }
-      if (layoutToggleTimeoutRef.current !== null) {
-        window.clearTimeout(layoutToggleTimeoutRef.current);
-      }
     };
   }, []);
 
@@ -122,13 +74,13 @@ const BlokHeadRouteContentContainer = ({ projects }: Props) => {
     <BlokHeadRouteContent
       projects={projects}
       themeLabel={themeLabel}
-      fullscreen={fullscreen}
-      fullscreenLabel={fullscreenLabel}
+      cameraTrack={cameraTrack}
+      cameraTrackLabel={cameraTrackLabel}
       isThemeSpinning={isThemeSpinning}
       isAboutMixedHovered={isAboutMixedHovered}
       onAboutMixedHoverChange={setIsAboutMixedHovered}
       onCycleTheme={handleCycleTheme}
-      onToggleFullscreen={toggleFullscreen}
+      onCycleCameraTrack={handleCycleCameraTrack}
     />
   );
 };
