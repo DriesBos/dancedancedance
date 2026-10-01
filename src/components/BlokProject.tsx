@@ -88,7 +88,11 @@ const BlokProject = ({
         />
       )}
       {thumbnail?.filename && thumbnailDimensions ? (
-        <div className={styles.projectThumbnail}>
+        <div
+          className={`${styles.projectThumbnail} ${
+            thumbnailPriority ? styles.projectThumbnailFirst : ''
+          }`}
+        >
           <BlurImage
             src={thumbnail.filename}
             alt=""

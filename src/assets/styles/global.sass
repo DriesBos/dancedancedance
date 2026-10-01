@@ -579,6 +579,15 @@ body
   main
     & > .blok-Head
       z-index: 3
+  // Thumbnail-mode project rows are borderless by default. The compact stack
+  // below opts them back into borders only while fullscreen is false, which
+  // prevents the entrance stagger from briefly painting the base list lines.
+  &[data-page='home']
+    @media (orientation: portrait) and (pointer: coarse)
+      .page-General > .blok-ProjectList:has(> .blok-Project[data-project-list-stack-item='true'])
+        border: 0
+        & > .blok-Project[data-project-list-stack-item='true']
+          border: 0
   &[data-fullscreen="true"]
     padding-left: 0
     padding-right: 0
@@ -703,6 +712,10 @@ body
       // (set after hydration, ~700ms) made it pop in after the entrance ended.
       .side_Top
         opacity: 1
+      // Project item panels only belong to the portrait touch stack. Keep the
+      // general page panels visible without leaking these onto fine pointers.
+      .page-General > .blok-ProjectList > .blok-Project[data-project-list-stack-item='true'] > .side_Top
+        opacity: 0
       @media (orientation: portrait) and (pointer: coarse)
         .page-General > .blok-ProjectList
           &:has(> .blok-Project[data-project-list-stack-item='true'])
@@ -714,14 +727,14 @@ body
               display: none
             & > .side_Top
               opacity: 0
+            & > .blok-Project[data-project-list-stack-item='true']
+              border: var(--border-width) solid currentColor
+            & > .blok-Project[data-project-list-stack-item='true']:last-child
+              border-bottom-width: 0
+            & > .blok-Project[data-project-list-stack-item='true'] + .blok-Project[data-project-list-stack-item='true']
+              margin-top: calc(0px - var(--border-width))
           & > .blok-Project[data-project-list-stack-item='true'] > .side_Top
             opacity: 1
-          & > .blok-Project[data-project-list-stack-item='true']
-            border: var(--border-width) solid currentColor
-          & > .blok-Project[data-project-list-stack-item='true']:last-child
-            border-bottom-width: 0
-          & > .blok-Project[data-project-list-stack-item='true'] + .blok-Project[data-project-list-stack-item='true']
-            margin-top: calc(0px - var(--border-width))
       main[data-stack-timeline-ready='true']
         .blok-Footer
           margin-top: 0
@@ -742,8 +755,10 @@ body
     @media (orientation: portrait) and (pointer: coarse)
       .page-General > .blok-ProjectList:has(> .blok-Project[data-project-list-stack-item='true'])
         border: 0
+        transition: padding-top var(--theme-transition), background var(--theme-transition), background-color var(--theme-transition), box-shadow var(--theme-transition), perspective-origin var(--transition-layout-duration)
         & > .blok-Project[data-project-list-stack-item='true']
           border: 0
+          transition: padding-top var(--theme-transition), background var(--theme-transition), background-color var(--theme-transition), box-shadow var(--theme-transition), perspective-origin var(--transition-layout-duration)
   &[data-theme='NIGHT']
     @media (hover: hover)
       :where(.blok-Project, .column-Image, a, button):hover .imageItem,

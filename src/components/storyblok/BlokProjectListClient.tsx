@@ -94,6 +94,9 @@ export default function BlokProjectListClient({
   }, [projects, searchValue, sortDirection, sortField]);
   const isSearching = searchValue.trim().length > 0;
   const hasNoSearchResults = isSearching && visibleProjects.length === 0;
+  const firstThumbnailIndex = visibleProjects.findIndex(
+    (project) => Boolean(project.thumbnail?.filename),
+  );
 
   const createThumbnailEvent = useCallback((projectSlug: string) => {
     const id = thumbnailEventIdRef.current + 1;
@@ -143,7 +146,7 @@ export default function BlokProjectListClient({
               title={item.title}
               category={item.category}
               thumbnail={item.thumbnail}
-              thumbnailPriority={index === 0}
+              thumbnailPriority={index === firstThumbnailIndex}
               stackTimelineItem
               external_link={item.external_link}
               onProjectHover={() => showProjectThumbnail(item)}
