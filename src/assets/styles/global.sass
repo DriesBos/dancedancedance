@@ -706,9 +706,12 @@ body
       @media (orientation: portrait) and (pointer: coarse)
         .page-General > .blok-ProjectList
           &:has(> .blok-Project[data-project-list-stack-item='true'])
+            background: transparent
             border-top-width: 0
             border-right-width: 0
             border-left-width: 0
+            & > .grainyGradient
+              display: none
             & > .side_Top
               opacity: 0
           & > .blok-Project[data-project-list-stack-item='true'] > .side_Top
@@ -735,6 +738,12 @@ body
         [data-stack-timeline='true'] > .side_Top,
         .blok-Footer > .side_Top
           transition: background var(--theme-transition)
+  &[data-fullscreen='true'][data-page='home']
+    @media (orientation: portrait) and (pointer: coarse)
+      .page-General > .blok-ProjectList:has(> .blok-Project[data-project-list-stack-item='true'])
+        border: 0
+        & > .blok-Project[data-project-list-stack-item='true']
+          border: 0
   &[data-theme='NIGHT']
     @media (hover: hover)
       :where(.blok-Project, .column-Image, a, button):hover .imageItem,
