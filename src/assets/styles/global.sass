@@ -667,6 +667,8 @@ body
     @media (orientation: portrait)
       padding-bottom: calc(var(--spacing-side) + env(safe-area-inset-bottom))
     @media (max-width: 770px)
+      .column-Icons_NextPrev .projectNumber
+        display: none
       .page-Project .row[data-column-behaviour='none']:has(> :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider):first-child):has(> :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider):nth-child(2):last-child)
         & > :where(.column-Image, .column-Thumbnail, .column-Video, .column-Slider):first-child
           padding-right: 0

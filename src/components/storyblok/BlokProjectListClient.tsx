@@ -135,13 +135,15 @@ export default function BlokProjectListClient({
         {hasNoSearchResults ? (
           <BlokProject title="No work found.." />
         ) : (
-          visibleProjects.map((item) => (
+          visibleProjects.map((item, index) => (
             <BlokProject
               key={item.slug}
               slug={item.slug}
               year={item.year}
               title={item.title}
               category={item.category}
+              thumbnail={item.thumbnail}
+              thumbnailPriority={index === 0}
               external_link={item.external_link}
               onProjectHover={() => showProjectThumbnail(item)}
               onProjectLeave={() => clearActiveProject(item.slug)}
