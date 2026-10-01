@@ -11,6 +11,8 @@ gsap.registerPlugin(ScrollTrigger);
 const STACK_LIFT = '--stack-lift';
 const STACK_Z = '--stack-z';
 const STACK_SCRUB_SECONDS = 0.8;
+const PROJECT_ITEM_STACK_MEDIA_QUERY =
+  '(orientation: portrait) and (pointer: coarse)';
 
 const isStackTimelinePath = (pathname: string | null) =>
   pathname === '/' ||
@@ -25,6 +27,14 @@ const getParticipants = (pathname: string | null) => {
   if (!page) return [];
 
   if (pathname === '/') {
+    if (window.matchMedia(PROJECT_ITEM_STACK_MEDIA_QUERY).matches) {
+      return Array.from(
+        page.querySelectorAll<HTMLElement>(
+          ':scope > .blok-Intro, :scope > .blok-Filter, :scope > .blok-ProjectList > .blok-Project[data-project-list-stack-item="true"]',
+        ),
+      );
+    }
+
     return Array.from(
       page.querySelectorAll<HTMLElement>(
         ':scope > .blok-Intro, :scope > .blok-Filter, :scope > .blok-ProjectList',
@@ -170,17 +180,30 @@ const StackTimelineBehavior = () => {
     const page = document.querySelector<HTMLElement>(
       '.page-General, .page-Project',
     );
+    const projectList = page?.querySelector<HTMLElement>(
+      ':scope > .blok-ProjectList',
+    );
     const resizeObserver = new ResizeObserver(refresh);
+    const projectListObserver = new MutationObserver(refresh);
+    const projectItemMediaQuery = window.matchMedia(
+      PROJECT_ITEM_STACK_MEDIA_QUERY,
+    );
     if (page) resizeObserver.observe(page);
+    if (projectList) {
+      projectListObserver.observe(projectList, { childList: true });
+    }
 
     window.addEventListener('resize', refresh);
+    projectItemMediaQuery.addEventListener('change', refresh);
     document.fonts?.ready.then(refresh);
     refresh();
 
     return () => {
       cancelled = true;
       resizeObserver.disconnect();
+      projectListObserver.disconnect();
       window.removeEventListener('resize', refresh);
+      projectItemMediaQuery.removeEventListener('change', refresh);
       killTimeline();
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);

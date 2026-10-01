@@ -144,6 +144,7 @@ export default function BlokProjectListClient({
               category={item.category}
               thumbnail={item.thumbnail}
               thumbnailPriority={index === 0}
+              stackTimelineItem
               external_link={item.external_link}
               onProjectHover={() => showProjectThumbnail(item)}
               onProjectLeave={() => clearActiveProject(item.slug)}

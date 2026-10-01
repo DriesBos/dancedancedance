@@ -6,6 +6,7 @@ import { useRef, useCallback } from 'react';
 import IconArrow from '@/components/Icons/IconArrow';
 import Row from './Row';
 import IconLinkOutside from './Icons/IconLinkOutside';
+import BlokSidePanels from './BlokSidePanels/BlokSidePanels';
 import GrainyGradient from '@/components/GrainyGradient/GrainyGradient';
 import ColorBurstText from '@/components/ColorBurstTypography/ColorBurstText';
 import BlurImage from '@/components/BlurImage';
@@ -24,6 +25,7 @@ interface Props {
   category?: string[];
   thumbnail?: ProjectData['thumbnail'];
   thumbnailPriority?: boolean;
+  stackTimelineItem?: boolean;
   external_link?: { cached_url: string };
   onProjectHover?: () => void;
   onProjectLeave?: () => void;
@@ -36,6 +38,7 @@ const BlokProject = ({
   category,
   thumbnail,
   thumbnailPriority = false,
+  stackTimelineItem = false,
   external_link,
   onProjectHover,
   onProjectLeave,
@@ -69,11 +72,13 @@ const BlokProject = ({
   return (
     <div
       className="blok blok-Project"
+      data-project-list-stack-item={stackTimelineItem ? true : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={onProjectLeave}
       onTouchStart={prefetchProject}
     >
       <GrainyGradient variant="blok" />
+      {stackTimelineItem ? <BlokSidePanels /> : null}
       {href && (
         <Link
           href={href}

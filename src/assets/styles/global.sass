@@ -703,6 +703,22 @@ body
       // (set after hydration, ~700ms) made it pop in after the entrance ended.
       .side_Top
         opacity: 1
+      @media (orientation: portrait) and (pointer: coarse)
+        .page-General > .blok-ProjectList
+          &:has(> .blok-Project[data-project-list-stack-item='true'])
+            border-top-width: 0
+            border-right-width: 0
+            border-left-width: 0
+            & > .side_Top
+              opacity: 0
+          & > .blok-Project[data-project-list-stack-item='true'] > .side_Top
+            opacity: 1
+          & > .blok-Project[data-project-list-stack-item='true']
+            border: var(--border-width) solid currentColor
+          & > .blok-Project[data-project-list-stack-item='true']:last-child
+            border-bottom-width: 0
+          & > .blok-Project[data-project-list-stack-item='true'] + .blok-Project[data-project-list-stack-item='true']
+            margin-top: calc(0px - var(--border-width))
       main[data-stack-timeline-ready='true']
         .blok-Footer
           margin-top: 0
