@@ -356,7 +356,8 @@ export default function ThumbnailWrapper({
       );
 
       setHoverThumbnails((items) => [
-        ...items,
+        // Replace this project's previous thumbnail, including one still exiting.
+        ...items.filter((item) => item.projectSlug !== hoverEvent.projectSlug),
         {
           id,
           projectSlug: hoverEvent.projectSlug,
