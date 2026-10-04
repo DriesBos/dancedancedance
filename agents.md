@@ -8,6 +8,14 @@
 - Do not add reduced motion preference handling (`prefers-reduced-motion`); this project intentionally keeps motion enabled unless the user explicitly asks otherwise.
 - Don't push to main unless specifically asked to do so.
 
+## Sprint Branch And Release Workflow
+
+- Work on `develop`; use a draft PR into `main` for previews.
+- After preview review and required checks, release only when explicitly requested: merge into `main` with a merge commit and keep `develop`.
+- Merge any hotfixes on `main` back into `develop`.
+- Keep Netlify's production branch set to `main`. Use one production deployment system; check for duplicate Netlify Git and GitHub Actions deployment triggers before changing deployment settings.
+- Batch production releases to conserve Netlify credits; do not publish each intermediate change.
+
 ## Deploy Checks
 
 - Netlify site id: `413466f9-c196-4d8d-8058-b83cda25c765`.
